@@ -1,90 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{title}}</title>
+    <title>Laundree.io{{#each title}} - {{this}}{{/each}}</title>
     <link href='https://fonts.googleapis.com/css?family=Open+Sans:300,700,400,400italic&subset=latin,latin-ext'
           rel='stylesheet' type='text/css'>
-    <link rel='stylesheet' href='/stylesheets/style.css'/>
+    {{#each styles}}
+        <link rel="stylesheet" href="{{this}}"/>
+    {{/each}}
 </head>
 <body>
 <div id="Container">
-
-    <nav>
-        <a href="#">Who are we?</a>
-        <a href="#" class="sign-in">Sign in</a>
-        <a href="#" class="language">English</a>
-    </nav>
-    <header>
-        <div>
-            <a href="https://laundree.io"><img src="/images/logo.svg" id="Logo"/></a>
-            <h2>An easy and free booking system for your laundry.</h2>
-        </div>
-        <div>
-            <video src="/videos/v6.mov" reload="auto" loop="loop" autoplay></video>
-        </div>
-    </header>
-
-    <main>
-        <div id="BackgroundArt">
-        </div>
-        <section id="QuickStart">
-            <h1>
-                Sign up your laundry in three easy steps. <br/>It's 100% free!
-            </h1>
-            <ul>
-                <li>
-                    <h2>Create</h2>
-                    Create a <a href="https://laundree.io">Laundree</a> account using your e-mail address.<br/>
-                    Don’t worry, we wont spam you or anything.
-                </li>
-                <li>
-                    <h2>Register</h2>
-                    Register your laundry with its washing machines and dryers.<br/>
-                    You can register as many as you want!
-                </li>
-                <li>
-                    <h2>Invite</h2>
-                    Invite your tenants to use laundree.<br/>
-                    All you need is their e-mail addresses.
-                </li>
-            </ul>
-        </section>
-        <section id="StartDemo">
-            <h1>
-                ... or spin up a live demo before you decide.
-            </h1>
-            <div>
-                <img src="/images/start-machine.svg"/>
-            </div>
-        </section>
-    </main>
+    {{#unless no_nav}}
+        <nav>
+            {{#if compact_nav }}
+                <a href="/">
+                    <img src="/images/logo-small.svg">
+                </a>
+            {{/if}}
+            <a href="#">Who are we?</a>
+            <a href="#">Contact us.</a>
+            <a href="/sign-in" class="sign-in">Sign in</a>
+            <a href="#" class="language">English</a>
+        </nav>
+    {{/unless}}
+    {{{ body }}}
 </div>
 <footer>
     <ul>
         <li>
             <img src="/images/iconmonstr-brick-8.svg"/>
-            Created by<br/>
-            Christian Budde Christensen <br/>
-            Malene Sjørslev Søholm<br/>
-            in<br/>
+            Created by
+            Christian Budde Christensen
+            Malene Sjørslev Søholm
+            in
             <a href="https://en.wikipedia.org/wiki/Aarhus" target="_blank">Aarhus, Denmark</a>
         </li>
         <li>
-            <img src="/images/iconmonstr-paypal-1.svg"/>
-            Do you want to help us keep the servers running at full throttle?<br/>
-            Then feel free to donate via <br/>
-            <br/>
-            <a href="#" target="_blank">PayPal</a>
-        </li>
-        <li>
-
+            <img src="/images/iconmonstr-email-13.svg"/>
+            Want to know more? Please contact and we'll try our best
+            to reply in a timely manner. You can find our contact
+            details at the
+            <a href="/contact">Contact page</a>
         </li>
         <li>
             <img src="/images/iconmonstr-github-1.svg"/>
-            Laundree is 100% open-source and any contribution is highly appreciated<br/>
-            File an issue, create a pull-request, <br/> or fork us on<br/>
+            Laundree is 100% open-source and any contribution is highly appreciated
+            File an issue, create a pull-request, or fork us on
             <a href="https://github.com/laundree/laundree" target="_blank">GitHub</a>
         </li>
+        <li>
+            <img src="/images/iconmonstr-paypal-1.svg"/>
+            Do you want to help us keep the servers running at full throttle?
+            Then feel free to donate via
+            <a href="#" target="_blank">PayPal</a>
+        </li>
+
     </ul>
 </footer>
 </body>
