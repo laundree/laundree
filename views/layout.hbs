@@ -10,20 +10,43 @@
 </head>
 <body>
 <div id="Container">
-    {{#unless no_nav}}
+    {{#unless no_top}}
         <nav>
-            {{#if compact_nav }}
-                <a href="/">
-                    <img src="/images/logo-small.svg">
-                </a>
-            {{/if}}
-            <a href="#">Who are we?</a>
+            <a href="/" class="home"> </a>
+            <a href="/about">Who are we?</a>
             <a href="#">Contact us.</a>
             <a href="/sign-in" class="sign-in">Sign in</a>
-            <a href="#" class="language">English</a>
+            <div class="language">
+                <span>English</span>
+                <ul>
+                    <li><a href="#">English</a></li>
+                    <li><a href="#">Danish</a></li>
+                </ul>
+
+            </div>
         </nav>
+        {{#if compact_top }}
+            <header class="compact">
+                <a href="/">
+                </a>
+
+            </header>
+        {{else}}
+            <header>
+                <div>
+                    <a href="/"><img src="/images/logo-2.svg" id="Logo"/></a>
+                    <h2>An easy and free booking system for your laundry.</h2>
+                </div>
+                <div>
+                    <video src="/videos/v13.mov" reload="auto" loop="loop" autoplay></video>
+                </div>
+            </header>
+        {{/if}}
+
     {{/unless}}
-    {{{ body }}}
+    <main>
+        {{{ body }}}
+    </main>
 </div>
 <footer>
     <ul>

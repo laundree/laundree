@@ -4,6 +4,12 @@
   -ms-border-radius: $radius
   border-radius: $radius
 
+=transition($prop)
+  -webkit-transition: $prop
+  -moz-transition: $prop
+  -o-transition: $prop
+  transition: $prop
+
 html, body
   height: 100%
 
@@ -70,12 +76,19 @@ nav
   height: 2em
   background-color: #E55564
 
-  img
-    height: 6em
-    float: left
-    margin: -1.7em 0
+  a.home
+    background: #E5954C url("/images/logo-small-2.svg") no-repeat center center
+    background-size: 0.9em
+    margin: 0
+    display: block
+    width: 2em
+    height: 2em
+    font-size: 1em
+    padding: 0
 
-  a
+
+
+  a, span
     line-height: 2.5em
     font-size: 0.8em
     color: #ffffff
@@ -85,11 +98,33 @@ nav
     margin: 0 1em
     font-weight: bold
 
-  a.language
+  div.language
     float: right
-    background: transparent url("/images/arrow-down.svg") no-repeat left center
-    padding-left: 1.5em
-    background-size: 1em
+    font-size: 0.8em
+    > span
+      background: transparent url("/images/arrow-down.svg") no-repeat left center
+    a, span
+      padding-left: 1.5em
+      background-size: 1em
+      font-size: 1em
+    ul
+      overflow: hidden
+      opacity: 0
+      height: 0
+      list-style-type: none
+      position: absolute
+      z-index: 11
+      top: 2.5em
+      background-color: #E55564
+      border-radius: 0 0 0.4em 0.4em
+      +transition(0.3s opacity)
+
+    &:hover
+      > span
+        opacity: 0.4
+      ul
+        opacity: 1
+        height: auto
 
   a.sign-in
     float: right
@@ -104,9 +139,60 @@ nav
     &:hover
       background: #f3a34e
 
+header.compact
+  img
+    width: 11em
+
+header:not(.compact)
+  position: relative
+  background: #F3FCFF
+  overflow: hidden
+  div:first-of-type
+    padding: 5em 0
+    z-index: 10
+    position: relative
+
+    a
+      width: 15em
+      margin: auto
+      display: block
+      img
+        display: block
+
+    h2
+      display: block
+      font-family: 'Open Sans', sans-serif
+      font-style: italic
+      font-weight: 400
+      font-size: 1em
+
+      margin: auto
+      text-align: center
+      padding: 1em 0
+      color: #ffffff
+
+  $height: 26em
+  $ratio: 1920/1080
+  $width: $height*$ratio
+
+  div:last-of-type
+    z-index: 0
+    top: 0
+    left: 0
+    right: 0
+    position: absolute
+    height: 100%
+    video
+      height: auto
+      width: 100%
+
+      @media (max-width: $width)
+        height: 100%
+        width: auto
+
 h1
   color: #ffffff
-  font-weight: 400
+  font-weight: 300
   font-size: 1.5em
   text-align: center
   padding: 1em 0

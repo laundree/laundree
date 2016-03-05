@@ -1,9 +1,9 @@
 var express = require('express')
 var router = express.Router()
 
-/* GET users listing. */
+/* GET home page. */
 router.get('/', (req, res) => {
-  res.render('sign-in', {title: ['Sign-in'], no_top: true, styles: ['/stylesheets/sign-in.css']})
+  res.render('about', {title: ['Home'], styles: ['/stylesheets/about.css'], compact_top: true})
 })
 
 module.exports = router

@@ -1,57 +1,5 @@
 @import "style.sass"
 
-=transition($prop)
-  -webkit-transition: $prop
-  -moz-transition: $prop
-  -o-transition: $prop
-  transition: $prop
-
-header
-  position: relative
-  background: #F3FCFF
-  overflow: hidden
-  div:first-of-type
-    padding: 5em 0
-    z-index: 10
-    position: relative
-
-    a
-      width: 15em
-      margin: auto
-      display: block
-      img
-        display: block
-
-    h2
-      font-family: 'Open Sans', sans-serif
-      font-style: italic
-      font-weight: 400
-      font-size: 1em
-      display: block
-      margin: auto
-      text-align: center
-      padding: 1em 0
-      color: #ffffff
-
-  $height: 26em
-  $ratio: 1920/1080
-  $width: $height*$ratio
-
-  div:last-of-type
-    z-index: 0
-    top: 0
-    left: 0
-    right: 0
-    position: absolute
-    height: 100%
-    video
-      height: auto
-      width: 100%
-
-      @media (max-width: $width)
-        height: 100%
-        width: auto
-
 main
   margin: auto
   border-top: 0.5em solid #7FECEC
