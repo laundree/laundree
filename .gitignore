@@ -34,4 +34,4 @@ public/stylesheets/*.css.map
 .idea
 
 *.ai
-*.mov
+public/videos
