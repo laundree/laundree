@@ -5,8 +5,11 @@ var logger = require('morgan')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 
-var routes = require('./routes/index')
-var users = require('./routes/users')
+var promo_route = require('./routes/promo')
+var index_route = require('./routes/index')
+var sign_in = require('./routes/sign-in')
+var about = require('./routes/about')
+var book = require('./routes/book')
 
 var app = express()
 
@@ -27,9 +30,11 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }))
 app.use(express.static(path.join(__dirname, 'public')))
-
-app.use('/', routes)
-app.use('/users', users)
+app.use('/', promo_route)
+app.use('/index', index_route)
+app.use('/sign-in', sign_in)
+app.use('/about', about)
+app.use('/book', book)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

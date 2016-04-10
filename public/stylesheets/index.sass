@@ -1,0 +1,71 @@
+@import "style.sass"
+
+main
+  margin: auto
+  border-top: 0.5em solid #7FECEC
+
+  #BackgroundArt
+    background:
+      image: url(/images/boxers.svg), url(/images/sock.svg), url(/images/tshirt.svg)
+      size: 11em, 8em, 16em
+      repeat: no-repeat
+      position: 7% 40%, 90% 10%, 94% 70%
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+    z-index: 0
+    +transition(opacity 0.1s)
+    @media (max-width: 69em)
+      opacity: 0.2
+  a
+    color: #d58948
+    font-weight: 700
+
+  section
+    position: relative
+    z-index: 1
+
+    h1
+      text-align: center
+      padding: 1em 0 2em
+
+    ul
+      list-style-type: none
+
+      li
+        font-size: 1em
+        padding: 2em 0 2.4em 8em
+        max-width: 28em
+        margin: auto
+        background-repeat: no-repeat
+        background-size: 4em
+        background-position: left center
+
+        h2
+          font-weight: 700
+          text-transform: uppercase
+          font-size: 1.1em
+          line-height: 2em
+
+        &:nth-of-type(1)
+          background-image: url('/images/step-1.svg')
+
+        &:nth-of-type(2)
+          background-image: url('/images/step-2.svg')
+
+        &:nth-of-type(3)
+          background-image: url('/images/step-3.svg')
+
+  section#StartDemo
+    div
+      padding: 2em 0
+
+      a
+        width: 10em
+        margin: auto
+        display: block
+
+        img
+          display: block

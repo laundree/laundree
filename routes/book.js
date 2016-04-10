@@ -1,9 +1,8 @@
 var express = require('express')
 var router = express.Router()
 
-/* GET users listing. */
 router.get('/', (req, res) => {
-  res.send('respond with a resource')
+  res.render('book', {title: ['Book'], styles: ['/stylesheets/book.css'], compact_top: true})
 })
 
 module.exports = router
