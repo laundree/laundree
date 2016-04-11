@@ -4,7 +4,7 @@ var router = express.Router()
 /* GET home page. */
 router.get('/', (req, res) => {
   res.render('promo', {
-    title: ['Laundree.io'],
+    title: [],
     no_top: true,
     no_footer: true,
     styles: ['/stylesheets/promo.css']
