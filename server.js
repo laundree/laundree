@@ -5,7 +5,8 @@
 var app = require('./app')
 var debug = require('debug')('laundree:server')
 var http = require('http')
-
+var socketIo = require('socket.io')
+var redis = require('socket.io-redis')
 /**
  * Get port from environment and store in Express.
  */
@@ -16,8 +17,17 @@ app.set('port', port)
 /**
  * Create HTTP server.
  */
-
 var server = http.createServer(app)
+
+var io = socketIo(server)
+
+if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
+  var config = {
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
+  }
+  io.adapter(redis(config))
+}
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -26,6 +36,12 @@ module.exports.start = function () {
   server.listen(port)
   server.on('error', onError)
   server.on('listening', onListening)
+  // Socket.io
+  io.on('connection', (socket) => {
+    socket.on('message', (data) => {
+      io.sockets.emit('message', data)
+    })
+  })
 }
 
 /**
