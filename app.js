@@ -10,7 +10,7 @@ var index_route = require('./routes/index')
 var sign_in = require('./routes/sign-in')
 var about = require('./routes/about')
 var book = require('./routes/book')
-var jsRouter = require('./routes/js')
+var jsRouter = require('./routes/javascripts')
 
 var app = express()
 
@@ -36,7 +36,7 @@ app.use('/index', index_route)
 app.use('/sign-in', sign_in)
 app.use('/about', about)
 app.use('/book', book)
-app.use('/', jsRouter)
+app.use('/javascripts', jsRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -10,6 +10,9 @@ browserify.settings({
   standalone: 'Laundree'
 })
 
-router.get('/javascripts/bundle.js', browserify(path.join(__dirname, '../client/index.js')))
+router.get('/bundle.js', browserify(path.join(__dirname, '../client/index.js'), {
+  cache: true,
+  precompile: true
+}))
 
 module.exports = router
