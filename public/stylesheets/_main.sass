@@ -21,7 +21,7 @@ body
   font-size: 11pt
   font-weight: 300
   background: #66D3D3
-  min-width: 30em
+  min-width: 20em
   position: relative
   padding-bottom: $footer_height
 
@@ -73,30 +73,49 @@ div#Container
   min-height: 100%
 
 nav
-  height: 2em
+  height: 4em
   background-color: #E55564
 
   a.home
     background: #E5954C url("/images/logo-small-2.svg") no-repeat center center
-    background-size: 0.9em
+    background-size: 1em
     margin: 0
     display: block
-    width: 2em
-    height: 2em
-    font-size: 1em
+    width: 4em
+    height: 4em
     padding: 0
 
-
-
   a, span
-    line-height: 2.5em
-    font-size: 0.8em
+    line-height: 4em
     color: #ffffff
     display: block
     float: left
     padding: 0 0.5em
-    margin: 0 1em
-    font-weight: bold
+    margin: 0 2em
+    font-weight: normal
+
+  a.icon
+    +transition(0.1s opacity)
+    background:
+      size: 1.2em
+      repeat: no-repeat
+      position-x: 0
+      position-y: 50%
+    padding-left: 1.9em
+
+    &:hover
+      text-decoration: none
+      opacity: 0.7
+
+
+  a.contact
+    background-image: url(/images/iconmonstr-email-4.svg)
+
+  a.help
+    background-image: url(/images/iconmonstr-lifebuoy-1.svg)
+
+  a.about
+    background-image: url(/images/iconmonstr-info-7.svg)
 
   div.language
     float: right
@@ -128,16 +147,43 @@ nav
 
   a.sign-in
     float: right
+    text-transform: uppercase
     background: #E5954C
-    height: 1.8em
-    margin: 0.35em 1em
-    line-height: 1.8em
-    padding: 0 2em
-    +border-radius(0.3em)
+    height: 3em
+    margin: 0.5em 1em
+    line-height: 3em
+    padding: 0 3em
+    +border-radius(0.1em)
     transition: 0.1s background
     text-decoration: none
     &:hover
       background: #f3a34e
+
+
+@media only screen and (max-width: 45em)
+  nav
+    a.icon
+      width: 2.2em
+      margin: 0 0.5em
+      height: 4em
+      padding: 0
+      background-position-x: 50%
+      color: transparent
+      overflow: hidden
+
+@media only screen and (max-width: 30em)
+  nav
+    a.sign-in
+      margin: 0.5em
+      padding: 0 1em
+
+
+@media only screen and (max-width: 25em)
+  nav
+    a.sign-in
+      margin: 0.5em 0
+      padding: 0 1em
+
 
 header.compact
   img
@@ -148,7 +194,7 @@ header:not(.compact)
   background: #F3FCFF
   overflow: hidden
   div:first-of-type
-    padding: 5em 0
+    padding: 8em 0
     z-index: 10
     position: relative
 
@@ -171,7 +217,7 @@ header:not(.compact)
       padding: 1em 0
       color: #ffffff
 
-  $height: 21em
+  $height: 25.6em
   $ratio: 1920/1080
   $width: $height*$ratio
 
@@ -182,6 +228,10 @@ header:not(.compact)
     right: 0
     position: absolute
     height: 100%
+    background:
+      color: #ffffff
+      image: url(/videos/v13-snap.png)
+      size: cover
     video
       height: auto
       width: 100%
@@ -223,7 +273,7 @@ footer
     li
       color: #69e7e7
       padding: 2em 1%
-      font-size: 0.9em
+      font-size: 1em
       width: (100% / 4) - 2
       float: left
       text-align: center
@@ -231,3 +281,16 @@ footer
       img
         display: block
         margin: 2em auto
+
+@media only screen and (max-width: 45em)
+  body
+    padding-bottom: $footer_height * 4
+
+  footer
+    height: $footer_height * 4
+    ul
+      li
+        float: none
+        margin: auto
+        width: 60%
+        height: 16em
