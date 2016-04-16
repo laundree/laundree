@@ -1,0 +1,81 @@
+<main>
+    <a href="/">
+        <svg id="Logo">
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Logo"></use>
+        </svg>
+    </a>
+    <ul id="StepList">
+        <li>
+            <svg class="step">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Step1"></use>
+            </svg>
+        </li>
+        <li class="dots">
+            <svg>
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dots"></use>
+            </svg>
+        </li>
+        <li>
+            <svg class="step inactive">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Step2"></use>
+            </svg>
+        </li>
+        <li class="dots">
+            <svg>
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dots"></use>
+            </svg>
+        </li>
+        <li>
+            <svg class="step inactive">
+                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Step3"></use>
+            </svg>
+        </li>
+    </ul>
+    <section id="CreateAccount">
+        <h1>
+            Create an account
+        </h1>
+        <form>
+            <label>
+                <input type="text" placeholder="Full name"/>
+            </label>
+            <label>
+                <input type="text" placeholder="E-mail address"/>
+            </label>
+            <label>
+                <input type="password" placeholder="Password"/>
+            </label>
+            <label>
+                <input type="checkbox"/>
+                Accept terms and conditions
+            </label>
+            <div class="buttons">
+                <button class="prev inactive">Previous</button>
+                <button class="next">Next</button>
+            </div>
+        </form>
+    </section>
+    <section id="RegisterMachines" hidden>
+        <h1>
+            Register your machines
+        </h1>
+        <form>
+            <ul>
+                <li>
+                    <div class="select_machine select open">
+                        <span class="value"></span>
+                        <input type="hidden" name="type"/>
+                        <ul>
+                            <li>
+                                Bob1
+                            </li>
+                        </ul>
+                    </div>
+                    <label>
+                        <input type="text"/>
+                    </label>
+                </li>
+            </ul>
+        </form>
+    </section>
+</main>

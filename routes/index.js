@@ -1,9 +1,12 @@
-var express = require('express')
-var router = express.Router()
+/**
+ * Created by budde on 16/04/16.
+ */
 
-/* GET home page. */
-router.get('/', (req, res) => {
-  res.render('index', {title: ['Home'], styles: ['/stylesheets/index.css']})
-})
-
-module.exports = router
+module.exports = {
+  homeRoute: require('./home'),
+  aboutRoute: require('./about'),
+  javaScriptsRoute: require('./javascripts'),
+  promoRoute: require('./promo'),
+  signInRoute: require('./sign-in'),
+  signUpRoute: require('./sign-up')
+}

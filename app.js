@@ -5,12 +5,7 @@ var logger = require('morgan')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 
-var promo_route = require('./routes/promo')
-var index_route = require('./routes/index')
-var sign_in = require('./routes/sign-in')
-var about = require('./routes/about')
-var book = require('./routes/book')
-var jsRouter = require('./routes/javascripts')
+var routes = require('./routes')
 
 var app = express()
 
@@ -31,12 +26,12 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }))
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/', promo_route)
-app.use('/index', index_route)
-app.use('/sign-in', sign_in)
-app.use('/about', about)
-app.use('/book', book)
-app.use('/javascripts', jsRouter)
+app.use('/', routes.promoRoute)
+app.use('/home', routes.homeRoute)
+app.use('/sign-in', routes.signInRoute)
+app.use('/sign-up', routes.signUpRoute)
+app.use('/about', routes.aboutRoute)
+app.use('/javascripts', routes.javaScriptsRoute)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -50,22 +45,24 @@ app.use(function (req, res, next) {
 // development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
-  app.use((err, req, res) => {
+  app.use((err, req, res, next) => {
     res.status(err.status || 500)
     res.render('error', {
       message: err.message,
-      error: err
+      error: err,
+      styles: ['/stylesheets/error.css']
     })
   })
 }
 
 // production error handler
 // no stacktraces leaked to user
-app.use((err, req, res) => {
+app.use((err, req, res, next) => {
   res.status(err.status || 500)
   res.render('error', {
     message: err.message,
-    error: {}
+    error: {},
+    styles: ['/stylesheets/error.css']
   })
 })
 
