@@ -1,0 +1,47 @@
+@import "main"
+
+main
+  padding: 4em 0
+  #Logo
+    width: 15em
+    height: logo_ratio_w_to_h(15em)
+    margin: auto
+    display: block
+
+  #StepList
+    list-style-type: none
+    margin: auto
+    display: block
+    width: 22em
+    padding: 5em 0 0
+    height: 3em
+    li
+      float: left
+
+    li.dots
+      svg
+        fill: #D1D1D1
+        width: 5.5em
+        height: 0.5em
+        padding: 1.25em 0.5em
+        display: block
+
+    li:not(.dots)
+      svg
+        width: 3em
+        height: 3em
+        display: block
+
+main
+  form
+    width: 23em
+    margin: auto
+    .buttons
+      padding-top: 1em
+      .next
+        float: right
+
+#RegisterMachines
+  form
+    > ul
+      list-style-type: none

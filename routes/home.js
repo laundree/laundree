@@ -1,8 +1,9 @@
 var express = require('express')
 var router = express.Router()
 
+/* GET home page. */
 router.get('/', (req, res) => {
-  res.render('book', {title: ['Book'], styles: ['/stylesheets/book.css'], compact_top: true})
+  res.render('home', {title: ['Home'], styles: ['/stylesheets/home.css']})
 })
 
 module.exports = router

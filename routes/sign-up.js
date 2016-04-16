@@ -3,11 +3,7 @@ var router = express.Router()
 
 /* GET users listing. */
 router.get('/', (req, res) => {
-  res.render('sign-in', {
-    title: ['Sign-in'],
-    no_nav: true,
-    styles: ['/stylesheets/sign-in.css']
-  })
+  res.render('sign-up', {title: ['Sign-up'], no_header: true, styles: ['/stylesheets/sign-up.css']})
 })
 
 module.exports = router

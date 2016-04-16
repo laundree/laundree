@@ -1,20 +1,25 @@
-<section>
-    <form id="SignIn">
-        <h1>Sign-in to</h1>
-        <a href="/" id="Logo">
-            <img src="/images/logo-2.svg"/>
-        </a>
-        <label>
-            E-mail address
-            <input type="text">
-        </label>
-        <label>
-            Password
-            <input type="password">
-        </label>
-        <a href="/" class="forgot">
-            Forgot your password?
-        </a>
-        <input type="submit" value="Sign-in"/>
-    </form>
-</section>
+<main>
+
+    <section>
+        <form id="SignIn">
+            <h1>Sign-in to</h1>
+            <a href="/" id="Logo">
+                <svg id="Logo">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Logo"></use>
+                </svg>
+            </a>
+            <label>
+                <input type="text" name="name" placeholder="E-mail address">
+            </label>
+            <label>
+                <input type="password" name="password" placeholder="Password">
+            </label>
+            <div class="forgot">
+                <a href="/" class="forgot">
+                    Forgot your password?
+                </a>
+            </div>
+            <input type="submit" value="Sign-in"/>
+        </form>
+    </section>
+</main>

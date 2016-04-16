@@ -4,11 +4,15 @@
   -ms-border-radius: $radius
   border-radius: $radius
 
-=transition($prop)
+=transition($prop...)
   -webkit-transition: $prop
   -moz-transition: $prop
   -o-transition: $prop
   transition: $prop
+
+@function logo_ratio_w_to_h($width)
+  @return 105.7 / 184 * $width
+
 
 html, body
   height: 100%
@@ -20,6 +24,7 @@ body
   font-family: 'Open Sans', sans-serif
   font-size: 11pt
   font-weight: 300
+  color: #03414C
   background: #66D3D3
   min-width: 20em
   position: relative
@@ -30,33 +35,42 @@ label
   padding-top: 1em
   font-size: 1em
 
-  input
+  input[type=text], input[type=password]
     font-size: 1em
     line-height: 2em
     padding: 1em
     height: 1em
     width: 21em
 
-input
+  input[type=checkbox]
+    margin-right: 1em
+
+input, button
   +border-radius(0.2em)
 
 input[type=text], input[type=password]
   display: block
   background: #ffffff
   border: 0
+  margin-top: 1em
   font:
     weight: 300
 
-input[type=submit]
+input[type=submit], button
   width: 10em
   background: #28aaba
   border: 0
   color: #ffffff
-  height: 2.4em
+  padding: 1em
   line-height: 1em
-  margin-top: 2em
+  margin-top: 1em
   font:
     size: 1em
+    weight: 100
+
+  &.inactive
+    background-color: #d1d1d1
+    color: #e2e2e2
 
 *
   padding: 0
@@ -77,13 +91,19 @@ nav
   background-color: #E55564
 
   a.home
-    background: #E5954C url("/images/logo-small-2.svg") no-repeat center center
-    background-size: 1em
+    background-color:  #E5954C
     margin: 0
     display: block
     width: 4em
     height: 4em
     padding: 0
+
+    svg
+      $height: (44.1/28.6)
+      margin: (2-($height / 2))*1em 1.5em
+      width: 1em
+      height: $height * 1em
+      fill: #ffffff
 
   a, span
     line-height: 4em
@@ -95,27 +115,20 @@ nav
     font-weight: normal
 
   a.icon
-    +transition(0.1s opacity)
-    background:
-      size: 1.2em
-      repeat: no-repeat
-      position-x: 0
-      position-y: 50%
-    padding-left: 1.9em
+
+    svg
+      width: 1.2em
+      float: left
+      height: 4em
+      margin: 0 0.5em
+      fill: #fff
 
     &:hover
+      $color: #ffb734
       text-decoration: none
-      opacity: 0.7
-
-
-  a.contact
-    background-image: url(/images/iconmonstr-email-4.svg)
-
-  a.help
-    background-image: url(/images/iconmonstr-lifebuoy-1.svg)
-
-  a.about
-    background-image: url(/images/iconmonstr-info-7.svg)
+      color: $color
+      svg
+        fill: $color
 
   div.language
     float: right
@@ -159,7 +172,6 @@ nav
     &:hover
       background: #f3a34e
 
-
 @media only screen and (max-width: 45em)
   nav
     a.icon
@@ -177,68 +189,12 @@ nav
       margin: 0.5em
       padding: 0 1em
 
-
 @media only screen and (max-width: 25em)
   nav
     a.sign-in
       margin: 0.5em 0
       padding: 0 1em
 
-
-header.compact
-  img
-    width: 11em
-
-header:not(.compact)
-  position: relative
-  background: #F3FCFF
-  overflow: hidden
-  div:first-of-type
-    padding: 8em 0
-    z-index: 10
-    position: relative
-
-    a
-      width: 15em
-      margin: auto
-      display: block
-      img
-        display: block
-
-    h2
-      display: block
-      font-family: 'Open Sans', sans-serif
-      font-style: italic
-      font-weight: 700
-      font-size: 1em
-
-      margin: auto
-      text-align: center
-      padding: 1em 0
-      color: #ffffff
-
-  $height: 25.6em
-  $ratio: 1920/1080
-  $width: $height*$ratio
-
-  div:last-of-type
-    z-index: 0
-    top: 0
-    left: 0
-    right: 0
-    position: absolute
-    height: 100%
-    background:
-      color: #ffffff
-      image: url(/videos/v13-snap.png)
-      size: cover
-    video
-      height: auto
-      width: 100%
-
-      @media (max-width: $width)
-        height: 100%
-        width: auto
 
 h1
   color: #ffffff
@@ -255,6 +211,28 @@ main
     padding-top: 2em
   section:last-of-type
     padding-bottom: 2em
+
+form
+  .select
+    background-color: #ffffff
+    height: 3em
+    +border-radius(0.2em)
+
+    ul
+      display: none
+
+    &.open
+      ul
+        display: block
+        list-style-type: none
+
+svg.step
+  fill: #E55564
+  color: #EA2D48
+
+svg.step.inactive
+  fill: #d1d1d1
+  color: #afafaf
 
 footer
   height: $footer_height
@@ -278,9 +256,12 @@ footer
       float: left
       text-align: center
 
-      img
+      svg
         display: block
         margin: 2em auto
+        fill: #66D3D3
+        width: 3em
+        height: 3em
 
 @media only screen and (max-width: 45em)
   body

@@ -5,8 +5,7 @@ var router = express.Router()
 router.get('/', (req, res) => {
   res.render('promo', {
     title: [],
-    no_top: true,
-    no_footer: true,
+    no_nav: true,
     styles: ['/stylesheets/promo.css']
   })
 })
