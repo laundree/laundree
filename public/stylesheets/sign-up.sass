@@ -26,52 +26,82 @@ main
         padding: 1.25em 0.5em
         display: block
 
-    li:not(.dots)
-      svg
-        width: 3em
-        height: 3em
-        display: block
+    svg.step
+      width: 3em
+      height: 3em
+      display: block
 
-main
-  form
-    width: 23em
-    margin: auto
+    svg.step2, svg.step3
+      +inactive-step-style
+
+  #StepList.step1
+    li.dots.dots1
+      svg
+        fill: #efa73f
+    svg.step2
+      +active-step-style
+
+  #StepList.step2
+    li.dots.dots1, li.dots.dots2
+      svg
+        fill: #efa73f
+    svg.step2, svg.step3
+      +active-step-style
+
+  section
+    .add
+      padding-top: 1em
+      cursor: pointer
+
+      svg
+        height: 1em
+        width: 1em
+        margin: 0 0.5em
+        fill: #EC923F
+
     .buttons
       padding-top: 1em
       .next
         float: right
 
+    padding-top: 2em
+    > form
+      width: 23em
+      margin: auto
+    form
+      > ul
+        list-style-type: none
+        > li
+          position: relative
+          height: 5em
+          .delete
+            position: absolute
+            height: 1.5em
+            width: 1.5em
+            top: 2.75em
+            right: -2.5em
+            fill: #d54a50
+            cursor: pointer
+
 #RegisterMachines
   form
     > ul
-      list-style-type: none
       > li
-        position: relative
-        height: 5em
         label
           float: right
           input
             width: 15em
-
-        .delete
-          position: absolute
-          height: 1.5em
-          width: 1.5em
-          top: 2.75em
-          right: -2.5em
-          fill: #d54a50
-          cursor: pointer
-
-        svg
-          fill: #3d9eaa
-          height: 2em
-          width: 2em
 
         .select
           position: relative
           width: 5em
           float: left
           margin-top: 2em
+
+          svg
+            fill: #3d9eaa
+            height: 2em
+            width: 2em
 
           &.open
             .value
@@ -115,12 +145,66 @@ main
                 width: 12em
               &:hover, &.active
                 background-color: #E6E6E6
-    .add
-      padding-top: 1em
-      cursor: pointer
 
-      svg
-        height: 1em
-        width: 1em
-        margin: 0 0.5em
-        fill: #EC923F
+#InviteTenants
+  > div
+    display: table
+    margin: auto
+    width: 57em
+    > div
+      display: table-row
+      > *
+        display: table-cell
+        vertical-align: top
+      form
+        width: 23em
+
+      > div.or
+        height: 100%
+        text-align: center
+        padding-top: 1.5em
+        color: #40a3a0
+        font-weight: bold
+
+        background:
+          image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDEgMSI+PHJlY3QgZmlsbD0iIzQwQTNBMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIvPjwvc3ZnPg==)
+          repeat: repeat-y
+          size: 0.1em
+          position-x: center
+
+        span
+          background-color: #66D3D3
+          line-height: 2em
+          display: block
+
+      > div.qr
+        width: 23em
+
+        svg
+          width: 6em
+          fill: #085466
+
+        p
+          width: 15em
+          float: right
+
+        div
+          float: right
+          width: 15em
+          padding: 1em 0
+          color: #bf3045
+          line-height: 1.5em
+          svg
+            float: left
+            height: 1.5em
+            width: 1.5em
+            margin: 0 1em 0 0
+            fill: #bf3045
+
+  .buttons
+    width: 31em
+    .prev
+      margin-left: 4em
+    .complete
+      background-color: #42965a
+      width: 14em
