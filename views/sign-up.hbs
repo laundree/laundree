@@ -55,27 +55,100 @@
             </div>
         </form>
     </section>
-    <section id="RegisterMachines" hidden>
+    <section id="RegisterMachines">
         <h1>
             Register your machines
         </h1>
         <form>
             <ul>
                 <li>
-                    <div class="select_machine select open">
-                        <span class="value"></span>
+                    <div class="select_machine select">
+                        <span class="value">
+                            <svg class="machine">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#WashingMachine"></use>
+                            </svg>
+                            <svg class="chevron">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ChevronDown"></use>
+                            </svg>
+
+                        </span>
                         <input type="hidden" name="type"/>
-                        <ul>
+                        <ul class="options">
                             <li>
-                                Bob1
+                                <svg class="machine">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#WashingMachine"></use>
+                                </svg>
+                                <span class="desc">
+                                    Washing machine
+                                </span>
+                            </li>
+                            <li>
+                                <svg class="machine">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dryer"></use>
+                                </svg>
+                                <span class="desc">
+                                    Tumble dryer
+                                </span>
                             </li>
                         </ul>
                     </div>
                     <label>
-                        <input type="text"/>
+                        <input type="text" placeholder="Machine name"/>
                     </label>
+                    <svg class="delete">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Trash"></use>
+                    </svg>
+                </li>
+                <li>
+                    <div class="select_machine select">
+                        <span class="value">
+                            <svg class="machine">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#WashingMachine"></use>
+                            </svg>
+                            <svg class="chevron">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ChevronDown"></use>
+                            </svg>
+
+                        </span>
+                        <input type="hidden" name="type"/>
+                        <ul class="options">
+                            <li class="active">
+                                <svg class="machine">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#WashingMachine"></use>
+                                </svg>
+                                <span class="desc">
+                                    Washing machine
+                                </span>
+                            </li>
+                            <li>
+                                <svg class="machine">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dryer"></use>
+                                </svg>
+                                <span class="desc">
+                                    Tumble dryer
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                    <label>
+                        <input type="text" placeholder="Machine name"/>
+                    </label>
+                    <svg class="delete">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Trash"></use>
+                    </svg>
                 </li>
             </ul>
+            <div class="add">
+                <svg class="delete">
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Plus"></use>
+                </svg>
+                Add machine
+            </div>
+            <div class="buttons">
+                <button class="prev">Previous</button>
+                <button class="next">Next</button>
+            </div>
+
         </form>
     </section>
 </main>

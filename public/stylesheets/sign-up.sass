@@ -45,3 +45,82 @@ main
   form
     > ul
       list-style-type: none
+      > li
+        position: relative
+        height: 5em
+        label
+          float: right
+          input
+            width: 15em
+
+        .delete
+          position: absolute
+          height: 1.5em
+          width: 1.5em
+          top: 2.75em
+          right: -2.5em
+          fill: #d54a50
+          cursor: pointer
+
+        svg
+          fill: #3d9eaa
+          height: 2em
+          width: 2em
+
+        .select
+          position: relative
+          width: 5em
+          float: left
+          margin-top: 2em
+
+          &.open
+            .value
+              +border-radius(0.2em 0.2em 0 0)
+              background-color: #ffffff
+
+          .value
+            position: relative
+            z-index: 10
+            line-height: 3em
+            display: block
+            height: 3em
+            cursor: pointer
+
+            svg.machine
+              margin: 0.5em
+
+            svg.chevron
+              float: right
+              width: 1em
+              height: 1em
+              margin: 1em 0.5em
+
+          .options
+            z-index: 11
+            position: absolute
+            top: 100%
+            width: auto
+            box-shadow: 0 0.1em 0.1em #c7c7c7
+            background-color: #ffffff
+            +border-radius(0 0.2em 0.2em 0.2em)
+            li
+              cursor: pointer
+              width: 15em
+              svg.machine
+                margin: 0.5em
+              .desc
+                line-height: 3em
+                display: block
+                float: right
+                width: 12em
+              &:hover, &.active
+                background-color: #E6E6E6
+    .add
+      padding-top: 1em
+      cursor: pointer
+
+      svg
+        height: 1em
+        width: 1em
+        margin: 0 0.5em
+        fill: #EC923F
