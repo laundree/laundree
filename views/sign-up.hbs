@@ -4,34 +4,34 @@
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Logo"></use>
         </svg>
     </a>
-    <ul id="StepList">
+    <ul id="StepList" class="">
         <li>
-            <svg class="step">
+            <svg class="step step1">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Step1"></use>
             </svg>
         </li>
-        <li class="dots">
+        <li class="dots dots1">
             <svg>
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dots"></use>
             </svg>
         </li>
         <li>
-            <svg class="step inactive">
+            <svg class="step step2">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Step2"></use>
             </svg>
         </li>
-        <li class="dots">
+        <li class="dots dots2">
             <svg>
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dots"></use>
             </svg>
         </li>
         <li>
-            <svg class="step inactive">
+            <svg class="step step3">
                 <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Step3"></use>
             </svg>
         </li>
     </ul>
-    <section id="CreateAccount">
+    <section id="CreateAccount" hidden>
         <h1>
             Create an account
         </h1>
@@ -55,7 +55,7 @@
             </div>
         </form>
     </section>
-    <section id="RegisterMachines">
+    <section id="RegisterMachines" hidden>
         <h1>
             Register your machines
         </h1>
@@ -139,7 +139,7 @@
                 </li>
             </ul>
             <div class="add">
-                <svg class="delete">
+                <svg>
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Plus"></use>
                 </svg>
                 Add machine
@@ -150,5 +150,85 @@
             </div>
 
         </form>
+    </section>
+    <section id="InviteTenants">
+        <div>
+            <div>
+
+                <form>
+                    <h1>
+                        Invite your tenants via e-mail
+                    </h1>
+                    <ul>
+                        <li>
+                            <label>
+                                <input type="text" placeholder="E-mail address">
+                            </label>
+                            <svg class="delete">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Trash"></use>
+                            </svg>
+                        </li>
+                    </ul>
+                    <div class="add">
+                        <svg>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Plus"></use>
+                        </svg>
+                        Add machine
+                    </div>
+                </form>
+
+                <div class="or">
+                    <span>OR</span>
+                </div>
+                <div class="qr">
+                    <h1>Invite with a QR code</h1>
+                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 87.8 104.1">
+                        <path d="M63.4,81.4v6.5h6.5v-6.5h-2.2v-2.2h-2.2v2.2H63.4z M67.7,83.6v2.2h-2.2v-2.2H67.7z M18.1,87.9
+		h17.2V70.6H18.1V87.9z M20.3,72.8h12.9v12.9H20.3V72.8z M63.4,79.3v-2.2h2.2v2.2H63.4z M22.4,75h8.6v8.6h-8.6V75z M39.7,68.5v4.3
+		h-2.2v-4.3H39.7z M44,51.2h2.2v2.2H44V51.2z M46.1,49.1h2.2v2.2h-2.2V49.1z M48.3,53.4v-2.2h2.2v2.2H48.3z M48.3,49.1h2.2V36.2H44
+		v2.2h-6.5v2.2H44v2.2h4.3V49.1z M46.1,40.5v-2.2h2.2v2.2H46.1z M31.1,49.1h-8.6v-8.6h8.6V49.1z M44,49.1h-2.2v-4.3h-4.3v-2.2H44
+		v2.2h2.2v2.2H44V49.1z M35.4,36.2H18.1v17.2h17.2V36.2z M33.2,51.2H20.3V38.3h12.9V51.2z M39.7,51.2h-2.2v-2.2h4.3v4.3h-2.2V51.2z
+		 M33.2,57.7v2.2h-2.2v-2.2H33.2z M65.5,70.6h4.3v6.5h-2.2V75h-4.3v2.2h-2.2V75h-2.2v-2.2h2.2v-2.2h2.2v2.2h2.2V70.6z M56.9,75h-2.2
+		v2.2h-2.2V75h-2.2v-2.2h2.2v-2.2h-4.3v-2.2h-2.2v2.2H44v2.2h-4.3V75h-2.2v12.9h10.8v-2.2h-2.2v-4.3H44v4.3h-4.3v-2.2h2.2v-2.2h-2.2
+		v-2.2h6.5v-2.2h4.3v4.3h-2.2v2.2h2.2v4.3h2.2v-4.3h2.2v2.2h2.2v-2.2h2.2v-4.3h2.2v-2.2h-4.3V75z M54.8,81.4h-2.2v-2.2h2.2V81.4z
+		 M67.7,68.5v-4.3h2.2v4.3H67.7z M48.3,79.3v2.2h-2.2v-2.2H48.3z M59.1,85.7v-2.2h2.2v4.3h-4.3v-2.2H59.1z M52.6,36.2v17.2h17.2
+		V36.2H52.6z M67.7,51.2H54.8V38.3h12.9V51.2z M65.5,49.1h-8.6v-8.6h8.6V49.1z M67.7,57.7h2.2V62h-2.2v2.2h-4.3v-8.6h2.2v4.3h2.2
+		V57.7z M59.1,70.6v-6.5h2.2v6.5H59.1z M31.1,55.6v2.2h-4.3v2.2h2.2V62h-6.5v-2.2h2.2v-2.2h-4.3v2.2h-2.2v-4.3H31.1z M28.9,64.2V62
+		h2.2v6.5h-2.2v-2.2h-2.2v2.2h-2.2v-2.2h-2.2v2.2h-4.3v-2.2h2.2v-2.2H28.9z M20.3,62v2.2h-2.2V62H20.3z M61.2,57.7h-2.2v-2.2h2.2
+		V57.7z M33.2,66.3h2.2v2.2h-2.2V66.3z M65.5,70.6h-2.2v-2.2h2.2V70.6z M54.8,72.8v-2.2h2.2v2.2H54.8z M52.6,70.6h2.2v-6.5h4.3V62
+		h2.2v-2.2h-2.2v-2.2h-4.3v-2.2h-2.2v2.2h-2.2v-2.2h-2.2v2.2h-2.2v-2.2H44v2.2h-2.2v2.2h-2.2v-2.2h2.2v-2.2h-8.6v2.2h4.3v2.2h-4.3
+		V62h2.2v4.3h2.2v-2.2h4.3v4.3H44v-8.6h2.2v4.3h6.5v2.2h-4.3v2.2h4.3V70.6z M54.8,59.9h2.2V62h-2.2V59.9z M50.5,62h-2.2v-2.2h2.2V62
+		z"></path>
+                        <path d="M10.9,15.2c0,1.4-1.1,2.6-2.6,2.6c-1.4,0-2.6-1.1-2.6-2.6c0-1.4,1.1-2.6,2.6-2.6
+		C9.7,12.7,10.9,13.8,10.9,15.2L10.9,15.2z M10.9,15.2"></path>
+                        <path d="M73.8,15.2c0,1.4-1.1,2.6-2.6,2.6c-1.4,0-2.6-1.1-2.6-2.6c0-1.4,1.1-2.6,2.6-2.6
+		C72.7,12.7,73.8,13.8,73.8,15.2L73.8,15.2z M73.8,15.2"></path>
+                        <path d="M82,15.2c0,1.4-1.1,2.6-2.6,2.6c-1.4,0-2.6-1.1-2.6-2.6c0-1.4,1.1-2.6,2.6-2.6
+		C80.9,12.7,82,13.8,82,15.2L82,15.2z M82,15.2"></path>
+                        <rect width="87.8" height="9"></rect>
+                        <path d="M0,20.3v83.8h87.8V20.3H0z M76.9,92.9c0,0.9-0.7,1.6-1.6,1.6H12.5c-0.9,0-1.6-0.7-1.6-1.6
+		V31.6c0-0.9,0.7-1.6,1.6-1.6h62.7c0.9,0,1.6,0.7,1.6,1.6V92.9z"></path>
+                    </svg>
+                    <p>
+                        If you don’t have the email addresses of your tenants, you can print a QR code for them to scan.<br/>
+                        <br/>
+                        By hanging this code in your laundry all users with access to the code will be able to use
+                        reserve machines via. laundree.
+                    </p>
+                    <div class="print">
+                        <svg>
+                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Print"></use>
+                        </svg>
+                        Print QR code
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="buttons">
+            <button class="prev">Previous</button>
+            <button class="next complete">Open your Laundree</button>
+        </div>
+
     </section>
 </main>

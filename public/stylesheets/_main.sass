@@ -10,9 +10,16 @@
   -o-transition: $prop
   transition: $prop
 
+=active-step-style()
+  fill: #E55564
+  color: #EA2D48
+
+=inactive-step-style()
+  fill: #d1d1d1
+  color: #afafaf
+
 @function logo_ratio_w_to_h($width)
   @return 105.7 / 184 * $width
-
 
 html, body
   height: 100%
@@ -91,7 +98,7 @@ nav
   background-color: #E55564
 
   a.home
-    background-color:  #E5954C
+    background-color: #E5954C
     margin: 0
     display: block
     width: 4em
@@ -195,7 +202,6 @@ nav
       margin: 0.5em 0
       padding: 0 1em
 
-
 h1
   color: #ffffff
   font-weight: 300
@@ -227,12 +233,10 @@ form
         list-style-type: none
 
 svg.step
-  fill: #E55564
-  color: #EA2D48
+  +active-step-style
 
 svg.step.inactive
-  fill: #d1d1d1
-  color: #afafaf
+  +inactive-step-style
 
 footer
   height: $footer_height
