@@ -7,6 +7,6 @@ module.exports = {
   aboutRoute: require('./about'),
   javaScriptsRoute: require('./javascripts'),
   promoRoute: require('./promo'),
-  signInRoute: require('./sign-in'),
+  authRoute: require('./auth'),
   signUpRoute: require('./sign-up')
 }

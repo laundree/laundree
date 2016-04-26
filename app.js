@@ -1,20 +1,31 @@
 var express = require('express')
 var path = require('path')
-// var favicon = require('serve-favicon')
+var favicon = require('serve-favicon')
 var logger = require('morgan')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 
 var routes = require('./routes')
+var lib = require('./setups')
+
+var passportSetup = lib.passportSetup
+var sessionSetup = lib.sessionSetup
 
 var app = express()
-
+var hbs = require('hbs')
+hbs.registerPartials(path.join(__dirname, 'views', 'partials'))
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'hbs')
 
+// Session
+sessionSetup(app)
+
+// Passport
+passportSetup(app)
+
 // uncomment after placing your favicon in /public
-// app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(logger('dev'))
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
@@ -28,7 +39,7 @@ app.use(require('node-sass-middleware')({
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', routes.promoRoute)
 app.use('/home', routes.homeRoute)
-app.use('/sign-in', routes.signInRoute)
+app.use('/auth', routes.authRoute)
 app.use('/sign-up', routes.signUpRoute)
 app.use('/about', routes.aboutRoute)
 app.use('/javascripts', routes.javaScriptsRoute)

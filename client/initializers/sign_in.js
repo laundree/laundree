@@ -9,7 +9,8 @@ class SignInFormInitializer extends Initializer {
   setup (element) {
     var form = element.querySelector('form#SignIn')
     if (!form) return
-    FormDecorator(form)
+    var decorator = new FormDecorator(form)
+    if (false) console.log(decorator)
   }
 }
 

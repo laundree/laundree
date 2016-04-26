@@ -52,18 +52,27 @@ class FormDecorator extends ElementDecorator {
    */
   constructor (formElement) {
     super(formElement)
-    /** @type {function() : Promise} */
-    this.submitFunction = undefined
-    formElement.addEventListener('submit', this._createSubmitEventListener())
+    this._submitFunction = undefined
+    this._submitIsSetup = false
     this._setupValidation()
+  }
+
+  /**
+   * @param {function() : Promise} func
+   */
+  set submitFunction (func) {
+    this._submitFunction = func
+    if (this._submitIsSetup) return
+    this.element.addEventListener('submit', this._createSubmitEventListener())
+    this._submitIsSetup = true
   }
 
   _createSubmitEventListener () {
     return (evt) => {
-      if (!this.submitFunction) return
+      if (!this._submitFunction) return
       evt.preventDefault()
       this.element.classList.add('blur')
-      this.submitFunction()
+      this._submitFunction()
         .then(() => this.element.classList.remove('blur'))
         .catch(() => this.element.classList.remove('blur'))
     }
