@@ -30,7 +30,7 @@
     "gulp-eslint": "^2.0.0"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"No test specified\"",
     "start": "./bin/www"
   },
   "repository": {

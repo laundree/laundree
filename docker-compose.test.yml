@@ -1,0 +1,14 @@
+version: '2'
+services:
+  web:
+    environment:
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    build: .
+    links:
+      - redis
+    ports:
+      - '80:3000'
+    command: 'test'
+  redis:
+    image: redis

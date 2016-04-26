@@ -3,5 +3,6 @@
  */
 module.exports = {
   InitializerLibrary: require('./initializer_library'),
-  SignUpInitializer: require('./sign_up')
+  SignUpInitializer: require('./sign_up'),
+  SignInInitializer: require('./sign_in')
 }
