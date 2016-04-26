@@ -31,9 +31,9 @@ class CreateAccountInitializer extends Initializer {
     })
     var formDecorator = new FormDecorator(form)
     formDecorator.submitFunction = () => Promise.resolve()
-    var next_button = form.querySelector('button.next')
-    if (!next_button) return
-    next_button.addEventListener('click', () => {
+    var nextButton = form.querySelector('button.next')
+    if (!nextButton) return
+    nextButton.addEventListener('click', () => {
 //      if (form.classList.contains('invalid') || form.classList.contains('initial')) return
       stepEmitter.emit('step', 2)
     })
@@ -52,14 +52,14 @@ class RegisterMachinesInitializer extends Initializer {
     var formDecorator = new FormDecorator(form)
     formDecorator.submitFunction = () => Promise.resolve()
     this._setupAddMachine(formDecorator)
-    var prev_button = form.querySelector('button.prev')
-    if (!prev_button) return
-    var next_button = form.querySelector('button.next')
-    if (!next_button) return
-    prev_button.addEventListener('click', () => {
+    var prevButton = form.querySelector('button.prev')
+    if (!prevButton) return
+    var nextButton = form.querySelector('button.next')
+    if (!nextButton) return
+    prevButton.addEventListener('click', () => {
       stepEmitter.emit('step', 1)
     })
-    next_button.addEventListener('click', () => {
+    nextButton.addEventListener('click', () => {
       stepEmitter.emit('step', 3)
     })
   }
@@ -104,9 +104,9 @@ class InviteTenantsInitializer extends Initializer {
     })
     var formDecorator = new FormDecorator(form)
     formDecorator.submitFunction = () => Promise.resolve()
-    var prev_button = form.querySelector('button.prev')
-    if (!prev_button) return
-    prev_button.addEventListener('click', () => {
+    var prevButton = form.querySelector('button.prev')
+    if (!prevButton) return
+    prevButton.addEventListener('click', () => {
       stepEmitter.emit('step', 2)
     })
   }
@@ -114,12 +114,12 @@ class InviteTenantsInitializer extends Initializer {
 
 class SignUpInitializer extends Initializer {
 
-  constructor (init_library) {
-    super(init_library)
-    init_library.registerInitializer(StepListInitializer)
-    init_library.registerInitializer(CreateAccountInitializer)
-    init_library.registerInitializer(RegisterMachinesInitializer)
-    init_library.registerInitializer(InviteTenantsInitializer)
+  constructor (initializerLibrary) {
+    super(initializerLibrary)
+    initializerLibrary.registerInitializer(StepListInitializer)
+    initializerLibrary.registerInitializer(CreateAccountInitializer)
+    initializerLibrary.registerInitializer(RegisterMachinesInitializer)
+    initializerLibrary.registerInitializer(InviteTenantsInitializer)
   }
 
   setup (element) {

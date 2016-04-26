@@ -30,7 +30,7 @@
     "gulp-eslint": "^2.0.0"
   },
   "scripts": {
-    "test": "echo \"No test specified\"",
+    "test": "./node_modules/.bin/gulp test",
     "start": "./bin/www"
   },
   "repository": {

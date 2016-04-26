@@ -17,3 +17,5 @@ gulp.task('build', function () {
     .bundle()
     .pipe(fs.createWriteStream('resources/bundle.js'))
 })
+
+gulp.task('test', ['lint'])

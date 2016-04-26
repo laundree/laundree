@@ -48,13 +48,13 @@ function validateChecked (input) {
 class FormDecorator extends ElementDecorator {
 
   /**
-   * @param {HTMLFormElement} form_element
+   * @param {HTMLFormElement} formElement
    */
-  constructor (form_element) {
-    super(form_element)
+  constructor (formElement) {
+    super(formElement)
     /** @type {function() : Promise} */
     this.submitFunction = undefined
-    form_element.addEventListener('submit', this._createSubmitEventListener())
+    formElement.addEventListener('submit', this._createSubmitEventListener())
     this._setupValidation()
   }
 

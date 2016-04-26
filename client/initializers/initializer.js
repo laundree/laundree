@@ -5,10 +5,10 @@
 class Initializer {
 
   /**
-   * @param {InitializerLibrary} init_library
+   * @param {InitializerLibrary} initializerLibrary
    */
-  constructor (init_library) {
-    this.init_library = init_library
+  constructor (initializerLibrary) {
+    this.init_library = initializerLibrary
   }
 
   /**

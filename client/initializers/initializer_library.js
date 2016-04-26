@@ -6,8 +6,11 @@ var Initializer = require('./initializer')
 
 class InitializerLibrary extends Initializer {
 
-  constructor (init_library) {
-    super(init_library)
+  /**
+   * @param {InitializerLibrary} initializerLibrary
+   */
+  constructor (initializerLibrary) {
+    super(initializerLibrary)
     this.initializers = []
   }
 
