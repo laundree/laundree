@@ -39,8 +39,9 @@ body
 
 label
   display: block
-  padding-top: 1em
+  padding-top: 2em
   font-size: 1em
+  position: relative
 
   input[type=text], input[type=password]
     font-size: 1em
@@ -48,20 +49,46 @@ label
     padding: 1em
     height: 1em
     width: 21em
+    transition: 0.2s box-shadow
+
+
+  &:before
+    color: #ff0000
+    content: attr(data-validate-error)
+    line-height: 1em
+    position: absolute
+    top: 0.5em
+    opacity: 0
+    transition: 0.4s opacity
+
+  &.invalid
+    input:not(:focus)
+      box-shadow: 0 0 0 0.1em #f00
+
+    &:before
+      opacity: 1
 
   input[type=checkbox]
     margin-right: 1em
 
 input, button
   +border-radius(0.2em)
+  &:focus
+    outline: 0
+    box-shadow: 0 0 0 0.1em #2c829d
+
 
 input[type=text], input[type=password]
   display: block
   background: #ffffff
   border: 0
-  margin-top: 1em
   font:
     weight: 300
+
+=inactive_button_style()
+  box-shadow: 0 0 0
+  background-color: #d1d1d1
+  color: #e2e2e2
 
 input[type=submit], button
   width: 10em
@@ -73,11 +100,18 @@ input[type=submit], button
   margin-top: 1em
   font:
     size: 1em
-    weight: 100
+    weight: 300
+    family: 'Roboto Condensed', sans-serif
+
+  transition: 0.1s,0.1s background,color
 
   &.inactive
-    background-color: #d1d1d1
-    color: #e2e2e2
+    +inactive_button_style
+
+
+form.invalid, form.initial
+  input[type=submit], button
+    +inactive_button_style
 
 *
   padding: 0

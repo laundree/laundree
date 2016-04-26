@@ -9,5 +9,6 @@ services:
       - redis
     ports:
       - '80:3000'
+    command: 'test'
   redis:
     image: redis

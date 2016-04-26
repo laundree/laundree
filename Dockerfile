@@ -7,4 +7,5 @@ WORKDIR /opt/laundree
 RUN chown -R laundree:laundree /opt/laundree
 USER laundree
 RUN npm install
-CMD npm start
+CMD ["start"]
+ENTRYPOINT ["npm"]

@@ -1,0 +1,65 @@
+@import "main"
+
+form
+  max-width: 23em
+  margin: auto
+
+  a#Logo
+    width: 15em
+    margin: auto auto 2em
+    display: block
+
+    svg
+      width: 15em
+      height: logo_ratio_w_to_h(15em)
+      display: block
+
+  div.forgot
+    text-align: right
+    a
+      font-size: 0.9em
+
+form
+  .auth_alternatives
+    overflow: hidden
+    padding: 1em 0
+
+    a
+      width: 23em
+      height: 3em
+      display: block
+      float: left
+      background: #269ACC
+      margin: 1em 0
+      line-height: 3em
+      color: #fff
+      border-radius: 0.2em
+      text-decoration: none
+      font-family: 'Roboto Condensed', sans-serif
+      font-weight: 300
+
+      &.google
+        background-color: #7D1974
+
+      &.facebook
+        background-color: #0F6084
+
+      svg
+        width: 2em
+        height: 2em
+        fill: #fff
+        margin: 0.5em 1em
+        float: left
+
+  .or
+    background:
+      image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4PSIwcHgiIHk9IjBweCIgdmlld0JveD0iMCAwIDEgMSI+PHJlY3QgZmlsbD0iIzQwQTNBMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIvPjwvc3ZnPg==)
+      repeat: repeat-x
+      size: 0.1em
+      position-y: center
+    text-align: center
+
+    span
+      font-weight: bold
+      background-color: #66D3D3
+      padding: 0 1em

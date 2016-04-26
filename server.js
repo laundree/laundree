@@ -6,7 +6,7 @@ var app = require('./app')
 var debug = require('debug')('laundree:server')
 var http = require('http')
 var config = require('./config')
-var socketIo = require('./src/socket-io')
+var socketIo = require('./setups').socketIoSetup
 /**
  * Get port from environment and store in Express.
  */

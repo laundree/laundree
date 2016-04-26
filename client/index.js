@@ -17,3 +17,11 @@ socket.on('message', function (data) {
 module.exports.message = function (message) {
   socket.emit('message', {id: id, message: message})
 }
+
+var initializers = require('./initializers')
+
+var library = new initializers.InitializerLibrary()
+library.registerInitializer(initializers.SignUpInitializer)
+library.registerInitializer(initializers.SignInInitializer)
+
+library.setup()

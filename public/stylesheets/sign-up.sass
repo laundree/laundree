@@ -34,14 +34,14 @@ main
     svg.step2, svg.step3
       +inactive-step-style
 
-  #StepList.step1
+  #StepList.step2
     li.dots.dots1
       svg
         fill: #efa73f
     svg.step2
       +active-step-style
 
-  #StepList.step2
+  #StepList.step3
     li.dots.dots1, li.dots.dots2
       svg
         fill: #efa73f
@@ -49,9 +49,12 @@ main
       +active-step-style
 
   section
+    padding-top: 2em
+
     .add
-      padding-top: 1em
+      padding-top: 2em
       cursor: pointer
+      text-align: center
 
       svg
         height: 1em
@@ -60,14 +63,14 @@ main
         fill: #EC923F
 
     .buttons
-      padding-top: 1em
+      padding-top: 5em
       .next
         float: right
 
-    padding-top: 2em
     > form
       width: 23em
       margin: auto
+
     form
       > ul
         list-style-type: none

@@ -1,4 +1,4 @@
-<main>
+<main id="SignUpPage">
     <a href="/">
         <svg id="Logo">
             <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Logo"></use>
@@ -31,27 +31,27 @@
             </svg>
         </li>
     </ul>
-    <section id="CreateAccount" hidden>
+    <section id="CreateAccount">
         <h1>
             Create an account
         </h1>
-        <form>
-            <label>
-                <input type="text" placeholder="Full name"/>
+        <form class="validate initial">
+            <label data-validate-error="Please enter your full name" class="validate">
+                <input type="text" placeholder="Full name" data-validate-type="non-empty"/>
             </label>
-            <label>
-                <input type="text" placeholder="E-mail address"/>
+            <label data-validate-error="Please enter a valid e-mail address" class="validate">
+                <input type="text" placeholder="E-mail address" data-validate-type="email"/>
             </label>
-            <label>
-                <input type="password" placeholder="Password"/>
+            <label data-validate-error="Min. 6 characters containing at least one letter" class="validate">
+                <input type="password" placeholder="Password" data-validate-type="password" />
             </label>
-            <label>
-                <input type="checkbox"/>
+            <label class="validate" data-validate-error="Please accept our conditions">
+                <input type="checkbox" data-validate-type="checked"/>
                 Accept terms and conditions
             </label>
             <div class="buttons">
-                <button class="prev inactive">Previous</button>
-                <button class="next">Next</button>
+                <button class="prev inactive">Back</button>
+                <button class="next continue">Next</button>
             </div>
         </form>
     </section>
@@ -59,7 +59,7 @@
         <h1>
             Register your machines
         </h1>
-        <form>
+        <form class="initial validate">
             <ul>
                 <li>
                     <div class="select_machine select">
@@ -92,46 +92,8 @@
                             </li>
                         </ul>
                     </div>
-                    <label>
-                        <input type="text" placeholder="Machine name"/>
-                    </label>
-                    <svg class="delete">
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Trash"></use>
-                    </svg>
-                </li>
-                <li>
-                    <div class="select_machine select">
-                        <span class="value">
-                            <svg class="machine">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#WashingMachine"></use>
-                            </svg>
-                            <svg class="chevron">
-                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#ChevronDown"></use>
-                            </svg>
-
-                        </span>
-                        <input type="hidden" name="type"/>
-                        <ul class="options">
-                            <li class="active">
-                                <svg class="machine">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#WashingMachine"></use>
-                                </svg>
-                                <span class="desc">
-                                    Washing machine
-                                </span>
-                            </li>
-                            <li>
-                                <svg class="machine">
-                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Dryer"></use>
-                                </svg>
-                                <span class="desc">
-                                    Tumble dryer
-                                </span>
-                            </li>
-                        </ul>
-                    </div>
-                    <label>
-                        <input type="text" placeholder="Machine name"/>
+                    <label class="validate" data-validate-error="Please enter a unique machine-name">
+                        <input type="text" placeholder="Machine name" name="machine_name" data-validate-type="non-empty unique"/>
                     </label>
                     <svg class="delete">
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Trash"></use>
@@ -145,13 +107,13 @@
                 Add machine
             </div>
             <div class="buttons">
-                <button class="prev">Previous</button>
-                <button class="next">Next</button>
+                <button class="prev">Back</button>
+                <button class="next continue">Next</button>
             </div>
 
         </form>
     </section>
-    <section id="InviteTenants">
+    <section id="InviteTenants" hidden>
         <div>
             <div>
 
@@ -226,7 +188,7 @@
             </div>
         </div>
         <div class="buttons">
-            <button class="prev">Previous</button>
+            <button class="prev">Back</button>
             <button class="next complete">Open your Laundree</button>
         </div>
 
