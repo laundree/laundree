@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-{{> head}}
+    {{> head}}
 </head>
 <body>
 {{> media}}
@@ -13,25 +13,38 @@
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#SmallLogo"></use>
                 </svg>
             </a>
-            <a href="/about" class="icon about">
-                <svg>
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Info"></use>
-                </svg>
-                About us
-            </a>
-            <a href="/help" class="icon help">
-                <svg>
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#LifeBuoy"></use>
-                </svg>
-                Help
-            </a>
-            <a href="/contact" class="icon contact">
-                <svg>
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#EMail4"></use>
-                </svg>
-                Contact
-            </a>
-            <a href="/auth" class="sign-in">Sign in</a>
+
+            {{#if user}}
+                <span class="user">
+                    {{{user.displayName}}}
+                </span>
+                <a href="/logout" class="icon log-out">
+                    <svg>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#LogOut"></use>
+                    </svg>
+                    Sign out
+                </a>
+            {{else}}
+                <a href="/about" class="icon about">
+                    <svg>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Info"></use>
+                    </svg>
+                    About us
+                </a>
+                <a href="/help" class="icon help">
+                    <svg>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#LifeBuoy"></use>
+                    </svg>
+                    Help
+                </a>
+                <a href="/contact" class="icon contact">
+                    <svg>
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#EMail4"></use>
+                    </svg>
+                    Contact
+                </a>
+                <a href="/auth" class="log-in">Log in</a>
+            {{/if}}
             <!--<div class="language">
                 <span>English</span>
                 <ul>

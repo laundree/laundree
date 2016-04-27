@@ -3,13 +3,16 @@ var config = {
   redis: {},
   facebook: {},
   google: {},
-  session: {}
+  session: {},
+  mongo: {}
 }
 
 config.web.port = process.env.PORT || 3000
 
 config.redis.host = process.env.REDIS_HOST || 'localhost'
 config.redis.port = process.env.REDIS_PORT || 6379
+
+config.mongo.url = process.env.MONGO_URL || 'mongodb://localhost/laundree'
 
 config.facebook.appId = process.env.FACEBOOK_CLIENT_ID || '1044245858966868'
 config.facebook.appSecret = process.env.FACEBOOK_CLIENT_SECRET || '394f0ef62fd8d104e110ba898afeeb4a'

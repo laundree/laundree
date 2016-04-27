@@ -37,12 +37,13 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }))
 app.use(express.static(path.join(__dirname, 'public')))
-app.use('/', routes.promoRoute)
-app.use('/home', routes.homeRoute)
-app.use('/auth', routes.authRoute)
-app.use('/sign-up', routes.signUpRoute)
-app.use('/about', routes.aboutRoute)
-app.use('/javascripts', routes.javaScriptsRoute)
+
+app.use((req, res, next) => {
+  res.locals.user = req.user
+  next()
+})
+
+app.use('/', routes)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -57,6 +58,7 @@ app.use(function (req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use((err, req, res, next) => {
+    console.log(err)
     res.status(err.status || 500)
     res.render('error', {
       message: err.message,
