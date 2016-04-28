@@ -6,6 +6,8 @@ var FacebookStrategy = require('passport-facebook').Strategy
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 var config = require('../config')
 
+var UserHandler = require('../handlers').UserHandler
+
 passport.use(new FacebookStrategy({
   clientID: config.facebook.appId,
   clientSecret: config.facebook.appSecret,
@@ -13,7 +15,7 @@ passport.use(new FacebookStrategy({
   profileFields: ['id', 'first_name', 'last_name', 'middle_name', 'email', 'gender', 'displayName', 'link', 'picture']
 }, (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
-  done(null, profile)
+  UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null)).catch(done)
 }))
 
 passport.use(new GoogleStrategy({
@@ -22,18 +24,15 @@ passport.use(new GoogleStrategy({
   callbackURL: config.google.callbackUrl
 }, (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
-  done(null, profile)
+  UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null)).catch(done)
 }))
 
-var users = {}
-
 passport.serializeUser((user, done) => {
-  users[user.id] = user
-  done(null, user.id)
+  done(null, user.model.id)
 })
 
 passport.deserializeUser((user, done) => {
-  done(null, users[user])
+  UserHandler.findFromId(user).then((user) => done(null, user || false)).catch(done)
 })
 
 function setup (app) {

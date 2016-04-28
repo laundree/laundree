@@ -1,0 +1,22 @@
+---
+engines:
+  scss-lint:
+    enabled: true
+  markdownlint:
+    enabled: true
+  duplication:
+    enabled: true
+    config:
+      languages:
+      - javascript
+  eslint:
+    enabled: false
+  fixme:
+    enabled: true
+ratings:
+  paths:
+  - "**.sass"
+  - "**.js"
+  - "**.md"
+exclude_paths:
+- node_modules/
