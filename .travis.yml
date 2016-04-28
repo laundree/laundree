@@ -4,9 +4,12 @@ language: node
 
 env:
   global:
-    - DOCKER_COMPOSE_VERSION=1.7.0
-    - DOCKER_VERSION=1.10.1-0~trusty
-
+  - DOCKER_COMPOSE_VERSION=1.7.0
+  - DOCKER_VERSION=1.10.1-0~trusty
+addons:
+  code_climate:
+    repo_token:
+      secure: Q1z2y6AkxsxuXE7I6e9F8ZoKeyuwdjSjUUzNoHd4H4+MeP7Ok/nsJMVx4lfef/ESvBIrNjaBSL3nFN/G2hjgT7Zee08qPST0sbo4iT+TFGc9ebQ/94uyEECH4xxYMbKDMcT0pYUsvYGdsAjqK5qeZjjgIa319F+NndEngEBRNXnxD8O7Pu/ZEEOdUpG3QEKogOhyC1CS7l/K/nMG4/5/gNNAV07J1gAXe31aGqjrvej7GsxIOYodY5SPI/b9LeRKeo1bKA/ihznLyHQ3u47fw/uuxL+f97VW38FE5eqFGk09QC1zC8NGjObVqCZbD+vVx+41v1c966KI1z/HciH7+3WbEHR/l2+UtNXZawAHcgH/zg22XTbnp7HvrpoA7ki55es5YP41QxqJODeVmWEDWNpPBkNrhWRxR7GwjK9Pkhqq67MkjhzSib53BJ6VCHsZ2fB/gqEGf/hSjWs/s0LGMAI+6W3EvG2A0XfDkPwjOYRTR+hLo4y7gtzT9iN9/8GnG9C0ApXLl8Xs5E5XGY3z31VVgMLxtr2GAOPm6Km/NR+lpc0c+BzzzvuJoe2qoSeaZsLRI8jxJ6kl3MVBXfkcQReNSfzeJDfxaeyFSUwcH/5MxWN1i8t3eqhyM62y22pVJ+1nEe8hJwVKI3JS3bMfVn8s0zdjIwuFlARK1ic2J2c=
 services:
   - docker
 
@@ -23,3 +26,4 @@ install:
 
 script:
   - docker-compose -f docker-compose.test.yml run sut
+

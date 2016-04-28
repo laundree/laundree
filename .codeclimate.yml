@@ -13,6 +13,8 @@ engines:
     enabled: false
   fixme:
     enabled: true
+  nodesecurity:
+    enabled: true
 ratings:
   paths:
   - "**.sass"

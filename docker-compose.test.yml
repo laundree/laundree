@@ -4,9 +4,13 @@ services:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
+      - MONGO_URL=mongodb://mongo/test
     build: .
     links:
       - redis
+      - mongo
     command: 'test'
   redis:
     image: redis
+  mongo:
+    image: mongo
