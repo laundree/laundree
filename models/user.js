@@ -7,6 +7,7 @@ var Schema = mongoose.Schema
 var userSchema = new Schema({
   email: {type: String, required: true, trim: true, lowercase: true, unique: true},
   password: {type: String},
+  latestProvider: String,
   profiles: [{
     provider: String,
     id: String,

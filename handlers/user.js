@@ -51,6 +51,7 @@ class UserHandler extends Handler {
   updateProfile (profile) {
     this.model.profiles = this.model.profiles.filter((p) => p.provider !== profile.provider)
     this.model.profiles.push(profile)
+    this.model.latestProvider = profile.provider
     return this.model.save().then((model) => {
       this.model = model
       return this
