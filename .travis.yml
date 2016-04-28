@@ -22,6 +22,7 @@ before_install:
   - sudo mv docker-compose /usr/local/bin
 
 install:
+  - mkdir coverage
   - docker-compose -f docker-compose.test.yml build
 
 script:
