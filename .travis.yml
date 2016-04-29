@@ -1,34 +1,26 @@
 sudo: required
-
 language: node
-
 env:
   global:
   - DOCKER_COMPOSE_VERSION=1.7.0
   - DOCKER_VERSION=1.10.1-0~trusty
-addons:
-  code_climate:
-    repo_token:
-      secure: Q1z2y6AkxsxuXE7I6e9F8ZoKeyuwdjSjUUzNoHd4H4+MeP7Ok/nsJMVx4lfef/ESvBIrNjaBSL3nFN/G2hjgT7Zee08qPST0sbo4iT+TFGc9ebQ/94uyEECH4xxYMbKDMcT0pYUsvYGdsAjqK5qeZjjgIa319F+NndEngEBRNXnxD8O7Pu/ZEEOdUpG3QEKogOhyC1CS7l/K/nMG4/5/gNNAV07J1gAXe31aGqjrvej7GsxIOYodY5SPI/b9LeRKeo1bKA/ihznLyHQ3u47fw/uuxL+f97VW38FE5eqFGk09QC1zC8NGjObVqCZbD+vVx+41v1c966KI1z/HciH7+3WbEHR/l2+UtNXZawAHcgH/zg22XTbnp7HvrpoA7ki55es5YP41QxqJODeVmWEDWNpPBkNrhWRxR7GwjK9Pkhqq67MkjhzSib53BJ6VCHsZ2fB/gqEGf/hSjWs/s0LGMAI+6W3EvG2A0XfDkPwjOYRTR+hLo4y7gtzT9iN9/8GnG9C0ApXLl8Xs5E5XGY3z31VVgMLxtr2GAOPm6Km/NR+lpc0c+BzzzvuJoe2qoSeaZsLRI8jxJ6kl3MVBXfkcQReNSfzeJDfxaeyFSUwcH/5MxWN1i8t3eqhyM62y22pVJ+1nEe8hJwVKI3JS3bMfVn8s0zdjIwuFlARK1ic2J2c=
+  - secure: YcZTCqPR2u9xi76hGaJtkR2zrF7y6QBXwxXYTQXLFjaxst75udDYQE1SHLuB/83sXyvLQIlApJ8tdJTO4Q/diPiRLXHyxy8s9GKBsEVlhB9fqFMFk3nQ6P9ydtEiEXE0krTuaCyWuBE6ulL9H6AAY9EWKmbWD00i7HInO1whuHsugu8BPk946KYq3uL1OIRx8rpLSc3OMoCQFOkyrwY/LdrMWSeECTxZA+qJHs34mobFlWtjDWipfJ1zzk+l83boLKoJ0+5tB8kc/cR2v4v9C8A2kMfY+R6lBQ+gz3zOMVlIR8/TXcwB0nBu8+VAT7qhr6Xzlns/3BcuC6nEjeQR1+gcPXGLg6RHgsQuT0uEf/E/oJO1f61iWGpZRIdnNvmJQrqj9DhaG0MMbSV2nz37jYotwFYDfP4ulLI+DjKkJa7glXJ8MNhOjJt58HA+2GHfDXgBfZ1IKV9+qCC3GZASvfOiKO+H5zUDrd/CFyOZQx/8ibs7fcLrQHq3GAkRXBQqwIjlLHmyHVddV+eA2AyClDdgcWzOxPnKS1jr8HuXCx2M6v1JrRxqy1b2qBeRKqBWisKo0O67hAqGQ4f2/OkdBu76CLePvrHiIuX8SEUneUdjhX2JZcpyiOFKLAHOPxBgKi9XXCm1eKAPHbekVI4Tzv2EhC5ta1W/t6IBvjucNs4=
 services:
-  - docker
-
+- docker
 before_install:
-  - npm install -g codeclimate-test-reporter
-  - sudo apt-get update
-  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-
+- npm install -g codeclimate-test-reporter
+- sudo apt-get update
+- sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
+- sudo rm /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
+  -s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
 install:
-  - mkdir coverage
-  - chmod -R 777 coverage
-  - docker-compose -f docker-compose.test.yml build
-
+- mkdir coverage
+- chmod -R 777 coverage
+- docker-compose -f docker-compose.test.yml build
 script:
-  - docker-compose -f docker-compose.test.yml run sut
-
+- docker-compose -f docker-compose.test.yml run sut
 after_script:
-  - codeclimate-test-reporter < coverage/lcov.info
+- codeclimate-test-reporter < coverage/lcov.info
