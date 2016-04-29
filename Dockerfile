@@ -4,7 +4,6 @@ EXPOSE 3000
 RUN adduser --disabled-password --gecos "" laundree
 COPY . /opt/laundree
 WORKDIR /opt/laundree
-VOLUME /opt/laundree/coverage
 RUN chown -R laundree:laundree /opt/laundree
 USER laundree
 RUN npm install
