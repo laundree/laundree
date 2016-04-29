@@ -26,7 +26,6 @@ install:
   - docker-compose -f docker-compose.test.yml build
 
 script:
-  - sudo su -c "setenforce 0"
   - docker-compose -f docker-compose.test.yml run sut
 
 after_script:
