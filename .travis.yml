@@ -23,6 +23,7 @@ before_install:
 
 install:
   - mkdir coverage
+  - chmod -R 777 coverage
   - docker-compose -f docker-compose.test.yml build
 
 script:
