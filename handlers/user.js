@@ -6,7 +6,7 @@ var Handler = require('./handler')
 var UserModel = require('../models').UserModel
 
 /**
- * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string, middleName: string, givenName: string}, emails: {value: string, type: string}[], photos: {value: string}[]}} Profile
+ * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string=, middleName: string=, givenName: string=}, emails: {value: string, type: string=}[], photos: {value: string}[]=}} Profile
  */
 
 class UserHandler extends Handler {

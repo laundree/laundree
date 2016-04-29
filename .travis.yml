@@ -1,25 +1,21 @@
 sudo: required
-
 language: node
-
 env:
   global:
-    - DOCKER_COMPOSE_VERSION=1.7.0
-    - DOCKER_VERSION=1.10.1-0~trusty
-
+  - DOCKER_COMPOSE_VERSION=1.7.0
+  - DOCKER_VERSION=1.10.1-0~trusty
+  - secure: YcZTCqPR2u9xi76hGaJtkR2zrF7y6QBXwxXYTQXLFjaxst75udDYQE1SHLuB/83sXyvLQIlApJ8tdJTO4Q/diPiRLXHyxy8s9GKBsEVlhB9fqFMFk3nQ6P9ydtEiEXE0krTuaCyWuBE6ulL9H6AAY9EWKmbWD00i7HInO1whuHsugu8BPk946KYq3uL1OIRx8rpLSc3OMoCQFOkyrwY/LdrMWSeECTxZA+qJHs34mobFlWtjDWipfJ1zzk+l83boLKoJ0+5tB8kc/cR2v4v9C8A2kMfY+R6lBQ+gz3zOMVlIR8/TXcwB0nBu8+VAT7qhr6Xzlns/3BcuC6nEjeQR1+gcPXGLg6RHgsQuT0uEf/E/oJO1f61iWGpZRIdnNvmJQrqj9DhaG0MMbSV2nz37jYotwFYDfP4ulLI+DjKkJa7glXJ8MNhOjJt58HA+2GHfDXgBfZ1IKV9+qCC3GZASvfOiKO+H5zUDrd/CFyOZQx/8ibs7fcLrQHq3GAkRXBQqwIjlLHmyHVddV+eA2AyClDdgcWzOxPnKS1jr8HuXCx2M6v1JrRxqy1b2qBeRKqBWisKo0O67hAqGQ4f2/OkdBu76CLePvrHiIuX8SEUneUdjhX2JZcpyiOFKLAHOPxBgKi9XXCm1eKAPHbekVI4Tzv2EhC5ta1W/t6IBvjucNs4=
 services:
-  - docker
-
+- docker
 before_install:
-  - sudo apt-get update
-  - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
-  - sudo rm /usr/local/bin/docker-compose
-  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
-  - chmod +x docker-compose
-  - sudo mv docker-compose /usr/local/bin
-
+- sudo apt-get update
+- sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
+- sudo rm /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
+  -s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
 install:
-  - docker-compose -f docker-compose.test.yml build
-
+- docker-compose -f docker-compose.test.yml build
 script:
-  - docker-compose -f docker-compose.test.yml run sut
+- docker-compose -f docker-compose.test.yml run -e CODECLIMATE_REPO_TOKEN=$CODECLIMATE_REPO_TOKEN sut
