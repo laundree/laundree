@@ -9,8 +9,6 @@ services:
     links:
       - redis
       - mongo
-    volumes:
-      - ./coverage:/opt/laundree/coverage
     command: 'test'
   redis:
     image: redis

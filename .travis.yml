@@ -8,7 +8,6 @@ env:
 services:
 - docker
 before_install:
-- npm install -g codeclimate-test-reporter
 - sudo apt-get update
 - sudo apt-get -o Dpkg::Options::="--force-confnew" install -y docker-engine=${DOCKER_VERSION}
 - sudo rm /usr/local/bin/docker-compose
@@ -17,10 +16,6 @@ before_install:
 - chmod +x docker-compose
 - sudo mv docker-compose /usr/local/bin
 install:
-- mkdir coverage
-- chmod -R 777 coverage
 - docker-compose -f docker-compose.test.yml build
 script:
-- docker-compose -f docker-compose.test.yml run sut
-after_script:
-- codeclimate-test-reporter < coverage/lcov.info
+- docker-compose -f docker-compose.test.yml run -e CODECLIMATE_REPO_TOKEN=$CODECLIMATE_REPO_TOKEN sut
