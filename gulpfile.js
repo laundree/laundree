@@ -6,6 +6,7 @@ var isparta = require('isparta')
 var mongoose = require('mongoose')
 var exec = require('child_process').exec
 var runSequence = require('run-sequence')
+var config = require('./config')
 
 gulp.task('lint', function () {
   return gulp.src(['{client,handlers,models,routes,setups,tests,utils,views}/**/*.js', '*.js'])
@@ -41,16 +42,16 @@ gulp.task('test-unit', function (done) {
 })
 
 gulp.task('send-coverage', (done) => {
-  if (!process.env.CODECLIMATE_REPO_TOKEN) return done()
-  gulp.on('finish', () => {
-    console.log('FIN')
-    exec('./node_modules/.bin/codeclimate-test-reporter < coverage/lcov.info',
-      (err, stdout, stderr) => {
-        console.log(stdout)
-        console.log(stderr)
-        done(err)
-      })
-  })
+  if (!config.codeClimate.repoToken) {
+    console.log('Skipping sending coverage because of missing configuration')
+    return done()
+  }
+  exec('./node_modules/.bin/codeclimate-test-reporter < coverage/lcov.info',
+    (err, stdout, stderr) => {
+      console.log(stdout)
+      console.log(stderr)
+      done(err)
+    })
 })
 
 gulp.task('test', (done) => {
