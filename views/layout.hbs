@@ -14,17 +14,7 @@
                 </svg>
             </a>
 
-            {{#if user}}
-                <span class="user">
-                    {{{user.displayName}}}
-                </span>
-                <a href="/logout" class="icon log-out">
-                    <svg>
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#LogOut"></use>
-                    </svg>
-                    Sign out
-                </a>
-            {{else}}
+
                 <a href="/about" class="icon about">
                     <svg>
                         <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Info"></use>
@@ -43,6 +33,25 @@
                     </svg>
                     Contact
                 </a>
+            {{#if user}}
+                <div class="user dropdown">
+                    <img src="{{{user.photo}}}" class="avatar"/>
+                    <div class="dropdown-content">
+                        <ul>
+                            <li>
+                                <a href="/app/i">
+                                    Manage your account
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/logout">
+                                    Log out
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            {{else}}
                 <a href="/auth" class="log-in">Log in</a>
             {{/if}}
             <!--<div class="language">
