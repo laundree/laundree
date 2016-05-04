@@ -54,21 +54,19 @@ userSchema
     return _.find(this.profiles, (profile) => profile.provider === this.latestProvider) || null
   })
 
-userSchema
-  .virtual('displayName')
-  .get(function () {
-    var profile = this.latestProfile
-    if (!profile) return null
-    return profile.displayName
-  })
+function fromLatestProfile (attribute) {
+  userSchema
+    .virtual(attribute)
+    .get(function () {
+      var profile = this.latestProfile
+      if (!profile) return null
+      return profile[attribute]
+    })
+}
 
-userSchema
-  .virtual('name')
-  .get(function () {
-    var profile = this.latestProfile
-    if (!profile) return null
-    return profile.name
-  })
+fromLatestProfile('displayName')
+
+fromLatestProfile('name')
 
 userSchema
   .virtual('photo')
