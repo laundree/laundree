@@ -8,7 +8,9 @@ var router = express.Router()
 router.use('/app', (req, res, next) => {
   if (req.user) return next()
   res.redirect('/auth')
-}, require('./home'))
+}, (req, res) => {
+  res.render('home', {title: ['Home'], styles: ['/stylesheets/home.css']})
+})
 
 router.use('/sign-up', require('./sign-up'))
 router.use('/logout', require('./logout'))
@@ -20,7 +22,8 @@ var authMiddleware = (req, res, next) => {
   res.redirect('/app')
 }
 
-router.use('/', authMiddleware, require('./home'))
 router.use('/auth', authMiddleware, require('./auth'))
+
+router.get('/', authMiddleware, (req, res) => res.render('home', {title: ['Home'], styles: ['/stylesheets/home.css']}))
 
 module.exports = router

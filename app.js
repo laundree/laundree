@@ -39,7 +39,7 @@ app.use(require('node-sass-middleware')({
 app.use(express.static(path.join(__dirname, 'public')))
 
 app.use((req, res, next) => {
-  res.locals.user = req.user
+  if (req.user) res.locals.user = req.user.model
   next()
 })
 
