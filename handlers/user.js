@@ -67,7 +67,8 @@ class UserHandler extends Handler {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return new UserModel({
       email: profile.emails[0].value,
-      profiles: [profile]
+      profiles: [profile],
+      latestProvider: profile.provider
     }).save().then((model) => new UserHandler(model))
   }
 }
