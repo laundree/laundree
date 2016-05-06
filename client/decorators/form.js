@@ -3,7 +3,9 @@
  */
 
 var ElementDecorator = require('./element')
-var utils = require('../../utils')
+
+var utils = {validateType: require('../../utils/validate_type'), regex: require('../../utils/regex')}
+
 var _ = require('lodash')
 
 function validateRegEx (formDecorator, input, regex) {

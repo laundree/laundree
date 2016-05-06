@@ -16,6 +16,7 @@
     "express": "~4.13.1",
     "express-session": "^1.13.0",
     "hbs": "~3.1.0",
+    "identicon": "^2.0.1",
     "isparta": "^4.0.0",
     "lodash": "^4.11.2",
     "mongoose": "^4.4.13",
