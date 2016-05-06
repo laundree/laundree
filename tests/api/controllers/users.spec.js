@@ -1,5 +1,5 @@
 var request = require('supertest')
-var server = require('../../../app')
+var app = require('../../../app')
 var chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
@@ -14,7 +14,7 @@ describe('controllers', function () {
   describe('users', function () {
     describe('GET /api/users', function () {
       it('should return an empty list', function (done) {
-        request(server)
+        request(app)
           .get('/api/users')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
@@ -29,7 +29,7 @@ describe('controllers', function () {
       })
       it('should limit output size', function (done) {
         dbUtils.populateUsers(100).then((users) => {
-          request(server)
+          request(app)
             .get('/api/users')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
@@ -49,7 +49,7 @@ describe('controllers', function () {
       })
       it('should allow custom output size', function (done) {
         dbUtils.populateUsers(100).then((users) => {
-          request(server)
+          request(app)
             .get('/api/users')
             .query({page_size: 12})
             .set('Accept', 'application/json')
@@ -71,7 +71,7 @@ describe('controllers', function () {
       })
       it('should allow since', function (done) {
         dbUtils.populateUsers(100).then((users) => {
-          request(server)
+          request(app)
             .get('/api/users')
             .query({since: users[55].model.id, page_size: 1})
             .set('Accept', 'application/json')
@@ -92,7 +92,7 @@ describe('controllers', function () {
       })
       it('should allow email filter', function (done) {
         dbUtils.populateUsers(10).then((users) => {
-          request(server)
+          request(app)
             .get('/api/users')
             .query({email: users[5].model.email})
             .set('Accept', 'application/json')

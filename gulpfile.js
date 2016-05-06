@@ -54,6 +54,13 @@ gulp.task('send-coverage', (done) => {
     })
 })
 
+gulp.task('exit', (done) => {
+  setTimeout(() => {
+    done()
+    process.exit(0)
+  }, 1000)
+})
+
 gulp.task('test', (done) => {
-  runSequence('lint', 'test-unit', 'send-coverage', done)
+  runSequence('lint', 'test-unit', 'send-coverage', 'exit', done)
 })
