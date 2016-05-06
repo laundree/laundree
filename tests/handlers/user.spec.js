@@ -72,7 +72,6 @@ describe('handlers', () => {
             user.model.name.givenName.should.be.equal('Alice')
             assert(user.model.name.middleName === undefined)
             user.model.displayName.should.be.equal('Alice Alison')
-            user.model.email.should.be.equal('ali@example.com')
             return user.verifyPassword('password1234').should.eventually.be.true
           }))
       it('should create user with more names', () =>
@@ -82,7 +81,6 @@ describe('handlers', () => {
             user.model.name.givenName.should.be.equal('Alice')
             user.model.name.middleName.should.be.equal('Alu Ali')
             user.model.displayName.should.be.equal('Alice Alu Ali Alison')
-            user.model.email.should.be.equal('ali@example.com')
             return user.verifyPassword('password1234').should.eventually.be.true
           }))
     })

@@ -8,13 +8,56 @@ var expect = chai.expect
 var assert = chai.assert
 var dbUtils = require('../../db_utils')
 var _ = require('lodash')
+var UserHandler = require('../../../handlers').UserHandler
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
   describe('users', function () {
     this.timeout(20000)
-    describe('GET /api/users', function () {
-      it('should return an empty list', function (done) {
+    describe('GET /api/users/id', () => {
+      it('should return error', (done) => {
+        request(app)
+          .get('/api/users/asd123')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(404)
+          .end(function (err) {
+            assert(!err)
+            done()
+          })
+      })
+
+      it('should return error on missing but right format', (done) => {
+        request(app)
+          .get('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(404)
+          .end(function (err) {
+            assert(!err)
+            done()
+          })
+      })
+      it('should find user', (done) => {
+        dbUtils.populateUsers(10).then((users) => {
+          request(app)
+            .get(`/api/users/${users[5].model.id}`)
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end(function (err, res) {
+              assert(!err)
+              var u = users[5].toRest()
+              u.href = res.body.href
+              res.body.should.be.deep.equal(u)
+              done()
+            })
+        })
+      })
+    })
+
+    describe('GET /api/users', () => {
+      it('should return an empty list', (done) => {
         request(app)
           .get('/api/users')
           .set('Accept', 'application/json')
@@ -28,7 +71,7 @@ describe('controllers', function () {
             done()
           })
       })
-      it('should limit output size', function (done) {
+      it('should limit output size', (done) => {
         dbUtils.populateUsers(100).then((users) => {
           request(app)
             .get('/api/users')
@@ -48,7 +91,7 @@ describe('controllers', function () {
             })
         })
       })
-      it('should allow custom output size', function (done) {
+      it('should allow custom output size', (done) => {
         dbUtils.populateUsers(100).then((users) => {
           request(app)
             .get('/api/users')
@@ -70,7 +113,7 @@ describe('controllers', function () {
             })
         })
       })
-      it('should allow since', function (done) {
+      it('should allow since', (done) => {
         dbUtils.populateUsers(100).then((users) => {
           request(app)
             .get('/api/users')
@@ -91,11 +134,11 @@ describe('controllers', function () {
             })
         })
       })
-      it('should allow email filter', function (done) {
+      it('should allow email filter', (done) => {
         dbUtils.populateUsers(10).then((users) => {
           request(app)
             .get('/api/users')
-            .query({email: users[5].model.email})
+            .query({email: users[5].model.emails[0]})
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
@@ -108,6 +151,56 @@ describe('controllers', function () {
               done()
             })
         })
+      })
+    })
+
+    describe('POST /api/users', () => {
+      it('should succede with right body', (done) => {
+        request(app)
+          .post('/api/users')
+          .send({displayName: 'Bob Bobbesen', email: 'bob@example.com', password: 'password1234'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+          .end(() => {
+            UserHandler.findFromEmail('bob@example.com').then((u) => {
+              u.should.not.be.undefined
+              done()
+            })
+          })
+      })
+      it('should fail on invalid email in body', (done) => {
+        request(app)
+          .post('/api/users')
+          .send({displayName: 'Bob Bobbesen', email: 'invalid', password: 'password1234'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .end(() => {
+            done()
+          })
+      })
+      it('should fail on invalid name in body', (done) => {
+        request(app)
+          .post('/api/users')
+          .send({displayName: '', email: 'a@example.com', password: 'password1234'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .end(() => {
+            done()
+          })
+      })
+      it('should fail on invalid password in body', (done) => {
+        request(app)
+          .post('/api/users')
+          .send({displayName: 'Bob', email: 'a@example.com', password: 'asdfg'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400)
+          .end(() => {
+            done()
+          })
       })
     })
   })

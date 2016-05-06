@@ -130,14 +130,16 @@ definitions:
 
   User:
     required:
-      - email
+      - id
       - href
     properties:
       id:
         type: string
-      email:
-        type: string
-        format: email
+      emails:
+        type: array
+        items:
+          type: string
+          format: email
       photo:
         type: string
       displayName:
