@@ -8,7 +8,6 @@ chai.use(chaiAsPromised)
 chai.should()
 var clearDb = require('../db_utils').clearDb
 var UserModel = require('../../models').UserModel
-var assert = chai.assert
 
 describe('models', () => {
   describe('UserModel', function () {
