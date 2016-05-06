@@ -12,6 +12,7 @@ var _ = require('lodash')
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
   describe('users', function () {
+    this.timeout(20000)
     describe('GET /api/users', function () {
       it('should return an empty list', function (done) {
         request(app)
