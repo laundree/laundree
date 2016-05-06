@@ -50,7 +50,8 @@ gulp.task('send-coverage', (done) => {
     (err, stdout, stderr) => {
       console.log(stdout)
       console.log(stderr)
-      done(err)
+      console.log(err)
+      done()
     })
 })
 
