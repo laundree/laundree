@@ -4,14 +4,15 @@
 var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
-var config = require('../config')
+var LocalStrategy = require('passport-local').Strategy
+var config = require('config')
 
 var UserHandler = require('../handlers').UserHandler
 
 passport.use(new FacebookStrategy({
-  clientID: config.facebook.appId,
-  clientSecret: config.facebook.appSecret,
-  callbackURL: config.facebook.callbackUrl,
+  clientID: config.get('facebook.appId'),
+  clientSecret: config.get('facebook.appSecret'),
+  callbackURL: config.get('facebook.callbackUrl'),
   profileFields: ['id', 'first_name', 'last_name', 'middle_name', 'email', 'gender', 'displayName', 'link', 'picture']
 }, (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
@@ -19,12 +20,22 @@ passport.use(new FacebookStrategy({
 }))
 
 passport.use(new GoogleStrategy({
-  clientID: config.google.clientId,
-  clientSecret: config.google.clientSecret,
-  callbackURL: config.google.callbackUrl
+  clientID: config.get('google.clientId'),
+  clientSecret: config.get('google.clientSecret'),
+  callbackURL: config.get('google.callbackUrl')
 }, (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
   UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null)).catch(done)
+}))
+
+passport.use(new LocalStrategy((username, password, done) => {
+  UserHandler.findFromEmail(username).then((user) => {
+    if (!user) return done(null, false)
+    return user.verifyPassword(password).then((result) => {
+      if (!result) return done(null, false)
+      done(null, user)
+    })
+  }).catch(done)
 }))
 
 passport.serializeUser((user, done) => {

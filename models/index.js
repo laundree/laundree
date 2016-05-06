@@ -3,9 +3,9 @@
  */
 
 var mongoose = require('mongoose')
-var config = require('../config')
+var config = require('config')
 
-mongoose.connect(config.mongo.url)
+mongoose.connect(config.get('mongo.url'))
 
 module.exports = {
   UserModel: require('./user')

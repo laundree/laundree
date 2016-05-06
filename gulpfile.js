@@ -6,7 +6,7 @@ var isparta = require('isparta')
 var mongoose = require('mongoose')
 var exec = require('child_process').exec
 var runSequence = require('run-sequence')
-var config = require('./config')
+var config = require('config')
 
 gulp.task('lint', function () {
   return gulp.src(['{client,handlers,models,routes,setups,tests,utils,views}/**/*.js', '*.js'])
@@ -16,7 +16,7 @@ gulp.task('lint', function () {
 })
 
 gulp.task('test-unit', function (done) {
-  gulp.src(['{handlers,models,utils}/**/*.js'])
+  gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
     .pipe(istanbul({ // Covering files
       instrumenter: isparta.Instrumenter,
       includeUntested: true
@@ -42,7 +42,7 @@ gulp.task('test-unit', function (done) {
 })
 
 gulp.task('send-coverage', (done) => {
-  if (!config.codeClimate.repoToken) {
+  if (!config.has('codeClimate.repoToken')) {
     console.log('Skipping sending coverage because of missing configuration')
     return done()
   }
@@ -50,10 +50,18 @@ gulp.task('send-coverage', (done) => {
     (err, stdout, stderr) => {
       console.log(stdout)
       console.log(stderr)
-      done(err)
+      console.log(err)
+      done()
     })
 })
 
+gulp.task('exit', (done) => {
+  setTimeout(() => {
+    done()
+    process.exit(0)
+  }, 1000)
+})
+
 gulp.task('test', (done) => {
-  runSequence('lint', 'test-unit', 'send-coverage', done)
+  runSequence('lint', 'test-unit', 'send-coverage', 'exit', done)
 })

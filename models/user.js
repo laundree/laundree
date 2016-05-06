@@ -26,27 +26,6 @@ var userSchema = new Schema({
   toJSON: {virtuals: true}
 })
 
-userSchema.set('toJSON', {
-  transform: function (doc, ret, options) {
-    return {
-      email: ret.email,
-      latestProvider: ret.latestProvider,
-      profiles: ret.profiles.map((profile) => ({
-        provider: profile.provider,
-        id: profile.id,
-        displayName: profile.displayName,
-        name: {
-          familyName: profile.name.familyName,
-          givenName: profile.name.givenName,
-          middleName: profile.name.middleName
-        },
-        emails: profile.emails.map((mail) => ({value: mail.value, type: mail.type})),
-        photos: profile.emails.map((photo) => ({value: photo.value}))
-      }))
-    }
-  }
-})
-
 userSchema
   .virtual('latestProfile')
   .get(function () {

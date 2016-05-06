@@ -3,5 +3,7 @@
  */
 
 module.exports = {
-  regex: require('./regex')
+  regex: require('./regex'),
+  validateType: require('./validate_type'),
+  password: require('./password')
 }

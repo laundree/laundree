@@ -4,46 +4,31 @@
 
 var ElementDecorator = require('./element')
 var utils = require('../../utils')
+var _ = require('lodash')
 
-function validateUnique (root, input) {
-  var name = input.name
-  if (!name) return true
-  var siblings = root.querySelectorAll(`input[name=${name}]`)
-  for (let k = 0; k < siblings.length; k++) {
-    var sibling = siblings[k]
-    if (sibling === input) continue
-    if (sibling.value !== input.value) continue
-    return false
+function validateRegEx (formDecorator, input, regex) {
+  if (!regex) {
+    var r = input.dataset['validateRegex']
+    if (!r) throw new Error('No regex provided to validation')
+    regex = new RegExp(r)
   }
-  return true
+  return Promise.resolve(regex.exec(input.value))
 }
 
-function validateRegEx (type, input) {
-  var regex
-  switch (type) {
-    case 'non-empty':
-      regex = utils.regex.non_empty
-      break
-    case 'email':
-      regex = utils.regex.email
-      break
-    case 'regex':
-      var r = input.dataset['validateRegex']
-      if (!r) throw new Error('No regex provided to validation')
-      regex = new RegExp(r)
-      break
-    case 'password':
-      regex = utils.regex.password
-      break
-    default:
-      regex = /.*/
-  }
-  return regex.exec(input.value)
+function validateChecked (formDecorator, input) {
+  return Promise.resolve(input.checked)
 }
 
-function validateChecked (input) {
-  return input.checked
-}
+/**
+ * @type {Object.<string, function(formDecorator: FormDecorator, input: HTMLElement) : Promise.<boolean>>}
+ */
+var staticValidators = {}
+
+staticValidators['checked'] = validateChecked
+
+Object.keys(utils.regex).forEach((key) => {
+  staticValidators[key] = (formDecorator, input) => validateRegEx(formDecorator, input, utils.regex[key])
+})
 
 class FormDecorator extends ElementDecorator {
 
@@ -54,6 +39,7 @@ class FormDecorator extends ElementDecorator {
     super(formElement)
     this._submitFunction = undefined
     this._submitIsSetup = false
+    this.validators = {}
     this._setupValidation()
   }
 
@@ -72,10 +58,24 @@ class FormDecorator extends ElementDecorator {
       if (!this._submitFunction) return
       evt.preventDefault()
       this.element.classList.add('blur')
-      this._submitFunction()
+      var promise = this._submitFunction()
+      if (!promise) {
+        this.element.classList.remove('blur')
+        return
+      }
+      promise
         .then(() => this.element.classList.remove('blur'))
         .catch(() => this.element.classList.remove('blur'))
     }
+  }
+
+  /**
+   * Register an validator
+   * @param {string} type
+   * @param {function (formDecorator:FormDecorator, HTMLElement element) : Promise.<boolean>} validator
+   */
+  registerValidator (type, validator) {
+    this.validators[type] = validator
   }
 
   _validateElement (element) {
@@ -85,25 +85,21 @@ class FormDecorator extends ElementDecorator {
     for (var j = 0; j < inputs.length; j++) {
       var input = inputs[j]
       var validateType = input.dataset['validateType']
-      results[j] = true
       if (!validateType) {
+        results[j] = Promise.resolve(true)
         continue
       }
-      validateType.split(' ').forEach((validateType) => {
-        if (!results[j] || !validateType) return
-        if (validateType === 'checked') {
-          results[j] = validateChecked(input)
-          return
-        }
-        if (validateType === 'unique') {
-          results[j] = validateUnique(this.element, input)
-          return
-        }
-        results[j] = validateRegEx(validateType, input)
-      })
+      results[j] = utils.validateType.parse(validateType)
+        .generateValidator(_.merge(staticValidators, this.validators))(this, input)
     }
-    if (results.every((d) => d)) element.classList.remove('invalid')
-    else element.classList.add('invalid')
+    element.classList.add('deciding')
+    Promise
+      .all(results)
+      .then((results) => results.every((d) => d))
+      .then((result) => {
+        element.classList.remove('deciding')
+        element.classList.toggle('invalid', !result)
+      })
   }
 
   validate () {

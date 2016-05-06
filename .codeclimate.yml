@@ -1,4 +1,6 @@
 ---
+exclude_paths:
+- "tests"
 engines:
   scss-lint:
     enabled: true

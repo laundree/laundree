@@ -1,6 +1,6 @@
 @import "main"
 
-form
+section
   max-width: 23em
   margin: auto
 
@@ -14,12 +14,13 @@ form
       height: logo_ratio_w_to_h(15em)
       display: block
 
-  div.forgot
-    text-align: right
-    a
+  .forgot
+    text-align: center
+    line-height: 2em
+    padding: 1em 0
+    > *
       font-size: 0.9em
 
-form
   .auth_alternatives
     overflow: hidden
     padding: 1em 0
@@ -39,7 +40,7 @@ form
       font-weight: 300
 
       &.google
-        background-color: #7D1974
+        background-color: #7D1919
 
       &.facebook
         background-color: #0F6084
@@ -50,6 +51,11 @@ form
         fill: #fff
         margin: 0.5em 1em
         float: left
+
+  .buttons
+    padding-top: 2em
+    input.create
+      width: 14em
 
   .or
     background:
@@ -63,3 +69,12 @@ form
       font-weight: bold
       background-color: #66D3D3
       padding: 0 1em
+
+  .notice
+    font-size: 0.7em
+    padding-top: 0.5em
+    border-top: 0.1em solid #40a3a0
+
+  .accept
+    font-size: 0.8em
+    padding-top: 2em

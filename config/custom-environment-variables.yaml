@@ -1,0 +1,25 @@
+web:
+  port: 'PORT'
+
+redis:
+  host: 'REDIS_HOST'
+  port: 'REDIS_PORT'
+
+mongo:
+  url: 'MONGO_URL'
+
+facebook:
+  appId: 'FACEBOOK_APP_ID'
+  appSecret: 'FACEBOOK_APP_SECRET'
+  callbackUrl: 'FACEBOOK_CALLBACK_URL'
+
+google:
+  clientId: 'GOOGLE_CLIENT_ID'
+  clientSecret: 'GOOGLE_CLIENT_SECRET'
+  callbackUrl: 'GOOGLE_CALLBACK_URL'
+
+session:
+  secret: 'SESSION_SECRET'
+
+codeClimate:
+  repoToken: 'CODECLIMATE_REPO_TOKEN'
