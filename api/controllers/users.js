@@ -22,7 +22,7 @@ function returnError (res, statusCode, message) {
 function getUser (req, res) {
   var id = req.swagger.params.id.value
   UserHandler.findFromId(id).then((user) => {
-    if (!user) returnError(res, 404, 'User not found.')
+    if (!user) return returnError(res, 404, 'User not found.')
     res.json(modelToUser(req, user))
   }).catch(() => {
     returnError(res, 404, 'User not found.')
@@ -34,7 +34,7 @@ function listUsers (req, res) {
   var email = req.swagger.params.email.value
   var limit = req.swagger.params.page_size.value
   if (email) {
-    filter.email = email
+    filter['profiles.emails.value'] = email
   }
   var since = req.swagger.params.since.value
   if (since) {

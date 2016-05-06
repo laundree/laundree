@@ -62,7 +62,7 @@ class UserHandler extends Handler {
    * @return {Promise.<UserHandler>}
    */
   static findFromEmail (email) {
-    return UserModel.findOne({email: email.toLowerCase().trim()}).exec().then((userModel) => userModel ? new UserHandler(userModel) : undefined)
+    return UserModel.findOne({'profiles.emails.value': email.toLowerCase().trim()}).exec().then((userModel) => userModel ? new UserHandler(userModel) : undefined)
   }
 
   /**
@@ -100,7 +100,6 @@ class UserHandler extends Handler {
   static createUserFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return new UserModel({
-      email: profile.emails[0].value,
       profiles: [profile],
       latestProvider: profile.provider
     }).save().then((model) => new UserHandler(model))
@@ -139,7 +138,7 @@ class UserHandler extends Handler {
 
   toRest (href) {
     return {
-      email: this.model.email,
+      emails: this.model.emails,
       id: this.model.id,
       displayName: this.model.displayName,
       name: {

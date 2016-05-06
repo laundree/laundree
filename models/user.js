@@ -6,7 +6,6 @@ var Schema = mongoose.Schema
 var _ = require('lodash')
 
 var userSchema = new Schema({
-  email: {type: String, required: true, trim: true, lowercase: true, unique: true},
   password: {type: String},
   latestProvider: String,
   profiles: [{
@@ -25,7 +24,7 @@ var userSchema = new Schema({
   toObject: {virtuals: true},
   toJSON: {virtuals: true}
 })
-
+userSchema.index({'profiles.emails.value': 1})
 userSchema
   .virtual('latestProfile')
   .get(function () {
@@ -46,6 +45,15 @@ function fromLatestProfile (attribute) {
 fromLatestProfile('displayName')
 
 fromLatestProfile('name')
+
+userSchema
+  .virtual('emails')
+  .get(function () {
+    var emails = this.profiles
+      .reduce((prev, profile) => prev.concat(profile.emails.map((email) => email.value)), [])
+    var seen = {}
+    return emails.filter((item, pos) => seen.hasOwnProperty(item) ? false : (seen[item] = true))
+  })
 
 userSchema
   .virtual('photo')
