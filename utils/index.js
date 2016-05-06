@@ -5,5 +5,6 @@
 module.exports = {
   regex: require('./regex'),
   validateType: require('./validate_type'),
-  password: require('./password')
+  password: require('./password'),
+  identicon: require('./identicon')
 }

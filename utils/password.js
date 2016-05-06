@@ -1,7 +1,7 @@
 /**
  * Created by budde on 06/05/16.
  */
-if (typeof window === 'undefined') var bcrypt = require('bcrypt')
+var bcrypt = require('bcrypt')
 
 /**
  * Hash a given password
