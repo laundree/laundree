@@ -107,6 +107,7 @@ class UserHandler extends Handler {
   }
 
   static createUserWithPassword (displayName, email, password) {
+    displayName = displayName.split(' ').filter((name) => name.length).join(' ')
     var profile = {
       id: email,
       displayName: displayName,
