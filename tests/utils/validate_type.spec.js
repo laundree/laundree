@@ -135,7 +135,7 @@ describe('unit', () => {
         it('should generate validator', () => {
           var validators = {true: () => Promise.resolve(true), false: () => Promise.resolve(false)}
           // noinspection BadExpressionStatementJS
-          return validateType.parse('(true or false) and true').generateValidator(validators)().should.eventually.be.true
+          return validateType.parse('(false or true) and true').generateValidator(validators)().should.eventually.be.true
         })
         it('should generate validator', () => {
           var validators = {true: () => Promise.resolve(true), false: () => Promise.resolve(false)}
