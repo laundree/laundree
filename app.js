@@ -6,10 +6,7 @@ var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 
 var routes = require('./routes')
-var lib = require('./setups')
-
-var passportSetup = lib.passportSetup
-var sessionSetup = lib.sessionSetup
+var setups = require('./setups')
 
 var app = express()
 var hbs = require('hbs')
@@ -19,12 +16,11 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'hbs')
 
 // Session
-sessionSetup(app)
+setups.sessionSetup(app)
 
 // Passport
-passportSetup(app)
+setups.passportSetup(app)
 
-// uncomment after placing your favicon in /public
 app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
 app.use(logger('dev'))
 app.use(bodyParser.json())
@@ -44,38 +40,34 @@ app.use((req, res, next) => {
 })
 
 app.use('/', routes)
-
+// Swagger
+setups.swaggerSetup(app).then((swaggerApp) => {
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  var err = new Error('Not Found')
-  err.status = 404
-  next(err)
-})
+  app.use(function (req, res, next) {
+    var err = new Error('Not Found')
+    err.status = 404
+    next(err)
+  })
 
-// error handlers
+  if (app.get('env') === 'development') {
+    app.use((err, req, res, next) => {
+      console.log(err)
+      res.status(err.status || 500)
+      res.render('error', {
+        message: err.message,
+        error: err,
+        styles: ['/stylesheets/error.css']
+      })
+    })
+  }
 
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
   app.use((err, req, res, next) => {
-    console.log(err)
     res.status(err.status || 500)
     res.render('error', {
       message: err.message,
-      error: err,
+      error: {},
       styles: ['/stylesheets/error.css']
     })
-  })
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use((err, req, res, next) => {
-  res.status(err.status || 500)
-  res.render('error', {
-    message: err.message,
-    error: {},
-    styles: ['/stylesheets/error.css']
   })
 })
 

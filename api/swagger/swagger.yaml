@@ -1,0 +1,164 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Laundree App
+
+# during dev, should point to your local machine
+host: localhost:3000
+# basePath prefixes all resource paths 
+basePath: /api
+# 
+schemes:
+  - http
+  - https
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+paths:
+  /users:
+    x-swagger-router-controller: users
+    get:
+      description: List users.
+      operationId: listUsers
+      parameters:
+        - name: email
+          in: query
+          description: Filter by email
+          required: false
+          type: string
+        - name: page_size
+          in: query
+          description: The maximum page-size
+          default: 10
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 100
+        - name: since
+          in: query
+          description: Since a given id
+          required: false
+          type: string
+      tags:
+        - Users
+      responses:
+        "200":
+          headers: 
+            Link: 
+              description: Link header
+              type: string
+          description: A list of users
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      description: Create a new user.
+      operationId: createUser
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema: 
+            $ref: "#/definitions/CreateUserRequest"
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /users/{id}:
+    x-swagger-router-controller: users
+    get:
+      description: Returns user with given Id.
+      operationId: getUser
+      parameters:
+        - name: id
+          in: path
+          description: The user to be queried
+          required: true
+          type: string
+      tags:
+        - Users
+      responses:
+        "200":
+          description: User
+          schema:
+            $ref: "#/definitions/User"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  CreateUserRequest:
+    required:
+      - displayName
+      - email
+      - password
+    properties:
+      displayName:
+        type: string
+      email:
+        type: string
+      password:
+        type: string
+        format: password
+
+  User:
+    required:
+      - email
+      - href
+    properties:
+      id:
+        type: string
+      email:
+        type: string
+        format: email
+      photo:
+        type: string
+      displayName:
+        type: string
+      name:
+        $ref: "#/definitions/Name"
+      href:
+        type: string
+        format: uri
+  Name:
+    properties:
+      familyName: 
+        type: string
+      givenName: 
+        type: string
+      middleName: 
+        type: string
+
+  Error:
+    required:
+      - message
+    properties:
+      message:
+        type: string

@@ -5,5 +5,6 @@
 module.exports = {
   passportSetup: require('./passport'),
   socketIoSetup: require('./socket-io'),
-  sessionSetup: require('./session')
+  sessionSetup: require('./session'),
+  swaggerSetup: require('./swagger')
 }

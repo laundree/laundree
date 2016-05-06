@@ -5,13 +5,13 @@
 var app = require('./app')
 var debug = require('debug')('laundree:server')
 var http = require('http')
-var config = require('./config')
+var config = require('config')
 var socketIo = require('./setups').socketIoSetup
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(config.web.port)
+var port = normalizePort(config.get('web.port'))
 app.set('port', port)
 
 /**
@@ -88,3 +88,4 @@ function onListening () {
     : 'port ' + addr.port
   debug('Listening on ' + bind)
 }
+

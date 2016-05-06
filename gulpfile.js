@@ -6,7 +6,7 @@ var isparta = require('isparta')
 var mongoose = require('mongoose')
 var exec = require('child_process').exec
 var runSequence = require('run-sequence')
-var config = require('./config')
+var config = require('config')
 
 gulp.task('lint', function () {
   return gulp.src(['{client,handlers,models,routes,setups,tests,utils,views}/**/*.js', '*.js'])
@@ -42,7 +42,7 @@ gulp.task('test-unit', function (done) {
 })
 
 gulp.task('send-coverage', (done) => {
-  if (!config.codeClimate.repoToken) {
+  if (!config.has('codeClimate.repoToken')) {
     console.log('Skipping sending coverage because of missing configuration')
     return done()
   }
