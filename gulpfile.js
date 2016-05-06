@@ -16,7 +16,7 @@ gulp.task('lint', function () {
 })
 
 gulp.task('test-unit', function (done) {
-  gulp.src(['{handlers,models,utils}/**/*.js'])
+  gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
     .pipe(istanbul({ // Covering files
       instrumenter: isparta.Instrumenter,
       includeUntested: true
