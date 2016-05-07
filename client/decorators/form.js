@@ -61,6 +61,7 @@ class FormDecorator extends ElementDecorator {
       if (!this._submitFunction) return
       evt.preventDefault()
       if (this.element.classList.contains('invalid') ||
+        this.element.classList.contains('blur') ||
         this.element.classList.contains('initial')) {
         return
       }
@@ -72,11 +73,12 @@ class FormDecorator extends ElementDecorator {
       }
       promise
         .then((response) => {
-          if (!response.message) return
+          if (!response || !response.message) return
           this.updateNotion(FormDecorator.NOTION_TYPE_SUCCESS, response.message)
         })
         .then(() => this.element.classList.remove('blur'))
         .then(() => this.element.reset())
+        .then(() => this.validateForm())
         .catch((err) => {
           this.updateNotion(FormDecorator.NOTION_TYPE_ERROR, err.message)
           this.element.classList.remove('blur')
