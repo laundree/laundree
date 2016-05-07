@@ -1,13 +1,12 @@
 
 table {
-    width: 100%;
+  width: 100%;
 }
 
-table td.logo {
-    text-align: center;
-
+table .logo {
+  text-align: center;
 }
 
-table td.body {
-    width: 400px;
+table .body {
+  width: 400px;
 }
