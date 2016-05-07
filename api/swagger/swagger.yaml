@@ -3,17 +3,17 @@ info:
   version: "0.0.1"
   title: Laundree App
 
-# during dev, should point to your local machine
 host: localhost:3000
-# basePath prefixes all resource paths 
+
 basePath: /api
-# 
+
 schemes:
   - http
   - https
 
 consumes:
   - application/json
+  - application/octet-stream
 
 produces:
   - application/json
@@ -110,6 +110,64 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /users/{id}/start-password-reset:
+    x-swagger-router-controller: users
+    post:
+      description: Start user password reset
+      operationId: startPasswordReset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The user to be queried
+          type: string
+      tags:
+        - Users
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /users/{id}/password-reset:
+    x-swagger-router-controller: users
+    post:
+      description: Reset user password
+      operationId: passwordReset
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The user to be queried
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema: 
+            $ref: "#/definitions/ResetPasswordRequest"
+      tags:
+        - Users
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+      
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -127,6 +185,17 @@ definitions:
       password:
         type: string
         format: password
+
+  ResetPasswordRequest:
+    required:
+      - password
+      - token
+    properties:
+      password:
+        type: string
+        format: password
+      token:
+        type: string
 
   User:
     required:

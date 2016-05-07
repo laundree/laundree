@@ -23,3 +23,7 @@ session:
 
 codeClimate:
   repoToken: 'CODECLIMATE_REPO_TOKEN'
+
+mailer:
+  smtp:
+    transport: 'MAILER_SMTP_TRANSPORT'

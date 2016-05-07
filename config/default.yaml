@@ -5,18 +5,22 @@ redis:
   host: 'localhost'
   port: 6379
 
+mailer:
+  smtp:
+    transport: 'smtps://user%40gmail.com:pass@smtp.gmail.com'
+
 mongo:
   url: 'mongodb://localhost/laundree'
 
 facebook:
-  appId: '1044245858966868'
-  appSecret: '394f0ef62fd8d104e110ba898afeeb4a'
-  callbackUrl: 'http://localhost:3000/auth/facebook/callback'
+  appId: '0000000000000000'
+  appSecret: '00000000000000000000000000000000'
+  callbackUrl: 'https://someUrl/auth/facebook/callback'
 
 google:
-  clientId: '1098336985149-el1jqcb5j7d3oldav4csv0nh976pvsch.apps.googleusercontent.com'
-  clientSecret: '0uWixpXV9BwwXTTeZYm0fvls'
-  callbackUrl: 'http://localhost:3000/auth/google/callback'
+  clientId: '0000000000000000000000000000000000000000000000.apps.googleusercontent.com'
+  clientSecret: '000000000000000000000000'
+  callbackUrl: 'https://someUrl/auth/google/callback'
 
 session:
   secret: 'secret1234'

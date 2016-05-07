@@ -42,6 +42,7 @@ class FormDecorator extends ElementDecorator {
     this._submitFunction = undefined
     this._submitIsSetup = false
     this.validators = {}
+    this.notionElement = null
     this._setupValidation()
   }
 
@@ -59,6 +60,10 @@ class FormDecorator extends ElementDecorator {
     return (evt) => {
       if (!this._submitFunction) return
       evt.preventDefault()
+      if (this.element.classList.contains('invalid') ||
+        this.element.classList.contains('initial')) {
+        return
+      }
       this.element.classList.add('blur')
       var promise = this._submitFunction()
       if (!promise) {
@@ -66,9 +71,30 @@ class FormDecorator extends ElementDecorator {
         return
       }
       promise
+        .then((response) => {
+          if (!response.message) return
+          this.updateNotion(FormDecorator.NOTION_TYPE_SUCCESS, response.message)
+        })
         .then(() => this.element.classList.remove('blur'))
-        .catch(() => this.element.classList.remove('blur'))
+        .then(() => this.element.reset())
+        .catch((err) => {
+          this.updateNotion(FormDecorator.NOTION_TYPE_ERROR, err.message)
+          this.element.classList.remove('blur')
+        })
     }
+  }
+
+  updateNotion (type, message) {
+    if (!message) return
+    if (!this.notionElement) {
+      this.notionElement = document.createElement('div')
+      this.notionElement.classList.add('notion')
+      this.notionElement.setAttribute('hidden', 'hidden')
+      this.element.insertBefore(this.notionElement, this.element.childNodes[0])
+    }
+    this.notionElement.setAttribute('class', `notion ${type}`)
+    this.notionElement.removeAttribute('hidden')
+    this.notionElement.innerText = message
   }
 
   /**
@@ -146,5 +172,8 @@ class FormDecorator extends ElementDecorator {
     this.element.addEventListener('input', listener)
   }
 }
+
+FormDecorator.NOTION_TYPE_ERROR = 'error'
+FormDecorator.NOTION_TYPE_SUCCESS = 'success'
 
 module.exports = FormDecorator

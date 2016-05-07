@@ -1,0 +1,12 @@
+
+table {
+  width: 100%;
+}
+
+table .logo {
+  text-align: center;
+}
+
+table .body {
+  width: 400px;
+}

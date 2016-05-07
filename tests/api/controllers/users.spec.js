@@ -203,5 +203,108 @@ describe('controllers', function () {
           })
       })
     })
+
+    describe('POST /api/users/{id}/start-password-reset', () => {
+/*
+      it('should start reset', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post(`/api/users/${users[0].model.id}/start-password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send()
+            .expect(204)
+            .end((err) => done(err))
+        }))
+*/
+
+      it('should fail on no user', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post('/api/users/aaa/start-password-reset')
+            .set('Accept', 'application/json')
+            .send()
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err) => done(err))
+        }))
+
+      it('should fail on no user', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/start-password-reset')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send()
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err) => done(err))
+        }))
+    })
+
+    describe('POST /api/users/{id}/password-reset', () => {
+      it('should fail on no body', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post(`/api/users/${users[0].model.id}/password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({})
+            .expect(400)
+            .end((err) => done(err))
+        }))
+
+      it('fail on no token', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post(`/api/users/${users[0].model.id}/password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: 'someToken', password: 'password1234'})
+            .expect(400)
+            .end((err) => done(err))
+        }))
+
+      it('fail on invalid password', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var user = users[0]
+          return user.generateResetToken().then((token) => [user, token])
+        }).then((result) => {
+          // noinspection UnnecessaryLocalVariableJS
+          var [user, token] = result
+          request(app)
+            .post(`/api/users/${user.model.id}/password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: token, password: 'pass'})
+            .expect(400)
+            .end((err) => done(err))
+        }))
+      it('success on right token', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var user = users[0]
+          return user.generateResetToken().then((token) => [user, token])
+        }).then((result) => {
+          // noinspection UnnecessaryLocalVariableJS
+          var [user, token] = result
+          request(app)
+            .post(`/api/users/${user.model.id}/password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: token, password: 'password1234'})
+            .expect(204)
+            .end((err) => done(err))
+        }))
+
+      it('fail on no invalid id', (done) => {
+        request(app)
+          .post('/api/users/aaa/password-reset')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({token: 'asdasdasdaasdsaasd', password: 'password1'})
+          .expect(404)
+          .end((err) => done(err))
+      })
+    })
   })
 })

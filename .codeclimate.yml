@@ -1,6 +1,7 @@
 ---
 exclude_paths:
 - "tests"
+- 'email-templates'
 engines:
   scss-lint:
     enabled: true
