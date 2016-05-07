@@ -13,13 +13,13 @@ mongo:
   url: 'mongodb://localhost/laundree'
 
 facebook:
-  appId: ''
-  appSecret: ''
+  appId: '0000000000000000'
+  appSecret: '00000000000000000000000000000000'
   callbackUrl: 'https://someUrl/auth/facebook/callback'
 
 google:
-  clientId: ''
-  clientSecret: ''
+  clientId: '0000000000000000000000000000000000000000000000.apps.googleusercontent.com'
+  clientSecret: '000000000000000000000000'
   callbackUrl: 'https://someUrl/auth/google/callback'
 
 session:
