@@ -1,7 +1,6 @@
 var express = require('express')
 var router = express.Router()
 var passport = require('passport')
-
 /* GET users listing. */
 router.get('/', (req, res) => res.render('log-in', {
   title: ['Log in'],
@@ -11,11 +10,24 @@ router.get('/', (req, res) => res.render('log-in', {
   styles: ['/stylesheets/auth.css']
 }))
 
-router.get('/forgot', (req, res) => res.render('reset-password', {
-  title: ['Reset password'],
+router.get('/forgot', (req, res) => res.render('forgot-password', {
+  title: ['Forgot password'],
   no_nav: true,
   styles: ['/stylesheets/auth.css']
 }))
+
+router.get('/reset', (req, res) => {
+  var user = req.query.user
+  var token = req.query.token
+  if (!user || !token) return res.redirect(req.baseUrl + '/forgot')
+  res.render('reset-password', {
+    title: ['Reset password'],
+    no_nav: true,
+    user_id: user,
+    token: token,
+    styles: ['/stylesheets/auth.css']
+  })
+})
 
 router.get('/facebook', function (req) {
   var params = {scope: ['public_profile', 'email']}

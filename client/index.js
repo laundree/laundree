@@ -23,6 +23,8 @@ var initializers = require('./initializers')
 var library = new initializers.InitializerLibrary()
 library.registerInitializer(initializers.SignUpInitializer)
 library.registerInitializer(initializers.SignInInitializer)
+library.registerInitializer(initializers.ForgotPasswordInitializer)
+library.registerInitializer(initializers.ResetPasswordInitializer)
 library.registerInitializer(initializers.DropDownInitializer)
 
 library.setup()

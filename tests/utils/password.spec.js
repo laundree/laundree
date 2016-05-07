@@ -13,11 +13,14 @@ var clearPassword = 'password1234'
 describe('utils', () => {
   describe('password', () => {
     describe('hashPassword', () => {
-      it('should hash', () => password.hashPassword(1, clearPassword).should.eventually.not.be.undefined)
+      it('should hash', () => password.hashPassword(clearPassword, 1).should.eventually.not.be.undefined)
     })
     describe('comparePassword', () => {
-      it('should match', () => password.hashPassword(2, clearPassword)
+      it('should match', () => password.hashPassword(clearPassword, 2)
         .then((hash) => password.comparePassword(clearPassword, hash)).should.eventually.be.true)
+    })
+    describe('generateToken', () => {
+      it('should generate hex string', () => password.generateToken().should.eventually.match(/^[a-f0-9]{40}$/))
     })
   })
 })

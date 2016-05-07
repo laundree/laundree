@@ -7,6 +7,12 @@ var errorCode = require('rest/interceptor/errorCode')
 
 var client = rest.wrap(mime).wrap(errorCode)
 
+function wrapError (req) {
+  var error = new Error(req.entity.message)
+  error.status = req.status.code
+  throw error
+}
+
 class UserClientApi {
 
   constructor (id, model) {
@@ -23,12 +29,21 @@ class UserClientApi {
     return client({
       path: `/api/users?email=${email}`,
       method: 'GET'
-    }).then((response) => {
+    }).catch(wrapError).then((response) => {
       var entity = response.entity
       if (!entity) return null
       if (entity.length !== 1) return null
       return new UserClientApi(entity[0].id, entity[0])
     })
+  }
+
+  static resetPassword (id, token, password) {
+    return client({
+      path: `/api/users/${id}/password-reset`,
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      entity: {token: token, password: password}
+    }).catch(wrapError)
   }
 
   static createUser (displayName, email, password) {
@@ -37,11 +52,19 @@ class UserClientApi {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       entity: {displayName: displayName, email: email, password: password}
-    }).then((response) => {
+    }).catch(wrapError).then((response) => {
       var entity = response.entity
       if (!entity) return null
       return new UserClientApi(entity.id, entity)
     })
+  }
+
+  static startPasswordReset (id) {
+    return client({
+      path: `/api/users/${id}/start-password-reset`,
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'}
+    }).catch(wrapError)
   }
 }
 

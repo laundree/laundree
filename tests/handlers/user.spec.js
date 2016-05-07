@@ -64,6 +64,20 @@ describe('handlers', () => {
         () => UserHandler.findFromId(user.model.id + 'asd').should.be.rejected)
     })
 
+    describe('resetPassword', () => {
+      it('should reset the password', () => user.resetPassword('password12345').then((user) => {
+        return user.verifyPassword('password12345').should.eventually.be.true
+      }))
+      it('should remove reset token', () => user.generateResetToken()
+        .then((token) => user.resetPassword('asd1234')
+          .then(() => user.verifyResetPasswordToken(token).should.eventually.be.false)))
+    })
+
+    describe('verifyResetPasswordToken', () => {
+      it('should verify', () => user.generateResetToken()
+        .then((token) => user.verifyResetPasswordToken(token).should.eventually.be.true))
+    })
+
     describe('createUserWithPassword', () => {
       it('should create user', () =>
         UserHandler.createUserWithPassword('Alice Alison', 'ali@example.com', 'password1234')

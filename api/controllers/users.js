@@ -69,8 +69,48 @@ function createUser (req, res) {
   })
 }
 
+function startPasswordReset (req, res) {
+  var id = req.swagger.params.id.value
+  UserHandler.findFromId(id)
+    .then((user) => {
+      if (!user) return returnError(res, 404, 'User not found.')
+      user.generateResetToken().then((token) => {
+        utils.mail.sendEmail({user: user.model, token: token}, 'password-reset', user.model.emails[0])
+          .then(() => {
+            res.statusCode = 204
+            res.json(null)
+          }).catch(() => returnError(res, 500, 'Failed to send email.'))
+      }).catch(() => returnError(res, 500, 'Creation failed.'))
+    })
+    .catch(() => returnError(res, 404, 'User not found.'))
+}
+
+function passwordReset (req, res) {
+  var id = req.swagger.params.id.value
+  var body = req.swagger.params.body.value
+  var token = body.token
+  var password = body.password
+  if (!password || !utils.regex.password.exec(password)) returnError(res, 400, 'Invalid password')
+  UserHandler.findFromId(id)
+    .then((user) => {
+      if (!user) return returnError(res, 404, 'User not found.')
+      user.verifyResetPasswordToken(token).then((result) => {
+        if (!result) return returnError(res, 400, 'Invalid token')
+        user.resetPassword(password)
+          .then(() => {
+            res.statusCode = 204
+            res.json(null)
+          })
+          .catch(() => returnError(res, 500, 'Reset failed.'))
+      })
+    })
+    .catch(() => returnError(res, 404, 'User not found.'))
+}
+
 module.exports = {
   getUser: getUser,
   listUsers: listUsers,
-  createUser: createUser
+  createUser: createUser,
+  startPasswordReset: startPasswordReset,
+  passwordReset: passwordReset
 }

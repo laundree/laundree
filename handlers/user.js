@@ -6,7 +6,6 @@ var Handler = require('./handler')
 var UserModel = require('../models').UserModel
 var _ = require('lodash')
 var utils = require('../utils')
-var config = require('config')
 
 /**
  * @param {string}displayName
@@ -93,6 +92,23 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Will create a new password-reset token with 1h. expiration.
+   * @return {Promise.<string>}
+   */
+  generateResetToken () {
+    return utils.password.generateToken().then((token) => {
+      return utils.password.hashPassword(token).then((hash) => {
+        this.model.resetPasswordToken = hash
+        this.model.resetPasswordExpire = Date.now() + 3600000
+        return this.model.save().then((model) => {
+          this.model = model
+          return token
+        })
+      })
+    })
+  }
+
+  /**
    * Create a new user from given profile.
    * @param {Profile} profile
    * @return {Promise.<UserHandler>}
@@ -118,7 +134,7 @@ class UserHandler extends Handler {
       }
       return Promise.all(
         [UserHandler.createUserFromProfile(profile),
-          utils.password.hashPassword(config.get('security.password.saltRounds'), password)])
+          utils.password.hashPassword(password)])
         .then((result) => {
           // noinspection UnnecessaryLocalVariableJS
           var [user, passwordHash] = result
@@ -131,6 +147,19 @@ class UserHandler extends Handler {
     })
   }
 
+  resetPassword (password) {
+    return utils.password.hashPassword(password)
+      .then((hash) => {
+        this.model.password = hash
+        this.model.resetPasswordToken = undefined
+        this.model.resetPasswordExpire = undefined
+        return this.model.save()
+      }).then((model) => {
+        this.model = model
+        return this
+      })
+  }
+
   /**
    * Verifies given password.
    * @param {string} password
@@ -139,6 +168,18 @@ class UserHandler extends Handler {
   verifyPassword (password) {
     if (!this.model.password) return Promise.resolve(false)
     return utils.password.comparePassword(password, this.model.password)
+  }
+
+  /**
+   * Verifies a given token.
+   * @param {string} token
+   * @return {Promise.<boolean>}
+   */
+  verifyResetPasswordToken (token) {
+    if (!this.model.resetPasswordToken) return Promise.resolve(false)
+    if (!this.model.resetPasswordExpire) return Promise.resolve(false)
+    if (new Date() > this.model.resetPasswordExpire) return Promise.resolve(false)
+    return utils.password.comparePassword(token, this.model.resetPasswordToken)
   }
 
   toRest (href) {

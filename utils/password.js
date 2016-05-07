@@ -2,14 +2,16 @@
  * Created by budde on 06/05/16.
  */
 var bcrypt = require('bcrypt')
-
+var crypto = require('crypto')
+var config = require('config')
 /**
  * Hash a given password
- * @param {int} saltRounds
+ * @param {int=} saltRounds
  * @param {string} password
  * @return {Promise.<string>}
  */
-function hashPassword (saltRounds, password) {
+function hashPassword (password, saltRounds) {
+  saltRounds = saltRounds || config.get('security.password.saltRounds')
   return new Promise((resolve, reject) => bcrypt.genSalt(saltRounds, (err, salt) => {
     if (err) return reject(err)
     bcrypt.hash(password, salt, (err, hash) => {
@@ -26,7 +28,18 @@ function comparePassword (password, hash) {
   }))
 }
 
+/**
+ * @return {Promise.<string>}
+ */
+function generateToken () {
+  return new Promise((resolve, reject) => crypto.randomBytes(20, (err, buffer) => {
+    if (err) return reject(err)
+    resolve(buffer.toString('hex'))
+  }))
+}
+
 module.exports = {
   hashPassword: hashPassword,
-  comparePassword: comparePassword
+  comparePassword: comparePassword,
+  generateToken: generateToken
 }

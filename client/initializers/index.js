@@ -5,5 +5,7 @@ module.exports = {
   InitializerLibrary: require('./initializer_library'),
   SignUpInitializer: require('./sign_up'),
   SignInInitializer: require('./sign_in'),
-  DropDownInitializer: require('./dropdown')
+  DropDownInitializer: require('./dropdown'),
+  ForgotPasswordInitializer: require('./forgot-password'),
+  ResetPasswordInitializer: require('./reset-password')
 }

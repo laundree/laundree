@@ -36,3 +36,4 @@ public/stylesheets/*.css.map
 *.ai
 public/videos
 reports
+config/local.yaml

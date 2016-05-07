@@ -7,6 +7,8 @@ var _ = require('lodash')
 
 var userSchema = new Schema({
   password: {type: String},
+  resetPasswordToken: String,
+  resetPasswordExpire: Date,
   latestProvider: String,
   profiles: [{
     provider: String,
