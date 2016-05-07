@@ -4,7 +4,6 @@ exclude_paths:
 engines:
   scss-lint:
     enabled: true
-    scss_files: 'public/stylesheets/*.sass'
   markdownlint:
     enabled: true
   duplication:
