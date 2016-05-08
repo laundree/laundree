@@ -46,6 +46,7 @@ setups.swaggerSetup(app).then((swaggerApp) => {
     res.status(404)
     res.render('error-404',
       {
+        title: ['Page not found'],
         styles: ['/stylesheets/error.css']
       })
   })
