@@ -3,3 +3,35 @@
 main
   section.error
     padding: 0 2em
+
+  section#NotFound
+    max-width: 44em
+    margin: auto
+    overflow: hidden
+    padding: 8em 0
+
+    h1
+      font-size: 3em
+      float: left
+      width: 100%
+      text-align: left
+      padding-bottom: 0.3em
+
+    .message
+      float: left
+      width: 20em
+    svg
+      width: 20em
+      float: right
+
+@media only screen and (max-width: 45em)
+
+  main
+    section#NotFound
+      svg
+        float: none
+        margin: 3em auto
+        display: block
+      .message
+        float: none
+        margin: auto

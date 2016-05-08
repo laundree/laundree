@@ -42,11 +42,12 @@ app.use((req, res, next) => {
 app.use('/', routes)
 // Swagger
 setups.swaggerSetup(app).then((swaggerApp) => {
-// catch 404 and forward to error handler
   app.use(function (req, res, next) {
-    var err = new Error('Not Found')
-    err.status = 404
-    next(err)
+    res.status(404)
+    res.render('error-404',
+      {
+        styles: ['/stylesheets/error.css']
+      })
   })
 
   if (app.get('env') === 'development') {
