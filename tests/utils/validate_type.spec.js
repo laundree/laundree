@@ -133,14 +133,14 @@ describe('unit', () => {
     describe('AstNode', () => {
       describe('generateValidator', () => {
         it('should generate validator', () => {
-          var validators = {true: () => Promise.resolve(true), false: () => Promise.resolve(false)}
+          var validators = {true: () => Promise.resolve(true), false: () => Promise.reject(false)}
           // noinspection BadExpressionStatementJS
           return validateType.parse('(false or true) and true').generateValidator(validators)().should.eventually.be.true
         })
         it('should generate validator', () => {
-          var validators = {true: () => Promise.resolve(true), false: () => Promise.resolve(false)}
+          var validators = {true: () => Promise.resolve(true), false: () => Promise.reject(false)}
           // noinspection BadExpressionStatementJS
-          return validateType.parse('(true or false) and false').generateValidator(validators)().should.eventually.be.false
+          return validateType.parse('(true or false) and false').generateValidator(validators)().should.be.rejected
         })
       })
     })

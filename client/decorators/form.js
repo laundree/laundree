@@ -8,17 +8,24 @@ var utils = {validateType: require('../../utils/validate_type'), regex: require(
 
 var _ = require('lodash')
 
+function boolToPromise (bool, validator) {
+  if (bool) return Promise.resolve()
+  var error = new Error()
+  error.validation = validator
+  return Promise.reject(error)
+}
+
 function validateRegEx (formDecorator, input, regex) {
   if (!regex) {
     var r = input.dataset['validateRegex']
     if (!r) throw new Error('No regex provided to validation')
     regex = new RegExp(r)
   }
-  return Promise.resolve(regex.exec(input.value))
+  return boolToPromise(regex.exec(input.value), 'regEx')
 }
 
 function validateChecked (formDecorator, input) {
-  return Promise.resolve(input.checked)
+  return boolToPromise(input.checked)
 }
 
 /**
@@ -29,7 +36,12 @@ var staticValidators = {}
 staticValidators['checked'] = validateChecked
 
 Object.keys(utils.regex).forEach((key) => {
-  staticValidators[key] = (formDecorator, input) => validateRegEx(formDecorator, input, utils.regex[key])
+  staticValidators[key] = (formDecorator, input) =>
+    validateRegEx(formDecorator, input, utils.regex[key])
+      .catch((err) => {
+        err.validation = key
+        throw err
+      })
 })
 
 class FormDecorator extends ElementDecorator {
@@ -86,14 +98,20 @@ class FormDecorator extends ElementDecorator {
     }
   }
 
+  _createNotionElement () {
+    if (this.notionElement) return
+    this.notionElement = this.element.querySelector('.notion')
+
+    if (this.notionElement) return
+    this.notionElement = document.createElement('div')
+    this.notionElement.classList.add('notion')
+    this.notionElement.setAttribute('hidden', 'hidden')
+    this.element.insertBefore(this.notionElement, this.element.childNodes[0])
+  }
+
   updateNotion (type, message) {
     if (!message) return
-    if (!this.notionElement) {
-      this.notionElement = document.createElement('div')
-      this.notionElement.classList.add('notion')
-      this.notionElement.setAttribute('hidden', 'hidden')
-      this.element.insertBefore(this.notionElement, this.element.childNodes[0])
-    }
+    this._createNotionElement()
     this.notionElement.setAttribute('class', `notion ${type}`)
     this.notionElement.removeAttribute('hidden')
     this.notionElement.innerText = message
@@ -102,10 +120,13 @@ class FormDecorator extends ElementDecorator {
   /**
    * Register an validator
    * @param {string} type
-   * @param {function (formDecorator:FormDecorator, HTMLElement element) : Promise.<boolean>} validator
+   * @param {function (formDecorator:FormDecorator, element:HTMLElement) : Promise.<boolean>} validator
    */
   registerValidator (type, validator) {
-    this.validators[type] = validator
+    this.validators[type] = (formDecorator, element) => validator(formDecorator, element).catch((err) => {
+      err.validation = type
+      throw err
+    })
   }
 
   _validateElement (element) {
@@ -125,10 +146,17 @@ class FormDecorator extends ElementDecorator {
     element.classList.add('deciding')
     Promise
       .all(results)
-      .then((results) => results.every((d) => d))
-      .then((result) => {
+      .then(() => {
         element.classList.remove('deciding')
-        element.classList.toggle('invalid', !result)
+        element.classList.remove('invalid')
+      })
+      .catch((err) => {
+        element.classList.add('invalid')
+        var validation = err.validation
+        if (!validation) throw err
+        validation = validation.charAt(0).toUpperCase() + validation.slice(1)
+        if (!element.dataset[`validateError${validation}`]) return
+        element.dataset.validateError = element.dataset[`validateError${validation}`]
       })
   }
 

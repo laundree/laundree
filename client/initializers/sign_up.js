@@ -30,10 +30,13 @@ class CreateAccountInitializer extends Initializer {
     if (!form) return
     var formDecorator = new FormDecorator(form)
     var validatorCache = {}
-    formDecorator.registerValidator('email_available', (formDecorator, input) => {
+    formDecorator.registerValidator('emailAvailable', (formDecorator, input) => {
       var value = input.value
       if (validatorCache.hasOwnProperty(value)) return validatorCache[value]
-      var response = UserClientApi.userFromEmail(value).then((user) => user === null)
+      var response = UserClientApi.userFromEmail(value).then((user) => {
+        if (user === null) return
+        throw new Error('Email already exists.')
+      })
       validatorCache[value] = response
       return response
     })
