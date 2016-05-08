@@ -99,11 +99,9 @@ class AndAstNode extends BinaryAstNode {
   }
 
   generateValidator (validators) {
-    return (formDecorator, input) =>
-      this.left.generateValidator(validators)(formDecorator, input).then((left) => {
-        if (!left) return false
-        return this.right.generateValidator(validators)(formDecorator, input)
-      })
+    return (formDecorator, input) => this.left
+      .generateValidator(validators)(formDecorator, input)
+      .then((left) => this.right.generateValidator(validators)(formDecorator, input))
   }
 }
 
@@ -120,10 +118,9 @@ class OrAstNode extends BinaryAstNode {
 
   generateValidator (validators) {
     return (formDecorator, input) =>
-      this.left.generateValidator(validators)(formDecorator, input).then((left) => {
-        if (left) return true
-        return this.right.generateValidator(validators)(formDecorator, input)
-      })
+      this.left
+        .generateValidator(validators)(formDecorator, input)
+        .catch((left) => this.right.generateValidator(validators)(formDecorator, input))
   }
 }
 

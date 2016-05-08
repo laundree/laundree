@@ -27,10 +27,12 @@
         </div>
         <form class="validate initial">
             <label data-validate-error="Please enter your full name" class="validate">
-                <input type="text" name="name" placeholder="Full name" data-validate-type="non_empty"/>
+                <input type="text" name="name" placeholder="Full name" data-validate-type="nonEmpty"/>
             </label>
-            <label data-validate-error="Please enter a valid e-mail address" class="validate">
-                <input type="text" name="email" placeholder="E-mail address" data-validate-type="email and email_available"/>
+            <label data-validate-error-email="Please enter a valid e-mail address"
+                   data-validate-error-email-available="This email is already registered"
+                   class="validate">
+                <input type="text" name="email" placeholder="E-mail address" data-validate-type="email and emailAvailable"/>
             </label>
             <label data-validate-error="Min. 6 characters containing at least one letter" class="validate">
                 <input type="password" name="password" placeholder="Password" data-validate-type="password"/>
