@@ -303,25 +303,29 @@ main
 
 form
   position: relative
-  
-  &.blur:before
-    content: ""
-    background-color: rgba(102, 211, 211, 0.81)
-    height: 100%
-    width: 100%
-    position: absolute
-    z-index: 100
+  &.blur
 
-  &.blur:after
-    content: "Loading"
-    position: absolute
-    top: 40%
-    z-index: 101
-    text-align: center
-    width: 100%
-    font-weight: bold
-    font-size: 1.5em
-    
+    &:before
+      content: ""
+      background-color: rgba(102, 211, 211, 0.81)
+      height: 100%
+      width: 100%
+      position: absolute
+      z-index: 100
+
+    &:after
+      content: "Loading"
+      position: absolute
+      top: 40%
+      z-index: 101
+      text-align: center
+      width: 100%
+      font-weight: bold
+      font-size: 1.5em
+
+    *
+      box-shadow: 0 0
+
   .notion
     padding: 0.5em 1em
     background-color: #CC8D3C
