@@ -1,14 +1,22 @@
 @import "main"
 
 main
-  section.error
-    padding: 0 2em
 
-  section#NotFound
+  #InternalError
+    padding: 8em 0
+    max-width: 64em
+    svg
+      width: 40em
+      display: block
+      margin: 4em auto
+
+  #NotFound
+    padding: 8em 0
     max-width: 44em
+
+  section
     margin: auto
     overflow: hidden
-    padding: 8em 0
 
     h1
       font-size: 3em
@@ -24,11 +32,23 @@ main
       width: 20em
       float: right
 
-@media only screen and (max-width: 45em)
+pre
+  width: 100%
+  float: left
+  overflow-x: scroll
+  margin: 2em 0
+  font-size: 0.7em
+  display: none
+
+@media only screen and (max-width: 60em)
 
   main
-    section#NotFound
+    #NotFound
       padding: 0 0 2em
+    #InternalError
+      padding: 0 0 2em
+
+    section
       svg
         float: none
         margin: 4em auto
@@ -36,3 +56,9 @@ main
       .message
         float: none
         margin: auto
+
+@media only screen and (max-width: 40em)
+  main
+    section#InternalError
+      svg
+        width: 90%

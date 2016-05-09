@@ -55,7 +55,7 @@ setups.swaggerSetup(app).then((swaggerApp) => {
     app.use((err, req, res, next) => {
       console.log(err)
       res.status(err.status || 500)
-      res.render('error', {
+      res.render('error-500', {
         message: err.message,
         error: err,
         styles: ['/stylesheets/error.css']
@@ -65,9 +65,8 @@ setups.swaggerSetup(app).then((swaggerApp) => {
 
   app.use((err, req, res, next) => {
     res.status(err.status || 500)
-    res.render('error', {
+    res.render('error-500', {
       message: err.message,
-      error: {},
       styles: ['/stylesheets/error.css']
     })
   })
