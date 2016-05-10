@@ -40,6 +40,11 @@ app.use((req, res, next) => {
 })
 
 app.use('/', routes)
+
+app.get('/err', (req, res, next) => {
+  next(new Error('This is a test error'))
+})
+
 // Swagger
 setups.swaggerSetup(app).then((swaggerApp) => {
   app.use(function (req, res, next) {
