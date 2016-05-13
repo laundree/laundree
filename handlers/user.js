@@ -123,28 +123,27 @@ class UserHandler extends Handler {
 
   static createUserWithPassword (displayName, email, password) {
     displayName = displayName.split(' ').filter((name) => name.length).join(' ')
-    return utils.identicon.generateIdenticonUrl(email, 150).then((imageData) => {
-      var profile = {
-        id: email,
-        displayName: displayName,
-        name: displayNameToName(displayName),
-        provider: 'local',
-        emails: [{value: email}],
-        photos: [{value: imageData}]
-      }
-      return Promise.all(
-        [UserHandler.createUserFromProfile(profile),
-          utils.password.hashPassword(password)])
-        .then((result) => {
-          // noinspection UnnecessaryLocalVariableJS
-          var [user, passwordHash] = result
-          user.model.password = passwordHash
-          return user.model.save().then((model) => {
-            user.model = model
-            return user
-          })
+
+    var profile = {
+      id: email,
+      displayName: displayName,
+      name: displayNameToName(displayName),
+      provider: 'local',
+      emails: [{value: email}],
+      photos: [{value: `/identicon/${email}/150.png`}]
+    }
+    return Promise.all(
+      [UserHandler.createUserFromProfile(profile),
+        utils.password.hashPassword(password)])
+      .then((result) => {
+        // noinspection UnnecessaryLocalVariableJS
+        var [user, passwordHash] = result
+        user.model.password = passwordHash
+        return user.model.save().then((model) => {
+          user.model = model
+          return user
         })
-    })
+      })
   }
 
   resetPassword (password) {
