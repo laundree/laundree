@@ -26,7 +26,16 @@
             <span>OR</span>
         </div>
         <form id="SignIn" class="validate initial" method="post" action="/auth/local">
-
+            {{#if errorMessages}}
+                <div class="notion error">
+                    {{errorMessages.[0]}}
+                </div>
+            {{/if}}
+            {{#if successMessages}}
+                <div class="notion success">
+                    {{successMessages.[0]}}
+                </div>
+            {{/if}}
             <label class="validate" data-validate-error="Please enter your e-mail address.">
                 <input type="text" name="username" placeholder="E-mail address" data-validate-type="email">
             </label>

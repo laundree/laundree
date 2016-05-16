@@ -1,0 +1,6 @@
+logging:
+  http:
+    enabled: true
+    format: 'common'
+  error:
+    enabled: false

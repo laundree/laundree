@@ -6,7 +6,8 @@ var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
-var clearDb = require('../db_utils').clearDb
+var dbUtils = require('../db_utils')
+var clearDb = dbUtils.clearDb
 var UserHandler = require('../../handlers').UserHandler
 var assert = chai.assert
 describe('handlers', () => {
@@ -61,7 +62,9 @@ describe('handlers', () => {
       it('should find right',
         () => UserHandler.findFromId(user.model.id).then((u) => u.model.id.should.equal(user.model.id)))
       it('should reject on error',
-        () => UserHandler.findFromId(user.model.id + 'asd').should.be.rejected)
+        () => UserHandler.findFromId(user.model.id + 'asd').should.eventually.be.undefined)
+      it('should reject on error',
+        () => UserHandler.findFromId('aaaaaaaaaaaaaaaaaaaa').should.eventually.be.undefined)
     })
 
     describe('resetPassword', () => {
@@ -97,6 +100,95 @@ describe('handlers', () => {
             user.model.displayName.should.be.equal('Alice Alu Ali Alison')
             return user.verifyPassword('password1234').should.eventually.be.true
           }))
+    })
+    describe('generateVerifyEmailToken', () => {
+      it('should generate a token', () =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          return user.generateVerifyEmailToken(user.model.emails[0]).should.eventually.not.be.undefined
+        }))
+      it('should not generate token for non-registered email', () =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          return user.generateVerifyEmailToken('not-valid' + user.model.emails[0]).should.eventually.be.undefined
+        }))
+      it('should generate a new token', () =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          return Promise.all([
+            user.generateVerifyEmailToken(user.model.emails[0]),
+            user.generateVerifyEmailToken(user.model.emails[0])
+          ]).then((tokens) => {
+            var [token1, token2] = tokens
+            token1.should.not.equal(token2)
+          })
+        }))
+    })
+
+    describe('verifyEmail', () => {
+      it('should resolve to true', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        var email = user.model.emails[0]
+        return user.generateVerifyEmailToken(email)
+          .then((token) => user.verifyEmail(email, token))
+          .should.eventually.be.true
+      }))
+      it('explicit verify email', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        var email = user.model.emails[0]
+        return user.generateVerifyEmailToken(email)
+          .then((token) => user.verifyEmail(email, token))
+          .then(() => user.model.explicitVerifiedEmails)
+          .should.eventually.contain(email)
+      }))
+
+      it('should resolve to false', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        var email = user.model.emails[0]
+        return user.generateVerifyEmailToken(email)
+          .then((token) => user.verifyEmail(email, token + 'asd'))
+          .should.eventually.be.false
+      }))
+
+      it('should resolve to false', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        var email = user.model.emails[0]
+        return user.verifyEmail(email, 'tokenbob1').should.eventually.be.false
+      }))
+      it('should verify latest', () =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          var email = user.model.emails[0]
+          return user.generateVerifyEmailToken(email).then((token1) =>
+            user.generateVerifyEmailToken(email).then((token2) => [token1, token2]))
+            .then((tokens) => {
+              var [token1, token2] = tokens
+              return Promise.all([user.verifyEmail(email, token1), user.verifyEmail(email, token2)])
+            })
+            .should.eventually.deep.equal([false, true])
+        }))
+      it('should remove old', () =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          var email = user.model.emails[0]
+          return user.generateVerifyEmailToken(email).then((token1) =>
+            user.generateVerifyEmailToken(email).then((token2) => [token1, token2]))
+            .then((tokens) => {
+              var [token1, token2] = tokens
+              return Promise.all([user.verifyEmail(email, token2), user.verifyEmail(email, token1)])
+            })
+            .should.eventually.deep.equal([true, false])
+        }))
+      it('should not verify twice', () =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          var email = user.model.emails[0]
+          return user.generateVerifyEmailToken(email).then((token1) =>
+            user.verifyEmail(email, token1).then((result1) =>
+              Promise.all([result1, user.verifyEmail(email, token1)]))
+              .should.eventually.deep.equal([true, false]))
+        })
+      )
     })
   })
 })

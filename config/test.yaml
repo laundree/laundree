@@ -1,0 +1,6 @@
+mongo:
+  url: 'mongodb://localhost/laundree-test'
+
+logging:
+  http:
+    enabled: false

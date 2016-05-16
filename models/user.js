@@ -10,6 +10,12 @@ var userSchema = new Schema({
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   latestProvider: String,
+  explicitVerifiedEmails: [{type: String}],
+  explicitVerificationEmailTokens: [{
+    email: {type: String, required: true},
+    hash: {type: String, required: true},
+    created: {type: Date, required: true, default: Date.now}
+  }],
   profiles: [{
     provider: String,
     id: String,
@@ -51,19 +57,39 @@ fromLatestProfile('name')
 userSchema
   .virtual('emails')
   .get(function () {
-    var emails = this.profiles
-      .reduce((prev, profile) => prev.concat(profile.emails.map((email) => email.value)), [])
-    var seen = {}
-    return emails.filter((item, pos) => seen.hasOwnProperty(item) ? false : (seen[item] = true))
+    var emailMap = this.profiles.reduce((obj, profile) => profile.emails.reduce((obj, email) => {
+      obj[email.value] = true
+      return obj
+    }, obj), {})
+    return Object.keys(emailMap)
+  })
+
+userSchema
+  .virtual('implicitVerifiedEmails')
+  .get(function () {
+    var emailMap = this.profiles.reduce((obj, profile) => {
+      if (['google', 'facebook'].indexOf(profile.provider) < 0) return obj
+      return profile.emails.reduce((obj, email) => {
+        obj[email.value] = true
+        return obj
+      }, obj)
+    }, {})
+    return Object.keys(emailMap)
+  })
+
+userSchema
+  .virtual('verifiedEmails')
+  .get(function () {
+    return _.union(this.explicitVerifiedEmails, this.implicitVerifiedEmails)
   })
 
 userSchema
   .virtual('photo')
   .get(function () {
     var profile = this.latestProfile
-    if (!profile) return null
-    if (!profile.photos) return null
-    if (!profile.photos.length) return null
+    if (!profile) return ''
+    if (!profile.photos) return ''
+    if (!profile.photos.length) return ''
     return profile.photos[0].value
   })
 

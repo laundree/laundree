@@ -12,8 +12,8 @@ class ResetPasswordInitializer extends Initializer {
     var form = element.querySelector('#ResetPassword')
     if (!form) return
     var decorator = new FormDecorator(form)
-    decorator.submitFunction = () => UserClientApi
-      .resetPassword(decorator.values.user, decorator.values.token, decorator.values.password)
+    decorator.submitFunction = () => new UserClientApi(decorator.values.user)
+      .resetPassword(decorator.values.token, decorator.values.password)
       .then(() => {
         window.location = '/auth'
       })

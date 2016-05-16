@@ -9,6 +9,13 @@ mailer:
   smtp:
     transport: 'smtps://user%40gmail.com:pass@smtp.gmail.com'
 
+logging:
+  http:
+    enabled: true
+    format: 'dev'
+  error:
+    enabled: true
+
 mongo:
   url: 'mongodb://localhost/laundree'
 

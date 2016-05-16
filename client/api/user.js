@@ -37,9 +37,9 @@ class UserClientApi {
     })
   }
 
-  static resetPassword (id, token, password) {
+  resetPassword (token, password) {
     return client({
-      path: `/api/users/${id}/password-reset`,
+      path: `/api/users/${this.id}/password-reset`,
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       entity: {token: token, password: password}
@@ -52,17 +52,28 @@ class UserClientApi {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       entity: {displayName: displayName, email: email, password: password}
-    }).catch(wrapError).then((response) => {
-      var entity = response.entity
-      if (!entity) return null
-      return new UserClientApi(entity.id, entity)
     })
+      .catch(wrapError)
+      .then((response) => {
+        var entity = response.entity
+        if (!entity) return null
+        return new UserClientApi(entity.id, entity)
+      })
   }
 
-  static startPasswordReset (id) {
+  startPasswordReset () {
     return client({
-      path: `/api/users/${id}/start-password-reset`,
+      path: `/api/users/${this.id}/start-password-reset`,
       method: 'POST',
+      headers: {'Content-Type': 'application/json'}
+    }).catch(wrapError)
+  }
+
+  startEmailVerification (email) {
+    return client({
+      path: `/api/users/${this.id}/start-email-verification`,
+      method: 'POST',
+      entity: {email: email},
       headers: {'Content-Type': 'application/json'}
     }).catch(wrapError)
   }

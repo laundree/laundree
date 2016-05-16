@@ -17,7 +17,7 @@ function render (data, template) {
   return t.render(data)
 }
 
-var transporter = nodemailer.createTransport(config.get('mailer.smtp.transport'))
+var standardTransporter = nodemailer.createTransport(config.get('mailer.smtp.transport'))
 
 /**
  * Send email
@@ -26,6 +26,7 @@ var transporter = nodemailer.createTransport(config.get('mailer.smtp.transport')
  * @return {Promise}
  */
 function sendRenderedEmail (address, content) {
+  var transporter = module.exports.transporter || standardTransporter
   var options = {
     from: '"Laundree.io" <no-reply@laundree.io>',
     to: address,
