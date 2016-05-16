@@ -46,6 +46,7 @@ class UserHandler extends Handler {
    * @returns {Promise.<UserHandler>}
    */
   static findFromId (id) {
+    if (!utils.regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
     try {
       return UserModel.findFromId(id)
         .exec()
@@ -105,6 +106,41 @@ class UserHandler extends Handler {
           return token
         })
       })
+    })
+  }
+
+  /**
+   * Will create a new email verification.
+   * @param {string} email
+   * @return {Promise.<string>}
+   */
+  generateVerifyEmailToken (email) {
+    if (this.model.emails.indexOf(email) < 0) return Promise.resolve()
+    return utils.password
+      .generateToken()
+      .then((token) => utils.password.hashPassword(token).then((hash) => {
+        var cleanTokens = this.model.explicitVerificationEmailTokens.filter((token) => token.email !== email)
+        cleanTokens.push({email: email, hash: hash})
+        this.model.explicitVerificationEmailTokens = cleanTokens
+        return this.model.save().then(() => token)
+      }))
+  }
+
+  /**
+   * Will verify a given email against the latest generated token.
+   * @param {string} email
+   * @param {string} token
+   * @returns {Promise.<boolean>}
+   */
+  verifyEmail (email, token) {
+    var storedToken = this.model.explicitVerificationEmailTokens.find((element) => element.email === email)
+    if (!storedToken) return Promise.resolve(false)
+    return utils.password.comparePassword(token, storedToken.hash).then((result) => {
+      if (!result) return false
+      this.model.explicitVerificationEmailTokens = this.model.explicitVerificationEmailTokens
+        .filter((element) => element.email !== email)
+      this.model.explicitVerifiedEmails.push(email)
+      return this.model.save().then(() => true)
     })
   }
 
@@ -181,7 +217,7 @@ class UserHandler extends Handler {
     return utils.password.comparePassword(token, this.model.resetPasswordToken)
   }
 
-  toRest (href) {
+  toRest () {
     return {
       emails: this.model.emails,
       id: this.model.id,
@@ -192,7 +228,15 @@ class UserHandler extends Handler {
         middleName: this.model.name.middleName
       },
       photo: this.model.photo,
-      href: href
+      href: `/api/users/${this.model.id}`
+    }
+  }
+
+  toRestSummary () {
+    return {
+      id: this.model.id,
+      displayName: this.model.displayName,
+      href: `/api/users/${this.model.id}`
     }
   }
 }

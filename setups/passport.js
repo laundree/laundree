@@ -8,31 +8,29 @@ var LocalStrategy = require('passport-local').Strategy
 var config = require('config')
 
 var UserHandler = require('../handlers').UserHandler
-
+var oauthCallback = (accessToken, refreshToken, profile, done) => {
+  if (!profile.emails || !profile.emails.length) return done(null, null)
+  UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null, {message: 'User not found'})).catch(done)
+}
 passport.use(new FacebookStrategy({
   clientID: config.get('facebook.appId'),
   clientSecret: config.get('facebook.appSecret'),
   callbackURL: config.get('facebook.callbackUrl'),
   profileFields: ['id', 'first_name', 'last_name', 'middle_name', 'email', 'gender', 'displayName', 'link', 'picture']
-}, (accessToken, refreshToken, profile, done) => {
-  if (!profile.emails || !profile.emails.length) return done(null, null)
-  UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null)).catch(done)
-}))
+}, oauthCallback))
 
 passport.use(new GoogleStrategy({
   clientID: config.get('google.clientId'),
   clientSecret: config.get('google.clientSecret'),
   callbackURL: config.get('google.callbackUrl')
-}, (accessToken, refreshToken, profile, done) => {
-  if (!profile.emails || !profile.emails.length) return done(null, null)
-  UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null)).catch(done)
-}))
+}, oauthCallback))
 
 passport.use(new LocalStrategy((username, password, done) => {
   UserHandler.findFromEmail(username).then((user) => {
-    if (!user) return done(null, false)
+    if (!user) return done(null, false, {message: "User doesn't exists"})
+    if (user.model.verifiedEmails.indexOf(username) < 0) return done(null, false, {message: 'User is not verified'})
     return user.verifyPassword(password).then((result) => {
-      if (!result) return done(null, false)
+      if (!result) return done(null, false, {message: 'Invalid email/password combination.'})
       done(null, user)
     })
   }).catch(done)

@@ -7,22 +7,6 @@ var UserClientApi = require('../api').UserClientApi
 
 var FormDecorator = decorators.FormDecorator
 
-function login (username, password) {
-  var form = document.createElement('form')
-  form.method = 'POST'
-  form.action = '/auth/local'
-  var createInput = (name, value) => {
-    var input = document.createElement('input')
-    input.type = 'hidden'
-    input.name = name
-    input.value = value
-    form.appendChild(input)
-  }
-  createInput('username', username)
-  createInput('password', password)
-  form.submit()
-}
-
 class CreateAccountInitializer extends Initializer {
 
   setup (element) {
@@ -43,9 +27,10 @@ class CreateAccountInitializer extends Initializer {
     formDecorator.submitFunction = () => {
       var email = formDecorator.values['email']
       var password = formDecorator.values['password']
-      return UserClientApi.createUser(formDecorator.values['name'], email, password).then(() => {
-        login(email, password)
-      })
+      return UserClientApi
+        .createUser(formDecorator.values['name'], email, password)
+        .then((user) => user.startEmailVerification(email))
+        .then(() => ({message: 'You have created an account and a verification link has been sent to your email address.'}))
     }
   }
 }

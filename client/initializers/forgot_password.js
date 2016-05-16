@@ -17,7 +17,7 @@ class ForgotPasswordInitializer extends Initializer {
         .userFromEmail(decorator.values.email)
         .then((user) => {
           if (!user) throw new Error('User not found')
-          return UserClientApi.startPasswordReset(user.id).then(() => ({message: 'A reset-link has been sent.'}))
+          return user.startPasswordReset().then(() => ({message: 'A reset-link has been sent to your email address.'}))
         })
     }
   }

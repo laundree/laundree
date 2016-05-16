@@ -1,14 +1,20 @@
 var express = require('express')
 var router = express.Router()
 var passport = require('passport')
+var UserHandler = require('../handlers').UserHandler
+
 /* GET users listing. */
-router.get('/', (req, res) => res.render('log-in', {
-  title: ['Log in'],
-  no_nav: true,
-  facebook_auth_failure: req.query.fb_auth_failure,
-  google_auth_failure: req.query.google_auth_failure,
-  styles: ['/stylesheets/auth.css']
-}))
+router.get('/', (req, res) => {
+  if (req.query.fb_auth_failure) req.flash('error', 'Facebook auth failed.')
+  if (req.query.google_auth_failure) req.flash('error', 'Google auth failed.')
+  res.render('log-in', {
+    title: ['Log in'],
+    no_nav: true,
+    errorMessages: req.flash('error'),
+    successMessages: req.flash('success'),
+    styles: ['/stylesheets/auth.css']
+  })
+})
 
 router.get('/forgot', (req, res) => res.render('forgot-password', {
   title: ['Forgot password'],
@@ -26,6 +32,30 @@ router.get('/reset', (req, res) => {
     user_id: user,
     token: token,
     styles: ['/stylesheets/auth.css']
+  })
+})
+
+router.get('/verify', (req, res) => {
+  var user = req.query.user
+  var token = req.query.token
+  var email = req.query.email
+  if (!user || !token || !email) {
+    req.flash('error', 'Invalid verification link')
+    return res.redirect(req.baseUrl + '/')
+  }
+  UserHandler.findFromId(user).then((user) => {
+    if (!user) {
+      req.flash('error', 'Invalid verification link')
+      return res.redirect(req.baseUrl + '/')
+    }
+    user.verifyEmail(email, token).then((result) => {
+      if (!result) {
+        req.flash('error', 'Invalid verification link')
+        return res.redirect(req.baseUrl + '/')
+      }
+      req.flash('success', 'Your email has been verified, please login')
+      return res.redirect(req.baseUrl + '/')
+    })
   })
 })
 
@@ -53,8 +83,9 @@ router.get('/google/callback',
 
 router.post('/local', function (req) {
   passport.authenticate('local', {
-    failureRedirect: `${req.baseUrl}?local_auth_failure=1`,
-    successRedirect: '/'
+    failureRedirect: `${req.baseUrl}`,
+    successRedirect: '/',
+    failureFlash: true
   }).apply(null, arguments)
 })
 

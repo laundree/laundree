@@ -1,10 +1,13 @@
+var nodemailer = require('nodemailer')
+var stubTransport = require('nodemailer-stub-transport')
+require('../../../utils').mail.transporter = nodemailer.createTransport(stubTransport())
 var request = require('supertest')
 var app = require('../../../app')
 var chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
-var expect = chai.expect
+
 var assert = chai.assert
 var dbUtils = require('../../db_utils')
 var _ = require('lodash')
@@ -14,7 +17,7 @@ describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
   describe('users', function () {
     this.timeout(20000)
-    describe('GET /api/users/id', () => {
+    describe('GET /api/users/{id}', () => {
       it('should return error', (done) => {
         request(app)
           .get('/api/users/asd123')
@@ -48,7 +51,6 @@ describe('controllers', function () {
             .end(function (err, res) {
               assert(!err)
               var u = users[5].toRest()
-              u.href = res.body.href
               res.body.should.be.deep.equal(u)
               done()
             })
@@ -81,12 +83,8 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var arr = _.slice(users, 0, 12).map((user) => user.toRest())
-              res.body.forEach((user) => {
-                expect(user.href).to.match(new RegExp(`\/api\/users\/${user.id}$`))
-                user.href = undefined
-                arr.should.include.something.that.deep.equals(user)
-              })
+              var arr = _.slice(users, 0, 10).map((user) => user.toRestSummary())
+              res.body.should.deep.equal(arr)
               done()
             })
         })
@@ -102,13 +100,8 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var arr = _.slice(users, 0, 12).map((user) => user.toRest())
-              res.body.forEach((user) => {
-                expect(user.href).to.match(new RegExp(`\/api\/users\/${user.id}$`))
-                user.href = undefined
-                arr.should.include.something.that.deep.equals(user)
-              })
-              arr = arr.map((u) => u.id).should.deep.equal(res.body.map((u) => u.id))
+              var arr = _.slice(users, 0, 12).map((user) => user.toRestSummary())
+              res.body.should.deep.equal(arr)
               done()
             })
         })
@@ -124,12 +117,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var u = users[56].toRest()
-              res.body.forEach((user) => {
-                expect(user.href).to.match(new RegExp(`\/api\/users\/${user.id}$`))
-                user.href = undefined
-                user.should.deep.equal(u)
-              })
+              res.body.should.deep.equal([users[56].toRestSummary()])
               done()
             })
         })
@@ -145,9 +133,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var u = users[5].toRest()
-              u.href = res.body[0].href
-              res.body.should.be.deep.equal([u])
+              res.body.should.be.deep.equal([users[5].toRestSummary()])
               done()
             })
         })
@@ -205,19 +191,6 @@ describe('controllers', function () {
     })
 
     describe('POST /api/users/{id}/start-password-reset', () => {
-/*
-      it('should start reset', (done) =>
-        dbUtils.populateUsers(2).then((users) => {
-          request(app)
-            .post(`/api/users/${users[0].model.id}/start-password-reset`)
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .send()
-            .expect(204)
-            .end((err) => done(err))
-        }))
-*/
-
       it('should fail on no user', (done) =>
         dbUtils.populateUsers(2).then((users) => {
           request(app)
@@ -239,6 +212,68 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .end((err) => done(err))
+        }))
+
+      it('should succeed', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          request(app)
+            .post(`/api/users/${user.model.id}/start-password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send()
+            .expect(204)
+            .end(done)
+        }))
+    })
+
+    describe('POST /api/users/{id}/start-email-verification', () => {
+      it('should fail on no user', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          request(app)
+            .post('/api/users/aaa/start-email-verification')
+            .set('Accept', 'application/json')
+            .send({email: user.model.emails[0]})
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err) => done(err))
+        }))
+
+      it('should fail on no user', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          request(app)
+            .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/start-email-verification')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({email: user.model.emails[0]})
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err) => done(err))
+        }))
+
+      it('should succeed', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          request(app)
+            .post(`/api/users/${user.model.id}/start-email-verification`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({email: user.model.emails[0]})
+            .expect(204)
+            .end(done)
+        }))
+      it('should fail on wrong email', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          request(app)
+            .post(`/api/users/${user.model.id}/start-email-verification`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({email: 'not-right-' + user.model.emails[0]})
+            .expect(400)
+            .end(done)
         }))
     })
 
@@ -302,6 +337,70 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .send({token: 'asdasdasdaasdsaasd', password: 'password1'})
+          .expect(404)
+          .end((err) => done(err))
+      })
+    })
+
+    describe('POST /api/users/{id}/verify-email', () => {
+      it('should fail on no body', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post(`/api/users/${users[0].model.id}/verify-email`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({})
+            .expect(400)
+            .end((err) => done(err))
+        }))
+
+      it('fail on no token', (done) =>
+        dbUtils.populateUsers(2).then((users) => {
+          request(app)
+            .post(`/api/users/${users[0].model.id}/verify-email`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: 'someToken', email: users[0].model.emails[0]})
+            .expect(400)
+            .end((err) => done(err))
+        }))
+      it('fail on invalid email', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var user = users[0]
+          return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
+        }).then((result) => {
+          // noinspection UnnecessaryLocalVariableJS
+          var [user, token] = result
+          request(app)
+            .post(`/api/users/${user.model.id}/password-reset`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: token, email: 'bob'})
+            .expect(400)
+            .end((err) => done(err))
+        }))
+      it('success on right token', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var user = users[0]
+          return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
+        }).then((result) => {
+          // noinspection UnnecessaryLocalVariableJS
+          var [user, token] = result
+          request(app)
+            .post(`/api/users/${user.model.id}/verify-email`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: token, email: user.model.emails[0]})
+            .expect(204)
+            .end((err) => done(err))
+        }))
+
+      it('fail on no invalid id', (done) => {
+        request(app)
+          .post('/api/users/aaa/verify-email')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({token: 'asdasdasdaasdsaasd', email: 'bob@bobs.dk'})
           .expect(404)
           .end((err) => done(err))
       })

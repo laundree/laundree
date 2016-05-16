@@ -6,6 +6,6 @@ module.exports = {
   SignUpInitializer: require('./sign_up'),
   SignInInitializer: require('./sign_in'),
   DropDownInitializer: require('./dropdown'),
-  ForgotPasswordInitializer: require('./forgot-password'),
-  ResetPasswordInitializer: require('./reset-password')
+  ForgotPasswordInitializer: require('./forgot_password'),
+  ResetPasswordInitializer: require('./reset_password')
 }

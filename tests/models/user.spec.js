@@ -33,6 +33,9 @@ describe('models', () => {
     describe('emails', () => {
       it('should merge emails', () => user.emails.should.deep.equal(['bob1@a.dk', 'bob3@a.dk', 'bob2@a.dk']))
     })
+    describe('implicitVerifiedEmails', () => {
+      it('should merge implicit verified emails', () => user.implicitVerifiedEmails.should.deep.equal(['bob1@a.dk', 'bob3@a.dk', 'bob2@a.dk']))
+    })
     describe('photo', () => {
       it('should find right photo', () => user.photo.should.equal('photo3'))
     })

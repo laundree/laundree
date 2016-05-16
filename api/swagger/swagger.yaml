@@ -3,12 +3,11 @@ info:
   version: "0.0.1"
   title: Laundree App
 
-host: localhost:3000
+host: laundree.io
 
 basePath: /api
 
 schemes:
-  - http
   - https
 
 consumes:
@@ -55,7 +54,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/User"
+              $ref: "#/definitions/UserSummary"
         default:
           description: Error
           schema:
@@ -68,7 +67,18 @@ paths:
           in: body
           required: true
           schema: 
-            $ref: "#/definitions/CreateUserRequest"
+            required:
+              - displayName
+              - email
+              - password
+            properties:
+              displayName:
+                type: string
+              email:
+                type: string
+              password:
+                type: string
+                format: password
       tags:
         - Users
       responses:
@@ -149,7 +159,16 @@ paths:
           in: body
           required: true
           schema: 
-            $ref: "#/definitions/ResetPasswordRequest"
+            required:
+              - password
+              - token
+            properties:
+              password:
+                type: string
+                format: password
+              token:
+                type: string
+
       tags:
         - Users
       responses:
@@ -167,40 +186,95 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-      
+  /users/{id}/start-email-verification:
+    x-swagger-router-controller: users
+    post:
+      description: Start email verification
+      operationId: startEmailVerification
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema: 
+            required:
+              - email
+            properties:
+              email:
+                type: string
+                format: email
+      tags:
+        - Users
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /users/{id}/verify-email:
+    x-swagger-router-controller: users
+    post:
+      description: Verify a user email
+      operationId: verifyEmail
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema: 
+            required:
+              - email
+              - token
+            properties:
+              email:
+                type: string
+                format: email
+              token:
+                type: string
+      tags:
+        - Users
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
 definitions:
-  CreateUserRequest:
-    required:
-      - displayName
-      - email
-      - password
-    properties:
-      displayName:
-        type: string
-      email:
-        type: string
-      password:
-        type: string
-        format: password
-
-  ResetPasswordRequest:
-    required:
-      - password
-      - token
-    properties:
-      password:
-        type: string
-        format: password
-      token:
-        type: string
-
   User:
     required:
       - id
       - href
+      - name
+      - emails
+      - displayName
+      - photo
     properties:
       id:
         type: string
@@ -211,21 +285,34 @@ definitions:
           format: email
       photo:
         type: string
+        format: url
       displayName:
         type: string
       name:
-        $ref: "#/definitions/Name"
+        properties:
+          familyName: 
+            type: string
+          givenName: 
+            type: string
+          middleName: 
+            type: string
       href:
         type: string
-        format: uri
-  Name:
+        format: url
+
+  UserSummary:
+    required:
+      - id
+      - displayName
+      - href
     properties:
-      familyName: 
+      id:
         type: string
-      givenName: 
+      displayName:
         type: string
-      middleName: 
+      href:
         type: string
+        format: url
 
   Error:
     required:
