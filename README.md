@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/laundree/laundree.png?label=ready&title=Ready)](https://waffle.io/laundree/laundree)
 # laundree
 
 [![Code Climate](https://codeclimate.com/github/laundree/laundree/badges/gpa.svg)](https://codeclimate.com/github/laundree/laundree)
