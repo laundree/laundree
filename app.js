@@ -48,7 +48,7 @@ app.get('/err', (req, res, next) => {
 })
 
 // Swagger
-setups.swaggerSetup(app).then((swaggerApp) => {
+setups.swaggerSetup(app).then(() => {
   app.use(function (req, res, next) {
     res.status(404)
     res.render('error-404',
