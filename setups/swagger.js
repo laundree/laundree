@@ -19,6 +19,7 @@ function setup (app) {
           if (config.get('logging.error.enabled') && res.statusCode === 500) console.log(err)
           res.json({message: err.message})
         })
+        resolve(app)
       }))
   })
 }
