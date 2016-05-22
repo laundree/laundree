@@ -1,8 +1,8 @@
-=border-radius($radius)
-  -webkit-border-radius: $radius
-  -moz-border-radius: $radius
-  -ms-border-radius: $radius
-  border-radius: $radius
+=border-radius($prop...)
+  -webkit-border-radius: $prop
+  -moz-border-radius: $prop
+  -ms-border-radius: $prop
+  border-radius: $prop
 
 =transition($prop...)
   -webkit-transition: $prop
@@ -17,6 +17,15 @@
 =inactive-step-style()
   fill: #d1d1d1
   color: #afafaf
+
+=user-select($prop...)
+  -webkit-touch-callout: $prop
+  -webkit-user-select: $prop
+  -khtml-user-select: $prop
+  -moz-user-select: $prop
+  -ms-user-select: $prop
+  user-select: $prop
+
 
 @function logo_ratio_w_to_h($width)
   @return 105.7 / 184 * $width
@@ -42,7 +51,7 @@ $max_page_width: 70em
     z-index: 100
     background-color: #FFFFFF
     padding: 1em
-    border-radius: 0.2em
+    +border-radius(0.2em)
     box-shadow: 0 0 0.2em #000
     display: none
 
@@ -224,7 +233,7 @@ div#Container
       z-index: 11
       top: 2.5em
       background-color: #E55564
-      border-radius: 0 0 0.4em 0.4em
+      +border-radius(0 0 0.4em 0.4em)
       +transition(0.3s opacity)
 
     &:hover
@@ -243,7 +252,7 @@ div#Container
       float: right
       height: 3em
       width: 3em
-      border-radius: 0.1em
+      +border-radius(0.2em)
       cursor: pointer
       background-color: #ffffff
 
@@ -258,8 +267,8 @@ div#Container
     margin: 0.5em 1em
     line-height: 3em
     padding: 0 3em
-    +border-radius(0.1em)
-    transition: 0.1s background
+    +border-radius(0.2em)
+    +transition(0.1s background)
     text-decoration: none
     &:hover
       background: #f3a34e
@@ -271,7 +280,7 @@ div#Container
   width: 15em
   height: 100%
   background-color: #E5954C
-  transition: 0.2s width
+  +transition(0.2s width)
 
   hr
     border: 0.05em solid #FCDECA
@@ -313,6 +322,7 @@ div#Container
   background-color: #E5954C
   cursor: pointer
   overflow: hidden
+  +user-select(none)
   svg
     width: 1.5em
     height: 1.5em
@@ -331,7 +341,7 @@ body.expanded_left_nav
 
 #RightContent
   margin-left: 15em
-  transition: 0.2s margin
+  +transition(0.2s margin)
 
 @media only screen and (max-width: 45em)
   #TopNav
@@ -403,7 +413,7 @@ form
     background-color: #CC8D3C
     box-shadow: 0 0 0.2em #585858
     color: #fff
-    border-radius: 0.1em
+    +border-radius(0.1em)
     text-align: center
     margin: 0.5em 0
 
@@ -483,7 +493,7 @@ footer
         overflow: hidden
 
         &:before, &:after
-          transition: 0.1s opacity
+          +transition(0.1s opacity)
 
         &:hover
           overflow: visible
@@ -511,7 +521,7 @@ footer
           padding: 0.5em
           position: absolute
           left: 5em
-          border-radius: 0.2em
+          +border-radius(0.2em)
           color: #fff
           display: block
           top: 0.75em
@@ -522,8 +532,8 @@ footer
           text-align: center
           opacity: 0
 
-    #RightContent
-      margin-left: 4em
+  #RightContent
+    margin-left: 4em
 
   #MenuExpander
     z-index: 11
