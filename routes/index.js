@@ -8,9 +8,7 @@ var router = express.Router()
 router.use('/app', (req, res, next) => {
   if (req.user) return next()
   res.redirect('/auth')
-}, (req, res) => {
-  res.render('home', {title: ['Home'], styles: ['/stylesheets/home.css']})
-})
+}, require('./app'))
 
 router.use('/sign-up', require('./sign-up'))
 router.use('/logout', require('./logout'))
