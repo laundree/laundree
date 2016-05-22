@@ -18,6 +18,15 @@
   fill: #d1d1d1
   color: #afafaf
 
+=user-select($prop)
+  -webkit-touch-callout: $prop
+  -webkit-user-select: $prop
+  -khtml-user-select: $prop
+  -moz-user-select: $prop
+  -ms-user-select: $prop
+  user-select: $prop
+
+
 @function logo_ratio_w_to_h($width)
   @return 105.7 / 184 * $width
 
@@ -313,6 +322,7 @@ div#Container
   background-color: #E5954C
   cursor: pointer
   overflow: hidden
+  +user-select(none)
   svg
     width: 1.5em
     height: 1.5em
