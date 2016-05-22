@@ -6,7 +6,7 @@ var express = require('express')
 var router = express.Router()
 
 router.get('/', (req, res, next) => {
-  res.render('home')
+  res.render('app-timetable', {layout: 'app-layout', styles: ['/stylesheets/app.css']})
 })
 
 module.exports = router

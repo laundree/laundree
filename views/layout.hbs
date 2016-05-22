@@ -7,106 +7,12 @@
 {{> media}}
 <div id="Container">
     {{#unless no_nav}}
-        <nav>
-            <a href="/" class="home">
-                <svg>
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#SmallLogo"></use>
-                </svg>
-            </a>
-
-
-                <a href="/about" class="icon about">
-                    <svg>
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Info"></use>
-                    </svg>
-                    About us
-                </a>
-                <a href="/help" class="icon help">
-                    <svg>
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#LifeBuoy"></use>
-                    </svg>
-                    Help
-                </a>
-                <a href="/contact" class="icon contact">
-                    <svg>
-                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#EMail4"></use>
-                    </svg>
-                    Contact
-                </a>
-            {{#if user}}
-                <div class="user dropdown">
-                    <img src="{{{user.photo}}}" class="avatar"/>
-                    <div class="dropdown-content">
-                        <ul>
-                            <li>
-                                <a href="/app/i">
-                                    Manage your account
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/logout">
-                                    Log out
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            {{else}}
-                <a href="/auth" class="log-in">Log in</a>
-            {{/if}}
-            <!--<div class="language">
-                <span>English</span>
-                <ul>
-                    <li><a href="#">English</a></li>
-                    <li><a href="#">Danish</a></li>
-                </ul>
-
-            </div>-->
-        </nav>
+        {{> topnav}}
     {{/unless}}
     {{{ body }}}
 </div>
 {{#unless no_footer}}
-    <footer>
-        <ul>
-            <li>
-                <svg xmlns="http://www.w3.org/2000/svg">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#Brick"></use>
-                </svg>
-                Created by
-                Christian Budde Christensen and
-                Malene Sjørslev Søholm
-                in
-                <a href="https://en.wikipedia.org/wiki/Aarhus" target="_blank">Aarhus, Denmark</a>
-            </li>
-            <li>
-                <svg xmlns="http://www.w3.org/2000/svg">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#EMail13"></use>
-                </svg>
-                Want to know more? Please contact and we'll try our best
-                to reply in a timely manner. You can find our contact
-                details at the
-                <a href="/contact">Contact page</a>
-            </li>
-            <li>
-                <svg xmlns="http://www.w3.org/2000/svg">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#GitHub"></use>
-                </svg>
-                Laundree is 100% open-source and any contribution is highly appreciated
-                File an issue, create a pull-request, or fork us on
-                <a href="https://github.com/laundree/laundree" target="_blank">GitHub</a>
-            </li>
-            <li>
-                <svg xmlns="http://www.w3.org/2000/svg">
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#PayPal"></use>
-                </svg>
-                Do you want to help us keep the servers running at full throttle?
-                Then feel free to donate via
-                <a href="#" target="_blank">PayPal</a>
-            </li>
-
-        </ul>
-    </footer>
+   {{> footer}}
 {{/unless}}
 </body>
 <script type="application/javascript" src="/javascripts/bundle.js"></script>

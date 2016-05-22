@@ -59,7 +59,6 @@ $max_page_width: 70em
         style: solid
         color: transparent transparent #ffffff transparent
 
-
     > ul
       list-style-type: none
       font-size: 0.8em
@@ -161,7 +160,9 @@ a:hover
 div#Container
   min-height: 100%
 
-nav
+#TopNav
+  z-index: 10
+  position: relative
   height: 4em
   background-color: #E55564
 
@@ -263,8 +264,77 @@ nav
     &:hover
       background: #f3a34e
 
+#LeftNav
+  z-index: 9
+  position: absolute
+  top: 0
+  width: 15em
+  height: 100%
+  background-color: #E5954C
+  transition: 0.2s width
+
+  hr
+    border: 0.05em solid #FCDECA
+    margin: 2em 1em
+  ul
+    &:first-of-type
+      padding-top: 5em
+
+    li
+      list-style-type: none
+      position: relative
+
+      a
+        overflow: hidden
+        height: 4em
+        color: #ffffff
+        line-height: 4em
+        display: block
+        position: relative
+        width: 100%
+        span
+          width: 11em
+          display: block
+          margin-left: 4em
+        svg
+          width: 1.5em
+          height: 1.5em
+          fill: #fff
+          position: absolute
+          top: 1.25em
+          left: 1.25em
+
+#MenuExpander
+  position: absolute
+  width: 4em
+  height: 4em
+  top: 0
+  z-index: 9
+  background-color: #E5954C
+  cursor: pointer
+  overflow: hidden
+  svg
+    width: 1.5em
+    height: 1.5em
+    margin: 1.25em
+    fill: #ffffff
+
+    &.close
+      display: none
+
+body.expanded_left_nav
+  #MenuExpander
+    svg:not(.close)
+      display: none
+    svg.close
+      display: block
+
+#RightContent
+  margin-left: 15em
+  transition: 0.2s margin
+
 @media only screen and (max-width: 45em)
-  nav
+  #TopNav
     a.icon
       width: 2.2em
       margin: 0 0.5em
@@ -275,13 +345,13 @@ nav
       overflow: hidden
 
 @media only screen and (max-width: 30em)
-  nav
+  #TopNav
     a.log-in
       margin: 0.5em
       padding: 0 1em
 
 @media only screen and (max-width: 25em)
-  nav
+  #TopNav
     a.log-in
       margin: 0.5em 0
       padding: 0 1em
@@ -403,3 +473,57 @@ footer
         margin: auto
         width: 60%
         height: 16em
+
+@media only screen and (max-width: 90em)
+  body:not(.expanded_left_nav)
+    #LeftNav
+      width: 4em
+
+      li
+        overflow: hidden
+
+        &:before, &:after
+          transition: 0.1s opacity
+
+        &:hover
+          overflow: visible
+          &:before, &:after
+            opacity: 1
+
+        &:before
+          content: ""
+          position: absolute
+          z-index: 101
+          height: 0
+          width: 0
+          top: 1.5em
+          right: -1em
+          opacity: 0
+          border:
+            width: 0.5em
+            style: solid
+            color: transparent #0a7288 transparent transparent
+
+        &:after
+          z-index: 100
+          content: attr(data-label)
+          background: #0a7288
+          padding: 0.5em
+          position: absolute
+          left: 5em
+          border-radius: 0.2em
+          color: #fff
+          display: block
+          top: 0.75em
+          font-family: 'Roboto Condensed', sans-serif
+          line-height: 1.5em
+          width: 6em
+          box-shadow: 0 0 0.1em #000
+          text-align: center
+          opacity: 0
+
+    #RightContent
+      margin-left: 4em
+
+  #MenuExpander
+    z-index: 11
