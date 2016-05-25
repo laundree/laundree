@@ -1,11 +1,82 @@
 @import "main"
 
-
 body.app
   padding-bottom: 0
 
-main
+#TopNav
+  position: absolute
+  top: 0
+  width: 100%
 
-  h1
-    text-align: left
-    padding: 1em
+#RightContent
+  height: 100%
+  main
+    height: 100%
+    width: 100%
+    overflow: hidden
+    header
+      position: relative
+      z-index: 5
+      padding-top: 4em
+      background-color: #66D3D3
+      height: 10em
+
+      h1
+        text-align: left
+        padding: 1em
+      table
+        position: absolute
+        border-spacing: 0
+        border-collapse: collapse
+        bottom: 0
+        td
+          border: 0.1em solid transparent
+        .dates
+          td
+            text-align: center
+        .machines
+          td
+            text-align: center
+            font-weight: bold
+            width: 3.4em
+            height: 3em
+        tr
+          .padding
+            width: 2em
+            padding-right: 1em
+    #TimeTable
+      padding: 0
+      background-color: #7DD8D5
+      margin-top: 14em
+      position: absolute
+      top: 0
+      bottom: 0
+      overflow-y: scroll
+      width: 100%
+
+      table
+        border-collapse: collapse
+        border-spacing: 0
+        float: left
+        td
+          width: 3.4em
+          height: 3em
+          background-color: #4DC4C1
+          border: 0.1em solid #7DD8D5
+
+          &.time
+            background-color: transparent
+            text-align: right
+            width: 2em
+            padding: 0 1em 0 0
+#TimeTable::-webkit-scrollbar-track
+  background-color: #7DD8D5
+
+#TimeTable::-webkit-scrollbar
+  width: 1em
+
+#TimeTable::-webkit-scrollbar-thumb
+  background-color: #E55564
+  +border-radius(0.2em)
+  &:hover
+    background-color: #bc4855
