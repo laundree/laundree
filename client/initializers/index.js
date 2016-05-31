@@ -8,5 +8,6 @@ module.exports = {
   DropDownInitializer: require('./dropdown'),
   ForgotPasswordInitializer: require('./forgot_password'),
   ResetPasswordInitializer: require('./reset_password'),
-  MenuExpanderInitializer: require('./menu_expander')
+  MenuExpanderInitializer: require('./menu_expander'),
+  TimetableInitializer: require('./app_timetable.jsx')
 }

@@ -27,5 +27,6 @@ library.registerInitializer(initializers.ForgotPasswordInitializer)
 library.registerInitializer(initializers.ResetPasswordInitializer)
 library.registerInitializer(initializers.DropDownInitializer)
 library.registerInitializer(initializers.MenuExpanderInitializer)
+library.registerInitializer(initializers.TimetableInitializer)
 
 library.setup()

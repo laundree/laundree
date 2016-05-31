@@ -24,26 +24,52 @@ body.app
       h1
         text-align: left
         padding: 1em
-      table
+      #TimeTableHeader
         position: absolute
-        border-spacing: 0
-        border-collapse: collapse
         bottom: 0
-        td
-          border: 0.1em solid transparent
-        .dates
-          td
+        padding-left: 4em
+        .header_container
+          float: left
+          &:not(:first-of-type)
+            margin-left: 3em
+          .date
             text-align: center
-        .machines
-          td
-            text-align: center
-            font-weight: bold
-            width: 3.4em
-            height: 3em
-        tr
-          .padding
-            width: 2em
-            padding-right: 1em
+            span
+              display: block
+              line-height: 2em
+          table
+            border-spacing: 0
+            border-collapse: collapse
+
+            tr
+              td
+                border: 0.1em solid transparent
+                &:first-of-type
+                  border-width: 0.1em 0.1em 0.1em 0
+                &:last-of-type
+                  border-width: 0.1em 0 0.1em 0.1em
+                &:first-of-type:last-of-type
+                  border-width: 0.1em 0
+              &.machines
+                td
+                  text-align: center
+                  font-weight: bold
+                  width: 3.4em
+                  height: 2em
+                  svg
+                    width: 1.5em
+                    height: 1.5em
+                    fill: #fff
+              &.labels
+                td
+                  border-color: #66D3D3
+                  background-color: #44B7B4
+                  text-align: center
+                  font-family: "Roboto Condensed", sans-serif
+                  font-size: 0.8em
+                  margin: 0.1em 0
+                  color: #ffffff
+
     #TimeTable
       padding: 0
       background-color: #7DD8D5
@@ -54,21 +80,113 @@ body.app
       overflow-y: scroll
       width: 100%
 
-      table
-        border-collapse: collapse
-        border-spacing: 0
+      .times
         float: left
-        td
-          width: 3.4em
-          height: 3em
-          background-color: #4DC4C1
-          border: 0.1em solid #7DD8D5
+        list-style-type: none
+        margin-top: 3.1em
+        li
+          $h: 6em
+          border: 0.1em solid transparent
+          border-width: 0.1em 0
+          height: $h
+          line-height: $h
+          text-align: right
+          width: 2em
+          padding: 0 1em
+        &:last-of-type
+          li
+            text-align: left
+      .overlay_container
+        position: relative
+        float: left
+        &:not(:first-of-type)
+          margin-left: 3em
+        .overlay
+          div
+            left: 0
+            right: 0
+            position: absolute
+            z-index: 10
+          .now
+            +transition(1s top)
+            z-index: 11
+            height: 0.2em
+            margin-top: -0.1em
+            background-color: #E54545
+            text-align: center
+            $color: #D33939
+            overflow: hidden
+            &:hover
+              overflow: visible
+              &:before, &:after
+                opacity: 1
 
-          &.time
-            background-color: transparent
-            text-align: right
-            width: 2em
-            padding: 0 1em 0 0
+            &:before, &:after
+              +transition(0.1s opacity)
+
+            &:before
+              content: ""
+              position: absolute
+              z-index: 101
+              height: 0
+              width: 0
+              opacity: 0
+              top: -0.4em
+              right: -1em
+              border:
+                width: 0.5em
+                style: solid
+                color: transparent $color transparent transparent
+
+            &:after
+              opacity: 0
+              z-index: 100
+              font-size: 0.8em
+              content: attr(data-time)
+              background: $color
+              padding: 0.5em
+              position: absolute
+              right: -5em
+              +border-radius(0.2em)
+              color: #fff
+              display: block
+              top: -1.15em
+              font-family: 'Roboto Condensed', sans-serif
+              line-height: 1.5em
+              width: 3em
+              box-shadow: 0 0 0.1em #000
+              text-align: center
+
+          .off_limits
+            +transition(1s height)
+            background-color: rgba(44, 76, 75, 0.4)
+          .booking
+            width: 3.5em
+            height: 3em
+            background-color: #7D1919
+
+        table
+          border-collapse: collapse
+          border-spacing: 0
+          float: left
+          tr
+            &:first-of-type
+              td
+                border-top: 0
+            &:last-of-type
+              td
+                border-bottom: 0
+            td
+              +user-select(none)
+              width: 3.4em
+              height: 3em
+              background-color: #4DC4C1
+              border: 0.1em solid #7DD8D5
+              &:last-of-type
+                border-width: 0.1em 0 0.1em 0.1em
+              &:first-of-type
+                border-width: 0.1em 0.1em 0.1em 0
+
 #TimeTable::-webkit-scrollbar-track
   background-color: #7DD8D5
 
