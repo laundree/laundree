@@ -3,8 +3,9 @@
  */
 
 var Handler = require('./handler')
-var UserModel = require('../models').UserModel
-var _ = require('lodash')
+var TokenHandler = require('./token')
+var {UserModel} = require('../models')
+var lodash = require('lodash')
 var utils = require('../utils')
 
 /**
@@ -20,7 +21,7 @@ function displayNameToName (displayName) {
   if (noNames === 2) return {givenName: names[0], familyName: names[1]}
   return {
     givenName: names[0],
-    middleName: _.slice(names, 1, names.length - 1).join(' '),
+    middleName: lodash.slice(names, 1, names.length - 1).join(' '),
     familyName: names[names.length - 1]
   }
 }
@@ -35,9 +36,12 @@ class UserHandler extends Handler {
    * Find users
    * @returns {Promise.<UserHandler[]>}
    */
-  static find (filter, limit) {
-    limit = limit || 10
-    return UserModel.find(filter, null, {sort: {'_id': 1}}).limit(limit).exec().then((users) => users.map((model) => new UserHandler(model)))
+  static find (filter, limit = 10) {
+    return UserModel
+      .find(filter, null, {sort: {'_id': 1}})
+      .limit(limit)
+      .exec()
+      .then((users) => users.map((model) => new UserHandler(model)))
   }
 
   /**
@@ -47,13 +51,9 @@ class UserHandler extends Handler {
    */
   static findFromId (id) {
     if (!utils.regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
-    try {
-      return UserModel.findFromId(id)
-        .exec()
-        .then((m) => m ? new UserHandler(m) : undefined)
-    } catch (e) {
-      return Promise.reject(e)
-    }
+    return UserModel.findFromId(id)
+      .exec()
+      .then((m) => m ? new UserHandler(m) : undefined)
   }
 
   /**
@@ -62,7 +62,9 @@ class UserHandler extends Handler {
    * @return {Promise.<UserHandler>}
    */
   static findFromEmail (email) {
-    return UserModel.findOne({'profiles.emails.value': email.toLowerCase().trim()}).exec().then((userModel) => userModel ? new UserHandler(userModel) : undefined)
+    return UserModel.findOne({'profiles.emails.value': email.toLowerCase().trim()})
+      .exec()
+      .then((userModel) => userModel ? new UserHandler(userModel) : undefined)
   }
 
   /**
@@ -106,6 +108,37 @@ class UserHandler extends Handler {
           return token
         })
       })
+    })
+  }
+
+  /**
+   * Find a auth token from given secret
+   * @param secret
+   * @return {Promise.<TokenHandler>}
+   */
+  findAuthTokenFromSecret (secret) {
+    return UserModel
+      .populate(this.model, {path: 'authTokens', model: 'Token'})
+      .then((model) =>
+        model.authTokens
+          .map((token) => new TokenHandler(token))
+          .reduce((prev, token) =>
+              prev
+                .then((oldToken) => oldToken || token
+                  .verify(secret)
+                  .then((result) => result ? token : null)),
+            Promise.resolve(null)))
+  }
+
+  /**
+   * Generates a new auth token associated with this account.
+   * @param {string} name
+   * @return {Promise.<TokenHandler>}
+   */
+  generateAuthToken (name) {
+    return TokenHandler._createToken(this, name).then((token) => {
+      this.model.authTokens.push(token.model)
+      return this.model.save().then(() => token)
     })
   }
 
@@ -154,7 +187,7 @@ class UserHandler extends Handler {
     return new UserModel({
       profiles: [profile],
       latestProvider: profile.provider
-    }).save().then((model) => new UserHandler(model))
+    }).save().then((model) => UserHandler.findFromId(model.id))
   }
 
   static createUserWithPassword (displayName, email, password) {
@@ -175,10 +208,7 @@ class UserHandler extends Handler {
         // noinspection UnnecessaryLocalVariableJS
         var [user, passwordHash] = result
         user.model.password = passwordHash
-        return user.model.save().then((model) => {
-          user.model = model
-          return user
-        })
+        return user.model.save().then((model) => UserHandler.findFromId(model.id))
       })
   }
 

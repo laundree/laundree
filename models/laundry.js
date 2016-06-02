@@ -1,0 +1,25 @@
+/**
+ * Created by budde on 02/06/16.
+ */
+const mongoose = require('mongoose')
+const {Schema} = mongoose
+
+const laundrySchema = new Schema({
+  name: String,
+  owner: {required: true, type: Schema.Types.ObjectId, ref: 'User'},
+  createdAt: {type: Date},
+  updatedAt: {type: Date}
+})
+
+laundrySchema.index({'name': 1})
+
+laundrySchema.pre('save', function (next) {
+  var now = new Date()
+  this.updatedAt = now
+  if (!this.createdAt) {
+    this.createdAt = now
+  }
+  next()
+})
+
+module.exports = mongoose.model('Laundry', laundrySchema)

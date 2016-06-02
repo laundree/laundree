@@ -6,7 +6,7 @@ var ElementDecorator = require('./element')
 
 var utils = {validateType: require('../../utils/validate_type'), regex: require('../../utils/regex')}
 
-var _ = require('lodash')
+var lodash = require('lodash')
 
 function boolToPromise (bool, validator) {
   if (bool) return Promise.resolve()
@@ -141,7 +141,7 @@ class FormDecorator extends ElementDecorator {
         continue
       }
       results[j] = utils.validateType.parse(validateType)
-        .generateValidator(_.merge(staticValidators, this.validators))(this, input)
+        .generateValidator(lodash.merge(staticValidators, this.validators))(this, input)
     }
     element.classList.add('deciding')
     Promise

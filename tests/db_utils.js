@@ -3,7 +3,7 @@
  */
 var mongoose = require('mongoose')
 var UserHandler = require('../handlers').UserHandler
-var _ = require('lodash')
+var lodash = require('lodash')
 var faker = require('faker')
 
 function clearDb () {
@@ -31,8 +31,20 @@ function generateProfile () {
 }
 
 function populateUsers (no) {
-  return Promise.all(_.range(no).map(generateProfile).map((profile) => UserHandler.createUserFromProfile(profile)))
+  return Promise.all(lodash.range(no).map(generateProfile).map((profile) => UserHandler.createUserFromProfile(profile)))
 }
 
-module.exports.clearDb = clearDb
-module.exports.populateUsers = populateUsers
+function populateTokens (no) {
+  const userPromise = populateUsers(1)
+  return userPromise
+    .then(([user]) =>
+      Promise
+        .all(lodash.range(no).map((i) => user.generateAuthToken(faker.name.findName())))
+        .then((tokens) => ({user: user, tokens: tokens})))
+}
+
+module.exports = {
+  clearDb: clearDb,
+  populateUsers: populateUsers,
+  populateTokens: populateTokens
+}

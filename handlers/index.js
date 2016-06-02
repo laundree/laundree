@@ -3,5 +3,7 @@
  */
 
 module.exports = {
-  UserHandler: require('./user')
+  UserHandler: require('./user'),
+  LaundryHandler: require('./laundry'),
+  TokenHandler: require('./token')
 }

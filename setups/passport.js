@@ -5,6 +5,7 @@ var passport = require('passport')
 var FacebookStrategy = require('passport-facebook').Strategy
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy
 var LocalStrategy = require('passport-local').Strategy
+var {BasicStrategy} = require('passport-http')
 var config = require('config')
 
 var UserHandler = require('../handlers').UserHandler
@@ -24,6 +25,17 @@ passport.use(new GoogleStrategy({
   clientSecret: config.get('google.clientSecret'),
   callbackURL: config.get('google.callbackUrl')
 }, oauthCallback))
+
+passport.use(new BasicStrategy((userId, password, done) => {
+  UserHandler.findFromId(userId).then((user) => {
+    if (!user) return done(null, false)
+    return user.findAuthTokenFromSecret(password).then((token) => {
+      if (!token) return done(null, false)
+      token.seen()
+      done(null, user)
+    })
+  }).catch(done)
+}))
 
 passport.use(new LocalStrategy((username, password, done) => {
   UserHandler.findFromEmail(username).then((user) => {

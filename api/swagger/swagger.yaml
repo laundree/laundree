@@ -17,6 +17,11 @@ consumes:
 produces:
   - application/json
 
+securityDefinitions:
+  userAccessToken:
+    type: basic
+    description: Basic auth with user access token auth.
+
 paths:
   /users:
     x-swagger-router-controller: users
@@ -263,6 +268,223 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /tokens:
+    x-swagger-router-controller: tokens
+    get:
+      description: List available tokens
+      security: 
+        - userAccessToken: []
+      operationId: listTokens
+      tags:
+        - Tokens
+      parameters:
+        - name: page_size
+          in: query
+          description: The maximum page-size
+          default: 10
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 100
+        - name: since
+          in: query
+          description: Since a given id
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          headers:
+            Link: 
+              description: Link header
+              type: string
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/TokenSummary"
+
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      description: Create a new token
+      operationId: createToken
+      security: 
+        - userAccessToken: []
+      tags:
+        - Tokens
+      parameters:
+        - name: body
+          in: body
+          schema:
+            properties:
+              name:
+                type: string
+  
+      responses:
+        "200":
+          description: Success
+          schema: 
+            $ref: "#/definitions/Token"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /tokens/{id}:
+    x-swagger-router-controller: tokens
+    get:
+      operationId: fetchToken
+      tags:
+        - Tokens
+      security: 
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Token"
+        "404":
+          description: Token not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      operationId: deleteToken
+      tags:
+        - Tokens
+      security: 
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Token"
+        "404":
+          description: Token not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /laundries:
+    x-swagger-router-controller: laundries
+    get:
+      security: 
+        - userAccessToken: []
+      description: Lists the current laundries
+      operationId: listLaundries
+      parameters:
+        - name: page_size
+          in: query
+          description: The maximum page-size
+          default: 10
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 100
+        - name: since
+          in: query
+          description: Since a given id
+          required: false
+          type: string
+      tags:
+        - Laundries
+      responses:
+        "200":
+          description: Success
+          headers:
+            Link: 
+              description: Link header
+              type: string
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/LaundrySummary"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      tags:
+        - Laundries
+      security: 
+        - userAccessToken: []
+      description: Create a laundry
+      operationId: createLaundry
+      parameters:
+        - name: body
+          in: body
+          schema:
+            required: 
+              - name
+              - owner
+            properties:
+              name: 
+                type: string
+              owner:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Laundry"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -314,6 +536,64 @@ definitions:
         type: string
         format: url
 
+  Laundry:
+    required:
+      - id
+      - name
+      - href
+      - owner
+    properties:
+      id:
+        type: string
+      name: 
+        type: string
+      href: 
+        type: string
+      owner:
+        $ref: "#/definitions/UserSummary"
+
+  LaundrySummary:
+    required:
+      - id
+      - name
+      - href
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      href:
+        type: string
+        format: url 
+
+  Token:
+    required:
+      - id
+      - name
+      - href
+      - owner
+    properties:
+      id:
+        type: string
+      name: 
+        type: string
+      href: 
+        type: string
+      owner:
+        $ref: "#/definitions/UserSummary"
+  TokenSummary:
+    required:
+      - id
+      - name
+      - href
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      href: 
+        type: string
+      
   Error:
     required:
       - message

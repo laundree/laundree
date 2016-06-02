@@ -10,7 +10,7 @@ chai.should()
 
 var assert = chai.assert
 var dbUtils = require('../../db_utils')
-var _ = require('lodash')
+var lodash = require('lodash')
 var UserHandler = require('../../../handlers').UserHandler
 
 describe('controllers', function () {
@@ -83,7 +83,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var arr = _.slice(users, 0, 10).map((user) => user.toRestSummary())
+              var arr = lodash.slice(users, 0, 10).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -100,7 +100,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var arr = _.slice(users, 0, 12).map((user) => user.toRestSummary())
+              var arr = lodash.slice(users, 0, 12).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })

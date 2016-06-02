@@ -190,5 +190,13 @@ describe('handlers', () => {
         })
       )
     })
+
+    describe('findAuthTokenFromSecret', () => {
+      it('should right token find', () =>
+        dbUtils.populateTokens(10)
+          .then(({user, tokens}) =>
+            user.findAuthTokenFromSecret(tokens[9].secret)
+              .then((token) => token.model.id.should.deep.equal(tokens[9].model.id))))
+    })
   })
 })

@@ -41,6 +41,32 @@ gulp.task('test-unit', function (done) {
     })
 })
 
+gulp.task('test-api', function (done) {
+  gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
+    .pipe(istanbul({ // Covering files
+      instrumenter: isparta.Instrumenter,
+      includeUntested: true
+    }))
+    .pipe(istanbul.hookRequire())
+    .on('finish', function () {
+      return gulp.src('tests/api/**/*.spec.js', {read: false})
+        .pipe(mocha({reporter: 'spec'}))
+        .pipe(istanbul.writeReports({
+          dir: 'coverage',
+          reportOpts: {dir: 'coverage'},
+          reporters: ['text', 'text-summary', 'lcov']
+        }))
+        .on('end', () => {
+          mongoose.connection.close()
+          done()
+        })
+        .on('error', (error) => {
+          mongoose.connection.close()
+          done(error)
+        })
+    })
+})
+
 gulp.task('send-coverage', (done) => {
   var config = require('config')
   if (!config.has('codeClimate.repoToken')) {
