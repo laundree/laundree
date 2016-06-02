@@ -77,6 +77,7 @@ describe('controllers', function () {
       })
       it('should allow since', (done) => {
         dbUtils.populateTokens(50).then(({user, tokens}) => {
+          tokens = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id))
           request(app)
             .get('/api/tokens')
             .query({since: tokens[24].model.id, page_size: 1})
@@ -86,6 +87,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .end(function (err, res) {
+
               if (err) return done(err)
               res.body.should.deep.equal([tokens[25].toRestSummary()])
               done()
