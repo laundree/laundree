@@ -87,7 +87,6 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .end(function (err, res) {
-
               if (err) return done(err)
               res.body.should.deep.equal([tokens[25].toRestSummary()])
               done()
