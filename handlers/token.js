@@ -3,7 +3,7 @@
  */
 
 const Handler = require('./handler')
-const {password} = require('../utils')
+const {password, regex} = require('../utils')
 const {TokenModel} = require('../models')
 
 class TokenHandler extends Handler {
@@ -19,6 +19,18 @@ class TokenHandler extends Handler {
       .limit(limit || 10)
       .exec()
       .then((tokens) => tokens.map((model) => new TokenHandler(model)))
+  }
+
+  /**
+   * Find an handler from given id.
+   * @param id
+   * @returns {Promise.<TokenHandler>}
+   */
+  static findFromId (id) {
+    if (!regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
+    return TokenModel.findFromId(id)
+      .exec()
+      .then((m) => m ? new TokenHandler(m) : undefined)
   }
 
   /**
@@ -57,6 +69,33 @@ class TokenHandler extends Handler {
    */
   verify (secret) {
     return password.comparePassword(secret, this.model.hash)
+  }
+
+  /**
+   * Delete the token
+   * @return {Promise.<TokenHandler>}
+   */
+  delete () {
+    return this.model.remove().then(() => this)
+  }
+
+  /**
+   * @param {UserHandler} user
+   * @return {boolean}
+   */
+  isOwner (user) {
+    return this.model.owner.equals(user.model._id) || this.model.owner.id === user.model.id
+  }
+
+  toRest () {
+    const UserHandler = require('./user')
+    return TokenModel.populate(this.model, {path: 'owner', model: 'User'})
+      .then((model) => ({
+        id: model.id,
+        name: model.name,
+        owner: new UserHandler(model.owner).toRestSummary(),
+        href: `/api/tokens/${model.id}`
+      }))
   }
 
   toRestSummary () {

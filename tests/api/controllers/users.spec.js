@@ -11,12 +11,12 @@ chai.should()
 var assert = chai.assert
 var dbUtils = require('../../db_utils')
 var lodash = require('lodash')
-var UserHandler = require('../../../handlers').UserHandler
+const {UserHandler, TokenHandler} = require('../../../handlers')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
   describe('users', function () {
-    this.timeout(20000)
+    this.timeout(5000)
     describe('GET /api/users/{id}', () => {
       it('should return error', (done) => {
         request(app)
@@ -49,10 +49,13 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(200)
             .end(function (err, res) {
-              assert(!err)
-              var u = users[5].toRest()
-              res.body.should.be.deep.equal(u)
-              done()
+              if (err) return done(err)
+              users[5].toRest()
+                .then((u) => {
+                  res.body.should.be.deep.equal(lodash.omitBy(u, lodash.isNil))
+                  done()
+                })
+                .catch(done)
             })
         })
       })
@@ -403,6 +406,88 @@ describe('controllers', function () {
           .send({token: 'asdasdasdaasdsaasd', email: 'bob@bobs.dk'})
           .expect(404)
           .end((err) => done(err))
+      })
+    })
+    describe('DELETE /users/{id}', () => {
+      it('should fail on not authenticated', (done) => {
+        request(app)
+          .delete('/api/users/id')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end((err, res) => done(err))
+      })
+      it('should return 404 on invalid id', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          request(app)
+            .delete('/api/users/id')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, tokens[0].secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'User not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on missing id', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          request(app)
+            .delete('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, tokens[0].secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'User not found'})
+              done()
+            })
+        })
+      })
+      it('should return 403 on other id', (done) => {
+        dbUtils.populateTokens(1).then(({user}) => {
+          const user1 = user
+          dbUtils.populateTokens(1).then(({user, tokens}) => {
+            const [token2] = tokens
+            request(app)
+              .delete(`/api/users/${user1.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token2.secret)
+              .expect(403)
+              .expect('Content-Type', /json/)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Not allowed'})
+                done()
+              })
+          })
+        })
+      })
+      it('should succeed', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          request(app)
+            .delete(`/api/users/${user.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, tokens[0].secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(tokens[0].model.id)])
+                .then((result) => {
+                  result.should.be.deep.equal([undefined, undefined])
+                  done()
+                })
+                .catch(done)
+            })
+        })
       })
     })
   })

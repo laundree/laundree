@@ -9,5 +9,6 @@ mongoose.connect(config.get('mongo.url'))
 
 module.exports = {
   UserModel: require('./user'),
-  TokenModel: require('./token')
+  TokenModel: require('./token'),
+  LaundryModel: require('./laundry')
 }

@@ -125,6 +125,34 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+    delete:
+      description: Delete a given user
+      operationId: deleteUser
+      security: 
+        - userAccessToken: []
+      tags: 
+        - Users
+      parameters:
+        - name: id
+          in: path
+          description: The user to be deleted
+          required: true
+          type: string
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema: 
+            $ref: "#/definitions/Error"
   /users/{id}/start-password-reset:
     x-swagger-router-controller: users
     post:
@@ -331,7 +359,7 @@ paths:
         "200":
           description: Success
           schema: 
-            $ref: "#/definitions/Token"
+            $ref: "#/definitions/TokenWithSecret"
         "400":
           description: Invalid input
           schema:
@@ -387,10 +415,8 @@ paths:
           required: true
           type: string
       responses:
-        "200":
+        "204":
           description: Success
-          schema:
-            $ref: "#/definitions/Token"
         "404":
           description: Token not found
           schema:
@@ -462,11 +488,8 @@ paths:
           schema:
             required: 
               - name
-              - owner
             properties:
               name: 
-                type: string
-              owner:
                 type: string
       responses:
         "200":
@@ -485,6 +508,184 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /laundries/{id}:
+    x-swagger-router-controller: laundries
+    get:
+      operationId: fetchLaundry
+      tags:
+        - Laundries
+      security: 
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Laundry"
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      operationId: deleteLaundry
+      tags:
+        - Laundries
+      security: 
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+#  /laundries/{id}/owners:
+#    x-swagger-router-controller: laundries
+#    get:
+#      operationId: listOwners
+#      tags: 
+#        - Laundries
+#      security:
+#        - userAccessToken: []
+#      parameters:
+#        - name: id
+#          in: path
+#          required: true
+#          type: string
+#      responses:
+#        "200":
+#          description: Success
+#          schema:
+#            type: array
+#            items: 
+#              $ref: "#/definitions/UserSummary"
+#        "404":
+#          description: Laundry not found
+#          schema:
+#            $ref: "#/definitions/Error"
+#        "403":
+#          description: Unauthorized
+#          schema:
+#            $ref: "#/definitions/Error"
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/Error"
+#  /laundries/{id}/owners/{userId}:
+#    x-swagger-router-controller: laundries
+#    get: 
+#      operationId: fetchOwner
+#      tags: 
+#        - Laundries
+#      security:
+#        - userAccessToken: []
+#      parameters:
+#        - name: id
+#          in: path
+#          required: true
+#          type: string
+#        - name: userId
+#          in: path
+#          required: true
+#          type: string
+#      responses:
+#        "200":
+#          description: Success
+#          schema:
+#            $ref: "#/definitions/User"
+#        "404":
+#          description: Laundry not found
+#          schema:
+#            $ref: "#/definitions/Error"
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/Error"
+#    put:
+#      operationId: addOwner
+#      tags: 
+#        - Laundries
+#      security:
+#        - userAccessToken: []
+#      parameters:
+#        - name: id
+#          in: path
+#          required: true
+#          type: string
+#        - name: userId
+#          in: path
+#          required: true
+#          type: string
+#      responses:
+#        "204":
+#          description: Success
+#        "404":
+#          description: Laundry not found
+#          schema:
+#            $ref: "#/definitions/Error"
+#        "403":
+#          description: Unauthorized
+#          schema:
+#            $ref: "#/definitions/Error"
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/Error"
+#    delete:
+#      operationId: removeOwner
+#      tags: 
+#        - Laundries
+#      security:
+#        - userAccessToken: []
+#      parameters:
+#        - name: id
+#          in: path
+#          required: true
+#          type: string
+#        - name: userId
+#          in: path
+#          required: true
+#          type: string
+#      responses:
+#        "204":
+#          description: Success
+#        "404":
+#          description: Laundry not found
+#          schema:
+#            $ref: "#/definitions/Error"
+#        "403":
+#          description: Unauthorized
+#          schema:
+#            $ref: "#/definitions/Error"
+#        default:
+#          description: Error
+#          schema:
+#            $ref: "#/definitions/Error"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -497,6 +698,7 @@ definitions:
       - emails
       - displayName
       - photo
+      - tokens
     properties:
       id:
         type: string
@@ -510,6 +712,9 @@ definitions:
         format: url
       displayName:
         type: string
+      lastSeen:
+        type: string
+        format: date
       name:
         properties:
           familyName: 
@@ -521,6 +726,14 @@ definitions:
       href:
         type: string
         format: url
+      laundries:
+        type: array
+        items: 
+          $ref: "#/definitions/LaundrySummary"
+      tokens:
+        type: array
+        items:
+          $ref: "#/definitions/TokenSummary"
 
   UserSummary:
     required:
@@ -541,7 +754,7 @@ definitions:
       - id
       - name
       - href
-      - owner
+      - owners
     properties:
       id:
         type: string
@@ -549,8 +762,14 @@ definitions:
         type: string
       href: 
         type: string
-      owner:
-        $ref: "#/definitions/UserSummary"
+      owners:
+        type: array
+        items: 
+          $ref: "#/definitions/UserSummary"
+      users:
+        type: array
+        items: 
+          $ref: "#/definitions/UserSummary"
 
   LaundrySummary:
     required:
@@ -579,8 +798,33 @@ definitions:
         type: string
       href: 
         type: string
+      lastSeen:
+        type: string
+        format: date
       owner:
         $ref: "#/definitions/UserSummary"
+  TokenWithSecret:
+    required:
+      - id
+      - name
+      - href
+      - owner
+      - secret
+    properties:
+      id:
+        type: string
+      secret:
+        type: string
+      name: 
+        type: string
+      href: 
+        type: string
+      lastSeen:
+        type: string
+        format: date
+      owner:
+        $ref: "#/definitions/UserSummary"
+
   TokenSummary:
     required:
       - id

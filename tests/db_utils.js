@@ -43,8 +43,17 @@ function populateTokens (no) {
         .then((tokens) => ({user: user, tokens: tokens})))
 }
 
+function populateLaundries (no) {
+  return populateTokens(1)
+    .then(({user, tokens}) =>
+      Promise
+        .all(lodash.range(no).map((i) => user.createLaundry(faker.name.findName())))
+        .then((laundries) => ({user: user, token: tokens[0], laundries: laundries})))
+}
+
 module.exports = {
   clearDb: clearDb,
   populateUsers: populateUsers,
+  populateLaundries: populateLaundries,
   populateTokens: populateTokens
 }

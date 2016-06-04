@@ -2,12 +2,12 @@
  * Created by budde on 02/06/16.
  */
 const {TokenHandler} = require('../../handlers')
-const utils = require('../../utils')
+const {api} = require('../../utils')
 
 function listTokens (req, res) {
-  var filter = {owner: req.user.model._id}
-  var limit = req.swagger.params.page_size.value
-  var since = req.swagger.params.since.value
+  const filter = {owner: req.user.model._id}
+  const limit = req.swagger.params.page_size.value
+  const since = req.swagger.params.since.value
   if (since) {
     filter._id = {$gt: since}
   }
@@ -15,22 +15,57 @@ function listTokens (req, res) {
     .then((tokens) => tokens.map((token) => token.toRestSummary()))
     .then((tokens) => {
       var links = {
-        first: `/api/users?page_size=${limit}`
+        first: `/api/tokens?page_size=${limit}`
       }
       if (tokens.length === limit) {
-        links.next = `/api/users?since=${tokens[tokens.length - 1].id}&page_size=${limit}`
+        links.next = `/api/tokens?since=${tokens[tokens.length - 1].id}&page_size=${limit}`
       }
       res.links(links)
       res.json(tokens)
     })
-    .catch(utils.api.generateErrorHandler(res))
+    .catch(api.generateErrorHandler(res))
 }
 
 function createToken (req, res) {
-  res.end()
+  const name = req.swagger.params.body.value.name.trim()
+  if (name === '') return api.returnError(res, 400, 'Invalid name')
+  TokenHandler.find({name: name, owner: req.user.model._id})
+    .then((tokens) => {
+      if (tokens.length) return api.returnError(res, 400, 'Token already exists')
+      return req.user.generateAuthToken(name)
+        .then((token) => api.returnSuccess(res, token.toRest().then((result) => {
+          result.secret = token.secret
+          return result
+        })))
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
+function fetchToken (req, res) {
+  const id = req.swagger.params.id.value
+  TokenHandler.findFromId(id)
+    .then((token) => {
+      if (!token) return api.returnError(res, 404, 'Token not found')
+      if (!token.isOwner(req.user)) return api.returnError(res, 404, 'Token not found')
+      api.returnSuccess(res, token.toRest())
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
+function deleteToken (req, res) {
+  const id = req.swagger.params.id.value
+  TokenHandler.findFromId(id)
+    .then((token) => {
+      if (!token) return api.returnError(res, 404, 'Token not found')
+      if (!token.isOwner(req.user)) return api.returnError(res, 404, 'Token not found')
+      return req.user.removeAuthToken(token).then(() => api.returnSuccess(res))
+    })
+    .catch(api.generateErrorHandler(res))
 }
 
 module.exports = {
   listTokens: listTokens,
-  createToken: createToken
+  createToken: createToken,
+  deleteToken: deleteToken,
+  fetchToken: fetchToken
 }

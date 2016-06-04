@@ -11,7 +11,11 @@ var config = require('config')
 var UserHandler = require('../handlers').UserHandler
 var oauthCallback = (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
-  UserHandler.findOrCreateFromProfile(profile).then((user) => done(null, user || null, {message: 'User not found'})).catch(done)
+  UserHandler.findOrCreateFromProfile(profile)
+    .then((user) => {
+      if (user) user.seen()
+      done(null, user || null, {message: 'User not found'})
+    }).catch(done)
 }
 passport.use(new FacebookStrategy({
   clientID: config.get('facebook.appId'),
@@ -43,6 +47,7 @@ passport.use(new LocalStrategy((username, password, done) => {
     if (user.model.verifiedEmails.indexOf(username) < 0) return done(null, false, {message: 'User is not verified'})
     return user.verifyPassword(password).then((result) => {
       if (!result) return done(null, false, {message: 'Invalid email/password combination.'})
+      user.seen()
       done(null, user)
     })
   }).catch(done)

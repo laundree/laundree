@@ -5,13 +5,15 @@ const mongoose = require('mongoose')
 const {Schema} = mongoose
 
 const laundrySchema = new Schema({
-  name: String,
-  owner: {required: true, type: Schema.Types.ObjectId, ref: 'User'},
+  name: {type: String, unique: true, trim: true, required: true},
+  owners: [{type: Schema.Types.ObjectId, ref: 'User'}],
+  users: [{type: Schema.Types.ObjectId, ref: 'User'}],
   createdAt: {type: Date},
   updatedAt: {type: Date}
 })
 
 laundrySchema.index({'name': 1})
+laundrySchema.index({'users': 1})
 
 laundrySchema.pre('save', function (next) {
   var now = new Date()

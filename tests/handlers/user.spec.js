@@ -124,7 +124,18 @@ describe('handlers', () => {
           })
         }))
     })
-
+    describe('seen', () => {
+      it('should return date', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        user.seen().should.eventually.be.an.instanceof(Date)
+      }))
+      it('should update lastSeen', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        user.seen().then((time) => {
+          user.model.lastSeen.should.be.equal(time)
+        })
+      }))
+    })
     describe('verifyEmail', () => {
       it('should resolve to true', () => dbUtils.populateUsers(1).then((users) => {
         var [user] = users

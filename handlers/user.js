@@ -4,6 +4,7 @@
 
 var Handler = require('./handler')
 var TokenHandler = require('./token')
+var LaundryHandler = require('./laundry')
 var {UserModel} = require('../models')
 var lodash = require('lodash')
 var utils = require('../utils')
@@ -137,9 +138,35 @@ class UserHandler extends Handler {
    */
   generateAuthToken (name) {
     return TokenHandler._createToken(this, name).then((token) => {
-      this.model.authTokens.push(token.model)
+      this.model.authTokens.push(token.model._id)
       return this.model.save().then(() => token)
     })
+  }
+
+  /**
+   * Create a new laundry with the current user as owner.
+   * @param {string} name
+   * @return {Promise.<LaundryHandler>}
+   */
+  createLaundry (name) {
+    return LaundryHandler._createLaundry(this, name).then((laundry) => {
+      this.model.laundries.push(laundry.model._id)
+      return this.model.save().then(() => laundry)
+    })
+  }
+
+  /**
+   * Remove provided token
+   * @param {TokenHandler} token
+   * @return {Promise.<UserHandler>}
+   */
+  removeAuthToken (token) {
+    return token.delete()
+      .then(() => {
+        this.model.authTokens.pull(token.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
   }
 
   /**
@@ -186,6 +213,7 @@ class UserHandler extends Handler {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return new UserModel({
       profiles: [profile],
+      laundries: [],
       latestProvider: profile.provider
     }).save().then((model) => UserHandler.findFromId(model.id))
   }
@@ -247,19 +275,43 @@ class UserHandler extends Handler {
     return utils.password.comparePassword(token, this.model.resetPasswordToken)
   }
 
+  delete () {
+    return UserModel.populate(this.model, {path: 'authTokens', model: 'Token'})
+      .then((model) => Promise.all(model.authTokens.map((t) => new TokenHandler(t).delete())))
+      .then(() => this.model.remove())
+      .then(() => this)
+  }
+
+  /**
+   * Update the last seen variable to now
+   * @return {Promise.<Date>}
+   */
+  seen () {
+    const date = new Date()
+    this.model.lastSeen = date
+    return this.model.save().then((model) => {
+      this.model = model
+      return date
+    })
+  }
+
   toRest () {
-    return {
-      emails: this.model.emails,
-      id: this.model.id,
-      displayName: this.model.displayName,
-      name: {
-        familyName: this.model.name.familyName,
-        givenName: this.model.name.givenName,
-        middleName: this.model.name.middleName
-      },
-      photo: this.model.photo,
-      href: `/api/users/${this.model.id}`
-    }
+    return UserModel
+      .populate(this.model, {path: 'tokens', model: 'Token'})
+      .then((model) => ({
+        emails: this.model.emails,
+        id: this.model.id,
+        displayName: this.model.displayName,
+        lastSeen: this.model.lastSeen,
+        name: {
+          familyName: this.model.name.familyName,
+          givenName: this.model.name.givenName,
+          middleName: this.model.name.middleName
+        },
+        tokens: model.authTokens.map((t) => new TokenHandler(t).toRestSummary()),
+        photo: this.model.photo,
+        href: `/api/users/${this.model.id}`
+      }))
   }
 
   toRestSummary () {

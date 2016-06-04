@@ -29,5 +29,12 @@ tokenSchema.pre('save', function (next) {
 
 tokenSchema.index({'name': 1})
 
+/**
+ * Find from id string
+ * @param {string} id
+ */
+tokenSchema.statics.findFromId = (id) => TokenModel.findById(new mongoose.Types.ObjectId(id))
+
 const TokenModel = mongoose.model('Token', tokenSchema)
+
 module.exports = TokenModel

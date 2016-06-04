@@ -2,14 +2,41 @@
  * Created by budde on 15/05/16.
  */
 
-var config = require('config')
+const error = require('./error')
 
 function generateErrorHandler (res) {
   return (err) => {
-    if (config.get('logging.error.enabled')) console.log(err)
+    error.logError(err)
     res.statusCode = 500
     res.json({message: 'Internal server error'})
   }
 }
+/**
+ * Return an error.
+ * @param res
+ * @param {number} statusCode
+ * @param {string} message
+ */
+function returnError (res, statusCode, message) {
+  res.statusCode = statusCode
+  res.json({message: message})
+}
+/**
+ * Return success
+ * @param res
+ * @param {Promise} result
+ * @returns {number|*}
+ */
+function returnSuccess (res, result) {
+  res.statusCode = result ? 200 : 204
+  if (!result) return res.end()
+  result
+    .then((result) => res.json(result))
+    .catch(error.logError)
+}
 
-module.exports = {generateErrorHandler: generateErrorHandler}
+module.exports = {
+  generateErrorHandler: generateErrorHandler,
+  returnError: returnError,
+  returnSuccess: returnSuccess
+}

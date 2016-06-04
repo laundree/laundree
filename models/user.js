@@ -10,7 +10,9 @@ var userSchema = new Schema({
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   latestProvider: String,
+  lastSeen: Date,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
+  laundries: [{type: Schema.Types.ObjectId, ref: 'Laundry'}],
   explicitVerifiedEmails: [{type: String}],
   explicitVerificationEmailTokens: [{
     email: {type: String, required: true},
