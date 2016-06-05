@@ -124,7 +124,18 @@ describe('handlers', () => {
           })
         }))
     })
-
+    describe('seen', () => {
+      it('should return date', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        user.seen().should.eventually.be.an.instanceof(Date)
+      }))
+      it('should update lastSeen', () => dbUtils.populateUsers(1).then((users) => {
+        var [user] = users
+        user.seen().then((time) => {
+          user.model.lastSeen.should.be.equal(time)
+        })
+      }))
+    })
     describe('verifyEmail', () => {
       it('should resolve to true', () => dbUtils.populateUsers(1).then((users) => {
         var [user] = users
@@ -187,8 +198,15 @@ describe('handlers', () => {
             user.verifyEmail(email, token1).then((result1) =>
               Promise.all([result1, user.verifyEmail(email, token1)]))
               .should.eventually.deep.equal([true, false]))
-        })
-      )
+        }))
+    })
+
+    describe('findAuthTokenFromSecret', () => {
+      it('should right token find', () =>
+        dbUtils.populateTokens(10)
+          .then(({user, tokens}) =>
+            user.findAuthTokenFromSecret(tokens[9].secret)
+              .then((token) => token.model.id.should.deep.equal(tokens[9].model.id))))
     })
   })
 })

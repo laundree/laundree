@@ -1,12 +1,13 @@
 var browserify = require('browserify-middleware')
 var babelify = require('babelify')
+var reactify = require('reactify')
 var express = require('express')
 var path = require('path')
 var router = express.Router()
 
 babelify.configure({presets: ['es2015']})
 browserify.settings({
-  transform: [babelify],
+  transform: [reactify, babelify],
   standalone: 'Laundree'
 })
 

@@ -9,7 +9,7 @@ var exec = require('child_process').exec
 var runSequence = require('run-sequence')
 
 gulp.task('lint', function () {
-  return gulp.src(['{client,handlers,models,routes,setups,tests,utils,views}/**/*.js', '*.js'])
+  return gulp.src(['{client,handlers,models,routes,setups,tests,utils,views}/**/*.{js,jsx}', '*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
@@ -24,6 +24,32 @@ gulp.task('test-unit', function (done) {
     .pipe(istanbul.hookRequire())
     .on('finish', function () {
       return gulp.src('tests/**/*.spec.js', {read: false})
+        .pipe(mocha({reporter: 'spec'}))
+        .pipe(istanbul.writeReports({
+          dir: 'coverage',
+          reportOpts: {dir: 'coverage'},
+          reporters: ['text', 'text-summary', 'lcov']
+        }))
+        .on('end', () => {
+          mongoose.connection.close()
+          done()
+        })
+        .on('error', (error) => {
+          mongoose.connection.close()
+          done(error)
+        })
+    })
+})
+
+gulp.task('test-api', function (done) {
+  gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
+    .pipe(istanbul({ // Covering files
+      instrumenter: isparta.Instrumenter,
+      includeUntested: true
+    }))
+    .pipe(istanbul.hookRequire())
+    .on('finish', function () {
+      return gulp.src('tests/api/**/*.spec.js', {read: false})
         .pipe(mocha({reporter: 'spec'}))
         .pipe(istanbul.writeReports({
           dir: 'coverage',

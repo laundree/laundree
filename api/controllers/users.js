@@ -6,20 +6,12 @@ var utils = require('../../utils')
 
 var UserHandler = require('../../handlers').UserHandler
 
-function returnError (res, statusCode, message) {
-  res.statusCode = statusCode
-  res.json({message: message})
-}
-
-function returnSuccess (res, statusCode, result) {
-  res.statusCode = statusCode
-  if (!result) return res.end()
-  res.json(result)
-}
-
 function getUser (req, res) {
   var id = req.swagger.params.id.value
-  UserHandler.findFromId(id).then((user) => !user ? returnError(res, 404, 'User not found.') : res.json(user.toRest()))
+  UserHandler.findFromId(id)
+    .then((user) => !user
+      ? utils.api.returnError(res, 404, 'User not found.')
+      : utils.api.returnSuccess(res, user.toRest()))
     .catch(utils.api.generateErrorHandler(res))
 }
 
@@ -54,23 +46,25 @@ function createUser (req, res) {
   var displayName = body.displayName
   var email = body.email
   var password = body.password
-  if (!displayName) return returnError(res, 400, 'Invalid display name.')
-  if (!email || !utils.regex.email.exec(email)) return returnError(res, 400, 'Invalid email address.')
-  if (!password || !utils.regex.password.exec(password)) return returnError(res, 400, 'Invalid password')
+  if (!displayName) return utils.api.returnError(res, 400, 'Invalid display name.')
+  if (!email || !utils.regex.email.exec(email)) return utils.api.returnError(res, 400, 'Invalid email address.')
+  if (!password || !utils.regex.password.exec(password)) return utils.api.returnError(res, 400, 'Invalid password')
   UserHandler
     .findFromEmail(email)
-    .then((user) => user ? returnError(res, 400, 'Email address already exists.') : UserHandler.createUserWithPassword(displayName, email, password)
-      .then((user) => res.json(user.toRest())))
+    .then((user) => user
+      ? utils.api.returnError(res, 400, 'Email address already exists.')
+      : UserHandler.createUserWithPassword(displayName, email, password)
+      .then((user) => utils.api.returnSuccess(res, user.toRest())))
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function startPasswordReset (req, res) {
   var id = req.swagger.params.id.value
-  if (!utils.regex.mongoDbId.exec(id)) return returnError(res, 404, 'User not found')
+  if (!utils.regex.mongoDbId.exec(id)) return utils.api.returnError(res, 404, 'User not found')
   UserHandler.findFromId(id)
-    .then((user) => !user ? returnError(res, 404, 'User not found.') : user.generateResetToken()
+    .then((user) => !user ? utils.api.returnError(res, 404, 'User not found.') : user.generateResetToken()
       .then((token) => utils.mail.sendEmail({user: user.model, token: token}, 'password-reset', user.model.emails[0]))
-      .then(() => returnSuccess(res, 204)))
+      .then(() => utils.api.returnSuccess(res)))
     .catch(utils.api.generateErrorHandler(res))
 }
 
@@ -79,24 +73,24 @@ function passwordReset (req, res) {
   var body = req.swagger.params.body.value
   var token = body.token
   var password = body.password
-  if (!password || !utils.regex.password.exec(password)) return returnError(res, 400, 'Invalid password')
+  if (!password || !utils.regex.password.exec(password)) return utils.api.returnError(res, 400, 'Invalid password')
   UserHandler.findFromId(id)
-    .then((user) => !user ? returnError(res, 404, 'User not found.') : user.verifyResetPasswordToken(token)
-      .then((result) => !result ? returnError(res, 400, 'Invalid token') : user.resetPassword(password)
-        .then(() => returnSuccess(res, 204))))
+    .then((user) => !user ? utils.api.returnError(res, 404, 'User not found.') : user.verifyResetPasswordToken(token)
+      .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : user.resetPassword(password)
+        .then(() => utils.api.returnSuccess(res))))
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function startEmailVerification (req, res) {
   var id = req.swagger.params.id.value
   var email = req.swagger.params.body.value.email
-  UserHandler.findFromId(id).then((user) => !user ? returnError(res, 404, 'User not found') : user.generateVerifyEmailToken(email)
-    .then((token) => !token ? returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
+  UserHandler.findFromId(id).then((user) => !user ? utils.api.returnError(res, 404, 'User not found') : user.generateVerifyEmailToken(email)
+    .then((token) => !token ? utils.api.returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
       email: email,
       token: token,
       user: user.model
     }, 'verify-email', email)
-      .then(() => returnSuccess(res, 204))))
+      .then(() => utils.api.returnSuccess(res))))
     .catch(utils.api.generateErrorHandler(res))
 }
 
@@ -105,10 +99,24 @@ function verifyEmail (req, res) {
   var body = req.swagger.params.body.value
   var email = body.email
   var token = body.token
-  if (!utils.regex.email.exec(email)) return returnError(res, 400, 'Invalid email')
+  if (!utils.regex.email.exec(email)) return utils.api.returnError(res, 400, 'Invalid email')
   UserHandler.findFromId(id)
-    .then((user) => !user ? returnError(res, 404, 'User not found') : user.verifyEmail(email, token)
-      .then((result) => !result ? returnError(res, 400, 'Invalid token') : returnSuccess(res, 204)))
+    .then((user) => !user ? utils.api.returnError(res, 404, 'User not found') : user.verifyEmail(email, token)
+      .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : utils.api.returnSuccess(res)))
+    .catch(utils.api.generateErrorHandler(res))
+}
+
+function deleteUser (req, res) {
+  const id = req.swagger.params.id.value
+  UserHandler.findFromId(id)
+    .then((user) => {
+      if (!user) return utils.api.returnError(res, 404, 'User not found')
+      if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
+      return user.findOwnedLaundries().then((laundries) => {
+        if (laundries.length) return utils.api.returnError(res, 403, 'Not allowed')
+        return user.deleteUser().then(() => utils.api.returnSuccess(res))
+      })
+    })
     .catch(utils.api.generateErrorHandler(res))
 }
 
@@ -119,5 +127,6 @@ module.exports = {
   startPasswordReset: startPasswordReset,
   passwordReset: passwordReset,
   startEmailVerification: startEmailVerification,
-  verifyEmail: verifyEmail
+  verifyEmail: verifyEmail,
+  deleteUser: deleteUser
 }

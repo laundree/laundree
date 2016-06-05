@@ -2,11 +2,11 @@
  * Module dependencies.
  */
 
-var app = require('./app')
-var debug = require('debug')('laundree:server')
-var http = require('http')
-var config = require('config')
-var socketIo = require('./setups').socketIoSetup
+const app = require('./app')
+const debug = require('debug')('laundree:server')
+const http = require('http')
+const config = require('config')
+const {socketIoSetup} = require('./setups')
 /**
  * Get port from environment and store in Express.
  */
@@ -26,7 +26,7 @@ module.exports.start = function () {
   server.listen(port)
   server.on('error', onError)
   server.on('listening', onListening)
-  socketIo(server)
+  socketIoSetup(server)
 }
 
 /**

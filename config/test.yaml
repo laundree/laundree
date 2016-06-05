@@ -4,3 +4,7 @@ mongo:
 logging:
   http:
     enabled: false
+
+security:
+  password:
+    saltRounds: 1

@@ -1,7 +1,7 @@
 /**
  * Created by budde on 05/05/16.
  */
-var _ = require('lodash')
+var lodash = require('lodash')
 /**
  * @typedef {{type: string, value: string=}} Token
  */
@@ -141,11 +141,11 @@ function parseTokenList (tokens) {
 
   var lastToken = tokens[tokens.length - 1]
   if (firstToken.type === 'L_PAREN' && lastToken.type === 'R_PAREN') {
-    return parseTokenList(_.slice(tokens, 1, tokens.length - 1))
+    return parseTokenList(lodash.slice(tokens, 1, tokens.length - 1))
   }
 
-  var left = (key) => parseTokenList(_.slice(tokens, 0, key))
-  var right = (key) => parseTokenList(_.slice(tokens, key + 1))
+  var left = (key) => parseTokenList(lodash.slice(tokens, 0, key))
+  var right = (key) => parseTokenList(lodash.slice(tokens, key + 1))
 
   var findBinary = (type, Node) => {
     var paren = 0

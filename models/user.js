@@ -3,13 +3,16 @@
  */
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
-var _ = require('lodash')
+var lodash = require('lodash')
 
 var userSchema = new Schema({
   password: {type: String},
   resetPasswordToken: String,
   resetPasswordExpire: Date,
   latestProvider: String,
+  lastSeen: Date,
+  authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
+  laundries: [{type: Schema.Types.ObjectId, ref: 'Laundry'}],
   explicitVerifiedEmails: [{type: String}],
   explicitVerificationEmailTokens: [{
     email: {type: String, required: true},
@@ -27,17 +30,29 @@ var userSchema = new Schema({
     },
     emails: [{value: String, type: {type: String}}],
     photos: [{value: String}]
-  }]
+  }],
+  createdAt: {type: Date},
+  updatedAt: {type: Date}
 }, {
   toObject: {virtuals: true},
   toJSON: {virtuals: true}
 })
+
+userSchema.pre('save', function (next) {
+  var now = new Date()
+  this.updatedAt = now
+  if (!this.createdAt) {
+    this.createdAt = now
+  }
+  next()
+})
+
 userSchema.index({'profiles.emails.value': 1})
 userSchema
   .virtual('latestProfile')
   .get(function () {
     if (!this.latestProvider) return null
-    return _.find(this.profiles, (profile) => profile.provider === this.latestProvider) || null
+    return lodash.find(this.profiles, (profile) => profile.provider === this.latestProvider) || null
   })
 
 function fromLatestProfile (attribute) {
@@ -80,7 +95,7 @@ userSchema
 userSchema
   .virtual('verifiedEmails')
   .get(function () {
-    return _.union(this.explicitVerifiedEmails, this.implicitVerifiedEmails)
+    return lodash.union(this.explicitVerifiedEmails, this.implicitVerifiedEmails)
   })
 
 userSchema

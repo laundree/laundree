@@ -21,6 +21,11 @@ function hashPassword (password, saltRounds) {
   }))
 }
 
+/**
+ * @param {string} password
+ * @param {string} hash
+ * @returns {Promise.<boolean>}
+ */
 function comparePassword (password, hash) {
   return new Promise((resolve, reject) => bcrypt.compare(password, hash, (err, res) => {
     if (err) return reject(err)

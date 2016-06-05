@@ -7,5 +7,6 @@ module.exports = {
   validateType: require('./validate_type'),
   password: require('./password'),
   mail: require('./mail'),
-  api: require('./api')
+  api: require('./api'),
+  error: require('./error')
 }

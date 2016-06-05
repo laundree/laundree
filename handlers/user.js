@@ -3,8 +3,10 @@
  */
 
 var Handler = require('./handler')
-var UserModel = require('../models').UserModel
-var _ = require('lodash')
+var TokenHandler = require('./token')
+var LaundryHandler = require('./laundry')
+var {UserModel} = require('../models')
+var lodash = require('lodash')
 var utils = require('../utils')
 
 /**
@@ -20,7 +22,7 @@ function displayNameToName (displayName) {
   if (noNames === 2) return {givenName: names[0], familyName: names[1]}
   return {
     givenName: names[0],
-    middleName: _.slice(names, 1, names.length - 1).join(' '),
+    middleName: lodash.slice(names, 1, names.length - 1).join(' '),
     familyName: names[names.length - 1]
   }
 }
@@ -35,9 +37,12 @@ class UserHandler extends Handler {
    * Find users
    * @returns {Promise.<UserHandler[]>}
    */
-  static find (filter, limit) {
-    limit = limit || 10
-    return UserModel.find(filter, null, {sort: {'_id': 1}}).limit(limit).exec().then((users) => users.map((model) => new UserHandler(model)))
+  static find (filter, limit = 10) {
+    return UserModel
+      .find(filter, null, {sort: {'_id': 1}})
+      .limit(limit)
+      .exec()
+      .then((users) => users.map((model) => new UserHandler(model)))
   }
 
   /**
@@ -47,13 +52,9 @@ class UserHandler extends Handler {
    */
   static findFromId (id) {
     if (!utils.regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
-    try {
-      return UserModel.findFromId(id)
-        .exec()
-        .then((m) => m ? new UserHandler(m) : undefined)
-    } catch (e) {
-      return Promise.reject(e)
-    }
+    return UserModel.findFromId(id)
+      .exec()
+      .then((m) => m ? new UserHandler(m) : undefined)
   }
 
   /**
@@ -62,7 +63,9 @@ class UserHandler extends Handler {
    * @return {Promise.<UserHandler>}
    */
   static findFromEmail (email) {
-    return UserModel.findOne({'profiles.emails.value': email.toLowerCase().trim()}).exec().then((userModel) => userModel ? new UserHandler(userModel) : undefined)
+    return UserModel.findOne({'profiles.emails.value': email.toLowerCase().trim()})
+      .exec()
+      .then((userModel) => userModel ? new UserHandler(userModel) : undefined)
   }
 
   /**
@@ -110,6 +113,94 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Finds the laundries owned by this user
+   * @return {Promise<LaundryHandler[]>}
+   */
+  findOwnedLaundries () {
+    return LaundryHandler.find({owners: this.model._id})
+  }
+
+  /**
+   * Find a auth token from given secret
+   * @param secret
+   * @return {Promise.<TokenHandler>}
+   */
+  findAuthTokenFromSecret (secret) {
+    return UserModel
+      .populate(this.model, {path: 'authTokens', model: 'Token'})
+      .then((model) =>
+        model.authTokens
+          .map((token) => new TokenHandler(token))
+          .reduce((prev, token) =>
+              prev
+                .then((oldToken) => oldToken || token
+                  .verify(secret)
+                  .then((result) => result ? token : null)),
+            Promise.resolve(null)))
+  }
+
+  /**
+   * Generates a new auth token associated with this account.
+   * @param {string} name
+   * @return {Promise.<TokenHandler>}
+   */
+  generateAuthToken (name) {
+    return TokenHandler._createToken(this, name).then((token) => {
+      this.model.authTokens.push(token.model._id)
+      return this.model.save().then(() => token)
+    })
+  }
+
+  /**
+   * Create a new laundry with the current user as owner.
+   * @param {string} name
+   * @return {Promise.<LaundryHandler>}
+   */
+  createLaundry (name) {
+    return LaundryHandler._createLaundry(this, name).then((laundry) => {
+      this.model.laundries.push(laundry.model._id)
+      return this.model.save().then(() => laundry)
+    })
+  }
+
+  /**
+   * Add this user as a user on the given laundry.
+   * @param {LaundryHandler} laundry
+   * @return {Promise.<UserHandler>}
+   */
+  addLaundry (laundry) {
+    return laundry._addUser(this)
+      .then(() => {
+        this.model.laundries.push(laundry.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
+  }
+
+  /**
+   * Remove provided token
+   * @param {TokenHandler} token
+   * @return {Promise.<UserHandler>}
+   */
+  removeAuthToken (token) {
+    return token.deleteToken()
+      .then(() => {
+        this.model.authTokens.pull(token.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
+  }
+
+  deleteLaundry (laundry) {
+    return laundry.deleteLaundry()
+      .then(() => {
+        this.model.laundries.pull(laundry.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
+  }
+
+  /**
    * Will create a new email verification.
    * @param {string} email
    * @return {Promise.<string>}
@@ -153,8 +244,9 @@ class UserHandler extends Handler {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return new UserModel({
       profiles: [profile],
+      laundries: [],
       latestProvider: profile.provider
-    }).save().then((model) => new UserHandler(model))
+    }).save().then((model) => UserHandler.findFromId(model.id))
   }
 
   static createUserWithPassword (displayName, email, password) {
@@ -175,10 +267,7 @@ class UserHandler extends Handler {
         // noinspection UnnecessaryLocalVariableJS
         var [user, passwordHash] = result
         user.model.password = passwordHash
-        return user.model.save().then((model) => {
-          user.model = model
-          return user
-        })
+        return user.model.save().then((model) => UserHandler.findFromId(model.id))
       })
   }
 
@@ -217,19 +306,46 @@ class UserHandler extends Handler {
     return utils.password.comparePassword(token, this.model.resetPasswordToken)
   }
 
+  deleteUser () {
+    return UserModel.populate(this.model, {path: 'authTokens laundries'})
+      .then((model) =>
+        Promise.all([
+          Promise.all(model.authTokens.map((t) => new TokenHandler(t).deleteToken())),
+          Promise.all(model.laundries.map((l) => new LaundryHandler(l)._removeUser(this)))]))
+      .then(() => this.model.remove())
+      .then(() => this)
+  }
+
+  /**
+   * Update the last seen variable to now
+   * @return {Promise.<Date>}
+   */
+  seen () {
+    const date = new Date()
+    this.model.lastSeen = date
+    return this.model.save().then((model) => {
+      this.model = model
+      return date
+    })
+  }
+
   toRest () {
-    return {
-      emails: this.model.emails,
-      id: this.model.id,
-      displayName: this.model.displayName,
-      name: {
-        familyName: this.model.name.familyName,
-        givenName: this.model.name.givenName,
-        middleName: this.model.name.middleName
-      },
-      photo: this.model.photo,
-      href: `/api/users/${this.model.id}`
-    }
+    return UserModel
+      .populate(this.model, {path: 'tokens', model: 'Token'})
+      .then((model) => ({
+        emails: this.model.emails,
+        id: this.model.id,
+        displayName: this.model.displayName,
+        lastSeen: this.model.lastSeen,
+        name: {
+          familyName: this.model.name.familyName,
+          givenName: this.model.name.givenName,
+          middleName: this.model.name.middleName
+        },
+        tokens: model.authTokens.map((t) => new TokenHandler(t).toRestSummary()),
+        photo: this.model.photo,
+        href: `/api/users/${this.model.id}`
+      }))
   }
 
   toRestSummary () {

@@ -8,5 +8,7 @@ var config = require('config')
 mongoose.connect(config.get('mongo.url'))
 
 module.exports = {
-  UserModel: require('./user')
+  UserModel: require('./user'),
+  TokenModel: require('./token'),
+  LaundryModel: require('./laundry')
 }

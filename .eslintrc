@@ -1,6 +1,13 @@
 {
-  "extends": "standard",
+  "extends": [
+    "standard",
+    "standard-react"
+  ],
   "parser": "babel-eslint",
+  "rules": {
+    "react/jsx-space-before-closing": 1,
+    "react/jsx-indent": 1
+  },
   "env": {
     "node": true
   }
