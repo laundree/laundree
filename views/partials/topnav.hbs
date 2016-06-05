@@ -24,33 +24,5 @@
         </svg>
         Contact
     </a>
-    {{#if user}}
-        <div class="user dropdown">
-            <img src="{{{user.photo}}}" class="avatar"/>
-            <div class="dropdown-content">
-                <ul>
-                    <li>
-                        <a href="/app/i">
-                            Manage your account
-                        </a>
-                    </li>
-                    <li>
-                        <a href="/logout">
-                            Log out
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    {{else}}
         <a href="/auth" class="log-in">Log in</a>
-    {{/if}}
-    <!--<div class="language">
-        <span>English</span>
-        <ul>
-            <li><a href="#">English</a></li>
-            <li><a href="#">Danish</a></li>
-        </ul>
-
-    </div>-->
 </nav>

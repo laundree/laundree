@@ -84,7 +84,8 @@ class TokenHandler extends Handler {
    * @return {boolean}
    */
   isOwner (user) {
-    return this.model.owner.equals(user.model._id) || this.model.owner.id === user.model.id
+    const ownerId = this.model.populated('owner') || this.model.owner
+    return user.model._id.equals(ownerId)
   }
 
   toRest () {

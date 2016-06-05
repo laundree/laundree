@@ -112,7 +112,10 @@ function deleteUser (req, res) {
     .then((user) => {
       if (!user) return utils.api.returnError(res, 404, 'User not found')
       if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
-      return user.delete().then(() => utils.api.returnSuccess(res))
+      return user.findOwnedLaundries().then((laundries) => {
+        if (laundries.length) return utils.api.returnError(res, 403, 'Not allowed')
+        return user.delete().then(() => utils.api.returnSuccess(res))
+      })
     })
     .catch(utils.api.generateErrorHandler(res))
 }

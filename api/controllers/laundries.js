@@ -27,10 +27,46 @@ function listLaundries (req, res) {
 }
 
 function createLaundry (req, res) {
-  res.end()
+  const name = req.swagger.params.body.value.name.trim()
+  if (name === '') return api.returnError(res, 400, 'Invalid name')
+  LaundryHandler
+    .find({name: name})
+    .then(([laundry]) => {
+      if (laundry) return api.returnError(res, 400, 'Laundry already exists')
+      return req.user.createLaundry(name)
+        .then((laundry) => api.returnSuccess(res, laundry.toRest()))
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
+function fetchLaundry (req, res) {
+  const id = req.swagger.params.id.value
+  LaundryHandler
+    .findFromId(id)
+    .then((laundry) => {
+      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
+      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
+      return api.returnSuccess(res, laundry.toRest())
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
+function deleteLaundry (req, res) {
+  const id = req.swagger.params.id.value
+  LaundryHandler
+    .findFromId(id)
+    .then((laundry) => {
+      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
+      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
+      if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
+      return req.user.deleteLaundry(laundry).then(() => api.returnSuccess(res))
+    })
+    .catch(api.generateErrorHandler(res))
 }
 
 module.exports = {
   listLaundries: listLaundries,
+  fetchLaundry: fetchLaundry,
+  deleteLaundry: deleteLaundry,
   createLaundry: createLaundry
 }

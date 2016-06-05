@@ -4,11 +4,14 @@
 const React = require('react')
 const TimetableHeaders = require('./timetable_headers.jsx')
 const TimetableTables = require('./timetable_tables.jsx')
+const DocumentTitle = require('react-document-title')
 
 const Timetable = (props) =>
   <main>
-    <TimetableHeaders title={props.title} dates={props.dates} machines={props.machines} />
-    <TimetableTables dates={props.dates} machines={props.machines} />
+    <DocumentTitle title='Timetable'>
+      <TimetableHeaders title={props.title} dates={props.dates} machines={props.machines}/>
+      <TimetableTables dates={props.dates} machines={props.machines}/>
+    </DocumentTitle>
   </main>
 
 Timetable.propTypes = {

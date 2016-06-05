@@ -755,6 +755,7 @@ definitions:
       - name
       - href
       - owners
+      - users
     properties:
       id:
         type: string

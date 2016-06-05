@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const Timetable = require('../view').Timetable
+const Timetable = require('../views').Timetable
 
 const mapStateToProps = (store) => {
   var today = new Date()

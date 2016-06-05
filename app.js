@@ -1,3 +1,4 @@
+require('babel-register')
 var express = require('express')
 var path = require('path')
 var favicon = require('serve-favicon')
@@ -16,7 +17,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.set('view engine', 'hbs')
 
 // Session
-setups.sessionSetup(app)
+app.use(setups.sessionSetup)
 
 // Passport
 setups.passportSetup(app)

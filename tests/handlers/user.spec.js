@@ -198,8 +198,7 @@ describe('handlers', () => {
             user.verifyEmail(email, token1).then((result1) =>
               Promise.all([result1, user.verifyEmail(email, token1)]))
               .should.eventually.deep.equal([true, false]))
-        })
-      )
+        }))
     })
 
     describe('findAuthTokenFromSecret', () => {

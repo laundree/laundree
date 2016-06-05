@@ -26,7 +26,6 @@
   -ms-user-select: $prop
   user-select: $prop
 
-
 @function logo_ratio_w_to_h($width)
   @return 105.7 / 184 * $width
 
@@ -301,6 +300,9 @@ div#Container
         display: block
         position: relative
         width: 100%
+        +transition(0.1s background-color)
+        &.active
+          background-color: #D0833C
         span
           width: 11em
           display: block
@@ -332,8 +334,8 @@ div#Container
     &.close
       display: none
 
-body.expanded_left_nav
-  #MenuExpander
+div.expanded_left_nav
+  > #MenuExpander
     svg:not(.close)
       display: none
     svg.close
@@ -342,7 +344,6 @@ body.expanded_left_nav
 #RightContent
   margin-left: 15em
   +transition(0.2s margin)
-
 
 h1
   color: #ffffff
@@ -463,8 +464,8 @@ footer
         height: 16em
 
 @media only screen and (max-width: 90em)
-  body:not(.expanded_left_nav)
-    #LeftNav
+  div:not(.expanded_left_nav)
+    > #LeftNav
       width: 4em
 
       li
@@ -534,9 +535,9 @@ footer
       padding: 0 1em
   #LeftNav
     overflow: hidden
-  body:not(.expanded_left_nav)
-    #LeftNav
+  div:not(.expanded_left_nav)
+    > #LeftNav
       width: 0
 
   #RightContent
-      margin-left: 0
+    margin-left: 0

@@ -3,26 +3,9 @@
 <head>
     {{> head}}
 </head>
-<body class="app">
+<body class="app"   >
 {{> media}}
-
-{{#unless no_nav}}
-    {{> topnav}}
-{{/unless}}
-
-<div id="MenuExpander">
-    <svg>
-        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#MenuLines"></use>
-    </svg>
-    <svg class="close">
-        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#CloseX"></use>
-    </svg>
-</div>
-{{> leftnav}}
-
-<div id="RightContent">
-    {{{ body }}}
-</div>
+{{{ body }}}
 </body>
 <script type="application/javascript" src="/javascripts/bundle.js"></script>
 </html>

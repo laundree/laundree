@@ -113,6 +113,14 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Finds the laundries owned by this user
+   * @return {Promise<LaundryHandler[]>}
+   */
+  findOwnedLaundries () {
+    return LaundryHandler.find({owners: this.model._id})
+  }
+
+  /**
    * Find a auth token from given secret
    * @param secret
    * @return {Promise.<TokenHandler>}
@@ -156,6 +164,20 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Add this user as a user on the given laundry.
+   * @param {LaundryHandler} laundry
+   * @return {Promise.<UserHandler>}
+   */
+  addLaundry (laundry) {
+    return laundry._addUser(this)
+      .then(() => {
+        this.model.laundries.push(laundry.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
+  }
+
+  /**
    * Remove provided token
    * @param {TokenHandler} token
    * @return {Promise.<UserHandler>}
@@ -164,6 +186,15 @@ class UserHandler extends Handler {
     return token.delete()
       .then(() => {
         this.model.authTokens.pull(token.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
+  }
+
+  deleteLaundry (laundry) {
+    return laundry.delete()
+      .then(() => {
+        this.model.laundries.pull(laundry.model._id)
         return this.model.save()
       })
       .then(() => this)
@@ -276,8 +307,11 @@ class UserHandler extends Handler {
   }
 
   delete () {
-    return UserModel.populate(this.model, {path: 'authTokens', model: 'Token'})
-      .then((model) => Promise.all(model.authTokens.map((t) => new TokenHandler(t).delete())))
+    return UserModel.populate(this.model, {path: 'authTokens laundries'})
+      .then((model) =>
+        Promise.all([
+          Promise.all(model.authTokens.map((t) => new TokenHandler(t).delete())),
+          Promise.all(model.laundries.map((l) => new LaundryHandler(l)._removeUser(this)))]))
       .then(() => this.model.remove())
       .then(() => this)
   }

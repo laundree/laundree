@@ -23,5 +23,8 @@ laundrySchema.pre('save', function (next) {
   }
   next()
 })
+laundrySchema.statics.findFromId = (id) => LaundryModel.findById(new mongoose.Types.ObjectId(id))
 
-module.exports = mongoose.model('Laundry', laundrySchema)
+const LaundryModel = mongoose.model('Laundry', laundrySchema)
+
+module.exports = LaundryModel

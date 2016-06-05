@@ -489,6 +489,48 @@ describe('controllers', function () {
             })
         })
       })
+      it('should fail on owner', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token}) => {
+          request(app)
+            .delete(`/api/users/${user.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(403)
+            .expect('Content-Type', /json/)
+            .end((err, res) => {
+              if (err) done(err)
+              res.body.should.deep.equal({message: 'Not allowed'})
+              done()
+            })
+        })
+      })
+      it('should succeed when only user', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          const [token] = tokens
+          return dbUtils.populateLaundries(1).then(({laundries}) => {
+            const [laundry] = laundries
+            return user.addLaundry(laundry)
+              .then(() => {
+                request(app)
+                  .delete(`/api/users/${user.model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .auth(user.model.id, token.secret)
+                  .expect(204)
+                  .end((err, res) => {
+                    if (err) return done(err)
+                    Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(token.model.id)])
+                      .then((result) => {
+                        result.should.be.deep.equal([undefined, undefined])
+                        done()
+                      })
+                      .catch(done)
+                  })
+              })
+          })
+        })
+      })
     })
   })
 })

@@ -5,9 +5,7 @@ module.exports = {
   InitializerLibrary: require('./initializer_library'),
   SignUpInitializer: require('./sign_up'),
   SignInInitializer: require('./sign_in'),
-  DropDownInitializer: require('./dropdown'),
   ForgotPasswordInitializer: require('./forgot_password'),
   ResetPasswordInitializer: require('./reset_password'),
-  MenuExpanderInitializer: require('./menu_expander'),
-  TimetableInitializer: require('./app_timetable.jsx')
+  AppInitializer: require('./app.jsx')
 }
