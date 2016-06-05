@@ -39,24 +39,7 @@ class TopNav extends React.Component {
           <use xlinkHref='#SmallLogo'/>
         </svg>
       </Link>
-      <Link to='/app/about' className='icon about' activeClassName='active'>
-        <svg>
-          <use xlinkHref='#Info'/>
-        </svg>
-        About us
-      </Link>
-      <Link to='/app/help' className='icon help' activeClassName='active'>
-        <svg>
-          <use xlinkHref='#LifeBuoy'/>
-        </svg>
-        Help
-      </Link>
-      <Link to='/app/contact' className='icon contact' activeClassName='active'>
-        <svg>
-          <use xlinkHref='#EMail4'/>
-        </svg>
-        Contact
-      </Link>
+
       <div className={'user dropdown ' + (this.state.open ? 'open' : '')}>
         <img src={this.props.user.photo} className='avatar' onClick={clickHandler}/>
         <div className='dropdown-content'>
