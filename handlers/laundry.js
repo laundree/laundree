@@ -47,7 +47,7 @@ class LaundryHandler extends Handler {
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}
    */
-  delete () {
+  deleteLaundry () {
     return this.model.remove().then(() => this)
   }
 

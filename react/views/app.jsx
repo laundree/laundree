@@ -55,7 +55,6 @@ class App extends React.Component {
                 <span>Settings</span>
               </Link>
             </li>
-
           </ul>
         </nav>
         <div id='RightContent'>

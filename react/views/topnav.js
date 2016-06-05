@@ -22,10 +22,12 @@ class TopNav extends React.Component {
       this.setState({open: false})
     }
   }
+
   componentWillUnmount () {
     document.removeEventListener('click', this.clickListener)
     document.removeEventListener('keyup', this.escListener)
   }
+
   componentDidMount () {
     document.addEventListener('click', this.clickListener)
     document.addEventListener('keyup', this.escListener)

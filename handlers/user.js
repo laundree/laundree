@@ -183,7 +183,7 @@ class UserHandler extends Handler {
    * @return {Promise.<UserHandler>}
    */
   removeAuthToken (token) {
-    return token.delete()
+    return token.deleteToken()
       .then(() => {
         this.model.authTokens.pull(token.model._id)
         return this.model.save()
@@ -192,7 +192,7 @@ class UserHandler extends Handler {
   }
 
   deleteLaundry (laundry) {
-    return laundry.delete()
+    return laundry.deleteLaundry()
       .then(() => {
         this.model.laundries.pull(laundry.model._id)
         return this.model.save()
@@ -306,11 +306,11 @@ class UserHandler extends Handler {
     return utils.password.comparePassword(token, this.model.resetPasswordToken)
   }
 
-  delete () {
+  deleteUser () {
     return UserModel.populate(this.model, {path: 'authTokens laundries'})
       .then((model) =>
         Promise.all([
-          Promise.all(model.authTokens.map((t) => new TokenHandler(t).delete())),
+          Promise.all(model.authTokens.map((t) => new TokenHandler(t).deleteToken())),
           Promise.all(model.laundries.map((l) => new LaundryHandler(l)._removeUser(this)))]))
       .then(() => this.model.remove())
       .then(() => this)

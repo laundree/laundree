@@ -75,7 +75,7 @@ class TokenHandler extends Handler {
    * Delete the token
    * @return {Promise.<TokenHandler>}
    */
-  delete () {
+  deleteToken () {
     return this.model.remove().then(() => this)
   }
 
