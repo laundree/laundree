@@ -3,7 +3,7 @@
  */
 
 const Handler = require('./handler')
-const {password, regex} = require('../utils')
+const {password} = require('../utils')
 const {TokenModel} = require('../models')
 
 class TokenHandler extends Handler {
@@ -14,23 +14,11 @@ class TokenHandler extends Handler {
   }
 
   static find (filter, limit) {
-    return TokenModel
-      .find(filter, null, {sort: {'_id': 1}})
-      .limit(limit || 10)
-      .exec()
-      .then((tokens) => tokens.map((model) => new TokenHandler(model)))
+    return this._find(TokenModel, TokenHandler, filter, limit)
   }
 
-  /**
-   * Find an handler from given id.
-   * @param id
-   * @returns {Promise.<TokenHandler>}
-   */
   static findFromId (id) {
-    if (!regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
-    return TokenModel.findFromId(id)
-      .exec()
-      .then((m) => m ? new TokenHandler(m) : undefined)
+    return this._findFromId(TokenModel, TokenHandler, id)
   }
 
   /**

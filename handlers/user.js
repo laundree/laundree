@@ -33,28 +33,12 @@ function displayNameToName (displayName) {
 
 class UserHandler extends Handler {
 
-  /**
-   * Find users
-   * @returns {Promise.<UserHandler[]>}
-   */
-  static find (filter, limit = 10) {
-    return UserModel
-      .find(filter, null, {sort: {'_id': 1}})
-      .limit(limit)
-      .exec()
-      .then((users) => users.map((model) => new UserHandler(model)))
+  static find (filter, limit) {
+    return this._find(UserModel, UserHandler, filter, limit)
   }
 
-  /**
-   * Find an handler from given id.
-   * @param id
-   * @returns {Promise.<UserHandler>}
-   */
   static findFromId (id) {
-    if (!utils.regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
-    return UserModel.findFromId(id)
-      .exec()
-      .then((m) => m ? new UserHandler(m) : undefined)
+    return this._findFromId(UserModel, UserHandler, id)
   }
 
   /**
@@ -192,7 +176,7 @@ class UserHandler extends Handler {
   }
 
   deleteLaundry (laundry) {
-    return laundry.deleteLaundry()
+    return laundry._deleteLaundry()
       .then(() => {
         this.model.laundries.pull(laundry.model._id)
         return this.model.save()
@@ -333,7 +317,6 @@ class UserHandler extends Handler {
     return UserModel
       .populate(this.model, {path: 'tokens', model: 'Token'})
       .then((model) => ({
-        emails: this.model.emails,
         id: this.model.id,
         displayName: this.model.displayName,
         lastSeen: this.model.lastSeen,

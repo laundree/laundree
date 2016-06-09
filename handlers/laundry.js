@@ -3,16 +3,12 @@
  */
 const {LaundryModel} = require('../models')
 const Handler = require('./handler')
-const {regex} = require('../utils')
+const MachineHandler = require('./machine')
 
 class LaundryHandler extends Handler {
 
   static find (filter, limit) {
-    return LaundryModel
-      .find(filter, null, {sort: {'_id': 1}})
-      .limit(limit || 10)
-      .exec()
-      .then((tokens) => tokens.map((model) => new LaundryHandler(model)))
+    return this._find(LaundryModel, LaundryHandler, filter, limit)
   }
 
   /**
@@ -21,10 +17,7 @@ class LaundryHandler extends Handler {
    * @returns {Promise.<TokenHandler>}
    */
   static findFromId (id) {
-    if (!regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
-    return LaundryModel.findFromId(id)
-      .exec()
-      .then((m) => m ? new LaundryHandler(m) : undefined)
+    return this._findFromId(LaundryModel, LaundryHandler, id)
   }
 
   /**
@@ -47,7 +40,7 @@ class LaundryHandler extends Handler {
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}
    */
-  deleteLaundry () {
+  _deleteLaundry () {
     return this.model.remove().then(() => this)
   }
 
@@ -69,6 +62,32 @@ class LaundryHandler extends Handler {
   isOwner (user) {
     const users = this.model.populated('owners') || this.model.owners
     return users.find((owner) => user.model._id.equals(owner))
+  }
+
+  /**
+   * Create a new machine with given name
+   * @param {string} name
+   * @return {Promise.<MachineHandler>}
+   */
+  createMachine (name) {
+    return MachineHandler._createMachine(this, name).then((machine) => {
+      this.model.machines.push(machine.model._id)
+      return this.model.save().then(() => machine)
+    })
+  }
+
+  /**
+   * Delete the given machine.
+   * @param {MachineHandler} machine
+   * @return {Promise}
+   */
+  deleteMachine (machine) {
+    return machine._deleteMachine()
+      .then(() => {
+        this.model.machines.pull(machine.model._id)
+        return this.model.save()
+      })
+      .then(() => this)
   }
 
   /**

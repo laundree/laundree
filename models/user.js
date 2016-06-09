@@ -30,22 +30,8 @@ var userSchema = new Schema({
     },
     emails: [{value: String, type: {type: String}}],
     photos: [{value: String}]
-  }],
-  createdAt: {type: Date},
-  updatedAt: {type: Date}
-}, {
-  toObject: {virtuals: true},
-  toJSON: {virtuals: true}
-})
-
-userSchema.pre('save', function (next) {
-  var now = new Date()
-  this.updatedAt = now
-  if (!this.createdAt) {
-    this.createdAt = now
-  }
-  next()
-})
+  }]
+}, {timestamps: true})
 
 userSchema.index({'profiles.emails.value': 1})
 userSchema
