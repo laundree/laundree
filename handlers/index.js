@@ -4,6 +4,8 @@
 
 module.exports = {
   UserHandler: require('./user'),
+  MachineHandler: require('./machine'),
+  BookingHandler: require('./booking'),
   LaundryHandler: require('./laundry'),
   TokenHandler: require('./token')
 }

@@ -1,10 +1,11 @@
+require('babel-register')
 process.env.NODE_ENV = 'test'
 var gulp = require('gulp')
+var babel = require('gulp-babel')
 var eslint = require('gulp-eslint')
 var mocha = require('gulp-mocha')
-var istanbul = require('gulp-istanbul')
+var istanbul = require('gulp-babel-istanbul')
 var isparta = require('isparta')
-var mongoose = require('mongoose')
 var exec = require('child_process').exec
 var runSequence = require('run-sequence')
 
@@ -15,56 +16,53 @@ gulp.task('lint', function () {
     .pipe(eslint.failAfterError())
 })
 
-gulp.task('test-unit', function (done) {
-  gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
+gulp.task('coverage:instrument', () => {
+  return gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
     .pipe(istanbul({ // Covering files
       instrumenter: isparta.Instrumenter,
       includeUntested: true
     }))
     .pipe(istanbul.hookRequire())
-    .on('finish', function () {
-      return gulp.src('tests/**/*.spec.js', {read: false})
-        .pipe(mocha({reporter: 'spec'}))
-        .pipe(istanbul.writeReports({
-          dir: 'coverage',
-          reportOpts: {dir: 'coverage'},
-          reporters: ['text', 'text-summary', 'lcov']
-        }))
-        .on('end', () => {
-          mongoose.connection.close()
-          done()
-        })
-        .on('error', (error) => {
-          mongoose.connection.close()
-          done(error)
-        })
-    })
+})
+gulp.task('coverage:report', () => {
+  return gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
+    .pipe(istanbul.writeReports({
+      dir: 'coverage',
+      reportOpts: {dir: 'coverage'},
+      reporters: ['text', 'text-summary', 'lcov']
+    }))
+    .pipe(istanbul.enforceThresholds({thresholds: {global: 90}}))
 })
 
-gulp.task('test-api', function (done) {
-  gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
-    .pipe(istanbul({ // Covering files
-      instrumenter: isparta.Instrumenter,
-      includeUntested: true
-    }))
-    .pipe(istanbul.hookRequire())
-    .on('finish', function () {
-      return gulp.src('tests/api/**/*.spec.js', {read: false})
-        .pipe(mocha({reporter: 'spec'}))
-        .pipe(istanbul.writeReports({
-          dir: 'coverage',
-          reportOpts: {dir: 'coverage'},
-          reporters: ['text', 'text-summary', 'lcov']
-        }))
-        .on('end', () => {
-          mongoose.connection.close()
-          done()
-        })
-        .on('error', (error) => {
-          mongoose.connection.close()
-          done(error)
-        })
-    })
+gulp.task('test:api', function () {
+  return gulp.src('tests/api/**/*.spec.js')
+    .pipe(babel())
+    .pipe(mocha({reporter: 'spec'}))
+})
+
+gulp.task('test:api-users', function () {
+  return gulp.src('tests/api/controllers/users.spec.js')
+    .pipe(babel())
+    .pipe(mocha({reporter: 'spec'}))
+})
+
+gulp.task('test:api-bookings', function () {
+  return gulp.src('tests/api/controllers/bookings.spec.js')
+    .pipe(babel())
+    .pipe(mocha({reporter: 'spec'}))
+})
+
+gulp.task('test:unit', function () {
+  return gulp.src('tests/**/*.spec.js')
+    .pipe(babel())
+    .pipe(mocha({reporter: 'spec'}))
+})
+
+gulp.task('test:api-coverage', function (done) {
+  runSequence('coverage:instrument', 'test:api', 'coverage:report', done)
+})
+gulp.task('test:unit-coverage', function (done) {
+  runSequence('coverage:instrument', 'test:unit', 'coverage:report', done)
 })
 
 gulp.task('send-coverage', (done) => {
@@ -90,5 +88,5 @@ gulp.task('exit', (done) => {
 })
 
 gulp.task('test', (done) => {
-  runSequence('lint', 'test-unit', 'send-coverage', 'exit', done)
+  runSequence('lint', 'test:unit-coverage', 'send-coverage', 'exit', done)
 })

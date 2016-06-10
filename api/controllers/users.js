@@ -46,9 +46,6 @@ function createUser (req, res) {
   var displayName = body.displayName
   var email = body.email
   var password = body.password
-  if (!displayName) return utils.api.returnError(res, 400, 'Invalid display name.')
-  if (!email || !utils.regex.email.exec(email)) return utils.api.returnError(res, 400, 'Invalid email address.')
-  if (!password || !utils.regex.password.exec(password)) return utils.api.returnError(res, 400, 'Invalid password')
   UserHandler
     .findFromEmail(email)
     .then((user) => user
@@ -60,7 +57,6 @@ function createUser (req, res) {
 
 function startPasswordReset (req, res) {
   var id = req.swagger.params.id.value
-  if (!utils.regex.mongoDbId.exec(id)) return utils.api.returnError(res, 404, 'User not found')
   UserHandler.findFromId(id)
     .then((user) => !user ? utils.api.returnError(res, 404, 'User not found.') : user.generateResetToken()
       .then((token) => utils.mail.sendEmail({user: user.model, token: token}, 'password-reset', user.model.emails[0]))
@@ -73,7 +69,6 @@ function passwordReset (req, res) {
   var body = req.swagger.params.body.value
   var token = body.token
   var password = body.password
-  if (!password || !utils.regex.password.exec(password)) return utils.api.returnError(res, 400, 'Invalid password')
   UserHandler.findFromId(id)
     .then((user) => !user ? utils.api.returnError(res, 404, 'User not found.') : user.verifyResetPasswordToken(token)
       .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : user.resetPassword(password)
@@ -99,7 +94,6 @@ function verifyEmail (req, res) {
   var body = req.swagger.params.body.value
   var email = body.email
   var token = body.token
-  if (!utils.regex.email.exec(email)) return utils.api.returnError(res, 400, 'Invalid email')
   UserHandler.findFromId(id)
     .then((user) => !user ? utils.api.returnError(res, 404, 'User not found') : user.verifyEmail(email, token)
       .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : utils.api.returnSuccess(res)))

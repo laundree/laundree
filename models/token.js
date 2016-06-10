@@ -8,24 +8,10 @@ var tokenSchema = new Schema({
   name: {type: String, required: true, trim: true},
   hash: {type: String},
   owner: {type: Schema.Types.ObjectId, ref: 'User', required: true},
-  lastSeen: Date,
-  createdAt: {type: Date},
-  updatedAt: {type: Date}
-}, {
-  toObject: {virtuals: true},
-  toJSON: {virtuals: true}
-})
+  lastSeen: Date
+}, {timestamps: true})
 
 tokenSchema.index({name: 1, owner: 1}, {unique: true})
-
-tokenSchema.pre('save', function (next) {
-  var now = new Date()
-  this.updatedAt = now
-  if (!this.createdAt) {
-    this.createdAt = now
-  }
-  next()
-})
 
 tokenSchema.index({'name': 1})
 

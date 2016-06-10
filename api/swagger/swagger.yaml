@@ -81,9 +81,9 @@ paths:
                 type: string
               email:
                 type: string
+                format: email
               password:
-                type: string
-                format: password
+                $ref: "#/definitions/password"
       tags:
         - Users
       responses:
@@ -119,6 +119,10 @@ paths:
             $ref: "#/definitions/User"
         "404":
           description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
           schema:
             $ref: "#/definitions/Error"
         default:
@@ -197,11 +201,9 @@ paths:
               - token
             properties:
               password:
-                type: string
-                format: password
+                $ref: "#/definitions/password"
               token:
                 type: string
-
       tags:
         - Users
       responses:
@@ -564,128 +566,327 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-#  /laundries/{id}/owners:
-#    x-swagger-router-controller: laundries
-#    get:
-#      operationId: listOwners
-#      tags: 
-#        - Laundries
-#      security:
-#        - userAccessToken: []
-#      parameters:
-#        - name: id
-#          in: path
-#          required: true
-#          type: string
-#      responses:
-#        "200":
-#          description: Success
-#          schema:
-#            type: array
-#            items: 
-#              $ref: "#/definitions/UserSummary"
-#        "404":
-#          description: Laundry not found
-#          schema:
-#            $ref: "#/definitions/Error"
-#        "403":
-#          description: Unauthorized
-#          schema:
-#            $ref: "#/definitions/Error"
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/Error"
-#  /laundries/{id}/owners/{userId}:
-#    x-swagger-router-controller: laundries
-#    get: 
-#      operationId: fetchOwner
-#      tags: 
-#        - Laundries
-#      security:
-#        - userAccessToken: []
-#      parameters:
-#        - name: id
-#          in: path
-#          required: true
-#          type: string
-#        - name: userId
-#          in: path
-#          required: true
-#          type: string
-#      responses:
-#        "200":
-#          description: Success
-#          schema:
-#            $ref: "#/definitions/User"
-#        "404":
-#          description: Laundry not found
-#          schema:
-#            $ref: "#/definitions/Error"
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/Error"
-#    put:
-#      operationId: addOwner
-#      tags: 
-#        - Laundries
-#      security:
-#        - userAccessToken: []
-#      parameters:
-#        - name: id
-#          in: path
-#          required: true
-#          type: string
-#        - name: userId
-#          in: path
-#          required: true
-#          type: string
-#      responses:
-#        "204":
-#          description: Success
-#        "404":
-#          description: Laundry not found
-#          schema:
-#            $ref: "#/definitions/Error"
-#        "403":
-#          description: Unauthorized
-#          schema:
-#            $ref: "#/definitions/Error"
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/Error"
-#    delete:
-#      operationId: removeOwner
-#      tags: 
-#        - Laundries
-#      security:
-#        - userAccessToken: []
-#      parameters:
-#        - name: id
-#          in: path
-#          required: true
-#          type: string
-#        - name: userId
-#          in: path
-#          required: true
-#          type: string
-#      responses:
-#        "204":
-#          description: Success
-#        "404":
-#          description: Laundry not found
-#          schema:
-#            $ref: "#/definitions/Error"
-#        "403":
-#          description: Unauthorized
-#          schema:
-#            $ref: "#/definitions/Error"
-#        default:
-#          description: Error
-#          schema:
-#            $ref: "#/definitions/Error"
+      
+  /laundries/{id}/machines:
+    x-swagger-router-controller: machines
+    get:
+      description: Lists the machines
+      operationId: listMachines
+      tags:
+        - Machines
+        - Laundries
+      security:
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Laundry id
+        - name: page_size
+          in: query
+          description: Page size
+          default: 10
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 100
+        - name: since
+          in: query
+          description: Since a given id
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          headers:
+            Link: 
+              description: Link header
+              type: string
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/MachineSummary"
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      operationId: createMachine
+      security:
+        - userAccessToken: []
+      tags:
+        - Machines
+        - Laundries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - name
+            properties:
+              name:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Machine"
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /machines/{id}:
+    x-swagger-router-controller: machines
+    get:
+      operationId: fetchMachine
+      tags:
+        - Machines
+      security:
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Machine id
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Machine"
+        "404":
+          description: Machine not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      operationId: deleteMachine
+      security:
+        - userAccessToken: []
+      tags:
+        - Machines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Machine id
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Machine not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+      
+  /machines/{machineId}/bookings:
+    x-swagger-router-controller: bookings
+    get:
+      description: Lists the bookings
+      operationId: listBookings
+      tags:
+        - Bookings
+        - Machines
+      security:
+        - userAccessToken: []
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: since
+          in: query
+          description: Since a given id
+          required: false
+          type: string
+        - name: page_size
+          in: query
+          description: Page size
+          default: 10
+          required: false
+          type: integer
+          minimum: 1
+          maximum: 100
+        - name: from
+          in: query
+          description: From date in seconds since epoch
+          required: true
+          type: integer
+        - name: to
+          in: query
+          description: To date in seconds since epoch
+          required: true
+          type: integer
+          format: date-time
+      responses:
+        "200":
+          description: Success
+          headers:
+            Link: 
+              description: Link header
+              type: string
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/BookingSummary"
+        "404":
+          description: Machine not found
+          schema:
+            $ref: "#/definitions/Error"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    post:
+      operationId: createBooking
+      tags:
+        - Bookings
+      security:
+        - userAccessToken: []
+      parameters:
+        - name: machineId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - from
+              - to
+            properties:
+              from:
+                type: string
+                format: date-time
+              to:
+                type: string
+                format: date-time
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Booking"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Machine not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+      
+
+  /bookings/{id}:
+    x-swagger-router-controller: bookings
+    get:
+      security:
+        - userAccessToken: []
+      operationId: fetchBooking
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Booking id
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Booking"
+        "404":
+          description: Booking not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      security:
+        - userAccessToken: []
+      operationId: deleteBooking
+      tags:
+        - Bookings
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Booking id
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Booking not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -695,18 +896,12 @@ definitions:
       - id
       - href
       - name
-      - emails
       - displayName
       - photo
       - tokens
     properties:
       id:
         type: string
-      emails:
-        type: array
-        items:
-          type: string
-          format: email
       photo:
         type: string
         format: url
@@ -838,10 +1033,67 @@ definitions:
         type: string
       href: 
         type: string
-      
+  Booking:
+    required:
+      - id
+      - href
+      - from
+      - to
+    properties:
+      id:
+        type: string
+      href:
+        type: string
+      from:
+        type: string
+        format: date-time
+      to:
+        type: string
+        format: date-time
+      owner:
+        type: string
+
+  BookingSummary:
+    required:
+      - id
+      - href
+    properties:
+      id:
+        type: string
+      href:
+        type: string
+  MachineSummary:
+    required:
+      - id
+      - href
+      - name
+    properties:
+      id:
+        type: string
+      href:
+        type: string
+      name: 
+        type: string
+  Machine:
+    required:
+      - id
+      - href
+      - name
+    properties:
+      id:
+        type: string
+      href:
+        type: string
+      name: 
+        type: string
   Error:
     required:
       - message
     properties:
       message:
         type: string
+  password:
+    type: string
+    format: password
+    pattern: ([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])
+

@@ -40,20 +40,51 @@ function populateTokens (no) {
     .then(([user]) =>
       Promise
         .all(lodash.range(no).map((i) => user.generateAuthToken(faker.name.findName())))
-        .then((tokens) => ({user: user, tokens: tokens})))
+        .then((tokens) => ({user: user, tokens: tokens, token: tokens[0]})))
 }
 
 function populateLaundries (no) {
   return populateTokens(1)
-    .then(({user, tokens}) =>
+    .then(({user, token}) =>
       Promise
         .all(lodash.range(no).map((i) => user.createLaundry(faker.name.findName())))
-        .then((laundries) => ({user: user, token: tokens[0], laundries: laundries})))
+        .then((laundries) => ({user: user, token: token, laundries: laundries, laundry: laundries[0]})))
+}
+
+function populateMachines (no) {
+  return populateLaundries(1)
+    .then(({user, token, laundry}) =>
+      Promise
+        .all(lodash.range(no).map((i) => laundry.createMachine(faker.name.findName())))
+        .then((machines) => ({
+          user: user,
+          token: token,
+          laundry: laundry,
+          machines: machines,
+          machine: machines[0]
+        })))
+}
+
+function populateBookings (no, length = 3600, space = 20) {
+  return populateMachines(1)
+    .then(({user, token, laundry, machine}) =>
+      Promise
+        .all(lodash.range(no).map((i) => machine.createBooking(user, new Date(i * (length + space)), new Date(i * (length + space) + length))))
+        .then((bookings) => ({
+          user: user,
+          token: token,
+          laundry: laundry,
+          machine: machine,
+          bookings: bookings,
+          booking: bookings[0]
+        })))
 }
 
 module.exports = {
   clearDb: clearDb,
   populateUsers: populateUsers,
   populateLaundries: populateLaundries,
-  populateTokens: populateTokens
+  populateTokens: populateTokens,
+  populateBookings: populateBookings,
+  populateMachines: populateMachines
 }

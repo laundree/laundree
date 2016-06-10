@@ -18,6 +18,16 @@ describe('controllers', function () {
   describe('users', function () {
     this.timeout(5000)
     describe('GET /api/users/{id}', () => {
+      it('should fail on auth', (done) => {
+        request(app)
+          .get('/api/users/asd123')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .end(function (err) {
+            done(err)
+          })
+      })
+
       it('should return error', (done) => {
         request(app)
           .get('/api/users/asd123')
@@ -25,8 +35,7 @@ describe('controllers', function () {
           .expect('Content-Type', /json/)
           .expect(404)
           .end(function (err) {
-            assert(!err)
-            done()
+            done(err)
           })
       })
 
@@ -37,8 +46,7 @@ describe('controllers', function () {
           .expect('Content-Type', /json/)
           .expect(404)
           .end(function (err) {
-            assert(!err)
-            done()
+            done(err)
           })
       })
       it('should find user', (done) => {
