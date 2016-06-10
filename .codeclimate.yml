@@ -2,6 +2,7 @@
 exclude_paths:
 - "tests"
 - 'email-templates'
+- 'gulpfile.js'
 engines:
   scss-lint:
     enabled: true
@@ -21,6 +22,3 @@ ratings:
   - "**.sass"
   - "**.js"
   - "**.md"
-exclude_paths:
-- node_modules/
-- gulpfile.js
