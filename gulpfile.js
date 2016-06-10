@@ -40,7 +40,13 @@ gulp.task('test:api', function () {
     .pipe(mocha({reporter: 'spec'}))
 })
 
-gulp.task('test:api-booking', function () {
+gulp.task('test:api-users', function () {
+  return gulp.src('tests/api/controllers/users.spec.js')
+    .pipe(babel())
+    .pipe(mocha({reporter: 'spec'}))
+})
+
+gulp.task('test:api-bookings', function () {
   return gulp.src('tests/api/controllers/bookings.spec.js')
     .pipe(babel())
     .pipe(mocha({reporter: 'spec'}))

@@ -31,7 +31,7 @@ function setup (app) {
         app.use(middleware.swaggerRouter({controllers: path.join(__dirname, '..', 'api', 'controllers')}))
         app.use(middleware.swaggerUi())
         app.use('/api', (err, req, res, next) => {
-          res.statusCode = res.statusCode || err.status || 500
+          res.statusCode = res.statusCode && res.statusCode < 300 ? err.status || 500 : res.statusCode
           if (config.get('logging.error.enabled') && res.statusCode === 500) console.log(err)
           res.json({message: err.message})
         })

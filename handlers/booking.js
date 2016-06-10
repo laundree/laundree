@@ -8,11 +8,11 @@ const {BookingModel} = require('../models')
 class BookingHandler extends Handler {
 
   static findFromId (id) {
-    Handler._findFromId(BookingModel, BookingHandler, id)
+    return Handler._findFromId(BookingModel, BookingHandler, id)
   }
 
   static find (filter, limit = 10) {
-    Handler._find(BookingModel, BookingHandler, filter, limit)
+    return Handler._find(BookingModel, BookingHandler, filter, limit)
   }
 
   /**
@@ -25,6 +25,33 @@ class BookingHandler extends Handler {
    */
   static _createBooking (machine, owner, from, to) {
     return new BookingModel({machine: machine.model._id, owner: owner.model._id, from, to})
+      .save()
+      .then((model) => new BookingHandler(model))
+  }
+
+  /**
+   * Fetch machine
+   * @return {Promise.<MachineHandler>}
+   */
+  fetchMachine () {
+    const MachineHandler = require('./machine')
+    return MachineHandler
+      .find({_id: this.model.machine})
+      .then(([machine]) => machine)
+  }
+
+  /**
+   * Checks if provided user is owner
+   * @param {UserHandler} user
+   * @return {boolean}
+   */
+  isOwner (user) {
+    const owner = this.model.populated('owner') || this.model.owner
+    return user.model._id.equals(owner)
+  }
+
+  deleteBooking () {
+    return this.model.remove().then(() => this)
   }
 
   toRestSummary () {
@@ -35,8 +62,8 @@ class BookingHandler extends Handler {
     return Promise.resolve({
       id: this.model.id,
       href: `/api/bookings/${this.model.id}`,
-      from: this.model.from,
-      to: this.model.to
+      from: this.model.from.toISOString(),
+      to: this.model.to.toISOString()
     })
   }
 }

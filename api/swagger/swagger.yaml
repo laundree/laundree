@@ -81,9 +81,9 @@ paths:
                 type: string
               email:
                 type: string
+                format: email
               password:
-                type: string
-                format: password
+                $ref: "#/definitions/password"
       tags:
         - Users
       responses:
@@ -201,8 +201,7 @@ paths:
               - token
             properties:
               password:
-                type: string
-                format: password
+                $ref: "#/definitions/password"
               token:
                 type: string
       tags:
@@ -738,6 +737,11 @@ paths:
           required: true
           type: string
           description: Machine id
+        - name: since
+          in: query
+          description: Since a given id
+          required: false
+          type: string
         - name: page_size
           in: query
           description: Page size
@@ -1088,3 +1092,8 @@ definitions:
     properties:
       message:
         type: string
+  password:
+    type: string
+    format: password
+    pattern: ([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])
+

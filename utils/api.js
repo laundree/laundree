@@ -24,7 +24,7 @@ function returnError (res, statusCode, message) {
 /**
  * Return success
  * @param res
- * @param {Promise} result
+ * @param {Promise=} result
  * @returns {number|*}
  */
 function returnSuccess (res, result) {

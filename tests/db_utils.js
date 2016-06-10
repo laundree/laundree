@@ -65,7 +65,7 @@ function populateMachines (no) {
         })))
 }
 
-function populateBookings (no, length = 3600, space = 0) {
+function populateBookings (no, length = 3600, space = 20) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise

@@ -23,10 +23,11 @@ describe('controllers', function () {
           .end((err, res) => done(err))
       })
       it('should limit output size', (done) => {
-        dbUtils.populateBookings(50).then(({user, token, laundry, bookings}) => {
+        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) => {
           request(app)
-            .get(`/api/machines/${laundry.model.id}/bookings`)
+            .get(`/api/machines/${machine.model.id}/bookings`)
             .set('Accept', 'application/json')
+            .query({from: 0, to: Date.now()})
             .auth(user.model.id, token.secret)
             .expect(200)
             .expect('Content-Type', /json/)
@@ -39,11 +40,48 @@ describe('controllers', function () {
             })
         }).catch(done)
       })
+      it('should query range', (done) => {
+        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) => {
+          request(app)
+            .get(`/api/machines/${machine.model.id}/bookings`)
+            .set('Accept', 'application/json')
+            .query({from: bookings[5].model.from.getTime(), to: bookings[8].model.to.getTime() + 1})
+            .auth(user.model.id, token.secret)
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect('Link', /rel=.first./)
+            .end(function (err, res) {
+              if (err) return done(err)
+              var arr = lodash.slice(bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)), 5, 9).map((machine) => machine.toRestSummary())
+              res.body.should.deep.equal(arr)
+              done()
+            })
+        })
+      })
+      it('should query range exclusive', (done) => {
+        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) => {
+          request(app)
+            .get(`/api/machines/${machine.model.id}/bookings`)
+            .set('Accept', 'application/json')
+            .query({from: bookings[5].model.from.getTime(), to: bookings[8].model.from.getTime()})
+            .auth(user.model.id, token.secret)
+            .expect(200)
+            .expect('Content-Type', /json/)
+            .expect('Link', /rel=.first./)
+            .end(function (err, res) {
+              if (err) return done(err)
+              var arr = lodash.slice(bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)), 5, 8).map((machine) => machine.toRestSummary())
+              res.body.should.deep.equal(arr)
+              done()
+            })
+        }).catch(done)
+      })
       it('fail on wrong machine id', (done) => {
         dbUtils.populateBookings(50).then(({user, token}) => {
           request(app)
             .get('/api/machines/foo/bookings')
             .set('Accept', 'application/json')
+            .query({from: 0, to: Date.now()})
             .auth(user.model.id, token.secret)
             .expect(404)
             .expect('Content-Type', /json/)
@@ -58,7 +96,7 @@ describe('controllers', function () {
         dbUtils.populateBookings(50).then(({user, token, bookings, machine}) => {
           request(app)
             .get(`/api/machines/${machine.model.id}/bookings`)
-            .query({page_size: 12})
+            .query({page_size: 12, from: 0, to: Date.now()})
             .auth(user.model.id, token.secret)
             .set('Accept', 'application/json')
             .expect(200)
@@ -80,6 +118,7 @@ describe('controllers', function () {
             request(app)
               .get(`/api/machines/${machine.model.id}/bookings`)
               .auth(user.model.id, token.secret)
+              .query({from: 0, to: Date.now()})
               .set('Accept', 'application/json')
               .expect(200)
               .expect('Content-Type', /json/)
@@ -101,22 +140,23 @@ describe('controllers', function () {
             request(app)
               .get(`/api/machines/${machine.model.id}/bookings`)
               .auth(user.model.id, token.secret)
+              .query({from: 0, to: Date.now()})
               .set('Accept', 'application/json')
               .expect(404)
               .expect('Content-Type', /json/)
               .end(function (err, res) {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Laundry not found'})
+                res.body.should.deep.equal({message: 'Machine not found'})
                 done()
               })
           }).catch(done)
       })
-      it('should allow since', (done) => { // TODO no
+      it('should allow since', (done) => {
         dbUtils.populateBookings(50).then(({machine, user, token, bookings}) => {
           bookings = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id))
           request(app)
             .get(`/api/machines/${machine.model.id}/bookings`)
-            .query({since: bookings[24].model.id, page_size: 1})
+            .query({since: bookings[24].model.id, page_size: 1, from: 0, to: Date.now()})
             .auth(user.model.id, token.secret)
             .set('Accept', 'application/json')
             .expect(200)
@@ -203,11 +243,27 @@ describe('controllers', function () {
             })
         }).catch(done)
       })
-      it('should on double booking', (done) => {
+      it('should fail on double booking', (done) => {
         dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
           request(app)
             .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({to: new Date(booking.getTime() + 2), from: new Date(0)})
+            .send({to: new Date(booking.model.from.getTime() + 2), from: new Date(0)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Machine not available'})
+              done()
+            })
+        }).catch(done)
+      })
+      it('should fail on double booking 2', (done) => {
+        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(0)})
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
@@ -220,12 +276,52 @@ describe('controllers', function () {
         }).catch(done)
       })
 
+      it('should fail on double booking 3', (done) => {
+        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(2)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Machine not available'})
+              done()
+            })
+        }).catch(done)
+      })
+
+      it('should succeed on tight booking', (done) => {
+        dbUtils.populateBookings(3).then(({user, token, machine, bookings}) => {
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({
+              from: bookings[1].model.to,
+              to: bookings[2].model.from
+            })
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end((err, res) => {
+              if (err) return done(err)
+              done()
+            })
+        }).catch(done)
+      })
+
       it('should fail on no such machine', (done) => {
         dbUtils.populateBookings(1).then(({user, token}) => {
           request(app)
             .post('/api/machines/foo/bookings')
             .send({name: 'Machine 2000'})
             .set('Accept', 'application/json')
+            .send({
+              from: new Date(Date.now() - 10),
+              to: new Date()
+            })
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(404)
@@ -256,7 +352,7 @@ describe('controllers', function () {
               })
           })
       })
-      it('should succede when user', (done) => { // TODO fix
+      it('should succeed when user', (done) => {
         Promise.all([dbUtils.populateBookings(1), dbUtils.populateBookings(2)])
           .then(([r1, r2]) => {
             const {laundry, machine} = r1
@@ -271,16 +367,23 @@ describe('controllers', function () {
                 .expect('Content-Type', /json/)
                 .end(function (err, res) {
                   if (err) return done(err)
-                  done()
+                  const id = res.body.id
+                  BookingHandler.findFromId(id).then((machine) => {
+                    machine.should.not.be.undefined
+                    return machine.toRest().then((result) => {
+                      res.body.should.deep.equal(result)
+                      done()
+                    })
+                  }).catch(done)
                 })
             })
           }).catch(done)
       })
 
       it('should succeed', (done) => {
-        dbUtils.populateBookings(1).then(({user, token, laundry, bookings}) => {
+        dbUtils.populateBookings(1).then(({user, token, machine, bookings}) => {
           request(app)
-            .post(`/api/machines/${laundry.model.id}/bookings`)
+            .post(`/api/machines/${machine.model.id}/bookings`)
             .send({from: new Date(), to: new Date(Date.now() + 5)})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -345,10 +448,10 @@ describe('controllers', function () {
         }).catch(done)
       })
       it('should return 404 on other id', (done) => {
-        dbUtils.populateBookings(1).then(({machine}) => {
+        dbUtils.populateBookings(1).then(({booking}) => {
           dbUtils.populateBookings(1).then(({user, token}) => {
             request(app)
-              .get(`/api/bookings/${machine.model.id}`)
+              .get(`/api/bookings/${booking.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -466,9 +569,9 @@ describe('controllers', function () {
         }).catch(done)
       })
       it('should succeed', (done) => {
-        dbUtils.populateBookings(1).then(({user, token, machine}) => {
+        dbUtils.populateBookings(1).then(({user, token, booking}) => {
           request(app)
-            .delete(`/api/bookings/${machine.model.id}`)
+            .delete(`/api/bookings/${booking.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -476,15 +579,14 @@ describe('controllers', function () {
             .end((err, res) => {
               if (err) return done(err)
               BookingHandler
-                .findFromId(machine.model.id)
+                .findFromId(booking.model.id)
                 .then((t) => {
                   assert(t === undefined)
                   done()
-                })
+                }).catch(done)
             })
         }).catch(done)
       })
-
       it('should fail when other user', (done) => {
         dbUtils.populateTokens(1).then(({user, token}) => {
           return dbUtils.populateBookings(1).then(({booking, laundry}) => {
@@ -500,27 +602,28 @@ describe('controllers', function () {
                   .end((err, res) => {
                     if (err) return done(err)
                     res.body.should.deep.equal({message: 'Not allowed'})
+                    done()
                   })
               })
           })
         }).catch(done)
       })
-      it('should fail when laundry owner', (done) => {
+      it('should succeed when laundry owner', (done) => {
         dbUtils.populateMachines(1).then(({user, token, laundry, machine}) => {
-          return dbUtils.populateUsers(1).then((minion) =>
-            laundry._addUser(minion).then(() => machine.createBooking(minion, new Date(), new Date(Date.now() + 300))))
-            .then(() => {
+          return dbUtils.populateUsers(1).then((minions) =>
+            laundry._addUser(minions[0]).then(() => machine.createBooking(minions[0], new Date(), new Date(Date.now() + 300))))
+            .then((booking) => {
               request(app)
-                .delete(`/api/bookings/${machine.model.id}`)
+                .delete(`/api/bookings/${booking.model.id}`)
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
                 .auth(user.model.id, token.secret)
-                .expect('Content-Type', /json/)
                 .expect(204)
                 .end((err, res) => {
                   done(err)
                 })
             })
+            .catch(done)
         })
       })
     })
