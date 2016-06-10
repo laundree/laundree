@@ -42,9 +42,13 @@ class MachineHandler extends Handler {
     return LaundryHandler.find({_id: this.model.laundry}).then(([laundry]) => laundry)
   }
 
-  // TODO delete bookings
   _deleteMachine () {
-    return this.model.remove().then(() => this)
+    return BookingHandler
+      .find({machine: this.model._id})
+      .then((bookings) => Promise
+        .all(bookings.map((booking) => booking.deleteBooking())))
+      .then(() => this.model.remove())
+      .then(() => this)
   }
 
   toRestSummary () {
