@@ -33,15 +33,14 @@ class TopNav extends React.Component {
     document.addEventListener('keyup', this.escListener)
   }
 
-  render () {
+  renderUserLoggedInMenu () {
     const clickHandler = () => this.setState({open: !this.state.open})
     return <nav id='TopNav'>
-      <Link to='/app' className='home' activeClassName='active'>
+      <Link to='/' className='home' activeClassName='active'>
         <svg>
           <use xlinkHref='#SmallLogo'/>
         </svg>
       </Link>
-
       <div className={'user dropdown ' + (this.state.open ? 'open' : '')}>
         <img src={this.props.user.photo} className='avatar' onClick={clickHandler}/>
         <div className='dropdown-content'>
@@ -60,6 +59,39 @@ class TopNav extends React.Component {
         </div>
       </div>
     </nav>
+  }
+
+  renderNotLoggedInMenu () {
+    return <nav id='TopNav'>
+      <Link to='/' className='home' activeClassName='active'>
+        <svg>
+          <use xlinkHref='#SmallLogo'/>
+        </svg>
+      </Link>
+      <a href='/about' className='icon about'>
+        <svg>
+          <use xlinkHref='#Info'/>
+        </svg>
+        About us
+      </a>
+      <a href='/help' className='icon help'>
+        <svg>
+          <use xlinkHref='#LifeBuoy'/>
+        </svg>
+        Help
+      </a>
+      <a href='/contact' className='icon contact'>
+        <svg>
+          <use xlinkHref='#EMail4'/>
+        </svg>
+        Contact
+      </a>
+      <Link to='/auth' className='log-in'>Log in</Link>
+    </nav>
+  }
+
+  render () {
+    return this.props.user ? this.renderUserLoggedInMenu() : this.renderNotLoggedInMenu()
   }
 }
 TopNav.propTypes = {

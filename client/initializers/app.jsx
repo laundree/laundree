@@ -9,7 +9,7 @@ const ReactDOM = require('react-dom')
 const {IntlProvider} = require('react-intl')
 const {Provider} = require('react-redux')
 const {Router, browserHistory, match} = require('react-router')
-const routes = require('../../react/routes')
+const routeGenerator = require('../../react/routes')
 const io = require('socket.io-client')
 const {createStore} = require('redux')
 const reducer = require('../../redux/reducer')
@@ -37,7 +37,7 @@ class AppInitializer extends Initializer {
     const rootElement = element.querySelector('#AppRoot')
     if (!rootElement) return
     fetchStore().then((store) => {
-      match({history: browserHistory, routes}, (e, redirectLocation, renderProps) => {
+      match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
         ReactDOM.render(
           <IntlProvider locale='en'>
             <Provider store={store}>

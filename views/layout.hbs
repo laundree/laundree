@@ -5,15 +5,7 @@
 </head>
 <body>
 {{> media}}
-<div id="Container">
-    {{#unless no_nav}}
-        {{> topnav}}
-    {{/unless}}
-    {{{ body }}}
-</div>
-{{#unless no_footer}}
-   {{> footer}}
-{{/unless}}
+{{{ body }}}
 </body>
 <script type="application/javascript" src="/javascripts/bundle.js"></script>
 </html>

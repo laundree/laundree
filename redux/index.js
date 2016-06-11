@@ -11,7 +11,7 @@ const actions = require('./actions')
  */
 function createInitialStore (user) {
   const store = createStore(reducer)
-  store.dispatch(actions.signInUser(user))
+  if (user) store.dispatch(actions.signInUser(user))
   return Promise.resolve(store)
 }
 

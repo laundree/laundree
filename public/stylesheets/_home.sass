@@ -1,0 +1,124 @@
+#Home
+  header
+    position: relative
+    background: #F3FCFF
+    overflow: hidden
+    div:first-of-type
+      padding: 8em 0
+      z-index: 10
+      position: relative
+
+      a
+        width: 15em
+        margin: auto
+        display: block
+        svg
+          width: 15em
+          height: logo_ratio_w_to_h(15em)
+          display: block
+
+      h2
+        display: block
+        font-family: 'Open Sans', sans-serif
+        font-style: italic
+        font-weight: 700
+        font-size: 1em
+
+        margin: auto
+        text-align: center
+        padding: 1em 0
+        color: #ffffff
+
+    $height: 25.6em
+    $ratio: 1920/1080
+    $width: $height*$ratio
+
+    div:last-of-type
+      z-index: 0
+      top: 0
+      left: 0
+      right: 0
+      position: absolute
+      height: 100%
+      background:
+        color: #ffffff
+        image: url(/videos/v13-snap.png)
+        size: cover
+      video
+        height: auto
+        width: 100%
+
+        @media (max-width: $width)
+          height: 100%
+          width: auto
+
+  main
+    margin: auto
+    border-top: 0.5em solid #7FECEC
+
+    #BackgroundArt
+      background:
+        image: url(/images/boxers.svg), url(/images/sock.svg), url(/images/tshirt.svg)
+        size: 11em, 8em, 16em
+        repeat: no-repeat
+        position: 7% 40%, 90% 10%, 94% 70%
+      position: absolute
+      top: 0
+      bottom: 0
+      left: 0
+      right: 0
+      z-index: 0
+      +transition(opacity 0.1s)
+      @media (max-width: 69em)
+        opacity: 0.2
+    a
+      color: #d58948
+      font-weight: 700
+
+    section
+      position: relative
+      z-index: 1
+
+      h1
+        text-align: center
+        padding: 1em 0 2em
+
+      ul
+        list-style-type: none
+
+        li
+          font-weight: bolder
+          font-size: 1em
+          max-width: 37em
+          margin: auto
+          position: relative
+
+          h2
+            font-weight: 700
+            text-transform: uppercase
+            font-size: 1.1em
+            line-height: 2em
+
+          svg
+            width: 4em
+            height: 4em
+            float: left
+            position: absolute
+            left: 1em
+            top: 2.5em
+
+          div
+            padding: 2em 1em 2.4em 8em
+
+
+    section#StartDemo
+      div
+        padding: 2em 0
+
+        a
+          width: 10em
+          margin: auto
+          display: block
+          svg
+            width: 10em
+            display: block
