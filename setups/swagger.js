@@ -6,7 +6,7 @@ var YAML = require('yamljs')
 var swaggerTools = require('swagger-tools')
 var config = require('config')
 var passport = require('passport')
-
+const {logError} = require('../utils/error')
 function setup (app) {
   return new Promise((resolve, reject) => {
     YAML.load(path.join(__dirname, '..', 'api', 'swagger', 'swagger.yaml'),
@@ -32,7 +32,7 @@ function setup (app) {
         app.use(middleware.swaggerUi())
         app.use('/api', (err, req, res, next) => {
           res.statusCode = res.statusCode && res.statusCode < 300 ? err.status || 500 : res.statusCode
-          if (config.get('logging.error.enabled') && res.statusCode === 500) console.log(err)
+          if (config.get('logging.error.enabled') && res.statusCode === 500) logError(err)
           res.json({message: err.message})
         })
         resolve(app)

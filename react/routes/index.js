@@ -1,2 +1,2 @@
 
-module.exports = [require('./app.jsx')]
+module.exports = require('./app.jsx')

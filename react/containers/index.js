@@ -4,6 +4,11 @@
 
 module.exports = {
   Timetable: require('./timetable'),
-  App: require('../views').App,
-  TopNav: require('./topnav')
+  App: require('./app'),
+  Auth: require('../views').Auth,
+  Forgot: require('../views').Forgot,
+  SignUp: require('../views').SignUp,
+  Home: require('../views').Home,
+  LogIn: require('./login'),
+  CreateLaundry: require('../views').CreateLaundry
 }

@@ -4,6 +4,7 @@
 const {createAction} = require('redux-actions')
 
 const SIGN_IN_USER = 'SIGN_IN_USER'
+const FLASH = 'FLASH'
 
 /**
  * @param {UserHandler} user
@@ -19,7 +20,9 @@ function userMapper (user) {
 
 module.exports = {
   types: {
-    SIGN_IN_USER: SIGN_IN_USER
+    SIGN_IN_USER: SIGN_IN_USER,
+    FLASH: FLASH
   },
-  signInUser: createAction(SIGN_IN_USER, userMapper)
+  signInUser: createAction(SIGN_IN_USER, userMapper),
+  flash: createAction(FLASH)
 }

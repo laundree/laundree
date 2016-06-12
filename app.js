@@ -5,7 +5,7 @@ var favicon = require('serve-favicon')
 var cookieParser = require('cookie-parser')
 var bodyParser = require('body-parser')
 var flash = require('connect-flash')
-
+const {logError} = require('./utils/error')
 var routes = require('./routes')
 var setups = require('./setups')
 
@@ -61,7 +61,7 @@ setups.swaggerSetup(app).then(() => {
 
   if (app.get('env') === 'development') {
     app.use((err, req, res, next) => {
-      console.log(err)
+      logError(err)
       res.status(err.status || 500)
       res.render('error-500', {
         message: err.message,

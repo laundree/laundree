@@ -5,15 +5,8 @@
 </head>
 <body>
 {{> media}}
-<div id="Container">
-    {{#unless no_nav}}
-        {{> topnav}}
-    {{/unless}}
-    {{{ body }}}
-</div>
-{{#unless no_footer}}
-   {{> footer}}
-{{/unless}}
+{{{ body }}}
 </body>
+{{#if flash}}<script type="application/javascript">window.__FLASH_MESSAGES__ = {{{flash}}}</script>{{/if}}
 <script type="application/javascript" src="/javascripts/bundle.js"></script>
 </html>

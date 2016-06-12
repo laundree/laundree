@@ -80,7 +80,13 @@ body
   background: #66D3D3
   min-width: 20em
   position: relative
-  padding-bottom: $footer_height
+
+#AppRoot
+  height: 100%
+  > div:not(.no_footer)
+    min-height: 100%
+    position: relative
+    padding-bottom: $footer_height
 
 label
   display: block
@@ -105,12 +111,13 @@ label
     opacity: 0
     transition: 0.4s opacity
 
-  &.invalid
+  &.invalid:not(.initial)
     input:not(:focus)
       box-shadow: 0 0 0 0.1em #f00
 
-    &:before
-      opacity: 1
+form.failed
+  label.invalid:before
+    opacity: 1
 
   input[type=checkbox]
     margin-right: 1em
@@ -426,6 +433,8 @@ footer
   width: 100%
   background-color: #47A0A0
   font-weight: 400
+  position: absolute
+  bottom: 0
 
   a
     color: #fff
@@ -451,7 +460,7 @@ footer
         height: 3em
 
 @media only screen and (max-width: 45em)
-  body
+  #AppRoot > div:not(.no_footer)
     padding-bottom: $footer_height * 4
 
   footer

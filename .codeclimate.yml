@@ -3,6 +3,7 @@ exclude_paths:
 - "tests"
 - 'email-templates'
 - 'gulpfile.js'
+- '**.jsx'
 engines:
   scss-lint:
     enabled: true

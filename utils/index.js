@@ -8,5 +8,6 @@ module.exports = {
   password: require('./password'),
   mail: require('./mail'),
   api: require('./api'),
+  react: require('./react'),
   error: require('./error')
 }
