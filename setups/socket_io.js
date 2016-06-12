@@ -18,7 +18,7 @@ function setupSocket (server) {
 
 function setupRedux (io) {
   io.on('connect', (s) => {
-    var currentUserId = s.request.session.passport.user
+    var currentUserId = s.request.session.passport ? s.request.session.passport.user : undefined
     UserHandler.findFromId(currentUserId).then((user) => {
       createInitialStore(user).then((store) => s.emit('init', store.getState()))
     })
