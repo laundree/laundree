@@ -12,8 +12,10 @@ const {match, RouterContext} = require('react-router')
 const {createInitialStore} = require('../redux')
 const utils = require('../utils')
 const DocumentTitle = require('react-document-title')
+const {ActionProvider} = require('../react/views/providers')
+
 router.use((req, res, next) => {
-  createInitialStore(req.user)
+  createInitialStore(req.user, req.flash('success'), req.flash('error'))
     .then((store) => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)
@@ -24,13 +26,15 @@ router.use((req, res, next) => {
           return next(error)
         }
         const html = renderToString(
-          <IntlProvider locale='en'>
-            <Provider store={store}>
-              {React.createElement(RouterContext, Object.assign({}, renderProps))}
-            </Provider>
-          </IntlProvider>)
+          <ActionProvider>
+            <IntlProvider locale='en'>
+              <Provider store={store}>
+                {React.createElement(RouterContext, Object.assign({}, renderProps))}
+              </Provider>
+            </IntlProvider>
+          </ActionProvider>)
         const title = DocumentTitle.rewind()
-        res.render('app', {html: html, title: title})
+        res.render('app', {html: html, title: title, flash: JSON.stringify(store.getState().flash)})
       })
     })
     .catch(utils.error.logError)

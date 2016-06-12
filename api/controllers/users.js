@@ -82,6 +82,7 @@ function startEmailVerification (req, res) {
   UserHandler.findFromId(id).then((user) => !user ? utils.api.returnError(res, 404, 'User not found') : user.generateVerifyEmailToken(email)
     .then((token) => !token ? utils.api.returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
       email: email,
+      emailEncoded: encodeURIComponent(email),
       token: token,
       user: user.model
     }, 'verify-email', email)

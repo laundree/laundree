@@ -4,28 +4,44 @@ class ValidationForm extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {valid: {}, initial: true}
+    this.state = {initial: true, failed: false}
+    this.initialState = {}
+    this.submitHandler = (evt) => {
+      if (!this.valid) {
+        evt.preventDefault()
+        this.setState({failed: true})
+        return
+      }
+      if (!this.props.onSubmit) return
+      this.props.onSubmit(evt)
+    }
   }
 
   generateValidationHandler () {
-    return (name, valid, initial) => {
+    return (name, valid) => {
       this.setState((prevState) => {
+        const valids = prevState.valid || this.initialState
         const obj = {}
         obj[name] = valid
-        return {initial: prevState.initial && initial, valid: Object.assign({}, prevState.valid, obj)}
+        return {initial: false, valid: Object.assign({}, valids, obj)}
       })
     }
   }
 
   get valid () {
+    const valids = this.state.valid || this.initialState
     return Object
-      .keys(this.state.valid)
-      .map((k) => this.state.valid[k])
+      .keys(valids)
+      .map((k) => valids[k])
       .every((v) => v)
   }
 
   get initial () {
     return this.state.initial
+  }
+
+  get failed () {
+    return this.state.failed
   }
 
   getChildContext () {
@@ -35,11 +51,13 @@ class ValidationForm extends React.Component {
   get className () {
     return (this.props.className || '') + ' ' +
       (this.valid ? '' : 'invalid') + ' ' +
-      (this.initial ? 'initial' : '')
+      (this.initial ? 'initial' : '') + ' ' +
+      (this.failed ? 'failed' : '')
   }
 
   render () {
     return <form
+      onSubmit={this.submitHandler}
       id={this.props.id}
       action={this.props.action}
       method={this.props.method}
@@ -54,6 +72,7 @@ ValidationForm.childContextTypes = {
 }
 
 ValidationForm.propTypes = {
+  onSubmit: React.PropTypes.func,
   className: React.PropTypes.string,
   id: React.PropTypes.string,
   method: React.PropTypes.string,

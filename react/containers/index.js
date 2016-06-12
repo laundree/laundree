@@ -9,5 +9,6 @@ module.exports = {
   Forgot: require('../views').Forgot,
   SignUp: require('../views').SignUp,
   Home: require('../views').Home,
-  LogIn: require('../views').LogIn
+  LogIn: require('./login'),
+  CreateLaundry: require('../views').CreateLaundry
 }

@@ -5,5 +5,6 @@ const {combineReducers} = require('redux')
 
 module.exports = combineReducers({
   users: require('./users'),
-  currentUser: require('./current_user')
+  currentUser: require('./current_user'),
+  flash: require('./flash')
 })

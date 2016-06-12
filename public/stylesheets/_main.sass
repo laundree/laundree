@@ -111,13 +111,13 @@ label
     opacity: 0
     transition: 0.4s opacity
 
-form:not(.initial)
-  label.invalid
+  &.invalid:not(.initial)
     input:not(:focus)
       box-shadow: 0 0 0 0.1em #f00
 
-    &:before
-      opacity: 1
+form.failed
+  label.invalid:before
+    opacity: 1
 
   input[type=checkbox]
     margin-right: 1em

@@ -55,10 +55,4 @@ router.post('/local', function (req) {
   }).apply(null, arguments)
 })
 
-router.get('/sign-up', (req, res) => res.render('sign-up', {
-  title: ['Sign up for an account '],
-  no_nav: true,
-  styles: ['/stylesheets/auth.css']
-}))
-
 module.exports = router

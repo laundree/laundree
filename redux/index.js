@@ -9,9 +9,15 @@ const actions = require('./actions')
  * @param {UserHandler} user
  * @return {Promise}
  */
-function createInitialStore (user) {
+function createInitialStore (user, successFlash = [], errorFlash = []) {
   const store = createStore(reducer)
   if (user) store.dispatch(actions.signInUser(user))
+  successFlash
+    .map((message) => ({type: 'success', message: message}))
+    .forEach((flash) => store.dispatch(actions.flash(flash)))
+  errorFlash
+    .map((message) => ({type: 'error', message: message}))
+    .forEach((flash) => store.dispatch(actions.flash(flash)))
   return Promise.resolve(store)
 }
 

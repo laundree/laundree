@@ -12,10 +12,12 @@ class ValidationElement extends React.Component {
   constructor (props) {
     super(props)
     this.valid = undefined
+    this.value = undefined
+    this.state = {initial: true}
   }
 
-  handle () {
-    const valid = Boolean(this.validate())
+  handle (valid) {
+    valid = Boolean(valid)
     if (valid === this.valid) return
     this.valid = valid
     if (!this.context.validation.handler) return
@@ -24,8 +26,12 @@ class ValidationElement extends React.Component {
 
   componentDidMount () {
     this.id = newId()
-    if (!this.context.validation.handler) return
-    this.context.validation.handler(this.name, false, true)
+    this.handle(false)
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.value === this.props.value) return
+    this.setState({initial: false})
   }
 
   get name () {
@@ -39,18 +45,20 @@ class ValidationElement extends React.Component {
     if (this.props.notOneOf) return this.props.notOneOf.indexOf(value) < 0
     if (this.props.nonEmpty) return value
     if (this.props.email) return regex.email.exec(value)
+    if (this.props.password) return regex.password.exec(value)
     return true
   }
 
-  componentWillReceiveProps () {
-    this.handle()
+  componentDidUpdate () {
+    this.handle(this.validate())
   }
 
   render () {
     const valid = this.validate()
     const child = React.Children.only(this.props.children)
     return React.cloneElement(child, {
-      className: (child.props.className || '') + (valid ? '' : ' invalid')
+      className: (child.props.className || '') + (valid ? '' : ' invalid') +
+      (this.props.initial || this.state.initial ? ' initial' : '')
     })
   }
 }
@@ -64,6 +72,8 @@ ValidationElement.propTypes = {
   notOneOf: React.PropTypes.arrayOf(React.PropTypes.string),
   trim: React.PropTypes.bool,
   nonEmpty: React.PropTypes.bool,
+  password: React.PropTypes.bool,
+  initial: React.PropTypes.bool,
   email: React.PropTypes.bool,
   value: React.PropTypes.string.isRequired,
   validator: React.PropTypes.func

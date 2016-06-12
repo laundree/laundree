@@ -5,23 +5,12 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
-
+const {generateChangeHandler} = require('../../utils/react')
 class LogIn extends React.Component {
 
   constructor (props) {
     super(props)
     this.state = {values: {}}
-  }
-
-  generateChangeHandler (name) {
-    return (evt) => {
-      const value = evt.target.value
-      this.setState((prevState) => {
-        const obj = {}
-        obj[name] = value
-        return {values: Object.assign({}, prevState.values, obj)}
-      })
-    }
   }
 
   render () {
@@ -53,24 +42,29 @@ class LogIn extends React.Component {
           <span>OR</span>
         </div>
         <ValidationForm id='SignIn' method='post' action='/auth/local'>
+          {this.props.flash.length
+            ? <div className={'notion ' + this.props.flash[0].type}>{this.props.flash[0].message}</div>
+            : null}
           <ValidationElement email trim value={this.state.values.email || ''}>
-            <label >
+            <label
+              data-validate-error='Please enter a valid e-mail address'>
               <input
                 type='text'
                 name='username'
                 placeholder='E-mail address'
                 value={this.state.values.email || ''}
-                onChange={this.generateChangeHandler('email')}/>
+                onChange={generateChangeHandler(this, 'email')}/>
             </label>
           </ValidationElement>
           <ValidationElement
             value={this.state.values.password || ''}
             nonEmpty trim>
-            <label >
+            <label
+              data-validate-error='Please enter a password'>
               <input
                 type='password' name='password' placeholder='Password'
                 value={this.state.values.password || ''}
-                onChange={this.generateChangeHandler('password')}/>
+                onChange={generateChangeHandler(this, 'password')}/>
             </label>
           </ValidationElement>
           <div className='buttons'>
@@ -97,4 +91,12 @@ class LogIn extends React.Component {
     </DocumentTitle>
   }
 }
+
+LogIn.propTypes = {
+  flash: React.PropTypes.arrayOf(React.PropTypes.shape({
+    type: React.PropTypes.string.isRequired,
+    message: React.PropTypes.string.isRequired
+  })).isRequired
+}
+
 module.exports = LogIn
