@@ -9,5 +9,7 @@ module.exports = {
   mail: require('./mail'),
   api: require('./api'),
   react: require('./react'),
-  error: require('./error')
+  error: require('./error'),
+  events: require('./events'),
+  object: require('./object')
 }

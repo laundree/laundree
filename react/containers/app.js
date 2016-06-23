@@ -7,7 +7,7 @@ const {App} = require('../views')
 const lodash = require('lodash')
 
 const mapStateToProps = (store) => {
-  return {user: lodash.cloneDeep(store.users[store.currentUser])}
+  return {user: lodash.cloneDeep(store.users[store.currentUser]), currentLaundry: store.currentLaundry}
 }
 
 module.exports = connect(mapStateToProps)(App)

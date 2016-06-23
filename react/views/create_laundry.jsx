@@ -1,7 +1,51 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
+const {ValidationForm, ValidationElement} = require('./validation')
+const {ValueUpdater} = require('./helpers')
 
-class CreateLaundry extends React.Component {
+class CreateLaundry extends ValueUpdater {
+
+  constructor (props) {
+    super(props)
+    this.state.createExpanded = false
+    this.state.loading = false
+    this.expander = (evt) => {
+      evt.target.blur()
+      this.setState(({createExpanded}) => ({createExpanded: !createExpanded}))
+    }
+    this.onSubmit = (event) => {
+      event.preventDefault()
+      this.setState({loading: true})
+      this.context.actions.createLaundry(this.state.values.name.trim()).then(
+        (data) => {
+          window.location = '/'
+        },
+        (err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
+    }
+  }
+
+  calculateClassName () {
+    var className = 'create'
+    if (this.state.createExpanded) className += ' expanded'
+    if (this.state.notion) className += ' has_notion'
+    return className
+  }
+
+  static errorToNotion (err) {
+    var message
+    switch (err.status) {
+      case 400:
+        message = 'A laundry by that name already exists'
+        break
+      case 500:
+        message = 'Internal server error'
+        break
+      default:
+        message = 'Unknown error occurred'
+    }
+    return {type: 'error', message}
+  }
+
   render () {
     return <DocumentTitle title='Create Laundry'>
       <main id='CreateLaundry'>
@@ -11,8 +55,25 @@ class CreateLaundry extends React.Component {
             It doesn't seem like you have any laundry attached to your account.
             If you want to share your machines with your tenants, please create a new laundry.
           </div>
-          <div className='create'>
-            <button>Create a laundry</button>
+          <div className={this.calculateClassName()}>
+            <ValidationForm className={this.state.loading ? 'blur' : ''} onSubmit={this.onSubmit}>
+              {this.state.notion
+                ? <div className={this.state.notion.type + ' notion'}>{this.state.notion.message}</div>
+                : null}
+              <ValidationElement name='name' nonEmpty value={this.state.values.name || ''}>
+                <label data-validate-error='Please enter a name for your laundry.'>
+                  <input
+                    type='text' value={this.state.values.name || ''} onChange={this.generateValueUpdater('name')}
+                    placeholder='Laundry name'/>
+                </label>
+              </ValidationElement>
+              <div className='buttons'>
+                <input type='submit' value='Create'/>
+              </div>
+            </ValidationForm>
+            <div className='expand_button'>
+              <button onClick={this.expander}>Create a laundry</button>
+            </div>
           </div>
           <div>
             Are you a tenant who wants to use laundree for your laundry? Please tell your
@@ -22,6 +83,11 @@ class CreateLaundry extends React.Component {
       </main>
     </DocumentTitle>
   }
+}
+CreateLaundry.contextTypes = {
+  actions: React.PropTypes.shape({
+    createLaundry: React.PropTypes.func
+  })
 }
 
 module.exports = CreateLaundry

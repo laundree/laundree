@@ -7,7 +7,7 @@ var bodyParser = require('body-parser')
 var flash = require('connect-flash')
 const {logError} = require('./utils/error')
 var routes = require('./routes')
-var setups = require('./setups')
+var setups = require('./lib')
 
 var app = express()
 var hbs = require('hbs')
@@ -37,19 +37,14 @@ app.use(require('node-sass-middleware')({
 app.use(flash())
 app.use(express.static(path.join(__dirname, 'public')))
 
-app.use((req, res, next) => {
-  if (req.user) res.locals.user = req.user.model
-  next()
-})
-
-app.use('/', routes)
-
-app.get('/err', (req, res, next) => {
-  next(new Error('This is a test error'))
-})
-
 // Swagger
 setups.swaggerSetup(app).then(() => {
+  app.use('/', routes)
+
+  app.get('/err', (req, res, next) => {
+    next(new Error('This is a test error'))
+  })
+
   app.use(function (req, res, next) {
     res.status(404)
     res.render('error-404',

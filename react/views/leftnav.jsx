@@ -22,7 +22,7 @@ class LeftNav extends React.Component {
       <nav id='LeftNav'>
         <ul>
           <li data-label='Timetable'>
-            <Link to='/app/timetable' activeClassName='active'>
+            <Link to={'/timetable/' + this.props.currentLaundry} activeClassName='active'>
               <svg>
                 <use xlinkHref='#Time'/>
               </svg>
@@ -30,7 +30,7 @@ class LeftNav extends React.Component {
             </Link>
           </li>
           <li data-label='Your bookings'>
-            <Link to='/app/bookings' activeClassName='active'>
+            <Link to={'/bookings/' + this.props.currentLaundry} activeClassName='active'>
               <svg>
                 <use xlinkHref='#List'/>
               </svg>
@@ -41,7 +41,7 @@ class LeftNav extends React.Component {
         <hr/>
         <ul>
           <li data-label='Settings'>
-            <Link to='/app/settings' activeClassName='active'>
+            <Link to={'/settings/' + this.props.currentLaundry} activeClassName='active'>
               <svg>
                 <use xlinkHref='#Gears'/>
               </svg>
@@ -52,6 +52,10 @@ class LeftNav extends React.Component {
       </nav>
     </div>
   }
+}
+
+LeftNav.propTypes = {
+  currentLaundry: React.PropTypes.string.isRequired
 }
 
 module.exports = LeftNav

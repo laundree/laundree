@@ -27,6 +27,18 @@ class Handler {
       .then((m) => m ? new Handler(m) : undefined)
   }
 
+  static _on (emitter, args) {
+    return emitter.on.apply(emitter, args)
+  }
+
+  static _removeListener (emitter, args) {
+    return emitter.removeListener.apply(emitter, args)
+  }
+
+  _emitEvent (emitter, event) {
+    emitter.emit(event, this)
+  }
+
   /**
    * @constructor
    * @template T
