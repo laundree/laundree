@@ -13,17 +13,26 @@ function dispatchFlashs (store, flashArray, type) {
 
 /**
  * Create initial store
- * @param {UserHandler} user
+ * @param {UserHandler} currentUser
+ * @param {Array=} successFlash
+ * @param {Array=} errorFlash
  * @return {Promise}
  */
-function createInitialStore (user, successFlash = [], errorFlash = []) {
+function createInitialStore (currentUser, successFlash = [], errorFlash = []) {
   const store = createStore(reducer)
-  if (user) store.dispatch(actions.signInUser(user))
   dispatchFlashs(store, successFlash, 'success')
   dispatchFlashs(store, errorFlash, 'error')
-  return Promise.resolve(store)
+  if (!currentUser) return Promise.resolve(store)
+  store.dispatch(actions.signInUser(currentUser))
+  return currentUser.fetchLaundries().then((laundries) => {
+    laundries = laundries.filter((l) => l)
+    if (!laundries.length) return store
+    store.dispatch(actions.listLaundries(laundries))
+    store.dispatch(actions.selectCurrentLaundry(laundries[0]))
+    return store
+  })
 }
 
 module.exports = {
-  createInitialStore: createInitialStore
+  createInitialStore, actions, reducer
 }

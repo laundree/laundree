@@ -10,5 +10,5 @@ module.exports = {
   SignUp: require('../views').SignUp,
   Home: require('../views').Home,
   LogIn: require('./login'),
-  CreateLaundry: require('../views').CreateLaundry
+  CreateLaundry: require('./create_laundry')
 }

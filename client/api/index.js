@@ -3,5 +3,6 @@
  */
 
 module.exports = {
-  UserClientApi: require('./user')
+  UserClientApi: require('./user'),
+  LaundryClientApi: require('./laundry')
 }

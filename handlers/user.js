@@ -2,13 +2,25 @@
  * Created by budde on 27/04/16.
  */
 
-var Handler = require('./handler')
-var TokenHandler = require('./token')
-var LaundryHandler = require('./laundry')
-var {UserModel} = require('../models')
-var lodash = require('lodash')
-var utils = require('../utils')
+const Handler = require('./handler')
+const TokenHandler = require('./token')
+const LaundryHandler = require('./laundry')
+const {UserModel} = require('../models')
+const lodash = require('lodash')
+const utils = require('../utils')
+const EventEmitter = require('events')
+const {linkEmitter} = require('../lib/redis')
 
+const pubStaticEmitter = new EventEmitter()
+const subStaticEmitter = new EventEmitter()
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'user',
+  ['update', 'create'],
+  (user) => Promise.resolve(user.model.id),
+  (id) => UserHandler.findFromId(id))
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -16,7 +28,7 @@ var utils = require('../utils')
 function displayNameToName (displayName) {
   var names = displayName.split(' ')
   names = names.filter((name) => name.length)
-  var noNames = names.length
+  const noNames = names.length
   if (noNames === 0) return {}
   if (noNames === 1) return {givenName: names[0]}
   if (noNames === 2) return {givenName: names[0], familyName: names[1]}
@@ -32,6 +44,14 @@ function displayNameToName (displayName) {
  */
 
 class UserHandler extends Handler {
+
+  static on () {
+    return Handler._on(pubStaticEmitter, arguments)
+  }
+
+  static removeListener () {
+    return Handler._removeListener(pubStaticEmitter, arguments)
+  }
 
   static find (filter, limit) {
     return this._find(UserModel, UserHandler, filter, limit)
@@ -60,6 +80,10 @@ class UserHandler extends Handler {
   static findOrCreateFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return UserHandler.findFromEmail(profile.emails[0].value).then((user) => user ? user.updateProfile(profile) : UserHandler.createUserFromProfile(profile))
+  }
+
+  emitEvent (event) {
+    this._emitEvent(subStaticEmitter, event)
   }
 
   /**
@@ -143,7 +167,10 @@ class UserHandler extends Handler {
   createLaundry (name) {
     return LaundryHandler._createLaundry(this, name).then((laundry) => {
       this.model.laundries.push(laundry.model._id)
-      return this.model.save().then(() => laundry)
+      return this.model.save().then(() => {
+        this.emitEvent('update')
+        return laundry
+      })
     })
   }
 
@@ -158,7 +185,10 @@ class UserHandler extends Handler {
         this.model.laundries.push(laundry.model._id)
         return this.model.save()
       })
-      .then(() => this)
+      .then(() => {
+        this.emitEvent('update')
+        return this
+      })
   }
 
   /**
@@ -181,7 +211,15 @@ class UserHandler extends Handler {
         this.model.laundries.pull(laundry.model._id)
         return this.model.save()
       })
-      .then(() => this)
+      .then(() => {
+        this.emitEvent('update')
+        return this
+      })
+  }
+
+  fetchLaundries () {
+    return UserModel.populate(this.model, {path: 'laundries'})
+      .then(({laundries}) => laundries.map((l) => new LaundryHandler(l)))
   }
 
   /**
@@ -194,7 +232,7 @@ class UserHandler extends Handler {
     return utils.password
       .generateToken()
       .then((token) => utils.password.hashPassword(token).then((hash) => {
-        var cleanTokens = this.model.explicitVerificationEmailTokens.filter((token) => token.email !== email)
+        const cleanTokens = this.model.explicitVerificationEmailTokens.filter((token) => token.email !== email)
         cleanTokens.push({email: email, hash: hash})
         this.model.explicitVerificationEmailTokens = cleanTokens
         return this.model.save().then(() => token)
@@ -208,7 +246,7 @@ class UserHandler extends Handler {
    * @returns {Promise.<boolean>}
    */
   verifyEmail (email, token) {
-    var storedToken = this.model.explicitVerificationEmailTokens.find((element) => element.email === email)
+    const storedToken = this.model.explicitVerificationEmailTokens.find((element) => element.email === email)
     if (!storedToken) return Promise.resolve(false)
     return utils.password.comparePassword(token, storedToken.hash).then((result) => {
       if (!result) return false
@@ -230,13 +268,18 @@ class UserHandler extends Handler {
       profiles: [profile],
       laundries: [],
       latestProvider: profile.provider
-    }).save().then((model) => UserHandler.findFromId(model.id))
+    }).save()
+      .then((model) => UserHandler.findFromId(model.id))
+      .then((user) => {
+        user.emitEvent('create')
+        return user
+      })
   }
 
   static createUserWithPassword (displayName, email, password) {
     displayName = displayName.split(' ').filter((name) => name.length).join(' ')
 
-    var profile = {
+    const profile = {
       id: email,
       displayName: displayName,
       name: displayNameToName(displayName),
@@ -249,7 +292,7 @@ class UserHandler extends Handler {
         utils.password.hashPassword(password)])
       .then((result) => {
         // noinspection UnnecessaryLocalVariableJS
-        var [user, passwordHash] = result
+        const [user, passwordHash] = result
         user.model.password = passwordHash
         return user.model.save().then((model) => UserHandler.findFromId(model.id))
       })

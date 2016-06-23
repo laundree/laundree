@@ -4,20 +4,40 @@
 const {LaundryModel} = require('../models')
 const Handler = require('./handler')
 const MachineHandler = require('./machine')
+const EventEmitter = require('events')
+const {linkEmitter} = require('../lib/redis')
+
+const pubStaticEmitter = new EventEmitter()
+const subStaticEmitter = new EventEmitter()
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'laundry',
+  ['update', 'create'],
+  (laundry) => Promise.resolve(laundry.model.id),
+  (id) => LaundryHandler.findFromId(id))
 
 class LaundryHandler extends Handler {
 
   static find (filter, limit) {
-    return this._find(LaundryModel, LaundryHandler, filter, limit)
+    return Handler._find(LaundryModel, LaundryHandler, filter, limit)
   }
 
+  static on () {
+    return Handler._on(pubStaticEmitter, arguments)
+  }
+
+  static removeListener () {
+    return Handler._removeListener(pubStaticEmitter, arguments)
+  }
   /**
    * Find an handler from given id.
    * @param id
    * @returns {Promise.<TokenHandler>}
    */
   static findFromId (id) {
-    return this._findFromId(LaundryModel, LaundryHandler, id)
+    return Handler._findFromId(LaundryModel, LaundryHandler, id)
   }
 
   /**
@@ -34,8 +54,15 @@ class LaundryHandler extends Handler {
     })
       .save()
       .then((model) => new LaundryHandler(model))
+      .then((laundry) => {
+        laundry.emitEvent('create')
+        return laundry
+      })
   }
 
+  emitEvent (event) {
+    return this._emitEvent(subStaticEmitter, event)
+  }
   /**
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}

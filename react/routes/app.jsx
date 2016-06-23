@@ -8,9 +8,16 @@ const {App, CreateLaundry, Home, Forgot, SignUp, Auth, LogIn, Timetable, Booking
 function routeGenerator (store) {
   const state = store.getState()
   if (state.currentUser) {
+    const checkLaundry = (nextState, replace) => {
+      if (!state.currentLaundry) return
+      replace({
+        pathname: '/timetable/' + state.currentLaundry
+      })
+    }
+
     return [
       <Route component={App} path='/'>
-        <IndexRoute component={CreateLaundry}/>
+        <IndexRoute component={CreateLaundry} onEnter={checkLaundry}/>
         <Route path='timetable'>
           <Route path=':id' component={Timetable}/>
         </Route>
@@ -21,7 +28,7 @@ function routeGenerator (store) {
         <Route path='settings' component={Settings}/>
       </Route>,
       <Route path='/auth'>
-        <IndexRedirect to='/' />
+        <IndexRedirect to='/'/>
       </Route>]
   }
   return [

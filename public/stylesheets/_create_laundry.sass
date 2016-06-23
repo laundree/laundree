@@ -7,7 +7,31 @@
     max-width: 25em
     margin: auto
     .create
-      padding: 2em 0
+      overflow: hidden
+      height: 9em
+      .expand_button
+        padding: 3em 0
+      +transition(height 0.2s)
+      form
+        display: none
+        padding: 1em 1em 3em
+        +transition(opacity 0.2s)
+        height: 0
+        opacity: 0
+        overflow-y: hidden
+        input
+          display: block
+      &.expanded
+        height: 14em
+        padding: 0
+        &.has_notion
+          height: 17em
+        form
+          height: auto
+          opacity: 1
+          display: block
+        .expand_button
+          display: none
       button
         width: 14em
         margin: auto

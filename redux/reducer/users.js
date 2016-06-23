@@ -9,4 +9,6 @@ actionMap[actions.types.SIGN_IN_USER] = (state, action) => {
   return Object.assign({}, state, obj)
 }
 
+actionMap[actions.types.UPDATE_USER] = actionMap[actions.types.SIGN_IN_USER]
+
 module.exports = handleActions(actionMap, {})

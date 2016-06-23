@@ -3,10 +3,10 @@
  */
 
 const app = require('./app')
-const debug = require('debug')('laundree:server')
+const debug = require('debug')('laundree.server')
 const http = require('http')
 const config = require('config')
-const {socketIoSetup} = require('./setups')
+const {socketIoSetup} = require('./lib')
 /**
  * Get port from environment and store in Express.
  */
