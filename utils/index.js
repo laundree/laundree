@@ -10,5 +10,6 @@ module.exports = {
   api: require('./api'),
   react: require('./react'),
   error: require('./error'),
-  events: require('./events')
+  events: require('./events'),
+  object: require('./object')
 }
