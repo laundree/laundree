@@ -28,7 +28,6 @@ function createInitialStore (currentUser, successFlash = [], errorFlash = []) {
     laundries = laundries.filter((l) => l)
     if (!laundries.length) return store
     store.dispatch(actions.listLaundries(laundries))
-    store.dispatch(actions.selectCurrentLaundry(laundries[0]))
     return store
   })
 }

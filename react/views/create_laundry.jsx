@@ -18,10 +18,14 @@ class CreateLaundry extends ValueUpdater {
       this.setState({loading: true})
       this.context.actions.createLaundry(this.state.values.name.trim()).then(
         (data) => {
-          window.location = '/'
         },
         (err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
     }
+  }
+
+  componentWillReceiveProps (nextProps) {
+    if (!nextProps.user.laundries.length) return
+    this.context.router.replace(`/laundries/${nextProps.user.laundries[0]}/timetable`)
   }
 
   calculateClassName () {
@@ -85,9 +89,14 @@ class CreateLaundry extends ValueUpdater {
   }
 }
 CreateLaundry.contextTypes = {
+  router: React.PropTypes.object,
   actions: React.PropTypes.shape({
     createLaundry: React.PropTypes.func
   })
+}
+
+CreateLaundry.propTypes = {
+  user: React.PropTypes.object
 }
 
 module.exports = CreateLaundry
