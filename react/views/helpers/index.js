@@ -1,4 +1,4 @@
 
 module.exports = {
-  ValueUpdater: require('./value_updater')
+  ValueUpdater: require('./value_updater.jsx')
 }
