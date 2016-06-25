@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const {App} = require('../views')
+const {Settings} = require('../views')
 const lodash = require('lodash')
 
 const mapStateToProps = (store, {params: {id}}) => {
@@ -14,4 +14,4 @@ const mapStateToProps = (store, {params: {id}}) => {
   }
 }
 
-module.exports = connect(mapStateToProps)(App)
+module.exports = connect(mapStateToProps)(Settings)

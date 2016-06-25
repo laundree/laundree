@@ -32,8 +32,9 @@ function listMachines (req, res) {
 }
 
 function createMachine (req, res) {
-  const name = req.swagger.params.body.value.name.trim()
-  if (name === '') return api.returnError(res, 400, 'Invalid name')
+  const body = req.swagger.params.body.value
+  const name = body.name.trim()
+  const type = body.type
   const id = req.swagger.params.id.value
   LaundryHandler.findFromId(id)
     .then((laundry) => {
@@ -42,8 +43,8 @@ function createMachine (req, res) {
       return MachineHandler
         .find({name: name})
         .then(([machine]) => {
-          if (machine) return api.returnError(res, 400, 'Machine already exists')
-          return laundry.createMachine(name)
+          if (machine) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
+          return laundry.createMachine(name, type)
             .then((machine) => api.returnSuccess(res, machine.toRest()))
         })
     })
@@ -81,9 +82,32 @@ function deleteMachine (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function updateMachine (req, res) {
+  const body = req.swagger.params.body.value
+  const name = body.name.trim()
+  const type = body.type
+  const id = req.swagger.params.id.value
+  MachineHandler.findFromId(id)
+    .then((machine) => {
+      if (!machine) return api.returnError(res, 404, 'Machine not found')
+      return machine.fetchLaundry()
+        .then((laundry) => ({machine: machine, laundry: laundry}))
+        .then(({machine, laundry}) => {
+          if (!laundry || !laundry.isUser(req.user)) return api.returnError(res, 404, 'Machine not found')
+          if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
+          return MachineHandler.find({name}).then(([m]) => {
+            if (m && m.model.id !== machine.model.id) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
+            machine.update({name, type}).then(() => api.returnSuccess(res, machine.toRest()))
+          })
+        })
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
 module.exports = {
-  listMachines: listMachines,
-  createMachine: createMachine,
-  fetchMachine: fetchMachine,
-  deleteMachine: deleteMachine
+  listMachines,
+  createMachine,
+  fetchMachine,
+  deleteMachine,
+  updateMachine
 }

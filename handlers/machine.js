@@ -5,7 +5,37 @@
 const Handler = require('./handler')
 const {MachineModel} = require('../models')
 const BookingHandler = require('./booking')
+const EventEmitter = require('events')
+const {linkEmitter} = require('../lib/redis')
+
+const pubStaticEmitter = new EventEmitter()
+const subStaticEmitter = new EventEmitter()
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'machine',
+  ['update', 'create'],
+  (machine) => Promise.resolve(machine.model.id),
+  (id) => MachineHandler.findFromId(id))
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'machine',
+  ['delete'],
+  (machine) => Promise.resolve(machine.model.id),
+  (id) => Promise.resolve(id))
+
 class MachineHandler extends Handler {
+
+  static on () {
+    return Handler._on(pubStaticEmitter, arguments)
+  }
+
+  static removeListener () {
+    return Handler._removeListener(pubStaticEmitter, arguments)
+  }
 
   static find (filter, limit) {
     return this._find(MachineModel, MachineHandler, filter, limit)
@@ -19,11 +49,21 @@ class MachineHandler extends Handler {
    * Create a new machine
    * @param {LaundryHandler} laundry
    * @param {string} name
+   * @param {string} type
    * @returns {Promise.<MachineHandler>}
    */
-  static _createMachine (laundry, name) {
-    const model = new MachineModel({laundry: laundry.model._id, name: name})
-    return model.save().then((model) => new MachineHandler(model))
+  static _createMachine (laundry, name, type) {
+    const model = new MachineModel({laundry: laundry.model._id, name, type})
+    return model.save()
+      .then((model) => new MachineHandler(model))
+      .then((machine) => {
+        machine.emitEvent('create')
+        return machine
+      })
+  }
+
+  emitEvent (event) {
+    return this._emitEvent(subStaticEmitter, event)
   }
 
   /**
@@ -42,21 +82,37 @@ class MachineHandler extends Handler {
     return LaundryHandler.find({_id: this.model.laundry}).then(([laundry]) => laundry)
   }
 
+  update ({name, type}) {
+    if (name) this.model.name = name
+    if (type) this.model.type = type
+    return this.model.save().then(() => {
+      this.emitEvent('update')
+      return this
+    })
+  }
+
   _deleteMachine () {
     return BookingHandler
       .find({machine: this.model._id})
       .then((bookings) => Promise
         .all(bookings.map((booking) => booking.deleteBooking())))
       .then(() => this.model.remove())
-      .then(() => this)
+      .then(() => {
+        this.emitEvent('delete')
+        return this
+      })
+  }
+
+  get restUrl () {
+    return `/machines/${this.model.id}`
   }
 
   toRestSummary () {
-    return {name: this.model.name, href: `/machines/${this.model.id}`, id: this.model.id}
+    return {name: this.model.name, href: this.restUrl, id: this.model.id}
   }
 
   toRest () {
-    return Promise.resolve({name: this.model.name, href: `/machines/${this.model.id}`, id: this.model.id})
+    return Promise.resolve({name: this.model.name, href: this.restUrl, id: this.model.id, type: this.model.type})
   }
 
 }

@@ -55,7 +55,7 @@ function populateMachines (no) {
   return populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise
-        .all(lodash.range(no).map((i) => laundry.createMachine(faker.name.findName())))
+        .all(lodash.range(no).map((i) => laundry.createMachine(faker.name.findName(), 'wash')))
         .then((machines) => ({
           user: user,
           token: token,

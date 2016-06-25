@@ -3,29 +3,29 @@
  */
 const React = require('react')
 const {Route, IndexRoute, IndexRedirect} = require('react-router')
-const {App, CreateLaundry, Home, Forgot, SignUp, Auth, LogIn, Timetable, Bookings, Settings, Account} = require('../containers')
+const {App, LeftNav, CreateLaundry, Home, Forgot, SignUp, Auth, LogIn, Timetable, Bookings, Settings, Machines} = require('../containers')
 
 function routeGenerator (store) {
   const state = store.getState()
   if (state.currentUser) {
     const checkLaundry = (nextState, replace) => {
-      if (!state.currentLaundry) return
+      if (!state.currentUser) return
+      const laundries = state.users[state.currentUser].laundries
+      if (!laundries.length) return
       replace({
-        pathname: '/timetable/' + state.currentLaundry
+        pathname: `/laundries/${laundries[0]}/timetable`
       })
     }
 
     return [
       <Route component={App} path='/'>
         <IndexRoute component={CreateLaundry} onEnter={checkLaundry}/>
-        <Route path='timetable'>
-          <Route path=':id' component={Timetable}/>
+        <Route path='laundries/:id' component={LeftNav}>
+          <Route path='timetable' component={Timetable}/>
+          <Route path='booking' component={Bookings}/>
+          <Route path='settings' component={Settings}/>
+          <Route path='machines' component={Machines}/>
         </Route>
-        <Route path='accounts'>
-          <Route path=':id' component={Account}/>
-        </Route>
-        <Route path='bookings' component={Bookings}/>
-        <Route path='settings' component={Settings}/>
       </Route>,
       <Route path='/auth'>
         <IndexRedirect to='/'/>

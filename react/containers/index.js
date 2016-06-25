@@ -5,10 +5,13 @@
 module.exports = {
   Timetable: require('./timetable'),
   App: require('./app'),
+  LeftNav: require('./leftnav'),
   Auth: require('../views').Auth,
   Forgot: require('../views').Forgot,
   SignUp: require('../views').SignUp,
   Home: require('../views').Home,
+  Settings: require('./settings'),
+  Machines: require('./machines'),
   LogIn: require('./login'),
   CreateLaundry: require('./create_laundry')
 }

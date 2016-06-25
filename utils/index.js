@@ -11,5 +11,6 @@ module.exports = {
   react: require('./react'),
   error: require('./error'),
   events: require('./events'),
-  object: require('./object')
+  object: require('./object'),
+  string: require('./string')
 }

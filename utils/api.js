@@ -16,9 +16,11 @@ function generateErrorHandler (res) {
  * @param res
  * @param {number} statusCode
  * @param {string} message
+ * @param {Object=} headers
  */
-function returnError (res, statusCode, message) {
+function returnError (res, statusCode, message, headers = {}) {
   res.statusCode = statusCode
+  Object.keys(headers).forEach((header) => res.set(header, headers[header]))
   res.json({message: message})
 }
 /**

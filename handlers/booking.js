@@ -55,13 +55,17 @@ class BookingHandler extends Handler {
   }
 
   toRestSummary () {
-    return {id: this.model.id, href: `/api/bookings/${this.model.id}`}
+    return {id: this.model.id, href: this.restUrl}
+  }
+
+  get restUrl () {
+    return `/api/bookings/${this.model.id}`
   }
 
   toRest () {
     return Promise.resolve({
       id: this.model.id,
-      href: `/api/bookings/${this.model.id}`,
+      href: this.restUrl,
       from: this.model.from.toISOString(),
       to: this.model.to.toISOString()
     })

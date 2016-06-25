@@ -28,10 +28,9 @@ function listTokens (req, res) {
 
 function createToken (req, res) {
   const name = req.swagger.params.body.value.name.trim()
-  if (name === '') return api.returnError(res, 400, 'Invalid name')
   TokenHandler.find({name: name, owner: req.user.model._id})
-    .then((tokens) => {
-      if (tokens.length) return api.returnError(res, 400, 'Token already exists')
+    .then(([token]) => {
+      if (token) return api.returnError(res, 409, 'Token already exists', {Location: token.restUrl})
       return req.user.generateAuthToken(name)
         .then((token) => api.returnSuccess(res, token.toRest().then((result) => {
           result.secret = token.secret

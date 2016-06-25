@@ -6,7 +6,7 @@ const connect = require('react-redux').connect
 const CreateLaundry = require('../views').CreateLaundry
 
 const mapStateToProps = (store) => {
-  return {}
+  return {user: store.users[store.currentUser]}
 }
 
 module.exports = connect(mapStateToProps)(CreateLaundry)
