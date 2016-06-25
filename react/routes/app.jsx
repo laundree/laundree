@@ -3,7 +3,7 @@
  */
 const React = require('react')
 const {Route, IndexRoute, IndexRedirect} = require('react-router')
-const {App, CreateLaundry, Home, Forgot, SignUp, Auth, LogIn, Timetable, Bookings, Settings} = require('../containers')
+const {App, LeftNav, CreateLaundry, Home, Forgot, SignUp, Auth, LogIn, Timetable, Bookings, Settings, Machines} = require('../containers')
 
 function routeGenerator (store) {
   const state = store.getState()
@@ -20,10 +20,11 @@ function routeGenerator (store) {
     return [
       <Route component={App} path='/'>
         <IndexRoute component={CreateLaundry} onEnter={checkLaundry}/>
-        <Route path='laundries/:id'>
+        <Route path='laundries/:id' component={LeftNav}>
           <Route path='timetable' component={Timetable}/>
           <Route path='booking' component={Bookings}/>
           <Route path='settings' component={Settings}/>
+          <Route path='machines' component={Machines}/>
         </Route>
       </Route>,
       <Route path='/auth'>

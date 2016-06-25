@@ -251,7 +251,7 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(409)
             .end((err, res) => {
               if (err) return done(err)
               res.body.should.deep.equal({message: 'Machine not available'})
@@ -267,7 +267,7 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(409)
             .end((err, res) => {
               if (err) return done(err)
               res.body.should.deep.equal({message: 'Machine not available'})
@@ -284,7 +284,7 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(409)
             .end((err, res) => {
               if (err) return done(err)
               res.body.should.deep.equal({message: 'Machine not available'})

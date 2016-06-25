@@ -28,6 +28,16 @@ class LaundryClientApi {
         return entity
       })
   }
+
+  createMachine (name, type) {
+    return client({
+      path: `/api/laundries/${this.id}/machines`,
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      entity: {name, type}
+    })
+      .catch(wrapError)
+  }
 }
 
 module.exports = LaundryClientApi

@@ -4,8 +4,8 @@ class ValidationForm extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {initial: true, failed: false}
-    this.initialState = {}
+    this.initialState = {initial: true, failed: false, valid: {}}
+    this.state = this.initialState
     this.submitHandler = (evt) => {
       if (!this.valid) {
         evt.preventDefault()
@@ -20,7 +20,7 @@ class ValidationForm extends React.Component {
   generateValidationHandler () {
     return (name, valid) => {
       this.setState((prevState) => {
-        const valids = prevState.valid || this.initialState
+        const valids = prevState.valid
         const obj = {}
         obj[name] = valid
         return {initial: false, valid: Object.assign({}, valids, obj)}
@@ -29,7 +29,7 @@ class ValidationForm extends React.Component {
   }
 
   get valid () {
-    const valids = this.state.valid || this.initialState
+    const valids = this.state.valid
     return Object
       .keys(valids)
       .map((k) => valids[k])
@@ -37,7 +37,7 @@ class ValidationForm extends React.Component {
   }
 
   get initial () {
-    return this.state.initial
+    return this.props.initial || this.state.initial
   }
 
   get failed () {
@@ -72,6 +72,7 @@ ValidationForm.childContextTypes = {
 }
 
 ValidationForm.propTypes = {
+  initial: React.PropTypes.bool,
   onSubmit: React.PropTypes.func,
   className: React.PropTypes.string,
   id: React.PropTypes.string,

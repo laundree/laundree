@@ -9,10 +9,14 @@ class TopNav extends React.Component {
   constructor (props) {
     super(props)
     this.state = {open: false}
+    var ref
+    this.refPuller = (r) => {
+      ref = r
+    }
     this.clickListener = (event) => {
       var target = event.target
       while (target && target.classList) {
-        if (target.classList.contains('dropdown')) return
+        if (target === ref) return
         target = target.parentNode
       }
       this.setState({open: false})
@@ -41,9 +45,12 @@ class TopNav extends React.Component {
           <use xlinkHref='#SmallLogo'/>
         </svg>
       </Link>
-      <div className={'user dropdown ' + (this.state.open ? 'open' : '')}>
+      <div className='laundries'>
+        {this.props.currentLaundry ? <span>{this.props.laundries[this.props.currentLaundry].name}</span> : null}
+      </div>
+      <div className={'user dropdown ' + (this.state.open ? 'open' : '')} ref={this.refPuller}>
         <img src={this.props.user.photo} className='avatar' onClick={clickHandler}/>
-        <div className='dropdown-content'>
+        <div className='dropdown_content right'>
           <ul>
             <li>
               <Link to={'/app/accounts/' + this.props.user.id} onClick={clickHandler}>
@@ -98,7 +105,9 @@ TopNav.propTypes = {
   user: React.PropTypes.shape({
     id: React.PropTypes.string,
     photo: React.PropTypes.string
-  })
+  }),
+  currentLaundry: React.PropTypes.string,
+  laundries: React.PropTypes.object
 }
 
 module.exports = TopNav

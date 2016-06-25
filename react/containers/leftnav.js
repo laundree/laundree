@@ -3,15 +3,14 @@
  */
 
 const connect = require('react-redux').connect
-const {App} = require('../views')
+const {LeftNav} = require('../views')
 const lodash = require('lodash')
 
 const mapStateToProps = (store, {params: {id}}) => {
   return {
-    user: lodash.cloneDeep(store.users[store.currentUser]),
     laundries: lodash.cloneDeep(store.laundries),
     currentLaundry: id
   }
 }
 
-module.exports = connect(mapStateToProps)(App)
+module.exports = connect(mapStateToProps)(LeftNav)

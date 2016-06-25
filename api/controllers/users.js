@@ -49,7 +49,7 @@ function createUser (req, res) {
   UserHandler
     .findFromEmail(email)
     .then((user) => user
-      ? utils.api.returnError(res, 400, 'Email address already exists.')
+      ? utils.api.returnError(res, 409, 'Email address already exists.', {Location: user.restUrl})
       : UserHandler.createUserWithPassword(displayName, email, password)
       .then((user) => utils.api.returnSuccess(res, user.toRest())))
     .catch(utils.api.generateErrorHandler(res))

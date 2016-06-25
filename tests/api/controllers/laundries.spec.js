@@ -118,9 +118,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(400)
             .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Invalid name'})
-              done()
+              done(err)
             })
         })
       })
@@ -133,7 +131,7 @@ describe('controllers', function () {
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(400)
+            .expect(409)
             .end((err, res) => {
               if (err) return done(err)
               res.body.should.deep.equal({message: 'Laundry already exists'})

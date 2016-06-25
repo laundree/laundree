@@ -356,6 +356,10 @@ class UserHandler extends Handler {
     })
   }
 
+  get restUrl () {
+    return `/api/users/${this.model.id}`
+  }
+
   toRest () {
     return UserModel
       .populate(this.model, {path: 'tokens', model: 'Token'})
@@ -370,7 +374,7 @@ class UserHandler extends Handler {
         },
         tokens: model.authTokens.map((t) => new TokenHandler(t).toRestSummary()),
         photo: this.model.photo,
-        href: `/api/users/${this.model.id}`
+        href: this.restUrl
       }))
   }
 
@@ -378,7 +382,7 @@ class UserHandler extends Handler {
     return {
       id: this.model.id,
       displayName: this.model.displayName,
-      href: `/api/users/${this.model.id}`
+      href: this.restUrl
     }
   }
 }

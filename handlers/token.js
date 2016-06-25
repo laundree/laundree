@@ -76,6 +76,9 @@ class TokenHandler extends Handler {
     return user.model._id.equals(ownerId)
   }
 
+  get restUrl () {
+    return `/api/tokens/${this.model.id}`
+  }
   toRest () {
     const UserHandler = require('./user')
     return TokenModel.populate(this.model, {path: 'owner', model: 'User'})
@@ -83,12 +86,12 @@ class TokenHandler extends Handler {
         id: model.id,
         name: model.name,
         owner: new UserHandler(model.owner).toRestSummary(),
-        href: `/api/tokens/${model.id}`
+        href: this.restUrl
       }))
   }
 
   toRestSummary () {
-    return {id: this.model.id, name: this.model.name, href: `/api/tokens/${this.model.id}`}
+    return {id: this.model.id, name: this.model.name, href: this.restUrl}
   }
 }
 

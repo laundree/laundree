@@ -28,11 +28,10 @@ function listLaundries (req, res) {
 
 function createLaundry (req, res) {
   const name = req.swagger.params.body.value.name.trim()
-  if (name === '') return api.returnError(res, 400, 'Invalid name')
   LaundryHandler
     .find({name: name})
     .then(([laundry]) => {
-      if (laundry) return api.returnError(res, 400, 'Laundry already exists')
+      if (laundry) return api.returnError(res, 409, 'Laundry already exists', {Location: laundry.restUrl})
       return req.user.createLaundry(name)
         .then((laundry) => api.returnSuccess(res, laundry.toRest()))
     })

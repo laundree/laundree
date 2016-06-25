@@ -15,7 +15,7 @@ const {createStore} = require('redux')
 const {reducer, actions} = require('../../redux')
 const reduxActions = require('../../redux/actions')
 const {ActionProvider} = require('../../react/views/providers')
-const {UserClientApi, LaundryClientApi} = require('../api')
+const {UserClientApi, LaundryClientApi, MachineClientApi} = require('../api')
 
 function fetchStore () {
   return new Promise((resolve, reject) => {
@@ -53,6 +53,15 @@ function createLaundry (name) {
   return LaundryClientApi.createLaundry(name)
 }
 
+function createMachine (id, name, type) {
+  return new LaundryClientApi(id).createMachine(name, type)
+}
+function deleteMachine (id) {
+  return new MachineClientApi(id).deleteMachine()
+}
+function updateMachine (id, params) {
+  return new MachineClientApi(id).updateMachine(params)
+}
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -61,7 +70,10 @@ class AppInitializer extends Initializer {
       const actions = {
         userForgotPassword,
         signUpUser,
-        createLaundry
+        createMachine,
+        createLaundry,
+        deleteMachine,
+        updateMachine
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

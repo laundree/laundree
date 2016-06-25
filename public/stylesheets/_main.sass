@@ -47,11 +47,26 @@
   -webkit-transform: $props
   transform: $props
 
+=arrow($color, $size, $direction:down)
+  border: $size solid
+  height: 0
+  width: 0
+  @if $direction == down
+    border-color: $color transparent transparent transparent
+  @if $direction == right
+    border-color: transparent $color transparent transparent
+  @if $direction == up
+    border-color: transparent transparent $color transparent
+  @if $direction == left
+    border-color: transparent transparent transparent $color
+
 @function logo_ratio_w_to_h($width)
   @return 105.7 / 184 * $width
 
-html, body
+html
   height: 100%
+body
+  min-height: 100%
 
 $footer_height: 20em
 $max_page_width: 70em
@@ -60,26 +75,32 @@ $max_page_width: 70em
   position: relative
 
   &.open
-    > .dropdown-content
+    > .dropdown_content
       display: block
 
-  > .dropdown-content
+  > .dropdown_content
     position: absolute
     width: 10em
-    right: 0.5em
+    &.right
+      right: 0.5em
+      &:before
+        right: 1em
+    &.left
+      left: 0.5em
+      &:before
+        left: 1em
     top: 100%
     z-index: 100
     background-color: #FFFFFF
     padding: 1em
     +border-radius(0.2em)
-    box-shadow: 0 0 0.2em #000
+    box-shadow: 0 0 0.2em #545454
     display: none
 
     &:before
       content: ""
       position: absolute
       top: -0.9em
-      right: 1em
       z-index: 101
       height: 0
       width: 0
@@ -103,7 +124,7 @@ body
   position: relative
 
 #AppRoot
-  height: 100%
+  min-height: 100%
   > div:not(.no_footer)
     min-height: 100%
     position: relative
@@ -124,13 +145,15 @@ label
     transition: 0.2s box-shadow
 
   &:before
-    color: #ff0000
-    content: attr(data-validate-error)
+    content: attr(data-default-label)
+    opacity: 0
     line-height: 1em
     position: absolute
     top: 0.5em
-    opacity: 0
-    transition: 0.4s opacity
+    +transition(0.4s opacity)
+  &.has_label:before
+    opacity: 1
+    +transition(0.4s color)
 
   &.invalid:not(.initial)
     input:not(:focus)
@@ -138,7 +161,9 @@ label
 
 form.failed
   label.invalid:before
+    content: attr(data-validate-error)
     opacity: 1
+    color: #ff0000
 
   input[type=checkbox]
     margin-right: 1em
@@ -201,6 +226,15 @@ div#Container
   position: relative
   height: 4em
   background-color: #E55564
+
+  .laundries
+    float: left
+    line-height: 2em
+    padding: 1em 2em
+    color: #fff
+    font-family: 'Roboto Condensed', sans-serif
+    span
+      font-size: 1.5em
 
   a.home
     background-color: #E5954C
@@ -282,9 +316,8 @@ div#Container
       +border-radius(0.2em)
       cursor: pointer
       background-color: #ffffff
-
-    .dropdown-content:before
-      right: 1.5em
+    .dropdown_content
+      right: 1em
 
   a.log-in
     float: right
@@ -380,7 +413,17 @@ h1
   text-align: center
   padding: 1em 0
 
+h2
+  color: #ffffff
+  font-weight: 300
+  font-size: 1.2em
+  padding: 1em 0 0 0
+  font-family: 'Roboto Condensed', sans-serif
+
 main
+  &.naved
+    +transition(0.2s padding)
+    padding: 5em 0 0 17em
   position: relative
   section
     padding: 0
@@ -423,7 +466,8 @@ form
       margin-top: -1.5em
     *
       box-shadow: 0 0
-
+  p
+    padding: 1em 0
   .notion
     font-family: 'Roboto Condensed', sans-serif
     padding: 0.5em 1em
@@ -505,6 +549,8 @@ footer
         height: 16em
 
 @media only screen and (max-width: 90em)
+  main.naved
+    padding-left: 6em
   div:not(.expanded_left_nav)
     > #LeftNav
       width: 4em
@@ -570,6 +616,8 @@ footer
       overflow: hidden
 
 @media only screen and (max-width: 30em)
+  main.naved
+    padding-left: 2em
   #TopNav
     a.log-in
       margin: 0.5em

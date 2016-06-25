@@ -7,6 +7,7 @@ const {Schema} = mongoose
 
 const machineSchema = new Schema({
   name: {type: String, required: true},
+  type: {type: String, enum: ['wash', 'dry'], required: true},
   laundry: {type: Schema.Types.ObjectId, ref: 'Laundry', required: true}
 }, {timestamps: true})
 

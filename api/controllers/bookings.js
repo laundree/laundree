@@ -70,7 +70,7 @@ function createBooking (req, res) {
             ]
           })
           .then(([booking]) => {
-            if (booking) return api.returnError(res, 400, 'Machine not available')
+            if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
             return machine
               .createBooking(req.user, from, to)
               .then((machine) => api.returnSuccess(res, machine.toRest()))

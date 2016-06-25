@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.1"
+  version: "0.0.2"
   title: Laundree App
 
 host: laundree.io
@@ -355,22 +355,20 @@ paths:
           schema:
             properties:
               name:
-                type: string
-  
+                $ref: "#/definitions/name"
       responses:
         "200":
           description: Success
           schema: 
             $ref: "#/definitions/TokenWithSecret"
-        "400":
-          description: Invalid input
-          schema:
-            $ref: "#/definitions/Error"
         "403":
           description: Unauthorized
           schema:
             $ref: "#/definitions/Error"
-
+        "409":
+          description: Token conflict
+          schema:
+            $ref: "#/definitions/Error"
         default:
           description: Error
           schema:
@@ -492,14 +490,14 @@ paths:
               - name
             properties:
               name: 
-                type: string
+                $ref: "#/definitions/name"
       responses:
         "200":
           description: Success
           schema:
             $ref: "#/definitions/Laundry"
-        "400":
-          description: Invalid input
+        "409":
+          description: Conflict
           schema:
             $ref: "#/definitions/Error"
         "403":
@@ -638,9 +636,12 @@ paths:
           schema:
             required:
               - name
+              - type
             properties:
+              type:
+                $ref: "#/definitions/machineType"
               name:
-                type: string
+                $ref: "#/definitions/name"
       responses:
         "200":
           description: Success
@@ -650,12 +651,12 @@ paths:
           description: Laundry not found
           schema:
             $ref: "#/definitions/Error"
-        "400":
-          description: Invalid input
-          schema:
-            $ref: "#/definitions/Error"
         "403":
           description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        "409":
+          description: Machine conflict
           schema:
             $ref: "#/definitions/Error"
         default:
@@ -693,6 +694,45 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+    put:
+      operationId: updateMachine
+      security:
+        - userAccessToken: []
+      tags:
+        - Machines
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              type:
+                $ref: "#/definitions/machineType"
+              name:
+                $ref: "#/definitions/name"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Machine"
+        "404":
+          description: Machine not found
+          schema:
+            $ref: "#/definitions/Error"
+        "409":
+          description: Machine conflict
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+      
     delete:
       operationId: deleteMachine
       security:
@@ -829,6 +869,10 @@ paths:
             $ref: "#/definitions/Error"
         "403":
           description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        "409":
+          description: Booking conflict
           schema:
             $ref: "#/definitions/Error"
         default:
@@ -1092,8 +1136,17 @@ definitions:
     properties:
       message:
         type: string
+  machineType:
+    type: string
+    enum:
+      - wash
+      - dry
   password:
     type: string
     format: password
     pattern: ([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])
+  name:
+    type: string
+    pattern: ([^\s]+)
+
 

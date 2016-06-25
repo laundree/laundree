@@ -4,6 +4,7 @@
 const {createStore} = require('redux')
 const reducer = require('./reducer')
 const actions = require('./actions')
+const lodash = require('lodash')
 
 function dispatchFlashs (store, flashArray, type) {
   flashArray
@@ -24,12 +25,17 @@ function createInitialStore (currentUser, successFlash = [], errorFlash = []) {
   dispatchFlashs(store, errorFlash, 'error')
   if (!currentUser) return Promise.resolve(store)
   store.dispatch(actions.signInUser(currentUser))
-  return currentUser.fetchLaundries().then((laundries) => {
-    laundries = laundries.filter((l) => l)
-    if (!laundries.length) return store
-    store.dispatch(actions.listLaundries(laundries))
-    return store
-  })
+  return currentUser.fetchLaundries()
+    .then((laundries) => Promise.all(laundries.map((laundry) => laundry.fetchMachines()))
+      .then((machines) => ({laundries, machines: lodash.flatten(machines)})))
+    .then(({laundries, machines}) => {
+      laundries = laundries.filter((l) => l)
+      machines = machines.filter((m) => m)
+      if (!laundries.length) return store
+      store.dispatch(actions.listLaundries(laundries))
+      store.dispatch(actions.listMachines(machines))
+      return store
+    })
 }
 
 module.exports = {

@@ -31,6 +31,7 @@ class LaundryHandler extends Handler {
   static removeListener () {
     return Handler._removeListener(pubStaticEmitter, arguments)
   }
+
   /**
    * Find an handler from given id.
    * @param id
@@ -63,6 +64,7 @@ class LaundryHandler extends Handler {
   emitEvent (event) {
     return this._emitEvent(subStaticEmitter, event)
   }
+
   /**
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}
@@ -94,12 +96,16 @@ class LaundryHandler extends Handler {
   /**
    * Create a new machine with given name
    * @param {string} name
+   * @param {string} type
    * @return {Promise.<MachineHandler>}
    */
-  createMachine (name) {
-    return MachineHandler._createMachine(this, name).then((machine) => {
+  createMachine (name, type) {
+    return MachineHandler._createMachine(this, name, type).then((machine) => {
       this.model.machines.push(machine.model._id)
-      return this.model.save().then(() => machine)
+      return this.model.save().then(() => machine).then((machine) => {
+        this.emitEvent('update')
+        return machine
+      })
     })
   }
 
@@ -114,7 +120,22 @@ class LaundryHandler extends Handler {
         this.model.machines.pull(machine.model._id)
         return this.model.save()
       })
-      .then(() => this)
+      .then(() => {
+        this.emitEvent('update')
+        return this
+      })
+  }
+
+  fetchMachines () {
+    return LaundryModel.populate(this.model, {path: 'machines'})
+      .then(({machines}) => machines.map((l) => new MachineHandler(l)))
+  }
+
+  /**
+   * @return {string[]}
+   */
+  get machineIds () {
+    return (this.model.populated('machines') || this.model.machines).map((id) => id.toString())
   }
 
   /**
@@ -150,14 +171,18 @@ class LaundryHandler extends Handler {
     return LaundryModel.populate(this.model, {path: 'owners users'}).then((model) => ({
       name: model.name,
       id: model.id,
-      href: `/api/laundries/${this.model.id}`,
+      href: this.restUrl,
       owners: model.owners.map((m) => new UserHandler(m).toRestSummary()),
       users: model.users.map((m) => new UserHandler(m).toRestSummary())
     }))
   }
 
+  get restUrl () {
+    return `/api/laundries/${this.model.id}`
+  }
+
   toRestSummary () {
-    return {name: this.model.name, id: this.model.id, href: `/api/laundries/${this.model.id}`}
+    return {name: this.model.name, id: this.model.id, href: this.restUrl}
   }
 }
 

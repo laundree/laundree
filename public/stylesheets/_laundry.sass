@@ -1,0 +1,105 @@
+#LaundryMain
+  padding-bottom: 5em
+  h1
+    text-align: left
+  .buttons
+    .reset
+      margin-left: 1em
+      background-color: #d25f89
+  .create_machine
+    .buttons
+      float: left
+      width: 100%
+    .machine_form
+      height: 10em
+  .add_machine
+    line-height: 2em
+    padding-top: 1em
+    padding-left: 1em
+    height: 2em
+    div
+      cursor: pointer
+      float: left
+      +user-select(none)
+    svg
+      height: 1em
+      width: 1em
+      margin: 0.5em 1em 0 0
+      float: left
+      fill: #e5954c
+  .no_machines
+    font-weight: bold
+    line-height: 7em
+    border-radius: 0.2em
+    text-align: center
+    width: 32em
+    color: #489c9c
+    span
+      font-size: 0.9em
+  .machine_form
+    &.changed
+      .save
+        opacity: 1
+        svg
+          cursor: pointer
+    height: 5em
+    .action
+      float: left
+      height: 2em
+      padding: 2.5em 1em 0
+      overflow: hidden
+      svg
+        height: 2em
+        width: 2em
+    .delete
+      svg
+        cursor: pointer
+        fill: #dc3f50
+    .save
+      +transition(0.2s opacity)
+      opacity: 0
+      svg
+        fill: #23587b
+    label
+      float: left
+    .dropdown
+      float: left
+      .dropdown_content
+        top: calc(100% + 0.8em)
+        line-height: 1.5em
+        li
+          line-height: 3em
+          cursor: pointer
+          &.selected
+            color: #28aaba
+        svg
+          float: left
+          margin: 0.75em 1em 0 0
+        &:before
+          left: 1.5em
+      svg
+        width: 1.5em
+        height: 1.5em
+        fill: #28aaba
+      .currentValue
+        cursor: pointer
+        width: 2.5em
+        height: 1.5em
+        background: #fff
+        border-radius: 0.2em
+        float: left
+        margin: 2em 1em 0 0
+        position: relative
+        padding: 0.75em 1em
+        svg
+          float: right
+        &:before
+          content: ''
+          position: absolute
+          top: 1.4em
+          left: 0.75em
+          +arrow(#28aaba, 0.4em)
+
+  ul.machine_list
+    list-style-type: none
+    padding-bottom: 2em
