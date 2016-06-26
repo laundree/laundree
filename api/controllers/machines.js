@@ -41,7 +41,7 @@ function createMachine (req, res) {
       if (!laundry || !laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
       if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
       return MachineHandler
-        .find({name: name})
+        .find({name: name, laundry: laundry.model._id})
         .then(([machine]) => {
           if (machine) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
           return laundry.createMachine(name, type)
@@ -95,7 +95,7 @@ function updateMachine (req, res) {
         .then(({machine, laundry}) => {
           if (!laundry || !laundry.isUser(req.user)) return api.returnError(res, 404, 'Machine not found')
           if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
-          return MachineHandler.find({name}).then(([m]) => {
+          return MachineHandler.find({name, laundry: laundry.model._id}).then(([m]) => {
             if (m && m.model.id !== machine.model.id) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
             machine.update({name, type}).then(() => api.returnSuccess(res, machine.toRest()))
           })
