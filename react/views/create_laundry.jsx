@@ -38,7 +38,7 @@ class CreateLaundry extends ValueUpdater {
   static errorToNotion (err) {
     var message
     switch (err.status) {
-      case 400:
+      case 409:
         message = 'A laundry by that name already exists'
         break
       case 500:

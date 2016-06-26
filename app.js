@@ -1,16 +1,18 @@
 require('babel-register')
-var express = require('express')
-var path = require('path')
-var favicon = require('serve-favicon')
-var cookieParser = require('cookie-parser')
-var bodyParser = require('body-parser')
-var flash = require('connect-flash')
-const {logError} = require('./utils/error')
-var routes = require('./routes')
-var setups = require('./lib')
 
-var app = express()
-var hbs = require('hbs')
+const express = require('express')
+const path = require('path')
+const favicon = require('serve-favicon')
+const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
+const flash = require('connect-flash')
+const {logError} = require('./utils/error')
+const routes = require('./routes')
+const setups = require('./lib')
+const config = require('config')
+const app = express()
+const hbs = require('hbs')
+
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'))
 // view engine setup
 app.set('views', path.join(__dirname, 'views'))
@@ -31,6 +33,7 @@ app.use(cookieParser())
 app.use(require('node-sass-middleware')({
   src: path.join(__dirname, 'public'),
   dest: path.join(__dirname, 'public'),
+  outputStyle: config.get('sass.outputStyle'),
   indentedSyntax: true,
   sourceMap: true
 }))
