@@ -16,6 +16,9 @@ logging:
   error:
     enabled: true
 
+sass:
+  outputStyle: 'extended'
+
 mongo:
   url: 'mongodb://localhost/laundree'
 
