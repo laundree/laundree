@@ -27,9 +27,9 @@ function fetchStore () {
       if (store) return store.dispatch(action)
       actions.push(action)
     })
-    nsp.on('init', (state) => {
-      if (store) return
-      store = createStore(reducer, state)
+    nsp.on('init', (events) => {
+      if (!store) store = createStore(reducer)
+      events.forEach((event) => store.dispatch(event))
       resolve(store)
       actions.forEach((action) => store.dispatch(action))
     })

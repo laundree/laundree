@@ -6,10 +6,10 @@ const reducer = require('./reducer')
 const actions = require('./actions')
 const lodash = require('lodash')
 
-function dispatchFlashs (store, flashArray, type) {
-  flashArray
+function mapFlash (flashArray, type) {
+  return flashArray
     .map((message) => ({type: type, message: message}))
-    .forEach((flash) => store.dispatch(actions.flash(flash)))
+    .map((flash) => actions.flash(flash))
 }
 
 /**
@@ -19,25 +19,34 @@ function dispatchFlashs (store, flashArray, type) {
  * @param {Array=} errorFlash
  * @return {Promise}
  */
-function createInitialStore (currentUser, successFlash = [], errorFlash = []) {
-  const store = createStore(reducer)
-  dispatchFlashs(store, successFlash, 'success')
-  dispatchFlashs(store, errorFlash, 'error')
-  if (!currentUser) return Promise.resolve(store)
-  store.dispatch(actions.signInUser(currentUser))
+function createInitialEvents (currentUser, successFlash = [], errorFlash = []) {
+  var events = mapFlash(successFlash, 'success')
+  events = events.concat(mapFlash(errorFlash, 'error'))
+  if (!currentUser) return Promise.resolve(events)
+  events.push(actions.signInUser(currentUser))
+
   return currentUser.fetchLaundries()
     .then((laundries) => Promise.all(laundries.map((laundry) => laundry.fetchMachines()))
       .then((machines) => ({laundries, machines: lodash.flatten(machines)})))
     .then(({laundries, machines}) => {
       laundries = laundries.filter((l) => l)
       machines = machines.filter((m) => m)
-      if (!laundries.length) return store
-      store.dispatch(actions.listLaundries(laundries))
-      store.dispatch(actions.listMachines(machines))
+      if (!laundries.length) return events
+      events.push(actions.listLaundries(laundries))
+      events.push(actions.listMachines(machines))
+      return events
+    })
+}
+
+function createInitialStore (currentUser, successFlash = [], errorFlash = []) {
+  return createInitialEvents(currentUser, successFlash, errorFlash)
+    .then((events) => {
+      const store = createStore(reducer)
+      events.forEach((event) => store.dispatch(event))
       return store
     })
 }
 
 module.exports = {
-  createInitialStore, actions, reducer
+  createInitialStore, createInitialEvents, actions, reducer
 }
