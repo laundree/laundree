@@ -2,7 +2,6 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const Footer = require('./footer.jsx')
 
 const Auth = ({children}) => <div>
   <main>
@@ -10,7 +9,6 @@ const Auth = ({children}) => <div>
       {children}
     </section>
   </main>
-  <Footer />
 </div>
 
 Auth.propTypes = {
