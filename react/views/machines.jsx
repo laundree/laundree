@@ -84,7 +84,7 @@ class MachineListItem extends React.Component {
 
     this.onSelect = (selected) => {
       if (this.props.machine) this.props.onUpdate({type: selected})
-      this.setState({selected, initial: false})
+      this.setState({selected})
     }
 
     this.onChange = (evt) => this.setState({value: evt.target.value, initial: false})
