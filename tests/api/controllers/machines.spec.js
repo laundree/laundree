@@ -231,6 +231,25 @@ describe('controllers', function () {
             })
         })
       })
+      it('should succeed on existing name in another laundry', (done) => {
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [l1, l2]}) => {
+          return Promise.all([l1.createMachine('m1', 'wash'), l2.createMachine('m2', 'wash')])
+            .then(([m1, m2]) => {
+              request(app)
+                .post(`/api/laundries/${l1.model.id}/machines`)
+                .send({name: m2.model.name, type: 'wash'})
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
+                .auth(user.model.id, token.secret)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                  done(err)
+                })
+            })
+        }).catch(done)
+      })
+
       it('should succeed', (done) => {
         dbUtils.populateMachines(1).then(({user, token, laundry, machines}) => {
           request(app)
@@ -354,7 +373,7 @@ describe('controllers', function () {
         })
       })
       it('should fail on existing name', (done) => {
-        dbUtils.populateMachines(2).then(({user, token, laundry, machines: [m1, m2]}) => {
+        dbUtils.populateMachines(2).then(({user, token, machines: [m1, m2]}) => {
           request(app)
             .put(`/api/machines/${m1.model.id}`)
             .send({name: m2.model.name, type: 'wash'})
@@ -369,6 +388,24 @@ describe('controllers', function () {
               done()
             })
         })
+      })
+      it('should succeed on existing name in another laundry', (done) => {
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [l1, l2]}) => {
+          return Promise.all([l1.createMachine('m1', 'wash'), l2.createMachine('m2', 'wash')])
+            .then(([m1, m2]) => {
+              request(app)
+                .put(`/api/machines/${m1.model.id}`)
+                .send({name: m2.model.name, type: 'wash'})
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
+                .auth(user.model.id, token.secret)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                  done(err)
+                })
+            })
+        }).catch(done)
       })
       it('should succeed', (done) => {
         dbUtils.populateMachines(1).then(({user, token, machine}) => {
