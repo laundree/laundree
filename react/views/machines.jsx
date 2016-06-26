@@ -81,29 +81,31 @@ class MachineListItem extends React.Component {
   constructor (props) {
     super(props)
     this.state = this.initialState
-    this.onSelect = (selected) => this.setState({selected, initial: false})
+
+    this.onSelect = (selected) => {
+      if (this.props.machine) this.props.onUpdate({type: selected})
+      this.setState({selected, initial: false})
+    }
+
     this.onChange = (evt) => this.setState({value: evt.target.value, initial: false})
+
     this.onSubmit = (evt) => {
       evt.preventDefault()
-      if (!this.props.onSubmit) return this.onUpdate()
-      this.setState({loading: true})
+      if (this.props.machine) return this.onUpdateName()
       this.props
         .onSubmit(this.selected, this.value)
-        .then(() => this.setState(this.initialState), this.setState({loading: false}))
+        .then(() => this.setState(this.initialState))
     }
-    this.onUpdate = () => {
-      if (!this.changed || !this.props.onUpdate) return
-      this.setState({loading: true})
-      this.props.onUpdate({
-        name: this.state.value,
-        type: this.state.selected
-      }).then(() => this.setState({loading: false}))
+
+    this.onUpdateName = () => {
+      if (!this.props.machine || !this.changed) return
+      this.props.onUpdate({name: this.state.value})
     }
   }
 
   get initialState () {
-    if (!this.props.machine) return {value: '', selected: 'wash', initial: true, loading: false}
-    return {value: this.props.machine.name, selected: this.props.machine.type, initial: true, loading: false}
+    if (!this.props.machine) return {value: '', selected: 'wash', initial: true}
+    return {value: this.props.machine.name, selected: this.props.machine.type, initial: true}
   }
 
   get selected () {
@@ -117,18 +119,19 @@ class MachineListItem extends React.Component {
 
   get changed () {
     if (!this.props.machine) return false
-    return this.props.machine.name !== this.state.value.trim() || this.props.machine.type !== this.state.selected
+    return this.props.machine.name !== this.state.value.trim()
   }
 
   render () {
     return <ValidationForm
-      className={'machine_form' + (this.changed ? ' changed' : '') + (this.state.loading ? ' blur' : '')}
+      className='machine_form'
       onSubmit={this.onSubmit}
       initial={this.state.initial}>
       <Dropdown selected={this.selected} onSelect={this.onSelect}/>
       <ValidationElement nonEmpty value={this.value} initial={this.state.initial}>
         <label data-validate-error='Please enter a unique machine name'>
           <input
+            onBlur={this.onUpdateName}
             type='text'
             placeholder={this.selected === 'wash' ? 'Washing machine name' : 'Dryer name'}
             value={this.value} onChange={this.onChange}/>
@@ -142,13 +145,6 @@ class MachineListItem extends React.Component {
       </div>
         : null
       }
-      {this.props.machine
-        ? <div className='save action'>
-        <svg onClick={this.onUpdate}>
-          <use xlinkHref='#Save'/>
-        </svg>
-      </div>
-        : null}
       {this.props.children}
     </ValidationForm>
   }
