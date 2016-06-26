@@ -103,6 +103,11 @@ class MachineListItem extends React.Component {
     }
   }
 
+  componentWillReceiveProps ({machine}) {
+    if (!machine) return
+    this.setState({value: machine.name, selected: machine.type})
+  }
+
   get initialState () {
     if (!this.props.machine) return {value: '', selected: 'wash', initial: true}
     return {value: this.props.machine.name, selected: this.props.machine.type, initial: true}
