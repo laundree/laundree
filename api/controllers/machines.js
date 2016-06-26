@@ -84,7 +84,7 @@ function deleteMachine (req, res) {
 
 function updateMachine (req, res) {
   const body = req.swagger.params.body.value
-  const name = body.name.trim()
+  const name = body.name ? body.name.trim() : undefined
   const type = body.type
   const id = req.swagger.params.id.value
   MachineHandler.findFromId(id)
