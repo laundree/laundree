@@ -33,16 +33,11 @@
     line-height: 7em
     border-radius: 0.2em
     text-align: center
-    width: 32em
+    max-width: 32.5em
     color: #489c9c
     span
       font-size: 0.9em
   .machine_form
-    &.changed
-      .save
-        opacity: 1
-        svg
-          cursor: pointer
     height: 5em
     .action
       float: left
@@ -100,3 +95,22 @@
   ul.machine_list
     list-style-type: none
     padding-bottom: 2em
+
+@media only screen and (max-width: 45em)
+  #LaundryMain
+    .no_machines
+      max-width: 26.5em
+    .machine_form
+      label
+        input
+          width: 15em
+@media only screen and (max-width: 30em)
+  #LaundryMain
+    .no_machines
+      max-width: 23em
+    .machine_form
+      label
+        input
+          width: 12.5em
+      .action:last-of-type
+        padding-right: 0

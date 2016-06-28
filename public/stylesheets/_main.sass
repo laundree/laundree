@@ -32,6 +32,11 @@
   -ms-user-select: $prop
   user-select: $prop
 
+=box-shadow($prop...)
+  -webkit-box-shadow: $prop
+  -moz-box-shadow: $prop
+  box-shadow: $prop
+
 =keyframes($name)
   @-webkit-keyframes #{$name}
     @content
@@ -65,6 +70,7 @@
 
 html
   height: 100%
+
 body
   min-height: 100%
 
@@ -94,7 +100,7 @@ $max_page_width: 70em
     background-color: #FFFFFF
     padding: 1em
     +border-radius(0.2em)
-    box-shadow: 0 0 0.2em #545454
+    +box-shadow(0 0 0.2em #545454)
     display: none
 
     &:before
@@ -120,7 +126,7 @@ body
   font-weight: 300
   color: #03414C
   background: #66D3D3
-  min-width: 20em
+  min-width: 23em
   position: relative
 
 #AppRoot
@@ -156,9 +162,9 @@ label
 
   &.invalid:not(.initial)
     input:not(:focus)
-      box-shadow: 0 0 0 0.1em #f00
+      +box-shadow(0 0 0 0.1em #f00)
 
-form.failed
+form.failed:not(.initial)
   label.invalid:before
     content: attr(data-validate-error)
     opacity: 1
@@ -171,7 +177,7 @@ input, button
   +border-radius(0.2em)
   &:focus
     outline: 0
-    box-shadow: 0 0 0 0.1em #2c829d
+    +box-shadow(0 0 0 0.1em #2c829d)
 
 input[type=text], input[type=password]
   display: block
@@ -181,7 +187,7 @@ input[type=text], input[type=password]
     weight: 300
 
 =inactive_button_style()
-  box-shadow: 0 0 0
+  +box-shadow(0 0 0)
   background-color: #d1d1d1
   color: #e2e2e2
 
@@ -423,7 +429,6 @@ main
   &.naved
     +transition(0.2s padding)
     padding: 5em 0 0 17em
-  position: relative
   section
     padding: 0
   section:first-of-type
@@ -464,14 +469,14 @@ form
       margin-left: -1.5em
       margin-top: -1.5em
     *
-      box-shadow: 0 0
+      +box-shadow(0 0 0)
   p
     padding: 1em 0
   .notion
     font-family: 'Roboto Condensed', sans-serif
     padding: 0.5em 1em
     background-color: #CC8D3C
-    box-shadow: 0 0 0.2em #585858
+    +box-shadow(0 0 0.2em #585858)
     color: #fff
     +border-radius(0.1em)
     text-align: center
@@ -593,7 +598,7 @@ footer
           font-family: 'Roboto Condensed', sans-serif
           line-height: 1.5em
           width: 8em
-          box-shadow: 0 0 0.1em #000
+          +box-shadow( 0 0 0.1em #000)
           text-align: center
           opacity: 0
 
@@ -602,6 +607,47 @@ footer
 
   #MenuExpander
     z-index: 21
+
+.confirmation_container
+  position: fixed
+  z-index: 1000
+  top: 0
+  bottom: 0
+  left: 0
+  padding-top: 20%
+  right: 0
+  background-color: rgba(255, 255, 255, 0.5)
+  .confirmation_overlay
+    z-index: 1001
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 0
+    right: 0
+  .confirmation_box
+    +animation(fadeIn 0.2s ease-in)
+    position: relative
+    z-index: 1002
+    margin: auto
+    max-width: 23em
+    padding: 2em
+    background-color: #ffffff
+    +box-shadow(0 0 1em #000)
+
+    .message
+      text-align: center
+    > ul
+      padding-top: 2em
+      list-style-type: none
+      margin: auto
+      text-align: center
+      li
+        padding-right: 1em
+        display: inline-block
+        &:last-of-type
+          padding-right: 0
+        .delete
+          background-color: #e55564
 
 @media only screen and (max-width: 45em)
   #TopNav
@@ -629,6 +675,17 @@ footer
 
   #RightContent
     margin-left: 0
+
+@media only screen and (max-width: 25em)
+  main.naved
+    padding-left: 0
+
++keyframes(fadeInWithShadow)
+  0%
+    opacity: 0
+
+  100%
+    opacity: 1
 
 +keyframes(fadeIn)
   0%
