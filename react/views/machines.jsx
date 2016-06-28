@@ -1,6 +1,7 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
+const Modal = require('./modal.jsx')
 
 class Dropdown extends React.Component {
 
@@ -101,6 +102,15 @@ class MachineListItem extends React.Component {
       if (!this.props.machine || !this.changed) return
       this.props.onUpdate({name: this.state.value})
     }
+
+    this.onCloseModal = () => this.setState({showModal: false})
+
+    this.onDelete = () => this.setState({showModal: true})
+
+    this.onDeleteModal = () => {
+      this.onCloseModal()
+      this.props.onDelete()
+    }
   }
 
   componentWillReceiveProps ({machine}) {
@@ -128,30 +138,39 @@ class MachineListItem extends React.Component {
   }
 
   render () {
-    return <ValidationForm
-      className='machine_form'
-      onSubmit={this.onSubmit}
-      initial={this.state.initial}>
-      <Dropdown selected={this.selected} onSelect={this.onSelect}/>
-      <ValidationElement nonEmpty value={this.value} initial={this.state.initial}>
-        <label data-validate-error='Please enter a unique machine name'>
-          <input
-            onBlur={this.onUpdateName}
-            type='text'
-            placeholder={this.selected === 'wash' ? 'Washing machine name' : 'Dryer name'}
-            value={this.value} onChange={this.onChange}/>
-        </label>
-      </ValidationElement>
-      {this.props.onDelete
-        ? <div className='delete action'>
-        <svg onClick={this.props.onDelete}>
-          <use xlinkHref='#Trash'/>
-        </svg>
-      </div>
-        : null
-      }
-      {this.props.children}
-    </ValidationForm>
+    return <div>
+      <Modal
+        show={this.state.showModal}
+        message='Are you sure that you want to delete this machine?'
+        onClose={this.onCloseModal}
+        actions={[
+          {label: 'Delete', className: 'delete', action: this.onDeleteModal},
+          {label: 'Cancel', className: 'cancel', action: this.onCloseModal}]}
+      />
+      <ValidationForm
+        className='machine_form'
+        onSubmit={this.onSubmit}
+        initial={this.state.initial}>
+        <Dropdown selected={this.selected} onSelect={this.onSelect}/>
+        <ValidationElement nonEmpty value={this.value} initial={this.state.initial}>
+          <label data-validate-error='Please enter a unique machine name'>
+            <input
+              onBlur={this.onUpdateName}
+              type='text'
+              placeholder={this.selected === 'wash' ? 'Washing machine name' : 'Dryer name'}
+              value={this.value} onChange={this.onChange}/>
+          </label>
+        </ValidationElement>
+        {this.props.onDelete
+          ? <div className='delete action'>
+          <svg onClick={this.onDelete}>
+            <use xlinkHref='#Trash'/>
+          </svg>
+        </div>
+          : null
+        }
+        {this.props.children}
+      </ValidationForm></div>
   }
 }
 
