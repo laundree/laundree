@@ -215,7 +215,9 @@ class Machines extends React.Component {
   render () {
     const laundry = this.props.laundries[this.props.currentLaundry]
     const blacklist = laundry.machines
-      .map((id) => this.props.machines[id].name)
+      .map((id) => this.props.machines[id])
+      .filter((m) => m)
+      .map((m) => m.name)
     return <DocumentTitle title='Machines'>
       <main className='naved' id='LaundryMain'>
         <h1>Machines</h1>
