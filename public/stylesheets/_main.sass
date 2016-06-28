@@ -164,7 +164,7 @@ label
     input:not(:focus)
       +box-shadow(0 0 0 0.1em #f00)
 
-form.failed
+form.failed:not(.initial)
   label.invalid:before
     content: attr(data-validate-error)
     opacity: 1

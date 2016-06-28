@@ -99,7 +99,7 @@ class MachineListItem extends React.Component {
     }
 
     this.onUpdateName = () => {
-      if (!this.props.machine || !this.changed) return
+      if (!this.props.machine || !this.changed || this.blacklist.indexOf(this.state.value.trim()) >= 0) return
       this.props.onUpdate({name: this.state.value})
     }
 
@@ -137,6 +137,12 @@ class MachineListItem extends React.Component {
     return this.props.machine.name !== this.state.value.trim()
   }
 
+  get blacklist () {
+    var blacklist = this.props.blacklist
+    if (this.props.machine) blacklist = blacklist.filter((name) => name !== this.props.machine.name)
+    return blacklist.concat([''])
+  }
+
   render () {
     return <div>
       <Modal
@@ -152,7 +158,10 @@ class MachineListItem extends React.Component {
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
         <Dropdown selected={this.selected} onSelect={this.onSelect}/>
-        <ValidationElement nonEmpty value={this.value} initial={this.state.initial}>
+        <ValidationElement
+          trim
+          notOneOf={this.blacklist}
+          value={this.value} initial={this.state.initial}>
           <label data-validate-error='Please enter a unique machine name'>
             <input
               onBlur={this.onUpdateName}
@@ -179,7 +188,8 @@ MachineListItem.propTypes = {
   onDelete: React.PropTypes.func,
   onUpdate: React.PropTypes.func,
   children: React.PropTypes.any,
-  machine: React.PropTypes.object
+  machine: React.PropTypes.object,
+  blacklist: React.PropTypes.array
 }
 
 class Machines extends React.Component {
@@ -204,6 +214,8 @@ class Machines extends React.Component {
 
   render () {
     const laundry = this.props.laundries[this.props.currentLaundry]
+    const blacklist = laundry.machines
+      .map((id) => this.props.machines[id].name)
     return <DocumentTitle title='Machines'>
       <main className='naved' id='LaundryMain'>
         <h1>Machines</h1>
@@ -211,6 +223,7 @@ class Machines extends React.Component {
           ? <ul className='machine_list'>
           {laundry.machines.map((machineId) => <li key={machineId}>
             <MachineListItem
+              blacklist={blacklist}
               machine={this.props.machines[machineId]}
               onUpdate={this.generateUpdater(machineId)}
               onDelete={this.generateDeleter(machineId)}/>
@@ -219,7 +232,9 @@ class Machines extends React.Component {
           : <div className='no_machines'><span>There are no machines registered to this laundry</span></div>}
         <div className='create_machine'>
           <h2>Create machine</h2>
-          <MachineListItem onSubmit={this.creator}>
+          <MachineListItem
+            blacklist={blacklist}
+            onSubmit={this.creator}>
             <div className='buttons'>
               <input type='submit' value='Create'/>
             </div>
