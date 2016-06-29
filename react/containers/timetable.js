@@ -5,8 +5,8 @@
 const connect = require('react-redux').connect
 const Timetable = require('../views').Timetable
 
-const mapStateToProps = (store, {params: {id}}) => {
-  return {laundry: store.laundries[id]}
+const mapStateToProps = ({laundries, machines}, {params: {id}}) => {
+  return {laundry: laundries[id], machines}
 }
 
 module.exports = connect(mapStateToProps)(Timetable)
