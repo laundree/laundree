@@ -1,65 +1,135 @@
 /**
  * Created by budde on 28/05/16.
  */
-var TimetableTable = require('./timetable_table.jsx')
-var React = require('react')
+
+const React = require('react')
+const lodash = require('lodash')
+
+function maxMin (value, max, min) {
+  return Math.max(Math.min(value, max), min)
+}
+
+class TimetableTable extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = this._calcPosition()
+  }
+
+  _row (key) {
+    return <tr key={key}>{this.props.laundry.machines.map((id) => this.props.machines[id]).map((m) => <td
+      key={m.id}/>)}</tr>
+  }
+
+  componentDidMount () {
+    this.interval = setInterval(() => this.tick(), 1000)
+  }
+
+  componentWillUnmount () {
+    clearInterval(this.interval)
+  }
+
+  tick () {
+    this.setState(this._calcPosition())
+  }
+
+  _calcPosition () {
+    // TODO Check daylight saving time
+    const now = new Date()
+    const diff = now.getTime() - this.props.date.getTime()
+    const percent = diff / (24 * 60 * 60 * 1000)
+    const offLimitsPosition = percent + (10 / (60 * 24))
+    return {nowPosition: percent * 100, offLimitsPosition: maxMin(offLimitsPosition, 1, 0) * 100}
+  }
+
+  render () {
+    var now = new Date()
+    var hours = now.getHours()
+    var minutes = now.getMinutes()
+    var time = hours.toString() + ':' + (minutes < 10 ? '0' + minutes.toString() : minutes.toString())
+    return <div className='overlay_container'>
+      <div className='overlay'>
+        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}></div>
+        {this.state.nowPosition > 0 && this.state.nowPosition < 100
+          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}></div> : ''}
+      </div>
+      <table>
+        <tbody>
+        {lodash.range(48).map((key) => this._row(key))}
+        </tbody>
+      </table>
+    </div>
+  }
+}
+
+TimetableTable.propTypes = {
+  machines: React.PropTypes.object.isRequired,
+  laundry: React.PropTypes.object.isRequired,
+  date: React.PropTypes.instanceOf(Date).isRequired
+}
+
 const TimetableTables = (props) => <section id='TimeTable'>
-  <ul className='times'>
-    <li>1</li>
-    <li>2</li>
-    <li>3</li>
-    <li>4</li>
-    <li>5</li>
-    <li>6</li>
-    <li>7</li>
-    <li>8</li>
-    <li>9</li>
-    <li>10</li>
-    <li>11</li>
-    <li>12</li>
-    <li>13</li>
-    <li>14</li>
-    <li>15</li>
-    <li>16</li>
-    <li>17</li>
-    <li>18</li>
-    <li>19</li>
-    <li>20</li>
-    <li>21</li>
-    <li>22</li>
-    <li>23</li>
-  </ul>
-  {props.dates.map((date) => <TimetableTable date={date} machines={props.machines} key={date} />)}
-  <ul className='times'>
-    <li>1</li>
-    <li>2</li>
-    <li>3</li>
-    <li>4</li>
-    <li>5</li>
-    <li>6</li>
-    <li>7</li>
-    <li>8</li>
-    <li>9</li>
-    <li>10</li>
-    <li>11</li>
-    <li>12</li>
-    <li>13</li>
-    <li>14</li>
-    <li>15</li>
-    <li>16</li>
-    <li>17</li>
-    <li>18</li>
-    <li>19</li>
-    <li>20</li>
-    <li>21</li>
-    <li>22</li>
-    <li>23</li>
-  </ul>
+  <div className='timetable_container'>
+    <ul className='times'>
+      <li><span>1</span></li>
+      <li><span>2</span></li>
+      <li><span>3</span></li>
+      <li><span>4</span></li>
+      <li><span>5</span></li>
+      <li><span>6</span></li>
+      <li><span>7</span></li>
+      <li><span>8</span></li>
+      <li><span>9</span></li>
+      <li><span>10</span></li>
+      <li><span>11</span></li>
+      <li><span>12</span></li>
+      <li><span>13</span></li>
+      <li><span>14</span></li>
+      <li><span>15</span></li>
+      <li><span>16</span></li>
+      <li><span>17</span></li>
+      <li><span>18</span></li>
+      <li><span>19</span></li>
+      <li><span>20</span></li>
+      <li><span>21</span></li>
+      <li><span>22</span></li>
+      <li><span>23</span></li>
+    </ul>
+    {props.dates.map((date) => <TimetableTable
+      date={date} machines={props.machines} laundry={props.laundry}
+      key={date}/>)}
+    <ul className='times'>
+      <li><span>1</span></li>
+      <li><span>2</span></li>
+      <li><span>3</span></li>
+      <li><span>4</span></li>
+      <li><span>5</span></li>
+      <li><span>6</span></li>
+      <li><span>7</span></li>
+      <li><span>8</span></li>
+      <li><span>9</span></li>
+      <li><span>10</span></li>
+      <li><span>11</span></li>
+      <li><span>12</span></li>
+      <li><span>13</span></li>
+      <li><span>14</span></li>
+      <li><span>15</span></li>
+      <li><span>16</span></li>
+      <li><span>17</span></li>
+      <li><span>18</span></li>
+      <li><span>19</span></li>
+      <li><span>20</span></li>
+      <li><span>21</span></li>
+      <li><span>22</span></li>
+      <li><span>23</span></li>
+    </ul>
+  </div>
 </section>
 
 TimetableTables.propTypes = {
   dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
-  machines: React.PropTypes.arrayOf(React.PropTypes.object).isRequired
+  laundry: React.PropTypes.object.isRequired,
+  machines: React.PropTypes.object.isRequired
 }
 
 module.exports = TimetableTables
