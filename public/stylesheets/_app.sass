@@ -138,12 +138,12 @@ main#TimeTableMain
               height: 0
               width: 0
               opacity: 0
-              top: -0.4em
-              right: -1em
+              top: -0.8em
+              right: calc(50% - 0.5em)
               border:
                 width: 0.5em
                 style: solid
-                color: transparent $color transparent transparent
+                color: $color transparent transparent transparent
 
             &:after
               opacity: 0
@@ -153,11 +153,11 @@ main#TimeTableMain
               background: $color
               padding: 0.5em
               position: absolute
-              right: -5em
+              right: calc(50% - 2em)
               +border-radius(0.2em)
               color: #fff
               display: block
-              top: -1.15em
+              top: -3.3em
               font-family: 'Roboto Condensed', sans-serif
               line-height: 1.5em
               width: 3em
@@ -179,6 +179,9 @@ main#TimeTableMain
           border-spacing: 0
           float: left
           tr
+            &.too_late
+              td
+                background-color: #60ccc9
             &:first-of-type
               td
                 border-top: 0
@@ -186,7 +189,9 @@ main#TimeTableMain
               td
                 border-bottom: 0
             td
+              +transition(0.2s background-color)
               +user-select(none)
+              position: relative
               height: 3em
               background-color: #4DC4C1
               border: 0.1em solid #7DD8D5

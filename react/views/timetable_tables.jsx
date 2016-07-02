@@ -16,9 +16,17 @@ class TimetableTable extends React.Component {
     this.state = this._calcPosition()
   }
 
-  _row (key) {
-    return <tr key={key}>{this.props.laundry.machines.map((id) => this.props.machines[id]).map((m) => <td
-      key={m.id}/>)}</tr>
+  _row (key, now) {
+    var tooLate = false
+    if (now) {
+      now = new Date(now.getTime() + 10 * 60 * 1000)
+      tooLate = now ? now.getHours() + (now.getMinutes() / 60) >= key / 2 : false
+    }
+    return <tr
+      key={key}
+      className={tooLate ? 'too_late' : ''}>
+      {this.props.laundry.machines.map((id) => this.props.machines[id]).map((m) => <td key={m.id}/>)}
+    </tr>
   }
 
   componentDidMount () {
@@ -43,10 +51,11 @@ class TimetableTable extends React.Component {
   }
 
   render () {
-    var now = new Date()
-    var hours = now.getHours()
-    var minutes = now.getMinutes()
-    var time = hours.toString() + ':' + (minutes < 10 ? '0' + minutes.toString() : minutes.toString())
+    const now = new Date()
+    const hours = now.getHours()
+    const minutes = now.getMinutes()
+    const time = hours.toString() + ':' + (minutes < 10 ? '0' + minutes.toString() : minutes.toString())
+    const today = new Date(now.getTime()).setHours(0, 0, 0, 0) === this.props.date.getTime()
     return <div className='overlay_container'>
       <div className='overlay'>
         <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}></div>
@@ -55,7 +64,7 @@ class TimetableTable extends React.Component {
       </div>
       <table>
         <tbody>
-        {lodash.range(48).map((key) => this._row(key))}
+        {lodash.range(48).map((key) => this._row(key, today ? now : undefined))}
         </tbody>
       </table>
     </div>
