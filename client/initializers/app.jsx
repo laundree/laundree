@@ -49,6 +49,10 @@ function userForgotPassword (email) {
   })
 }
 
+function userResetPassword (userId, token, newPassword) {
+  return new UserClientApi(userId).resetPassword(token, newPassword)
+}
+
 function createLaundry (name) {
   return LaundryClientApi.createLaundry(name)
 }
@@ -73,7 +77,8 @@ class AppInitializer extends Initializer {
         createMachine,
         createLaundry,
         deleteMachine,
-        updateMachine
+        updateMachine,
+        userResetPassword
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

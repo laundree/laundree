@@ -13,7 +13,7 @@ class TimetableTable extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = this._calcPosition()
+    this.state = Object.assign({bookings: {}}, this._calcPosition())
   }
 
   _row (key, now) {
@@ -25,16 +25,22 @@ class TimetableTable extends React.Component {
     return <tr
       key={key}
       className={tooLate ? 'too_late' : ''}>
-      {this.props.laundry.machines.map((id) => this.props.machines[id]).map((m) => <td key={m.id}/>)}
+      {this.props.laundry.machines
+        .map((id) => this.props.machines[id])
+        .map((m, i) => <td key={m.id}>{this.isBooked(i, key) ? <div className='booking'/> : null}</td>)}
     </tr>
   }
 
   componentDidMount () {
-    this.interval = setInterval(() => this.tick(), 1000)
+    this._interval = setInterval(() => this.tick(), 60 * 1000)
   }
 
   componentWillUnmount () {
-    clearInterval(this.interval)
+    clearInterval(this._interval)
+  }
+
+  isBooked (x, y) {
+    return this.state.bookings[`${x}:${y}`]
   }
 
   tick () {
@@ -50,19 +56,57 @@ class TimetableTable extends React.Component {
     return {nowPosition: percent * 100, offLimitsPosition: maxMin(offLimitsPosition, 1, 0) * 100}
   }
 
+  handleMouseDown (event) {
+    switch (event.target.tagName.toLowerCase()) {
+      case 'td':
+        const td = event.target
+        this._mouseDownStart = TimetableTable.tdToTablePos(td)
+        break
+      default:
+        this._mouseDownStart = undefined
+    }
+  }
+
+  handleMouseUp (event) {
+    switch (event.target.tagName.toLowerCase()) {
+      case 'td':
+        const td = event.target
+        const to = TimetableTable.tdToTablePos(td)
+        this.book(this._mouseDownStart || to, to)
+    }
+  }
+
+  static tdToTablePos (td) {
+    return {x: td.cellIndex, y: td.parentNode.rowIndex}
+  }
+
+  book (from, to) {
+    const xRange = lodash.range(Math.min(from.x, to.x), Math.max(from.x, to.x) + 1)
+    const yRange = lodash.range(Math.min(from.y, to.y), Math.max(from.y, to.y) + 1)
+    const o = {}
+    xRange.forEach((x) => yRange.forEach((y) => {
+      o[`${x}:${y}`] = true
+    }))
+    this.setState(({bookings}) => ({bookings: Object.assign({}, bookings, o)}))
+  }
+
   render () {
     const now = new Date()
     const hours = now.getHours()
     const minutes = now.getMinutes()
     const time = hours.toString() + ':' + (minutes < 10 ? '0' + minutes.toString() : minutes.toString())
     const today = new Date(now.getTime()).setHours(0, 0, 0, 0) === this.props.date.getTime()
+    const tableMouseDownHandler = (event) => this.handleMouseDown(event)
+    const tableMouseUpHandler = (event) => this.handleMouseUp(event)
     return <div className='overlay_container'>
       <div className='overlay'>
         <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}></div>
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
           ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}></div> : ''}
       </div>
-      <table>
+      <table
+        onMouseDown={tableMouseDownHandler}
+        onMouseUp={tableMouseUpHandler}>
         <tbody>
         {lodash.range(48).map((key) => this._row(key, today ? now : undefined))}
         </tbody>

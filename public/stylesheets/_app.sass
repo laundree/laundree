@@ -14,7 +14,6 @@ main#TimeTableMain
     position: relative
     z-index: 15
     background-color: #66D3D3
-    height: 10em
     padding:
       top: 5em
       left: 15em
@@ -22,16 +21,16 @@ main#TimeTableMain
       padding-left: 1.5em
       text-align: left
     #TimeTableHeader
-      position: absolute
-      bottom: 0
-      padding-left: 0
+      padding-top: 1em
       display: flex
+      padding-left: 0
       padding-right: 3em
       .header_container
         margin-left: 2em
         .date
           text-align: center
           span
+            font-family: "Roboto Condensed", sans-serif
             display: block
             line-height: 2em
             height: 2em
@@ -73,6 +72,11 @@ main#TimeTableMain
                   overflow: hidden
                   span
                     font-size: 0.8em
+  &.loading
+    #TimeTable
+      .timetable_container
+        .times
+          display: none
   #TimeTable
     background-color: #7DD8D5
     margin-top: 15em
@@ -84,8 +88,15 @@ main#TimeTableMain
     width: calc(100% - 15em)
     padding: 0 0 0 15em
     .timetable_container
+      position: relative
+      padding-right: 2em
       display: flex
       .times
+        position: absolute
+        &.times:first-of-type
+          left: 0
+        &.times:last-of-type
+          right: 0
         list-style-type: none
         margin-top: 3em
         li
@@ -99,15 +110,14 @@ main#TimeTableMain
           padding: 0 0.5em
           span
             font-size: 0.8em
-            font-weight: bold
+            font-family: "Roboto Condensed", sans-serif
         &:last-of-type
           li
             text-align: left
       .overlay_container
         position: relative
         display: inline-block
-        &:not(:first-of-type)
-          margin-left: 2em
+        margin-left: 2em
         .overlay
           div
             left: 0
@@ -173,6 +183,7 @@ main#TimeTableMain
             background-color: #7D1919
 
         table
+
           width: 100%
           table-layout: fixed
           border-collapse: collapse
@@ -188,9 +199,14 @@ main#TimeTableMain
             &:last-of-type
               td
                 border-bottom: 0
+            &:not(.too_late)
+              td
+                cursor: pointer
+
             td
               +transition(0.2s background-color)
               +user-select(none)
+              background-clip: padding-box
               position: relative
               height: 3em
               background-color: #4DC4C1
@@ -199,6 +215,14 @@ main#TimeTableMain
                 border-width: 0.1em 0 0.1em 0.1em
               &:first-of-type
                 border-width: 0.1em 0.1em 0.1em 0
+              .booking
+                z-index: 100
+                background-color: rgb(73, 160, 68)
+                position: absolute
+                top: 0
+                left: 0
+                width: calc(100% + 0.1em)
+                height: calc(100% + 0.1em)
 
 #TimeTable::-webkit-scrollbar-track
   background-color: #7DD8D5
@@ -216,7 +240,8 @@ main#TimeTableMain
   main#TimeTableMain
     header
       padding-left: 4em
-      height: 9em
+      #TimeTableHeader
+        padding-top: 0
     #TimeTable
       margin-top: 14em
       width: calc(100% - 4em)
@@ -224,10 +249,8 @@ main#TimeTableMain
 
 @media only screen and (max-width: 45em)
   main#TimeTableMain
-    header
-      height: 8em
     #TimeTable
-      margin-top: 13em
+      margin-top: 12.5em
 
 @media only screen and (max-width: 30em)
   main#TimeTableMain
