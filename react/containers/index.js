@@ -9,6 +9,7 @@ module.exports = {
   Auth: require('../views').Auth,
   Forgot: require('../views').Forgot,
   SignUp: require('../views').SignUp,
+  Reset: require('../views').Reset,
   Home: require('../views').Home,
   Settings: require('./settings'),
   Machines: require('./machines'),

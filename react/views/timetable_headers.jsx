@@ -40,7 +40,7 @@ TimetableHeader.propTypes = {
 
 const TimetableHeaders = (props) => {
   return <header
-    className={props.dates[0].setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) ? 'today' : undefined}>
+    className={props.dates.length && props.dates[0].setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) ? 'today' : undefined}>
     <h1>
       Timetable
     </h1>
