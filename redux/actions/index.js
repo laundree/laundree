@@ -14,6 +14,10 @@ const CREATE_MACHINE = 'CREATE_MACHINE'
 const UPDATE_MACHINE = 'UPDATE_MACHINE'
 const DELETE_MACHINE = 'DELETE_MACHINE'
 const DELETE_LAUNDRY = 'DELETE_LAUNDRY'
+const UPDATE_BOOKING = 'UPDATE_BOOKING'
+const DELETE_BOOKING = 'DELETE_BOOKING'
+const CREATE_BOOKING = 'CREATE_BOOKING'
+const LOAD_BOOKING = 'LOAD_BOOKING'
 
 /**
  * @param {UserHandler} user
@@ -47,19 +51,32 @@ function machineMapper (machine) {
   }
 }
 
+function bookingMapper (booking) {
+  if (!booking.model) return booking
+  return {
+    id: booking.model.id,
+    from: booking.model.from,
+    to: booking.model.to
+  }
+}
+
 module.exports = {
   types: {
-    LIST_MACHINES: LIST_MACHINES,
-    CREATE_MACHINE: CREATE_MACHINE,
-    LIST_LAUNDRIES: LIST_LAUNDRIES,
-    SIGN_IN_USER: SIGN_IN_USER,
-    FLASH: FLASH,
-    UPDATE_USER: UPDATE_USER,
-    CREATE_LAUNDRY: CREATE_LAUNDRY,
-    UPDATE_MACHINE: UPDATE_MACHINE,
-    DELETE_MACHINE: DELETE_MACHINE,
-    DELETE_LAUNDRY: DELETE_LAUNDRY,
-    UPDATE_LAUNDRY: UPDATE_LAUNDRY
+    LIST_MACHINES,
+    CREATE_MACHINE,
+    LIST_LAUNDRIES,
+    SIGN_IN_USER,
+    FLASH,
+    UPDATE_USER,
+    CREATE_LAUNDRY,
+    UPDATE_MACHINE,
+    DELETE_MACHINE,
+    DELETE_LAUNDRY,
+    UPDATE_LAUNDRY,
+    UPDATE_BOOKING,
+    CREATE_BOOKING,
+    DELETE_BOOKING,
+    LOAD_BOOKING
   },
   listLaundries: createAction(LIST_LAUNDRIES, (laundries) => laundries.map(laundryMapper)),
   createLaundry: createAction(CREATE_LAUNDRY, laundryMapper),
@@ -73,6 +90,11 @@ module.exports = {
   createMachine: createAction(CREATE_MACHINE, machineMapper),
   updateMachine: createAction(UPDATE_MACHINE, machineMapper),
   deleteMachine: createAction(DELETE_MACHINE),
+
+  loadBooking: createAction(LOAD_BOOKING, (bookings) => bookings.map(bookingMapper)),
+  createBooking: createAction(CREATE_BOOKING, bookingMapper),
+  updateBooking: createAction(UPDATE_BOOKING, bookingMapper),
+  deleteBooking: createAction(DELETE_BOOKING),
 
   flash: createAction(FLASH)
 }
