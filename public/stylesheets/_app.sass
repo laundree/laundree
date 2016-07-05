@@ -17,9 +17,40 @@ main#TimeTableMain
     padding:
       top: 5em
       left: 15em
-    h1
-      padding-left: 1.5em
-      text-align: left
+    &.today
+      .date_nav
+        .nav
+          .left
+            +arrow(#5bb5b5, 0.5em, left)
+            cursor: auto
+          svg
+            cursor: auto
+            fill: #5bb5b5
+    .date_nav
+      .nav
+        +user-select(none)
+        font-style: italic
+        display: inline-block
+        padding: 0 0 0 2em
+        svg
+          cursor: pointer
+          height: 1em
+          width: 1em
+          margin: 0 1em 0 0
+          fill: #1e6a72
+        .arrow
+          display: inline-block
+          cursor: pointer
+        .left
+          margin-right: 1em
+          +arrow(#1e6a72, 0.5em, left)
+        .right
+          margin-left: 1em
+          +arrow(#1e6a72, 0.5em, right)
+      h1
+        display: inline-block
+        padding-left: 1.5em
+        text-align: left
     #TimeTableHeader
       padding-top: 1em
       display: flex
@@ -216,7 +247,7 @@ main#TimeTableMain
               &:first-of-type
                 border-width: 0.1em 0.1em 0.1em 0
               .booking
-                z-index: 100
+                z-index: 9
                 background-color: rgb(73, 160, 68)
                 position: absolute
                 top: 0
@@ -240,17 +271,19 @@ main#TimeTableMain
   main#TimeTableMain
     header
       padding-left: 4em
-      #TimeTableHeader
-        padding-top: 0
     #TimeTable
-      margin-top: 14em
+      margin-top: 15em
       width: calc(100% - 4em)
       padding-left: 4em
 
 @media only screen and (max-width: 45em)
   main#TimeTableMain
+    header
+      .date_nav
+        .nav
+          padding: 0 0 0 1em
     #TimeTable
-      margin-top: 12.5em
+      margin-top: 13.5em
 
 @media only screen and (max-width: 30em)
   main#TimeTableMain

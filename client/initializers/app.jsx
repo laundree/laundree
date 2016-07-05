@@ -66,6 +66,10 @@ function deleteMachine (id) {
 function updateMachine (id, params) {
   return new MachineClientApi(id).updateMachine(params)
 }
+function createBooking (id, from, to) {
+  return new MachineClientApi(id).createBooking(from, to)
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -78,7 +82,8 @@ class AppInitializer extends Initializer {
         createLaundry,
         deleteMachine,
         updateMachine,
-        userResetPassword
+        userResetPassword,
+        createBooking
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

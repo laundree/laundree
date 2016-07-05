@@ -59,11 +59,11 @@
   @if $direction == down
     border-color: $color transparent transparent transparent
   @if $direction == right
-    border-color: transparent $color transparent transparent
+    border-color: transparent transparent transparent $color
   @if $direction == up
     border-color: transparent transparent $color transparent
   @if $direction == left
-    border-color: transparent transparent transparent $color
+    border-color: transparent $color transparent transparent
 
 =loading_before()
   content: ""

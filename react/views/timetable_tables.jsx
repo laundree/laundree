@@ -68,11 +68,12 @@ class TimetableTable extends React.Component {
   }
 
   handleMouseUp (event) {
+    if (!this._mouseDownStart) return
     switch (event.target.tagName.toLowerCase()) {
       case 'td':
         const td = event.target
         const to = TimetableTable.tdToTablePos(td)
-        this.book(this._mouseDownStart || to, to)
+        this.book(this._mouseDownStart, to)
     }
   }
 
@@ -80,7 +81,17 @@ class TimetableTable extends React.Component {
     return {x: td.cellIndex, y: td.parentNode.rowIndex}
   }
 
+  posToDate ({y}) {
+    const d = new Date(this.props.date.getTime())
+    const mins = y * 30
+    d.setHours(Math.floor(mins / 60), mins % 30, 0, 0)
+    return d
+  }
+
   book (from, to) {
+    // const exclusiveTo = {x: to.x, y: to.y + 1}
+    // return this.context.actions.createBooking(this.props.laundry.machines[0], this.posToDate(from), this.posToDate(exclusiveTo))
+
     const xRange = lodash.range(Math.min(from.x, to.x), Math.max(from.x, to.x) + 1)
     const yRange = lodash.range(Math.min(from.y, to.y), Math.max(from.y, to.y) + 1)
     const o = {}
@@ -119,6 +130,12 @@ TimetableTable.propTypes = {
   machines: React.PropTypes.object.isRequired,
   laundry: React.PropTypes.object.isRequired,
   date: React.PropTypes.instanceOf(Date).isRequired
+}
+
+TimetableTable.contextTypes = {
+  actions: React.PropTypes.shape({
+    createBooking: React.PropTypes.func
+  })
 }
 
 const TimetableTables = (props) => <section id='TimeTable'>

@@ -5,6 +5,10 @@
 var React = require('react')
 var reactIntl = require('react-intl')
 
+function shortName (name) {
+  return name.replace(/ (.)/g, (_, a) => a.toUpperCase()).replace(/[a-z]/g, '')
+}
+
 const TimetableHeader = (props) => {
   return <div className='header_container'>
     <div className='date'>
@@ -25,7 +29,7 @@ const TimetableHeader = (props) => {
         {props.laundry.machines
           .map((id) => props.machines[id])
           .map((machine) => <td key={machine.id}>
-            <div><span>{machine.name}</span></div>
+            <div><span>{shortName(machine.name)}</span></div>
           </td>)}
       </tr>
       </tbody>
@@ -38,26 +42,79 @@ TimetableHeader.propTypes = {
   machines: React.PropTypes.object.isRequired
 }
 
+class TimeTableHeaderNav extends React.Component {
+
+  get firstDate () {
+    return this.props.dates[0]
+  }
+
+  get lastDate () {
+    return this.props.dates[this.props.dates.length - 1]
+  }
+
+  render () {
+    const calendar = <svg className='today' onClick={this.props.onToday}>
+      <use xlinkHref='#Calendar'/>
+    </svg>
+    const navLeft = <div className='left arrow' onClick={this.props.onYesterday}/>
+    const navRight = <div className='right arrow' onClick={this.props.onTomorrow}/>
+    if (this.props.dates.length === 0) return null
+    if (this.props.dates.length === 1) {
+      return <div className='nav'>
+        {navLeft}
+        {calendar}
+        <reactIntl.FormattedDate
+          weekday='short' month='numeric' day='numeric'
+          value={this.firstDate}/>
+        {navRight}
+      </div>
+    }
+
+    return <div className='nav'>
+      {navLeft}
+      {calendar}
+      from{' '}
+      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={this.firstDate}/>
+      {' '}
+      to{' '}
+      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={this.lastDate}/>
+      {navRight}
+    </div>
+  }
+}
+
+TimeTableHeaderNav.propTypes = {
+  dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
+  onToday: React.PropTypes.func,
+  onTomorrow: React.PropTypes.func,
+  onYesterday: React.PropTypes.func
+}
+
 const TimetableHeaders = (props) => {
   return <header
     className={props.dates.length && props.dates[0].setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) ? 'today' : undefined}>
-    <h1>
-      Timetable
-    </h1>
+    <div className='date_nav'>
+      <h1>
+        Timetable
+      </h1>
+      <TimeTableHeaderNav
+        onToday={props.onToday}
+        onTomorrow={props.onTomorrow}
+        onYesterday={props.onYesterday}
+        dates={props.dates}/>
+    </div>
     <div id='TimeTableHeader'>
       {props.dates.map((date) => <TimetableHeader
         laundry={props.laundry} machines={props.machines} date={date}
         key={date}/>)}
-      <div className='nav'>
-        <div className='step_back' />
-        <div className='step_forward' />
-      </div>
-
     </div>
   </header>
 }
 
 TimetableHeaders.propTypes = {
+  onToday: React.PropTypes.func,
+  onTomorrow: React.PropTypes.func,
+  onYesterday: React.PropTypes.func,
   laundry: React.PropTypes.object.isRequired,
   dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
   machines: React.PropTypes.object.isRequired

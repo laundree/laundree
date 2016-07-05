@@ -11,8 +11,11 @@ class Timetable extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {numDays: 0, loading: true}
+    this.state = {numDays: 0, loading: true, offset: 0}
     this.handleResize = () => this.setState({numDays: this.numDays})
+    this.todayHandler = () => this.setState({offset: 0})
+    this.tomorrowHandler = () => this.setState(({offset}) => ({offset: offset + 1}))
+    this.yesterdayHandler = () => this.setState(({offset}) => ({offset: Math.max(0, offset - 1)}))
   }
 
   componentDidMount () {
@@ -30,13 +33,13 @@ class Timetable extends React.Component {
   }
 
   get numDays () {
-    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (this.props.laundry.machines.length * 50)), 1), 7)
+    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (this.props.laundry.machines.length * 100)), 1), 7)
   }
 
   get days () {
     const startDay = new Date()
     startDay.setHours(0, 0, 0, 0)
-    return lodash.range(this.state.numDays).map((i) => {
+    return lodash.range(this.state.offset, this.state.offset + this.state.numDays).map((i) => {
       const d = new Date(startDay.getTime())
       d.setDate(startDay.getDate() + i)
       return d
@@ -50,7 +53,11 @@ class Timetable extends React.Component {
     const days = this.days
     return <DocumentTitle title='Timetable'>
       <main id='TimeTableMain' ref={refPuller} className={this.state.loading ? 'loading' : ''}>
-        <TimetableHeaders laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+        <TimetableHeaders
+          onToday={this.todayHandler}
+          onTomorrow={this.tomorrowHandler}
+          onYesterday={this.yesterdayHandler}
+          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <TimetableTables laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
       </main>
     </DocumentTitle>

@@ -8,5 +8,6 @@ module.exports = combineReducers({
   currentUser: require('./current_user'),
   flash: require('./flash'),
   laundries: require('./laundries'),
-  machines: require('./machines')
+  machines: require('./machines'),
+  bookings: require('./bookings')
 })

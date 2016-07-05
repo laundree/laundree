@@ -35,6 +35,21 @@ class MachineClientApi {
     })
       .catch(wrapError)
   }
+
+  /**
+   * Create a booking
+   * @param {Date} from
+   * @param {Date} to
+   */
+  createBooking (from, to) {
+    return client({
+      path: `/api/machines/${this.id}/bookings`,
+      headers: {'Content-Type': 'application/json'},
+      method: 'POST',
+      entity: {from: from.toISOString(), to: to.toISOString()}
+    })
+      .catch(wrapError)
+  }
 }
 
 module.exports = MachineClientApi
