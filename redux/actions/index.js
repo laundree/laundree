@@ -17,7 +17,7 @@ const DELETE_LAUNDRY = 'DELETE_LAUNDRY'
 const UPDATE_BOOKING = 'UPDATE_BOOKING'
 const DELETE_BOOKING = 'DELETE_BOOKING'
 const CREATE_BOOKING = 'CREATE_BOOKING'
-const LOAD_BOOKING = 'LOAD_BOOKING'
+const LIST_BOOKINGS = 'LIST_BOOKINGS'
 
 /**
  * @param {UserHandler} user
@@ -56,7 +56,8 @@ function bookingMapper (booking) {
   return {
     id: booking.model.id,
     from: booking.model.from,
-    to: booking.model.to
+    to: booking.model.to,
+    machine: booking.model.machine.toString()
   }
 }
 
@@ -76,7 +77,7 @@ module.exports = {
     UPDATE_BOOKING,
     CREATE_BOOKING,
     DELETE_BOOKING,
-    LOAD_BOOKING
+    LIST_BOOKINGS
   },
   listLaundries: createAction(LIST_LAUNDRIES, (laundries) => laundries.map(laundryMapper)),
   createLaundry: createAction(CREATE_LAUNDRY, laundryMapper),
@@ -91,7 +92,7 @@ module.exports = {
   updateMachine: createAction(UPDATE_MACHINE, machineMapper),
   deleteMachine: createAction(DELETE_MACHINE),
 
-  loadBooking: createAction(LOAD_BOOKING, (bookings) => bookings.map(bookingMapper)),
+  listBookings: createAction(LIST_BOOKINGS, (bookings) => bookings.map(bookingMapper)),
   createBooking: createAction(CREATE_BOOKING, bookingMapper),
   updateBooking: createAction(UPDATE_BOOKING, bookingMapper),
   deleteBooking: createAction(DELETE_BOOKING),

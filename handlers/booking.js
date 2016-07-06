@@ -4,15 +4,44 @@
 
 const Handler = require('./handler')
 const {BookingModel} = require('../models')
+const EventEmitter = require('events')
+const {linkEmitter} = require('../lib/redis')
+
+const pubStaticEmitter = new EventEmitter()
+const subStaticEmitter = new EventEmitter()
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'booking',
+  ['update', 'create'],
+  (machine) => Promise.resolve(machine.model.id),
+  (id) => BookingHandler.findFromId(id))
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'booking',
+  ['delete'],
+  (machine) => Promise.resolve(machine.model.id),
+  (id) => Promise.resolve(id))
 
 class BookingHandler extends Handler {
+
+  static on () {
+    return Handler._on(pubStaticEmitter, arguments)
+  }
+
+  static removeListener () {
+    return Handler._removeListener(pubStaticEmitter, arguments)
+  }
 
   static findFromId (id) {
     return Handler._findFromId(BookingModel, BookingHandler, id)
   }
 
-  static find (filter, limit = 10) {
-    return Handler._find(BookingModel, BookingHandler, filter, limit)
+  static find (filter, options) {
+    return Handler._find(BookingModel, BookingHandler, filter, options)
   }
 
   /**
@@ -27,6 +56,10 @@ class BookingHandler extends Handler {
     return new BookingModel({machine: machine.model._id, owner: owner.model._id, from, to})
       .save()
       .then((model) => new BookingHandler(model))
+      .then((booking) => {
+        booking.emitEvent('create')
+        return booking
+      })
   }
 
   /**
@@ -60,6 +93,10 @@ class BookingHandler extends Handler {
 
   get restUrl () {
     return `/api/bookings/${this.model.id}`
+  }
+
+  emitEvent (event) {
+    return this._emitEvent(subStaticEmitter, event)
   }
 
   toRest () {

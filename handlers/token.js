@@ -13,8 +13,8 @@ class TokenHandler extends Handler {
     this.secret = secret
   }
 
-  static find (filter, limit) {
-    return this._find(TokenModel, TokenHandler, filter, limit)
+  static find (filter, options) {
+    return this._find(TokenModel, TokenHandler, filter, options)
   }
 
   static findFromId (id) {

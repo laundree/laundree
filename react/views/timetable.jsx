@@ -58,7 +58,9 @@ class Timetable extends React.Component {
           onTomorrow={this.tomorrowHandler}
           onYesterday={this.yesterdayHandler}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-        <TimetableTables laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+        <TimetableTables
+          bookings={this.props.bookings}
+          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
       </main>
     </DocumentTitle>
   }
@@ -66,6 +68,7 @@ class Timetable extends React.Component {
 
 Timetable.propTypes = {
   machines: React.PropTypes.object,
+  bookings: React.PropTypes.object,
   laundry: React.PropTypes.shape({
     id: React.PropTypes.string,
     name: React.PropTypes.string,

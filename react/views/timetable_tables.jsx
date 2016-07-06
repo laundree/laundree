@@ -27,7 +27,7 @@ class TimetableTable extends React.Component {
       className={tooLate ? 'too_late' : ''}>
       {this.props.laundry.machines
         .map((id) => this.props.machines[id])
-        .map((m, i) => <td key={m.id}>{this.isBooked(i, key) ? <div className='booking'/> : null}</td>)}
+        .map((m) => <td key={m.id}>{this.isBooked(m.id, key) ? <div className='booking'/> : null}</td>)}
     </tr>
   }
 
@@ -37,6 +37,24 @@ class TimetableTable extends React.Component {
 
   componentWillUnmount () {
     clearInterval(this._interval)
+  }
+
+  componentWillReceiveProps ({bookings}) {
+    const day = this.props.date.getDate()
+    this.setState({
+      bookings: Object.keys(bookings)
+        .map((key) => bookings[key])
+        .map(({from, to, machine}) => ({from: new Date(from), to: new Date(to), machine}))
+        .filter(({from, to}) => to.getDate() >= day && from.getDate() <= day)
+        .reduce((obj, {machine, from, to}) => {
+          const fromY = TimetableTable.dateToY(from)
+          const toY = TimetableTable.dateToY(to)
+          lodash.range(fromY, toY).forEach((y) => {
+            obj[`${machine}:${y}`] = true
+          })
+          return obj
+        }, {})
+    })
   }
 
   isBooked (x, y) {
@@ -81,24 +99,22 @@ class TimetableTable extends React.Component {
     return {x: td.cellIndex, y: td.parentNode.rowIndex}
   }
 
+  static dateToY (date) {
+    return Math.floor((date.getHours() * 60 + date.getMinutes()) / 30)
+  }
+
   posToDate ({y}) {
     const d = new Date(this.props.date.getTime())
     const mins = y * 30
-    d.setHours(Math.floor(mins / 60), mins % 30, 0, 0)
+    d.setHours(Math.floor(mins / 60), mins % 60, 0, 0)
     return d
   }
 
   book (from, to) {
-    // const exclusiveTo = {x: to.x, y: to.y + 1}
-    // return this.context.actions.createBooking(this.props.laundry.machines[0], this.posToDate(from), this.posToDate(exclusiveTo))
-
-    const xRange = lodash.range(Math.min(from.x, to.x), Math.max(from.x, to.x) + 1)
-    const yRange = lodash.range(Math.min(from.y, to.y), Math.max(from.y, to.y) + 1)
-    const o = {}
-    xRange.forEach((x) => yRange.forEach((y) => {
-      o[`${x}:${y}`] = true
-    }))
-    this.setState(({bookings}) => ({bookings: Object.assign({}, bookings, o)}))
+    const exclusiveTo = {x: to.x, y: to.y + 1}
+    return Promise.all(lodash
+      .range(from.x, to.x + 1)
+      .map((x) => this.context.actions.createBooking(this.props.laundry.machines[x], this.posToDate(from), this.posToDate(exclusiveTo))))
   }
 
   render () {
@@ -129,6 +145,7 @@ class TimetableTable extends React.Component {
 TimetableTable.propTypes = {
   machines: React.PropTypes.object.isRequired,
   laundry: React.PropTypes.object.isRequired,
+  bookings: React.PropTypes.object.isRequired,
   date: React.PropTypes.instanceOf(Date).isRequired
 }
 
@@ -138,68 +155,89 @@ TimetableTable.contextTypes = {
   })
 }
 
-const TimetableTables = (props) => <section id='TimeTable'>
-  <div className='timetable_container'>
-    <ul className='times'>
-      <li><span>1</span></li>
-      <li><span>2</span></li>
-      <li><span>3</span></li>
-      <li><span>4</span></li>
-      <li><span>5</span></li>
-      <li><span>6</span></li>
-      <li><span>7</span></li>
-      <li><span>8</span></li>
-      <li><span>9</span></li>
-      <li><span>10</span></li>
-      <li><span>11</span></li>
-      <li><span>12</span></li>
-      <li><span>13</span></li>
-      <li><span>14</span></li>
-      <li><span>15</span></li>
-      <li><span>16</span></li>
-      <li><span>17</span></li>
-      <li><span>18</span></li>
-      <li><span>19</span></li>
-      <li><span>20</span></li>
-      <li><span>21</span></li>
-      <li><span>22</span></li>
-      <li><span>23</span></li>
-    </ul>
-    {props.dates.map((date) => <TimetableTable
-      date={date} machines={props.machines} laundry={props.laundry}
-      key={date}/>)}
-    <ul className='times'>
-      <li><span>1</span></li>
-      <li><span>2</span></li>
-      <li><span>3</span></li>
-      <li><span>4</span></li>
-      <li><span>5</span></li>
-      <li><span>6</span></li>
-      <li><span>7</span></li>
-      <li><span>8</span></li>
-      <li><span>9</span></li>
-      <li><span>10</span></li>
-      <li><span>11</span></li>
-      <li><span>12</span></li>
-      <li><span>13</span></li>
-      <li><span>14</span></li>
-      <li><span>15</span></li>
-      <li><span>16</span></li>
-      <li><span>17</span></li>
-      <li><span>18</span></li>
-      <li><span>19</span></li>
-      <li><span>20</span></li>
-      <li><span>21</span></li>
-      <li><span>22</span></li>
-      <li><span>23</span></li>
-    </ul>
-  </div>
-</section>
+class TimetableTables extends React.Component {
 
+  componentWillReceiveProps ({dates, laundry: {id}}) {
+    const oldDates = this.props.dates
+    if (dates.length === oldDates.length && oldDates.map((d) => d.getTime()).every((t, i) => t === dates[i].getTime())) return
+    const firstDate = dates[0]
+    const lastDate = dates[dates.length - 1]
+    const lastDateExclusive = new Date(lastDate.getTime())
+    lastDateExclusive.setDate(lastDate.getDate() + 1)
+    this.context.actions.listBookings(id, firstDate, lastDateExclusive)
+  }
+
+  render () {
+    return <section id='TimeTable'>
+      <div className='timetable_container'>
+        <ul className='times'>
+          <li><span>1</span></li>
+          <li><span>2</span></li>
+          <li><span>3</span></li>
+          <li><span>4</span></li>
+          <li><span>5</span></li>
+          <li><span>6</span></li>
+          <li><span>7</span></li>
+          <li><span>8</span></li>
+          <li><span>9</span></li>
+          <li><span>10</span></li>
+          <li><span>11</span></li>
+          <li><span>12</span></li>
+          <li><span>13</span></li>
+          <li><span>14</span></li>
+          <li><span>15</span></li>
+          <li><span>16</span></li>
+          <li><span>17</span></li>
+          <li><span>18</span></li>
+          <li><span>19</span></li>
+          <li><span>20</span></li>
+          <li><span>21</span></li>
+          <li><span>22</span></li>
+          <li><span>23</span></li>
+        </ul>
+        {this.props.dates.map((date) => <TimetableTable
+          date={date} machines={this.props.machines} laundry={this.props.laundry}
+          bookings={this.props.bookings}
+          key={date}/>)}
+        <ul className='times'>
+          <li><span>1</span></li>
+          <li><span>2</span></li>
+          <li><span>3</span></li>
+          <li><span>4</span></li>
+          <li><span>5</span></li>
+          <li><span>6</span></li>
+          <li><span>7</span></li>
+          <li><span>8</span></li>
+          <li><span>9</span></li>
+          <li><span>10</span></li>
+          <li><span>11</span></li>
+          <li><span>12</span></li>
+          <li><span>13</span></li>
+          <li><span>14</span></li>
+          <li><span>15</span></li>
+          <li><span>16</span></li>
+          <li><span>17</span></li>
+          <li><span>18</span></li>
+          <li><span>19</span></li>
+          <li><span>20</span></li>
+          <li><span>21</span></li>
+          <li><span>22</span></li>
+          <li><span>23</span></li>
+        </ul>
+      </div>
+    </section>
+  }
+}
+TimetableTables.contextTypes = {
+  actions: React.PropTypes.shape({
+    listBookings: React.PropTypes.func
+  })
+}
 TimetableTables.propTypes = {
   dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
   laundry: React.PropTypes.object.isRequired,
-  machines: React.PropTypes.object.isRequired
+  machines: React.PropTypes.object.isRequired,
+  bookings: React.PropTypes.object.isRequired
 }
 
 module.exports = TimetableTables

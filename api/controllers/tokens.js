@@ -11,7 +11,7 @@ function listTokens (req, res) {
   if (since) {
     filter._id = {$gt: since}
   }
-  TokenHandler.find(filter, limit)
+  TokenHandler.find(filter, {limit, sort: {_id: 1}})
     .then((tokens) => tokens.map((token) => token.toRestSummary()))
     .then((tokens) => {
       var links = {

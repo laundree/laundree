@@ -9,13 +9,12 @@ class Handler {
    * @param Model
    * @param Handler
    * @param filter
-   * @param limit
+   * @param options
    * @returns {Promise.<Handler>}
    */
-  static _find (Model, Handler, filter, limit) {
+  static _find (Model, Handler, filter, options = {sort: {'_id': 1}}) {
     return Model
-      .find(filter, null, {sort: {'_id': 1}})
-      .limit(limit || 10)
+      .find(filter, null, options)
       .exec()
       .then((tokens) => tokens.map((model) => new Handler(model)))
   }

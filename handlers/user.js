@@ -53,8 +53,8 @@ class UserHandler extends Handler {
     return Handler._removeListener(pubStaticEmitter, arguments)
   }
 
-  static find (filter, limit) {
-    return this._find(UserModel, UserHandler, filter, limit)
+  static find (filter, options) {
+    return this._find(UserModel, UserHandler, filter, options)
   }
 
   static findFromId (id) {
