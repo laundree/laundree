@@ -2,17 +2,14 @@
  * Created by budde on 28/05/16.
  */
 
-var React = require('react')
-var reactIntl = require('react-intl')
-
-function shortName (name) {
-  return name.replace(/ (.)/g, (_, a) => a.toUpperCase()).replace(/[a-z]/g, '')
-}
+const React = require('react')
+const reactIntl = require('react-intl')
+const string = require('../../utils/string')
 
 const TimetableHeader = (props) => {
   return <div className='header_container'>
     <div className='date'>
-      <reactIntl.FormattedDate weekday='long' month='numeric' day='numeric' value={props.date}/>
+      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={props.date}/>
     </div>
     <table>
       <tbody>
@@ -29,7 +26,7 @@ const TimetableHeader = (props) => {
         {props.laundry.machines
           .map((id) => props.machines[id])
           .map((machine) => <td key={machine.id}>
-            <div><span>{shortName(machine.name)}</span></div>
+            <div><span>{string.shortName(machine.name)}</span></div>
           </td>)}
       </tr>
       </tbody>
