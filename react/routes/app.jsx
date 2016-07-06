@@ -35,6 +35,9 @@ function routeGenerator (store) {
     <Route component={App} path='/'>
       <IndexRoute component={Home}/>
     </Route>,
+    <Route path='/laundries/*'>
+      <IndexRedirect to='/auth' />
+    </Route>,
     <Route path='/auth' component={Auth}>
       <IndexRoute component={LogIn}/>
       <Route path='forgot' component={Forgot}/>
