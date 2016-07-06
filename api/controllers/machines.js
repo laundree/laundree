@@ -16,7 +16,7 @@ function listMachines (req, res) {
   LaundryHandler.findFromId(id).then((laundry) => {
     if (!laundry || !laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
     filter.laundry = laundry.model._id
-    return MachineHandler.find(filter, limit)
+    return MachineHandler.find(filter, {limit, sort: {_id: 1}})
       .then((machines) => machines.map((machine) => machine.toRestSummary()))
       .then((machines) => {
         var links = {

@@ -37,8 +37,8 @@ class MachineHandler extends Handler {
     return Handler._removeListener(pubStaticEmitter, arguments)
   }
 
-  static find (filter, limit) {
-    return this._find(MachineModel, MachineHandler, filter, limit)
+  static find (filter, options) {
+    return this._find(MachineModel, MachineHandler, filter, options)
   }
 
   static findFromId (id) {

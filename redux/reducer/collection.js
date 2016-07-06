@@ -16,9 +16,8 @@ function arrayToObject (array) {
  * @param {string[]} addActions Will add an entry
  * @param {string=} deleteAction Will delete a given id
  * @param {string=} listAction Will replace state with given entries.
- * @param {string=} loadAction Will load given entries, overwriting duplicates.
  */
-function setupCollection (addActions, deleteAction, listAction, loadAction) {
+function setupCollection (addActions, deleteAction, listAction) {
   const actionMap = {}
   addActions.forEach((action) => {
     actionMap[action] = (state, action) => object.assignImmutable(state, action.payload.id, action.payload)
@@ -32,9 +31,6 @@ function setupCollection (addActions, deleteAction, listAction, loadAction) {
   }
   if (listAction) {
     actionMap[listAction] = (state, action) => arrayToObject(action.payload)
-  }
-  if (loadAction) {
-    actionMap[loadAction] = (state, action) => Object.assing({}, state, arrayToObject(action.payload))
   }
   return handleActions(actionMap, {})
 }

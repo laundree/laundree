@@ -17,11 +17,12 @@ const reduxActions = require('../../redux/actions')
 const {ActionProvider} = require('../../react/views/providers')
 const {UserClientApi, LaundryClientApi, MachineClientApi} = require('../api')
 
+const nsp = io('/redux')
+
 function fetchStore () {
   return new Promise((resolve, reject) => {
     var store
     var actions = []
-    var nsp = io('/redux')
     nsp.on('action', (action) => {
       console.log(action)
       if (store) return store.dispatch(action)
@@ -70,6 +71,10 @@ function createBooking (id, from, to) {
   return new MachineClientApi(id).createBooking(from, to)
 }
 
+function listBookings (laundryId, from, to) {
+  return nsp.emit('listBookings', laundryId, from.getTime(), to.getTime())
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -83,7 +88,8 @@ class AppInitializer extends Initializer {
         deleteMachine,
         updateMachine,
         userResetPassword,
-        createBooking
+        createBooking,
+        listBookings
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

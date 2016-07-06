@@ -11,7 +11,7 @@ function listLaundries (req, res) {
   if (since) {
     filter._id = {$gt: since}
   }
-  LaundryHandler.find(filter, limit)
+  LaundryHandler.find(filter, {limit, sort: {_id: 1}})
     .then((laundries) => laundries.map((laundry) => laundry.toRestSummary()))
     .then((laundries) => {
       var links = {

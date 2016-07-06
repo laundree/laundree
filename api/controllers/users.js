@@ -26,7 +26,7 @@ function listUsers (req, res) {
   if (since) {
     filter._id = {$gt: since}
   }
-  UserHandler.find(filter, limit)
+  UserHandler.find(filter, {limit, sort: {_id: 1}})
     .then((users) => users.map((user) => user.toRestSummary()))
     .then((users) => {
       var links = {

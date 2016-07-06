@@ -25,7 +25,7 @@ function listBookings (req, res) {
       return machine.fetchLaundry().then((laundry) => {
         if (!laundry) return
         if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Machine not found')
-        return BookingHandler.find(filter, limit)
+        return BookingHandler.find(filter, {limit, sort: {_id: 1}})
           .then((bookings) => bookings.map((booking) => booking.toRestSummary()))
           .then((bookings) => {
             var links = {

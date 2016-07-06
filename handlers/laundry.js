@@ -4,6 +4,7 @@
 const {LaundryModel} = require('../models')
 const Handler = require('./handler')
 const MachineHandler = require('./machine')
+const BookingHandler = require('./booking')
 const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
 
@@ -20,8 +21,8 @@ linkEmitter(
 
 class LaundryHandler extends Handler {
 
-  static find (filter, limit) {
-    return Handler._find(LaundryModel, LaundryHandler, filter, limit)
+  static find (filter, options) {
+    return Handler._find(LaundryModel, LaundryHandler, filter, options)
   }
 
   static on () {
@@ -163,6 +164,36 @@ class LaundryHandler extends Handler {
     return this.model.save().then((m) => {
       this.model = m
       return this
+    })
+  }
+
+  /**
+   * Fetch bookings for laundry.
+   * Finds any booking with start before to and end after from
+   * @param {Date} from
+   * @param {Date} to
+   * @return {BookingHandler[]}
+   */
+  fetchBookings (from, to) {
+    console.log(from, to)
+    return BookingHandler.find({
+      $or: [
+        {
+          machine: {$in: this.model.machines},
+          from: {$lte: from},
+          to: {$gt: from}
+        },
+        {
+          machine: {$in: this.model.machines},
+          from: {$lt: to},
+          to: {$gte: to}
+        },
+        {
+          machine: {$in: this.model.machines},
+          from: {$gte: from},
+          to: {$lte: to}
+        }
+      ]
     })
   }
 
