@@ -73,6 +73,28 @@ class BookingHandler extends Handler {
       .then(([machine]) => machine)
   }
 
+  static _fetchBookings (from, to, machineIds) {
+    return BookingHandler.find({
+      $or: [
+        {
+          machine: {$in: machineIds},
+          from: {$lte: from},
+          to: {$gt: from}
+        },
+        {
+          machine: {$in: machineIds},
+          from: {$lt: to},
+          to: {$gte: to}
+        },
+        {
+          machine: {$in: machineIds},
+          from: {$gte: from},
+          to: {$lte: to}
+        }
+      ]
+    })
+  }
+
   /**
    * Checks if provided user is owner
    * @param {UserHandler} user

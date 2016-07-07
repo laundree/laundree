@@ -54,21 +54,7 @@ function createBooking (req, res) {
       if (!machine) return api.returnError(res, 404, 'Machine not found')
       return machine.fetchLaundry().then((laundry) => {
         if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Machine not found')
-        return BookingHandler
-          .find({
-            $or: [
-              {
-                machine: machine.model._id,
-                from: {$lte: fromDate},
-                to: {$gt: fromDate}
-              },
-              {
-                machine: machine.model._id,
-                from: {$gt: toDate},
-                to: {$lt: toDate}
-              }
-            ]
-          })
+        machine.fetchBookings(fromDate, toDate)
           .then(([booking]) => {
             if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
             return machine

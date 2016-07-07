@@ -293,6 +293,23 @@ describe('controllers', function () {
         }).catch(done)
       })
 
+      it('should fail on double booking 4', (done) => {
+        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(booking.model.from.getTime() - 2)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(409)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Machine not available'})
+              done()
+            })
+        }).catch(done)
+      })
+
       it('should succeed on tight booking', (done) => {
         dbUtils.populateBookings(3).then(({user, token, machine, bookings}) => {
           request(app)

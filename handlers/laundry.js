@@ -175,26 +175,7 @@ class LaundryHandler extends Handler {
    * @return {BookingHandler[]}
    */
   fetchBookings (from, to) {
-    console.log(from, to)
-    return BookingHandler.find({
-      $or: [
-        {
-          machine: {$in: this.model.machines},
-          from: {$lte: from},
-          to: {$gt: from}
-        },
-        {
-          machine: {$in: this.model.machines},
-          from: {$lt: to},
-          to: {$gte: to}
-        },
-        {
-          machine: {$in: this.model.machines},
-          from: {$gte: from},
-          to: {$lte: to}
-        }
-      ]
-    })
+    return BookingHandler._fetchBookings(from, to, this.model.machines)
   }
 
   toRest () {

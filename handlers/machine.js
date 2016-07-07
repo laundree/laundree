@@ -91,6 +91,17 @@ class MachineHandler extends Handler {
     })
   }
 
+  /**
+   * Fetch bookings for machine.
+   * Finds any booking with start before to and end after from
+   * @param {Date} from
+   * @param {Date} to
+   * @return {BookingHandler[]}
+   */
+  fetchBookings (from, to) {
+    return BookingHandler._fetchBookings(from, to, [this.model._id])
+  }
+
   _deleteMachine () {
     return BookingHandler
       .find({machine: this.model._id})
