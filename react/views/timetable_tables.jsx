@@ -24,10 +24,10 @@ class TimetableTable extends React.Component {
     }
     return <tr
       key={key}
-      className={tooLate ? 'too_late' : ''}>
+      className={(tooLate ? 'too_late' : '') + (this.props.hoverRow === key ? ' hover' : '')}>
       {this.props.laundry.machines
         .map((id) => this.props.machines[id])
-        .map((m) => <td key={m.id}>{this.isBooked(m.id, key) ? <div className='booking'/> : null}</td>)}
+        .map((m, i) => <td key={m.id}>{this.isBooked(m.id, key) ? <div className='booking'/> : null}</td>)}
     </tr>
   }
 
@@ -125,6 +125,32 @@ class TimetableTable extends React.Component {
     }
   }
 
+  handleMouseOut () {
+    this.hover(-1, -1)
+  }
+
+  hover (x, y) {
+    this.props.onHoverRow(y)
+  }
+
+  hoverTd (td) {
+    this.hover(td.cellIndex, td.parentNode.rowIndex)
+  }
+
+  handleMouseOver (event) {
+    switch (event.target.tagName.toLowerCase()) {
+      case 'div':
+        if (event.target.parentNode.tagName.toLowerCase() !== 'td') break
+        this.hoverTd(event.target.parentNode)
+        break
+      case 'td':
+        this.hoverTd(event.target)
+        break
+      default:
+        this.props.onHoverRow(-1)
+    }
+  }
+
   render () {
     const now = new Date()
     const hours = now.getHours()
@@ -133,6 +159,9 @@ class TimetableTable extends React.Component {
     const today = new Date(now.getTime()).setHours(0, 0, 0, 0) === this.props.date.getTime()
     const tableMouseDownHandler = (event) => this.handleMouseDown(event)
     const tableMouseUpHandler = (event) => this.handleMouseUp(event)
+    const tableMouseOverHandler = (event) => this.handleMouseOver(event)
+    const tableMouseOutHandler = (event) => this.handleMouseOut(event)
+
     return <div className='overlay_container'>
       <div className='overlay'>
         <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}></div>
@@ -140,6 +169,8 @@ class TimetableTable extends React.Component {
           ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}></div> : ''}
       </div>
       <table
+        onMouseOver={tableMouseOverHandler}
+        onMouseOut={tableMouseOutHandler}
         onMouseDown={tableMouseDownHandler}
         onMouseUp={tableMouseUpHandler}>
         <tbody>
@@ -154,7 +185,9 @@ TimetableTable.propTypes = {
   machines: React.PropTypes.object.isRequired,
   laundry: React.PropTypes.object.isRequired,
   bookings: React.PropTypes.object.isRequired,
-  date: React.PropTypes.instanceOf(Date).isRequired
+  date: React.PropTypes.instanceOf(Date).isRequired,
+  onHoverRow: React.PropTypes.func.isRequired,
+  hoverRow: React.PropTypes.number.isRequired
 }
 
 TimetableTable.contextTypes = {
@@ -164,6 +197,12 @@ TimetableTable.contextTypes = {
 }
 
 class TimetableTables extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {hoverRow: 1}
+    this.hoverRowHandler = (row) => this.setState({hoverRow: row})
+  }
 
   componentWillReceiveProps ({dates, laundry: {id}}) {
     const oldDates = this.props.dates
@@ -204,6 +243,8 @@ class TimetableTables extends React.Component {
           <li><span>23</span></li>
         </ul>
         {this.props.dates.map((date) => <TimetableTable
+          hoverRow={this.state.hoverRow}
+          onHoverRow={this.hoverRowHandler}
           date={date} machines={this.props.machines} laundry={this.props.laundry}
           bookings={this.props.bookings}
           key={date}/>)}
