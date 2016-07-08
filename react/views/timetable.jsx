@@ -5,6 +5,7 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const TimetableTables = require('./timetable_tables.jsx')
 const TimetableHeaders = require('./timetable_headers.jsx')
+const {Link} = require('react-router')
 const lodash = require('lodash')
 
 class Timetable extends React.Component {
@@ -22,6 +23,7 @@ class Timetable extends React.Component {
     window.addEventListener('resize', this.handleResize)
     const numDays = this.numDays
     this.setState({numDays: numDays, loading: false}, () => {
+      if (!this._mainRef) return
       const now = this._mainRef.querySelector('#TimeTable .now')
       if (!now) return
       now.scrollIntoView()
@@ -33,6 +35,7 @@ class Timetable extends React.Component {
   }
 
   get numDays () {
+    if (!this._mainRef) return 0
     return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (this.props.laundry.machines.length * 100)), 1), 7)
   }
 
@@ -46,22 +49,35 @@ class Timetable extends React.Component {
     })
   }
 
-  render () {
+  renderTables () {
     const refPuller = (ref) => {
       this._mainRef = ref
     }
     const days = this.days
+    return <main id='TimeTableMain' ref={refPuller} className={this.state.loading ? 'loading' : ''}>
+      <TimetableHeaders
+        onToday={this.todayHandler}
+        onTomorrow={this.tomorrowHandler}
+        onYesterday={this.yesterdayHandler}
+        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+      <TimetableTables
+        bookings={this.props.bookings}
+        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+    </main>
+  }
+
+  renderEmpty () {
+    return <main className='naved'>
+      <h1 className='alignLeft'>There are no machines registered</h1>
+      <section>
+        Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
+      </section>
+    </main>
+  }
+
+  render () {
     return <DocumentTitle title='Timetable'>
-      <main id='TimeTableMain' ref={refPuller} className={this.state.loading ? 'loading' : ''}>
-        <TimetableHeaders
-          onToday={this.todayHandler}
-          onTomorrow={this.tomorrowHandler}
-          onYesterday={this.yesterdayHandler}
-          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-        <TimetableTables
-          bookings={this.props.bookings}
-          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-      </main>
+      {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
     </DocumentTitle>
   }
 }

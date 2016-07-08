@@ -236,11 +236,13 @@ class TimetableTables extends React.Component {
     </section>
   }
 }
+
 TimetableTables.contextTypes = {
   actions: React.PropTypes.shape({
     listBookings: React.PropTypes.func
   })
 }
+
 TimetableTables.propTypes = {
   dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
   laundry: React.PropTypes.object.isRequired,
