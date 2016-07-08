@@ -111,10 +111,18 @@ class TimetableTable extends React.Component {
   }
 
   book (from, to) {
-    const exclusiveTo = {x: to.x, y: to.y + 1}
+    const {max, min} = TimetableTable._fixPos(from, to)
+    const maxExclusive = {x: max.x + 1, y: max.y + 1}
     return Promise.all(lodash
-      .range(from.x, to.x + 1)
-      .map((x) => this.context.actions.createBooking(this.props.laundry.machines[x], this.posToDate(from), this.posToDate(exclusiveTo))))
+      .range(min.x, maxExclusive.x)
+      .map((x) => this.context.actions.createBooking(this.props.laundry.machines[x], this.posToDate(min), this.posToDate(maxExclusive))))
+  }
+
+  static _fixPos (pos1, pos2) {
+    return {
+      min: {x: Math.min(pos1.x, pos2.x), y: Math.min(pos1.y, pos2.y)},
+      max: {x: Math.max(pos1.x, pos2.x), y: Math.max(pos1.y, pos2.y)}
+    }
   }
 
   render () {
