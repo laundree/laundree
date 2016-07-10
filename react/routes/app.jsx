@@ -22,7 +22,7 @@ function routeGenerator (store) {
         <IndexRoute component={CreateLaundry} onEnter={checkLaundry}/>
         <Route path='laundries/:id' component={LeftNav}>
           <Route path='timetable' component={Timetable}/>
-          <Route path='booking' component={Bookings}/>
+          <Route path='bookings' component={Bookings}/>
           <Route path='settings' component={Settings}/>
           <Route path='machines' component={Machines}/>
         </Route>

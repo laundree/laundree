@@ -233,7 +233,7 @@ class TimetableTables extends React.Component {
     const lastDate = dates[dates.length - 1]
     const lastDateExclusive = new Date(lastDate.getTime())
     lastDateExclusive.setDate(lastDate.getDate() + 1)
-    this.context.actions.listBookings(id, firstDate, lastDateExclusive)
+    this.context.actions.listBookingsInTime(id, firstDate, lastDateExclusive)
   }
 
   hoverColumnWrapper (i) {
@@ -309,7 +309,7 @@ class TimetableTables extends React.Component {
 
 TimetableTables.contextTypes = {
   actions: React.PropTypes.shape({
-    listBookings: React.PropTypes.func
+    listBookingsInTime: React.PropTypes.func
   })
 }
 
