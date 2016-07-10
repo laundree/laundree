@@ -51,8 +51,8 @@ class TimetableTable extends React.Component {
         .map(({from, to, machine, id}) => ({from: new Date(from), to: new Date(to), machine, id}))
         .filter(({from, to}) => to.getDate() >= day && from.getDate() <= day)
         .reduce((obj, {machine, from, to, id}) => {
-          const fromY = TimetableTable.dateToY(from)
-          const toY = TimetableTable.dateToY(to)
+          const fromY = day === from.getDate() ? TimetableTable.dateToY(from) : 0
+          const toY = day === to.getDate() ? TimetableTable.dateToY(to) : 48
           lodash.range(fromY, toY).forEach((y) => {
             obj[`${machine}:${y}`] = id
           })
