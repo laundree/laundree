@@ -324,8 +324,32 @@ describe('controllers', function () {
             .expect(200)
             .end((err, res) => {
               if (err) return done(err)
+              res.body.from.should.equal(bookings[1].model.from.toISOString())
+              res.body.to.should.equal(bookings[2].model.to.toISOString())
               done()
             })
+        }).catch(done)
+      })
+      it('should not merge tight booking from other user', (done) => {
+        Promise.all([dbUtils.populateTokens(1), dbUtils.populateBookings(3)]).then(([{user, token}, {laundry, machine, bookings}]) => {
+          return user.addLaundry(laundry).then(() => {
+            request(app)
+              .post(`/api/machines/${machine.model.id}/bookings`)
+              .send({
+                from: bookings[1].model.to,
+                to: bookings[2].model.from
+              })
+              .set('Accept', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.from.should.equal(bookings[1].model.to.toISOString())
+                res.body.to.should.equal(bookings[2].model.from.toISOString())
+                done()
+              })
+          })
         }).catch(done)
       })
 

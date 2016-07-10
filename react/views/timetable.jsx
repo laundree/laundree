@@ -19,19 +19,21 @@ class BookingInfo extends React.Component {
   renderBooking () {
     const fromDate = new Date(this.props.booking.from)
     const toDate = new Date(this.props.booking.to)
-    const sameDay = fromDate.getDate() === toDate.getDate()
+    const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
     return <div>
       <h1>Booking info</h1>
-      From{' '}
-      <FormattedDate
-        weekday={today ? undefined : 'long'}
-        month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
-        value={this.props.booking.from}/> {' '}
-      to{' '}
-      <FormattedDate
-        weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
-        day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric' value={this.props.booking.to}/>
+      <div>From{' '}
+        <FormattedDate
+          weekday={today ? undefined : 'long'}
+          month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
+          value={this.props.booking.from}/> {' '}
+        to{' '}
+        <FormattedDate
+          weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
+          day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric' value={this.props.booking.to}/> {' '}
+        on <span>{this.props.machines[this.props.booking.machine].name}</span>
+      </div>
       <div className='actions'>
         <button className='red' onClick={this.deleteHandler}>Delete booking</button>
       </div>
@@ -56,7 +58,8 @@ BookingInfo.contextTypes = {
 
 BookingInfo.propTypes = {
   onClose: React.PropTypes.func,
-  booking: React.PropTypes.object
+  booking: React.PropTypes.object,
+  machines: React.PropTypes.object
 }
 
 class Timetable extends React.Component {
@@ -122,7 +125,9 @@ class Timetable extends React.Component {
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-        <BookingInfo booking={this.props.bookings[this.state.activeBooking]} onClose={this.deactivateBookingHandler}/>
+        <BookingInfo
+          booking={this.props.bookings[this.state.activeBooking]} machines={this.props.machines}
+          onClose={this.deactivateBookingHandler}/>
       </div>
     </main>
   }

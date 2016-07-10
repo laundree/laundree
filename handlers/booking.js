@@ -112,6 +112,34 @@ class BookingHandler extends Handler {
     })
   }
 
+  /**
+   * Find adjacent bookings
+   * @param {UserHandler} user
+   * @param {MachineHandler} machine
+   * @param {Date} from
+   * @param {Date} to
+   * @return {Promise.<{before: BookingHandler=, after: BookingHandler=}>}
+   */
+  static findAdjacentBookingsOfUser (user, machine, from, to) {
+    return Promise.all([
+      BookingHandler.findBookingForUserAndMachine(user, machine, {to: from}, {limit: 1}),
+      BookingHandler.findBookingForUserAndMachine(user, machine, {from: to}, {limit: 1})
+    ])
+      .then(([[before], [after]]) => ({before, after}))
+  }
+
+  /**
+   * Find booking for user and machine
+   * @param {UserHandler} user
+   * @param {MachineHandler} machine
+   * @param filter
+   * @param options
+   * @returns {Promise.<BookingHandler[]>}
+   */
+  static findBookingForUserAndMachine (user, machine, filter = {}, options = {}) {
+    return BookingHandler.find(Object.assign({}, filter, {owner: user.model._id, machine: machine.model._id}), options)
+  }
+
   toRestSummary () {
     return {id: this.model.id, href: this.restUrl}
   }

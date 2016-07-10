@@ -54,12 +54,27 @@ function createBooking (req, res) {
       if (!machine) return api.returnError(res, 404, 'Machine not found')
       return machine.fetchLaundry().then((laundry) => {
         if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Machine not found')
-        machine.fetchBookings(fromDate, toDate)
+        return machine.fetchBookings(fromDate, toDate)
           .then(([booking]) => {
             if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
-            return machine
-              .createBooking(req.user, from, to)
-              .then((machine) => api.returnSuccess(res, machine.toRest()))
+            return BookingHandler
+              .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate)
+              .then(({before, after}) => {
+                const promises = []
+                var from = fromDate
+                var to = toDate
+                if (before) {
+                  promises.push(before.deleteBooking())
+                  from = before.model.from
+                }
+                if (after) {
+                  promises.push(after.deleteBooking())
+                  to = after.model.to
+                }
+                return Promise.all(promises)
+                  .then(() => machine.createBooking(req.user, from, to))
+                  .then((machine) => api.returnSuccess(res, machine.toRest()))
+              })
           })
       })
     })
