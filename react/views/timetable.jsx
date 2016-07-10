@@ -108,20 +108,22 @@ class Timetable extends React.Component {
       this._mainRef = ref
     }
     const days = this.days
-    return <main id='TimeTableMain' ref={refPuller} className={this.state.loading ? 'loading' : ''}>
-      <TimetableHeaders
-        hoverColumn={this.state.hoverColumn}
-        onToday={this.todayHandler}
-        onTomorrow={this.tomorrowHandler}
-        onYesterday={this.yesterdayHandler}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-      <TimetableTables
-        onActiveBooking={this.activeBookingHandler}
-        activeBooking={this.state.activeBooking}
-        onHoverColumn={this.hoverColumn}
-        bookings={this.props.bookings}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-      <BookingInfo booking={this.props.bookings[this.state.activeBooking]} onClose={this.deactivateBookingHandler}/>
+    return <main id='TimeTableMain' ref={refPuller}>
+      <div className={this.state.loading ? 'loading blur' : ''}>
+        <TimetableHeaders
+          hoverColumn={this.state.hoverColumn}
+          onToday={this.todayHandler}
+          onTomorrow={this.tomorrowHandler}
+          onYesterday={this.yesterdayHandler}
+          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+        <TimetableTables
+          onActiveBooking={this.activeBookingHandler}
+          activeBooking={this.state.activeBooking}
+          onHoverColumn={this.hoverColumn}
+          bookings={this.props.bookings}
+          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+        <BookingInfo booking={this.props.bookings[this.state.activeBooking]} onClose={this.deactivateBookingHandler}/>
+      </div>
     </main>
   }
 
