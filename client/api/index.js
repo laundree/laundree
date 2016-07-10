@@ -5,5 +5,6 @@
 module.exports = {
   UserClientApi: require('./user'),
   LaundryClientApi: require('./laundry'),
-  MachineClientApi: require('./machine')
+  MachineClientApi: require('./machine'),
+  BookingClientApi: require('./booking')
 }

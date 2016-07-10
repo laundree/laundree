@@ -15,7 +15,7 @@ const {createStore} = require('redux')
 const {reducer} = require('../../redux')
 const reduxActions = require('../../redux/actions')
 const {ActionProvider} = require('../../react/views/providers')
-const {UserClientApi, LaundryClientApi, MachineClientApi} = require('../api')
+const {UserClientApi, LaundryClientApi, MachineClientApi, BookingClientApi} = require('../api')
 
 const nsp = io('/redux')
 
@@ -75,6 +75,10 @@ function listBookings (laundryId, from, to) {
   return nsp.emit('listBookings', laundryId, from.getTime(), to.getTime())
 }
 
+function deleteBooking (id) {
+  return new BookingClientApi(id).deleteBooking()
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -89,6 +93,7 @@ class AppInitializer extends Initializer {
         updateMachine,
         userResetPassword,
         createBooking,
+        deleteBooking,
         listBookings
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))

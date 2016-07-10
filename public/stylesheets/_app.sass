@@ -14,6 +14,7 @@ main#TimeTableMain
     position: relative
     z-index: 15
     background-color: #66D3D3
+    +transition(left, 0.2s)
     padding:
       top: 5em
       left: 15em
@@ -92,6 +93,9 @@ main#TimeTableMain
                   fill: #fff
             &.labels
               td
+                &.hoverColumn
+                  background-color: #49a09e
+                +transition(0.1s background)
                 border-color: #66D3D3
                 background-color: #44B7B4
                 text-align: center
@@ -251,6 +255,10 @@ main#TimeTableMain
               &:first-of-type
                 border-width: 0.1em 0.1em 0.1em 0
               .booking
+                &.active
+                  background-color: #52b94c
+                +transition(0.1s background-color)
+                +user-select(none)
                 z-index: 9
                 background-color: rgb(73, 160, 68)
                 position: absolute
@@ -258,7 +266,46 @@ main#TimeTableMain
                 left: 0
                 width: 100%
                 height: calc(100% + 0.1em)
-
+  #ActiveBooking
+    overflow: hidden
+    position: fixed
+    bottom: 0
+    height: 15em
+    right: 0
+    left: 15em
+    color: #000
+    background-color: #f9ffff
+    z-index: 15
+    .actions
+      position: absolute
+      bottom: 2em
+    .close
+      width: 1.1em
+      height: 1.1em
+      position: absolute
+      right: 1em
+      top: 1em
+      cursor: pointer
+      fill: #d00101
+      opacity: 0.6
+      z-index: 16
+      +transition(0.1s opacity)
+      &:hover
+        opacity: 1
+    +transition(0.2s all)
+    > div
+      position: relative
+      padding: 1em
+      height: 13em
+    h1
+      font-family: "Roboto Condensed", sans-serif
+      padding-bottom: 1em
+      color: #2b2b2b
+      text-align: left
+      font-size: 1.3em
+      padding-top: 0
+    &.no_booking
+      height: 0
 #TimeTable::-webkit-scrollbar-track
   background-color: #7DD8D5
 
@@ -273,6 +320,8 @@ main#TimeTableMain
 
 @media only screen and (max-width: 90em)
   main#TimeTableMain
+    #ActiveBooking
+      left: 4em
     header
       padding-left: 4em
     #TimeTable
@@ -291,6 +340,8 @@ main#TimeTableMain
 
 @media only screen and (max-width: 30em)
   main#TimeTableMain
+    #ActiveBooking
+      left: 0
     header
       padding-left: 0
     #TimeTable

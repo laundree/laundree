@@ -204,6 +204,10 @@ form.failed:not(.initial)
 
 input, button
   +border-radius(0.2em)
+  &.red
+    background-color: #e55564
+    &:focus
+      +box-shadow(0 0 0 0.1em #c54755)
   &:focus
     outline: 0
     +box-shadow(0 0 0 0.1em #2c829d)

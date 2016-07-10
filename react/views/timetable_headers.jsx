@@ -16,7 +16,9 @@ const TimetableHeader = (props) => {
       <tr className='machines'>
         {props.laundry.machines
           .map((id) => props.machines[id])
-          .map((machine) => <td key={machine.id} className={machine.type}>
+          .map((machine, i) => <td
+            key={machine.id}
+            className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '')}>
             <svg>
               <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}></use>
             </svg>
@@ -25,7 +27,7 @@ const TimetableHeader = (props) => {
       <tr className='labels'>
         {props.laundry.machines
           .map((id) => props.machines[id])
-          .map((machine) => <td key={machine.id}>
+          .map((machine, i) => <td key={machine.id} className={props.hoverColumn === i ? ' hoverColumn' : ''}>
             <div><span>{string.shortName(machine.name)}</span></div>
           </td>)}
       </tr>
@@ -34,6 +36,7 @@ const TimetableHeader = (props) => {
   </div>
 }
 TimetableHeader.propTypes = {
+  hoverColumn: React.PropTypes.number,
   laundry: React.PropTypes.object.isRequired,
   date: React.PropTypes.instanceOf(Date).isRequired,
   machines: React.PropTypes.object.isRequired
@@ -101,7 +104,8 @@ const TimetableHeaders = (props) => {
         dates={props.dates}/>
     </div>
     <div id='TimeTableHeader'>
-      {props.dates.map((date) => <TimetableHeader
+      {props.dates.map((date, i) => <TimetableHeader
+        hoverColumn={props.hoverColumn - (i * props.laundry.machines.length)}
         laundry={props.laundry} machines={props.machines} date={date}
         key={date}/>)}
     </div>
@@ -109,6 +113,7 @@ const TimetableHeaders = (props) => {
 }
 
 TimetableHeaders.propTypes = {
+  hoverColumn: React.PropTypes.number,
   onToday: React.PropTypes.func,
   onTomorrow: React.PropTypes.func,
   onYesterday: React.PropTypes.func,

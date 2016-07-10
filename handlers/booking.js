@@ -106,7 +106,10 @@ class BookingHandler extends Handler {
   }
 
   deleteBooking () {
-    return this.model.remove().then(() => this)
+    return this.model.remove().then(() => {
+      this.emitEvent('delete')
+      return this
+    })
   }
 
   toRestSummary () {
