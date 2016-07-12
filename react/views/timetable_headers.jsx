@@ -5,6 +5,7 @@
 const React = require('react')
 const reactIntl = require('react-intl')
 const string = require('../../utils/string')
+const {Link} = require('react-router')
 
 const TimetableHeader = (props) => {
   return <div className='header_container'>
@@ -52,13 +53,31 @@ class TimeTableHeaderNav extends React.Component {
     return this.props.dates[this.props.dates.length - 1]
   }
 
+  get yesterday () {
+    const d = new Date(this.props.dates[0].getTime())
+    d.setDate(d.getDate() - 1)
+    return d
+  }
+
+  get tomorrow () {
+    const d = new Date(this.props.dates[0].getTime())
+    d.setDate(d.getDate() + 1)
+    return d
+  }
+
   render () {
-    const calendar = <svg className='today' onClick={this.props.onToday}>
-      <use xlinkHref='#Calendar'/>
-    </svg>
-    const navLeft = <div className='left arrow' onClick={this.props.onYesterday}/>
-    const navRight = <div className='right arrow' onClick={this.props.onTomorrow}/>
+    const calendar = <Link to={`/laundries/${this.props.laundry.id}/timetable`}>
+      <svg className='today'>
+        <use xlinkHref='#Calendar'/>
+      </svg>
+    </Link>
     if (this.props.dates.length === 0) return null
+    const navLeft = <Link
+      className='left arrow'
+      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.getTime()}`}/>
+    const navRight = <Link
+      className='right arrow'
+      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.getTime()}`}/>
     if (this.props.dates.length === 1) {
       return <div className='nav'>
         {navLeft}
@@ -84,10 +103,8 @@ class TimeTableHeaderNav extends React.Component {
 }
 
 TimeTableHeaderNav.propTypes = {
-  dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
-  onToday: React.PropTypes.func,
-  onTomorrow: React.PropTypes.func,
-  onYesterday: React.PropTypes.func
+  laundry: React.PropTypes.object,
+  dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired
 }
 
 const TimetableHeaders = (props) => {
@@ -98,9 +115,7 @@ const TimetableHeaders = (props) => {
         Timetable
       </h1>
       <TimeTableHeaderNav
-        onToday={props.onToday}
-        onTomorrow={props.onTomorrow}
-        onYesterday={props.onYesterday}
+        laundry={props.laundry}
         dates={props.dates}/>
     </div>
     <div id='TimeTableHeader'>
@@ -114,9 +129,6 @@ const TimetableHeaders = (props) => {
 
 TimetableHeaders.propTypes = {
   hoverColumn: React.PropTypes.number,
-  onToday: React.PropTypes.func,
-  onTomorrow: React.PropTypes.func,
-  onYesterday: React.PropTypes.func,
   laundry: React.PropTypes.object.isRequired,
   dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
   machines: React.PropTypes.object.isRequired

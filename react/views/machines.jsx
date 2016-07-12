@@ -231,7 +231,7 @@ class Machines extends React.Component {
               onDelete={this.generateDeleter(machineId)}/>
           </li>)}
         </ul>
-          : <div className='no_machines'><span>There are no machines registered to this laundry</span></div>}
+          : <div className='empty_list'><span>There are no machines registered to this laundry</span></div>}
         <div className='create_machine'>
           <h2>Create machine</h2>
           <MachineListItem

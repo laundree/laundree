@@ -4,7 +4,7 @@
 
 const React = require('react')
 const lodash = require('lodash')
-
+const {Link} = require('react-router')
 function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
 }
@@ -14,6 +14,7 @@ class TimetableTable extends React.Component {
   constructor (props) {
     super(props)
     this.state = Object.assign({bookings: {}, activeBooking: null}, this._calcPosition())
+    this.firstBooking = false
   }
 
   _row (key, now) {
@@ -29,10 +30,19 @@ class TimetableTable extends React.Component {
         .map((id) => this.props.machines[id])
         .map((m) => {
           const isBooked = this.isBooked(m.id, key)
-          return <td key={m.id}>{isBooked
-            ? <div className={'booking' + (this.isActive(isBooked) ? ' active' : '')}/> : null}</td>
+          if (!isBooked) return <td key={m.id}/>
+          return <td key={m.id}>
+            <Link
+              to={this.bookingLink(isBooked)}
+              className={'booking' + (this.isActive(isBooked) ? ' active' : '')}/>
+          </td>
         })}
     </tr>
+  }
+
+  bookingLink (bookingId) {
+    const query = [bookingId ? `activeBooking=${bookingId}` : null, this.props.offsetDate ? `offsetDate=${this.props.offsetDate}` : null].filter((p) => p).join('&')
+    return `/laundries/${this.props.laundry.id}/timetable${query ? '?' + query : ''}`
   }
 
   componentDidMount () {
@@ -61,6 +71,14 @@ class TimetableTable extends React.Component {
     })
   }
 
+  componentDidUpdate () {
+    if (this.firstBooking) return
+    this.firstBooking = true
+    const ref = this.ref.querySelector('.booking.active')
+    if (!ref) return
+    ref.scrollIntoView()
+  }
+
   isBooked (x, y) {
     return this.state.bookings[`${x}:${y}`]
   }
@@ -84,11 +102,6 @@ class TimetableTable extends React.Component {
 
   handleMouseDown (event) {
     switch (event.target.tagName.toLowerCase()) {
-      case 'div':
-        const div = event.target
-        if (!div.classList.contains('booking')) return
-        this.activeTd(div.parentNode)
-        break
       case 'td':
         const td = event.target
         this._mouseDownStart = TimetableTable.tdToTablePos(td)
@@ -96,15 +109,6 @@ class TimetableTable extends React.Component {
       default:
         this._mouseDownStart = undefined
     }
-  }
-
-  activeTd (td) {
-    if (!td) return this.props.onActiveBooking(null)
-    const {x, y} = TimetableTable.tdToTablePos(td)
-    const machine = this.props.laundry.machines[x]
-    const booking = this.state.bookings[`${machine}:${y}`]
-    if (!booking) return
-    this.props.onActiveBooking(booking === this.props.activeBooking ? null : booking)
   }
 
   handleMouseUp (event) {
@@ -180,8 +184,10 @@ class TimetableTable extends React.Component {
     const tableMouseUpHandler = (event) => this.handleMouseUp(event)
     const tableMouseOverHandler = (event) => this.handleMouseOver(event)
     const tableMouseOutHandler = (event) => this.handleMouseOut(event)
-
-    return <div className='overlay_container'>
+    const refPuller = (ref) => {
+      this.ref = ref
+    }
+    return <div className='overlay_container' ref={refPuller}>
       <div className='overlay'>
         <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}></div>
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
@@ -205,8 +211,8 @@ TimetableTable.propTypes = {
   machines: React.PropTypes.object.isRequired,
   laundry: React.PropTypes.object.isRequired,
   bookings: React.PropTypes.object.isRequired,
-  onActiveBooking: React.PropTypes.func.isRequired,
   activeBooking: React.PropTypes.string,
+  offsetDate: React.PropTypes.string,
   date: React.PropTypes.instanceOf(Date).isRequired,
   onHoverRow: React.PropTypes.func.isRequired,
   hoverRow: React.PropTypes.number.isRequired
@@ -222,7 +228,7 @@ class TimetableTables extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {hoverRow: 1}
+    this.state = {hoverRow: -1}
     this.hoverRowHandler = (row) => this.setState({hoverRow: row})
   }
 
@@ -269,9 +275,9 @@ class TimetableTables extends React.Component {
           <li><span>23</span></li>
         </ul>
         {this.props.dates.map((date, i) => <TimetableTable
+          offsetDate={this.props.offsetDate}
           activeBooking={this.props.activeBooking}
           hoverRow={this.state.hoverRow}
-          onActiveBooking={this.props.onActiveBooking}
           onHoverRow={this.hoverRowHandler}
           onHoverColumn={this.hoverColumnWrapper(i)}
           date={date} machines={this.props.machines} laundry={this.props.laundry}
@@ -314,8 +320,8 @@ TimetableTables.contextTypes = {
 }
 
 TimetableTables.propTypes = {
-  onActiveBooking: React.PropTypes.func.isRequired,
   activeBooking: React.PropTypes.string,
+  offsetDate: React.PropTypes.string,
   onHoverColumn: React.PropTypes.func.isRequired,
   dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
   laundry: React.PropTypes.object.isRequired,
