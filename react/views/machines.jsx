@@ -150,7 +150,7 @@ class MachineListItem extends React.Component {
         message='Are you sure that you want to delete this machine?'
         onClose={this.onCloseModal}
         actions={[
-          {label: 'Delete', className: 'delete', action: this.onDeleteModal},
+          {label: 'Delete', className: 'delete red', action: this.onDeleteModal},
           {label: 'Cancel', className: 'cancel', action: this.onCloseModal}]}
       />
       <ValidationForm

@@ -1,49 +1,65 @@
 #BookingList
-  ul
+  .loading.blur
+    height: 10em
+    position: relative
+  > ul
     list-style-type: none
     padding-right: 2em
-    li
+    > li
       border:
         width: 0.1em
         color: #5eb9b9
         bottom-style: solid
       &:first-of-type
         border-top-style: solid
-      height: 3em
+      float: left
+      width: calc(100% - 2em)
+      min-height: 3em
       padding: 1em 1em
       .machine_name
         line-height: 3em
         float: left
-      .time
-        margin: 0.5em
+      .time_action_wrapper
         float: right
-        display: block
-        height: 2em
-        line-height: 2em
-        background-color: #3d8c9a
-        border-radius: 0.2em
-        color: #fff
-        > span
-          display: block
-          float: left
-          font-size: 0.9em
-          &:first-of-type
-            padding-right: 0.5em
-          &:last-of-type
-            padding-left: 0.5em
-            padding-right: 1em
-            background-color: #42a4b5
-            border-radius: 0 0.2em 0.2em 0
-        svg
-          float: left
+        .time
           margin: 0.5em
-          fill: #ffffff
-          width: 1em
-          height: 1em
-      .trash
-        margin: 0.5em
-        float: right
-        width: 2em
-        height: 2em
-        cursor: pointer
-        fill: #dc3f50
+          float: left
+          display: block
+          height: 2em
+          line-height: 2em
+          background-color: #3d8c9a
+          border-radius: 0.2em
+          color: #fff
+          > span
+            display: block
+            float: left
+            font-size: 0.9em
+            &:first-of-type
+              padding-right: 0.5em
+            &:last-of-type
+              padding-left: 0.5em
+              padding-right: 1em
+              background-color: #42a4b5
+              border-radius: 0 0.2em 0.2em 0
+          svg
+            float: left
+            margin: 0.5em
+            fill: #ffffff
+            width: 1em
+            height: 1em
+        .trash
+          margin: 0.5em
+          float: left
+          width: 2em
+          height: 2em
+          cursor: pointer
+          fill: #dc3f50
+@media only screen and (max-width: 25em)
+  #BookingList
+    > ul
+      padding-right: 0
+      > li
+        width: calc(100% - 1em)
+        padding:
+          left: 0.5em
+          right: 0.5em
