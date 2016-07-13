@@ -15,5 +15,6 @@ module.exports = {
   Bookings: require('./bookings'),
   Machines: require('./machines'),
   LogIn: require('./login'),
+  Users: require('./users'),
   CreateLaundry: require('./create_laundry')
 }

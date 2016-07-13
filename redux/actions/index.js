@@ -39,7 +39,9 @@ function laundryMapper (laundry) {
   return {
     id: laundry.model.id,
     name: laundry.model.name,
-    machines: laundry.machineIds
+    machines: laundry.machineIds,
+    users: laundry.model.users.map((id) => id.toString()),
+    owners: laundry.model.owners.map((id) => id.toString())
   }
 }
 

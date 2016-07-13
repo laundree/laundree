@@ -36,7 +36,7 @@ class Bookings extends React.Component {
           {label: 'Delete', className: 'delete red', action: this.deleteModalGenerator(booking)},
           {label: 'Cancel', className: 'cancel', action: this.onCloseModal}]}
       />
-      <div className='machine_name'>
+      <div className='name'>
         <Link
           to={`/laundries/${this.props.currentLaundry}/timetable?offsetDate=${fromDate.getTime()}&activeBooking=${booking.id}`}>
           {this.props.machines[booking.machine].name}

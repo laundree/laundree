@@ -1,4 +1,6 @@
-#BookingList
+#BookingList, #UserList
+  float: left
+  width: 100%
   .loading.blur
     height: 10em
     position: relative
@@ -16,7 +18,14 @@
       width: calc(100% - 2em)
       min-height: 3em
       padding: 1em 1em
-      .machine_name
+      .avatar
+        float: left
+        height: 3em
+        width: 3em
+        margin-right: 1em
+        background-color: #ffffff
+        +border-radius(0.2em)
+      .name
         line-height: 3em
         float: left
       .time_action_wrapper
@@ -55,7 +64,7 @@
           cursor: pointer
           fill: #dc3f50
 @media only screen and (max-width: 25em)
-  #BookingList
+  #BookingList, #UserList
     > ul
       padding-right: 0
       > li
