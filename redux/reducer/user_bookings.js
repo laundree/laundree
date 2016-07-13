@@ -8,5 +8,5 @@ const actions = require('../actions')
 const actionMap = {}
 
 actionMap[actions.types.LIST_BOOKINGS_FOR_USER] = (state, action) => action.payload.map(({id}) => id)
-actionMap[actions.types.DELETE_BOOKING] = (state, action) => state.filter((id) => id !== action.payload)
+actionMap[actions.types.DELETE_BOOKING] = (state, action) => state ? state.filter((id) => id !== action.payload) : null
 module.exports = handleActions(actionMap, null)
