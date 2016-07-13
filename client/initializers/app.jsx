@@ -71,8 +71,12 @@ function createBooking (id, from, to) {
   return new MachineClientApi(id).createBooking(from, to)
 }
 
-function listBookings (laundryId, from, to) {
-  return nsp.emit('listBookings', laundryId, from.getTime(), to.getTime())
+function listBookingsInTime (laundryId, from, to) {
+  return nsp.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
+}
+
+function listBookingsForUser (laundryId, userId, filter = {}) {
+  return nsp.emit('listBookingsForUser', laundryId, userId, filter)
 }
 
 function deleteBooking (id) {
@@ -94,7 +98,8 @@ class AppInitializer extends Initializer {
         userResetPassword,
         createBooking,
         deleteBooking,
-        listBookings
+        listBookingsInTime,
+        listBookingsForUser
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

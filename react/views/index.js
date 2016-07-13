@@ -4,6 +4,7 @@
 
 module.exports = {
   Timetable: require('./timetable.jsx'),
+  Bookings: require('./bookings.jsx'),
   App: require('./app.jsx'),
   TopNav: require('./topnav.jsx'),
   LeftNav: require('./leftnav.jsx'),

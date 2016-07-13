@@ -41,10 +41,14 @@ class BookingInfo extends React.Component {
   }
 
   render () {
+    const query = this.props.offsetDate ? '?offsetDate=' + this.props.offsetDate : ''
     return <div id='ActiveBooking' className={this.props.booking ? '' : 'no_booking'}>
-      <svg className='close' onClick={this.props.onClose}>
-        <use xlinkHref='#CloseX'/>
-      </svg>
+      <Link
+        to={`/laundries/${this.props.laundry.id}/timetable${query}`}>
+        <svg className='close'>
+          <use xlinkHref='#CloseX'/>
+        </svg>
+      </Link>
       {this.props.booking ? this.renderBooking() : null}
     </div>
   }
@@ -57,9 +61,17 @@ BookingInfo.contextTypes = {
 }
 
 BookingInfo.propTypes = {
-  onClose: React.PropTypes.func,
+  offsetDate: React.PropTypes.string,
+  laundry: React.PropTypes.object,
   booking: React.PropTypes.object,
   machines: React.PropTypes.object
+}
+
+const diffDates = (d1, d2) => {
+  var oneDay = 24 * 60 * 60 * 1000
+  var t1 = new Date(d1.getTime()).setHours(0, 0, 0, 0)
+  var t2 = new Date(d2.getTime()).setHours(0, 0, 0, 0)
+  return Math.round((t2 - t1) / (oneDay))
 }
 
 class Timetable extends React.Component {
@@ -68,12 +80,7 @@ class Timetable extends React.Component {
     super(props)
     this.state = {numDays: 0, loading: true, offset: 0, hoverColumn: -1, activeBooking: null}
     this.handleResize = () => this.setState({numDays: this.numDays})
-    this.todayHandler = () => this.setState({offset: 0})
-    this.tomorrowHandler = () => this.setState(({offset}) => ({offset: offset + 1}))
-    this.yesterdayHandler = () => this.setState(({offset}) => ({offset: Math.max(0, offset - 1)}))
-    this.activeBookingHandler = (bookingId) => this.setState({activeBooking: bookingId})
     this.hoverColumn = (hoverColumn) => this.setState({hoverColumn})
-    this.deactivateBookingHandler = () => this.activeBookingHandler(null)
   }
 
   componentDidMount () {
@@ -96,10 +103,17 @@ class Timetable extends React.Component {
     return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (this.props.laundry.machines.length * 100)), 1), 7)
   }
 
+  get offsetDays () {
+    const offsetTime = parseInt(this.props.offsetDate)
+    if (isNaN(offsetTime)) return 0
+    return Math.max(0, diffDates(new Date(), new Date(offsetTime)))
+  }
+
   get days () {
     const startDay = new Date()
     startDay.setHours(0, 0, 0, 0)
-    return lodash.range(this.state.offset, this.state.offset + this.state.numDays).map((i) => {
+    const offset = this.offsetDays
+    return lodash.range(offset, offset + this.state.numDays).map((i) => {
       const d = new Date(startDay.getTime())
       d.setDate(startDay.getDate() + i)
       return d
@@ -115,19 +129,18 @@ class Timetable extends React.Component {
       <div className={this.state.loading ? 'loading blur' : ''}>
         <TimetableHeaders
           hoverColumn={this.state.hoverColumn}
-          onToday={this.todayHandler}
-          onTomorrow={this.tomorrowHandler}
-          onYesterday={this.yesterdayHandler}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <TimetableTables
-          onActiveBooking={this.activeBookingHandler}
-          activeBooking={this.state.activeBooking}
+          activeBooking={this.props.activeBooking}
+          offsetDate={this.props.offsetDate}
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <BookingInfo
-          booking={this.props.bookings[this.state.activeBooking]} machines={this.props.machines}
-          onClose={this.deactivateBookingHandler}/>
+          laundry={this.props.laundry}
+          offsetDate={this.props.offsetDate}
+          booking={this.props.bookings[this.props.activeBooking]}
+          machines={this.props.machines}/>
       </div>
     </main>
   }
@@ -149,6 +162,8 @@ class Timetable extends React.Component {
 }
 
 Timetable.propTypes = {
+  activeBooking: React.PropTypes.string,
+  offsetDate: React.PropTypes.string,
   machines: React.PropTypes.object,
   bookings: React.PropTypes.object,
   laundry: React.PropTypes.shape({

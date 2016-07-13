@@ -12,6 +12,7 @@ module.exports = {
   Reset: require('../views').Reset,
   Home: require('../views').Home,
   Settings: require('./settings'),
+  Bookings: require('./bookings'),
   Machines: require('./machines'),
   LogIn: require('./login'),
   CreateLaundry: require('./create_laundry')

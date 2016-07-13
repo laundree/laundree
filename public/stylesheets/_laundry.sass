@@ -1,5 +1,7 @@
 #LaundryMain
   padding-bottom: 5em
+  .empty_list
+    max-width: 32.5em
   h1
     text-align: left
     padding-bottom: 0
@@ -28,15 +30,6 @@
       margin: 0.5em 1em 0 0
       float: left
       fill: #e5954c
-  .no_machines
-    font-weight: bold
-    line-height: 7em
-    border-radius: 0.2em
-    text-align: center
-    max-width: 32.5em
-    color: #489c9c
-    span
-      font-size: 0.9em
   .machine_form
     height: 5em
     .action
@@ -98,7 +91,7 @@
 
 @media only screen and (max-width: 45em)
   #LaundryMain
-    .no_machines
+    .empty_list
       max-width: 26.5em
     .machine_form
       label
@@ -106,7 +99,7 @@
           width: 15em
 @media only screen and (max-width: 30em)
   #LaundryMain
-    .no_machines
+    .empty_list
       max-width: 23em
     .machine_form
       label
