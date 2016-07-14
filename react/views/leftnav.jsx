@@ -45,6 +45,14 @@ class LeftNav extends React.Component {
                 <span>Machines</span>
               </Link>
             </li>
+            <li data-label='Users'>
+              <Link to={'/laundries/' + this.props.currentLaundry + '/users'} activeClassName='active'>
+                <svg>
+                  <use xlinkHref='#Users' />
+                </svg>
+                <span>Users</span>
+              </Link>
+            </li>
           </ul>
           <hr/>
           <ul>
