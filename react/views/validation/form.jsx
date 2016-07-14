@@ -17,13 +17,20 @@ class ValidationForm extends React.Component {
     }
   }
 
+  componentWillReceiveProps ({sesh}) {
+    if (sesh === this.props.sesh) return
+    this.setState(this.initialState)
+  }
+
   generateValidationHandler () {
-    return (name, valid) => {
+    return (name, valid, initial) => {
       this.setState((prevState) => {
         const valids = prevState.valid
         const obj = {}
         obj[name] = valid
-        return {initial: false, valid: Object.assign({}, valids, obj)}
+        const resultObj = {valid: Object.assign({}, valids, obj)}
+        if (initial) return Object.assign({}, resultObj)
+        return Object.assign({initial: false}, resultObj)
       })
     }
   }
@@ -72,6 +79,7 @@ ValidationForm.childContextTypes = {
 }
 
 ValidationForm.propTypes = {
+  sesh: React.PropTypes.number,
   initial: React.PropTypes.bool,
   onSubmit: React.PropTypes.func,
   className: React.PropTypes.string,

@@ -95,7 +95,7 @@ class MachineListItem extends React.Component {
       if (this.props.machine) return this.onUpdateName()
       this.props
         .onSubmit(this.selected, this.value)
-        .then(() => this.setState(this.initialState))
+        .then(() => this.reset())
     }
 
     this.onUpdateName = () => {
@@ -113,13 +113,16 @@ class MachineListItem extends React.Component {
     }
   }
 
+  reset () {
+    this.setState(({sesh}) => Object.assign({}, this.initialState, {sesh: sesh + 1}))
+  }
   componentWillReceiveProps ({machine}) {
     if (!machine) return
     this.setState({value: machine.name, selected: machine.type})
   }
 
   get initialState () {
-    if (!this.props.machine) return {value: '', selected: 'wash', initial: true}
+    if (!this.props.machine) return {sesh: 0, value: '', selected: 'wash', initial: true}
     return {value: this.props.machine.name, selected: this.props.machine.type, initial: true}
   }
 
@@ -154,11 +157,13 @@ class MachineListItem extends React.Component {
           {label: 'Cancel', className: 'cancel', action: this.onCloseModal}]}
       />
       <ValidationForm
+        sesh={this.state.sesh}
         className='machine_form'
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
         <Dropdown selected={this.selected} onSelect={this.onSelect}/>
         <ValidationElement
+          sesh={this.state.sesh}
           trim
           notOneOf={this.blacklist}
           value={this.value} initial={this.state.initial}>
