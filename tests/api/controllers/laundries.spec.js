@@ -269,6 +269,111 @@ describe('controllers', function () {
         })
       })
     })
+    describe('POST /laundries/{id}/invite-by-email', () => {
+      it('should fail on not authenticated', (done) => {
+        request(app)
+          .post('/api/laundries/id/invite-by-email')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end((err, res) => done(err))
+      })
+      it('should return 404 on invalid id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .post('/api/laundries/id/invite-by-email')
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Laundry not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on missing id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .post('/api/laundries/id/invite-by-email')
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Laundry not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on other id', (done) => {
+        dbUtils.populateLaundries(1).then(({laundries}) => {
+          const [laundry] = laundries
+          dbUtils.populateLaundries(1).then(({user, token}) => {
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: 'alice@example.com'})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Laundry not found'})
+                done()
+              })
+          })
+        })
+      })
+      it('should succeed', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => done(err))
+        })
+      })
+      // TODO add more happy paths
+      it('should fail when only user', (done) => {
+        dbUtils.populateTokens(1)
+          .then(({user, token}) => {
+            return dbUtils
+              .populateLaundries(1)
+              .then(({laundry}) => {
+                return user
+                  .addLaundry(laundry)
+                  .then(() => {
+                    request(app)
+                      .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+                      .send({email: 'alice@example.com'})
+                      .set('Accept', 'application/json')
+                      .set('Content-Type', 'application/json')
+                      .auth(user.model.id, token.secret)
+                      .expect('Content-Type', /json/)
+                      .expect(403)
+                      .end((err, res) => {
+                        if (err) return done(err)
+                        res.body.should.deep.equal({message: 'Not allowed'})
+                        done()
+                      })
+                  })
+              })
+          })
+          .catch(done)
+      })
+    })
     describe('DELETE /laundries/{id}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
@@ -348,26 +453,27 @@ describe('controllers', function () {
                 })
             })
         })
-        it('should fail when only user', (done) => {
-          dbUtils.populateTokens(1).then(({user, tokens}) => {
-            const [token] = tokens
-            return dbUtils.populateLaundries(1).then(({laundries}) => {
-              const [laundry] = laundries
-              return user.addLaundry(laundry)
-                .then(() => {
-                  request(app)
-                    .get(`/api/laundries/${laundries[0].model.id}`)
-                    .set('Accept', 'application/json')
-                    .set('Content-Type', 'application/json')
-                    .auth(user.model.id, token.secret)
-                    .expect('Content-Type', /json/)
-                    .expect(403)
-                    .end((err, res) => {
-                      if (err) return done(err)
-                      res.body.should.deep.equal({message: 'Not allowed'})
-                    })
-                })
-            })
+      })
+      it('should fail when only user', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          const [token] = tokens
+          return dbUtils.populateLaundries(1).then(({laundries}) => {
+            const [laundry] = laundries
+            return user.addLaundry(laundry)
+              .then(() => {
+                request(app)
+                  .delete(`/api/laundries/${laundries[0].model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .auth(user.model.id, token.secret)
+                  .expect('Content-Type', /json/)
+                  .expect(403)
+                  .end((err, res) => {
+                    if (err) return done(err)
+                    res.body.should.deep.equal({message: 'Not allowed'})
+                    done()
+                  })
+              })
           })
         })
       })
