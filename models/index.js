@@ -12,5 +12,6 @@ module.exports = {
   TokenModel: require('./token'),
   LaundryModel: require('./laundry'),
   BookingModel: require('./booking'),
-  MachineModel: require('./machine')
+  MachineModel: require('./machine'),
+  LaundryInvitationModel: require('./laundry_invitation')
 }

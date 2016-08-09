@@ -65,13 +65,16 @@ function deleteLaundry (req, res) {
 
 function inviteUserByEmail (req, res) {
   const id = req.swagger.params.id.value
+  const email = req.swagger.params.body.value.email
   LaundryHandler
     .findFromId(id)
     .then((laundry) => {
       if (!laundry) return api.returnError(res, 404, 'Laundry not found')
       if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
       if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
-      return api.returnSuccess(res)
+      return laundry
+        .inviteUserByEmail(email)
+        .then(() => api.returnSuccess(res))
     })
     .catch(api.generateErrorHandler(res))
 }

@@ -7,7 +7,7 @@ const MachineHandler = require('./machine')
 const BookingHandler = require('./booking')
 const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
-
+const LaundryInvitationHandler = require('./laundry_invitation')
 const pubStaticEmitter = new EventEmitter()
 const subStaticEmitter = new EventEmitter()
 
@@ -176,6 +176,15 @@ class LaundryHandler extends Handler {
    */
   fetchBookings (from, to) {
     return BookingHandler._fetchBookings(from, to, this.model.machines)
+  }
+
+  /**
+   * Invite a user by email address.
+   * @param {string} email
+   * @return {LaundryInvitationHandler}
+   */
+  inviteUserByEmail (email) {
+    return LaundryInvitationHandler.createInvitation(this, email)
   }
 
   toRest () {

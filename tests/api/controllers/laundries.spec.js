@@ -5,7 +5,7 @@ chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {LaundryHandler} = require('../../../handlers')
+const {LaundryHandler, LaundryInvitationHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
 const lodash = require('lodash')
 
@@ -343,6 +343,26 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .end((err, res) => done(err))
+        })
+      })
+      it('should create invitation', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryInvitationHandler
+                .find({email: 'alice@example.com', laundry: laundry.model._id})
+                .then(([invitation]) => {
+                  chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
+                  done()
+                }).catch(done)
+            })
         })
       })
       // TODO add more happy paths

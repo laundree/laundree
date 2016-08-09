@@ -9,7 +9,9 @@ class InviteUserForm extends React.Component {
     this.state = {values: {}, sesh: 0}
     this.submitHandler = (evt) => {
       evt.preventDefault()
-      this.reset()
+      return this.context.actions
+        .inviteUserByEmail(this.props.laundryId, this.state.values.email)
+        .then(() => this.reset())
     }
   }
 
@@ -42,6 +44,16 @@ class InviteUserForm extends React.Component {
   }
 }
 
+InviteUserForm.contextTypes = {
+  actions: React.PropTypes.shape({
+    inviteUserByEmail: React.PropTypes.func
+  })
+}
+
+InviteUserForm.propTypes = {
+  laundryId: React.PropTypes.string.isRequired
+}
+
 class Users extends React.Component {
 
   renderUser (user) {
@@ -66,7 +78,7 @@ class Users extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title='Bookings'>
+    return <DocumentTitle title='Laundry users'>
       <main className='naved'>
         <h1 className='alignLeft'>Laundry users</h1>
         <section id='UserList'>
@@ -74,7 +86,7 @@ class Users extends React.Component {
         </section>
         <section id='InviteUserForm'>
           <h2>Invite user</h2>
-          <InviteUserForm/>
+          <InviteUserForm laundryId={this.props.laundry.id}/>
         </section>
       </main>
     </DocumentTitle>
