@@ -64,17 +64,32 @@ class Users extends React.Component {
       </div>
     </div>
   }
+  renderInvite (invite) {
+    return <div>
+      <div className='avatar'/>
+      <div className='name'>
+        {invite.email}
+      </div>
+    </div>
+  }
 
   isOwner (user) {
     return this.props.laundry.owners.find((id) => id === user.id)
   }
 
   renderUsers () {
-    return <ul>{this.users.map((user) => <li key={user.id}>{this.renderUser(user)}</li>)}</ul>
+    return <ul>
+      {this.users.map((user) => <li key={user.id}>{this.renderUser(user)}</li>)}
+      {this.invites.map((invite) => <li key={invite.id}>{this.renderInvite(invite)}</li>)}
+      </ul>
   }
 
   get users () {
     return this.props.laundry.users.map((id) => this.props.users[id]).filter((u) => u)
+  }
+
+  get invites () {
+    return this.props.laundry.invites.map((id) => this.props.invites[id]).filter((i) => i).filter(({used}) => !used)
   }
 
   render () {
@@ -94,6 +109,7 @@ class Users extends React.Component {
 }
 
 Users.propTypes = {
+  invites: React.PropTypes.object,
   users: React.PropTypes.object,
   laundry: React.PropTypes.object
 }

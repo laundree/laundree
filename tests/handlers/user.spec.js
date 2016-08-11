@@ -8,8 +8,9 @@ chai.use(chaiAsPromised)
 chai.should()
 var dbUtils = require('../db_utils')
 var clearDb = dbUtils.clearDb
-var UserHandler = require('../../handlers').UserHandler
+var {UserHandler, LaundryInvitationHandler, LaundryHandler} = require('../../handlers')
 var assert = chai.assert
+
 describe('handlers', () => {
   describe('UserHandler', function () {
     this.timeout(20000)
@@ -25,6 +26,30 @@ describe('handlers', () => {
     beforeEach(() => clearDb().then(() => UserHandler.createUserFromProfile(profile)).then((u) => {
       user = u
     }))
+
+    describe('createUserFromProfile', () => {
+      it('should add laundry if invitations on creation', () =>
+        user.createLaundry('Bobs Laundry').then((laundry) =>
+          laundry
+            .inviteUserByEmail('alice@example.com')
+            .then(() => UserHandler
+              .createUserFromProfile(Object.assign({}, profile, {emails: [{value: 'alice@example.com'}]}))
+              .then((user) => {
+                user.model.laundries.should.have.length(1)
+                user.model.laundries[0].toString().should.equal(laundry.model.id)
+                return LaundryHandler
+                  .find({_id: laundry.model._id})
+                  .then(([laundry]) => {
+                    Boolean(laundry.isUser(user)).should.be.true
+                    return LaundryInvitationHandler
+                      .find({email: 'alice@example.com'})
+                      .then((results) => {
+                        results.should.have.length(1)
+                        results[0].model.used.should.be.true
+                      })
+                  })
+              }))))
+    })
 
     describe('findFromEmail', () => {
       it('should be possible to find existing profiles from email',

@@ -19,6 +19,11 @@ const DELETE_BOOKING = 'DELETE_BOOKING'
 const CREATE_BOOKING = 'CREATE_BOOKING'
 const LIST_BOOKINGS = 'LIST_BOOKINGS'
 const LIST_BOOKINGS_FOR_USER = 'LIST_BOOKINGS_FOR_USER'
+const LIST_USERS = 'LIST_USERS'
+const CREATE_INVITATION = 'CREATE_INVITATION'
+const LIST_INVITATIONS = 'LIST_INVITATIONS'
+const DELETE_INVITATION = 'DELETE_INVITATION'
+const UPDATE_INVITATION = 'UPDATE_INVITATION'
 
 /**
  * @param {UserHandler} user
@@ -40,8 +45,9 @@ function laundryMapper (laundry) {
     id: laundry.model.id,
     name: laundry.model.name,
     machines: laundry.machineIds,
-    users: laundry.model.users.map((id) => id.toString()),
-    owners: laundry.model.owners.map((id) => id.toString())
+    users: laundry.userIds,
+    owners: laundry.ownerIds,
+    invites: laundry.inviteIds
   }
 }
 
@@ -60,7 +66,18 @@ function bookingMapper (booking) {
     id: booking.model.id,
     from: booking.model.from,
     to: booking.model.to,
-    machine: booking.model.machine.toString()
+    machine: booking.model.machine.toString(),
+    owner: booking.model.owner.toString()
+  }
+}
+
+function invitationMapper (invite) {
+  if (!invite.model) return invite
+  return {
+    used: invite.model.used,
+    id: invite.model.id,
+    email: invite.model.email,
+    laundry: invite.model.laundry.toString()
   }
 }
 
@@ -81,7 +98,12 @@ module.exports = {
     CREATE_BOOKING,
     DELETE_BOOKING,
     LIST_BOOKINGS,
-    LIST_BOOKINGS_FOR_USER
+    LIST_BOOKINGS_FOR_USER,
+    LIST_USERS,
+    CREATE_INVITATION,
+    LIST_INVITATIONS,
+    DELETE_INVITATION,
+    UPDATE_INVITATION
   },
   listLaundries: createAction(LIST_LAUNDRIES, (laundries) => laundries.map(laundryMapper)),
   createLaundry: createAction(CREATE_LAUNDRY, laundryMapper),
@@ -90,17 +112,26 @@ module.exports = {
 
   signInUser: createAction(SIGN_IN_USER, userMapper),
   updateUser: createAction(UPDATE_USER, userMapper),
+  listUsers: createAction(LIST_USERS, (users) => users.map(userMapper)),
 
   listMachines: createAction(LIST_MACHINES, (machines) => machines.map(machineMapper)),
   createMachine: createAction(CREATE_MACHINE, machineMapper),
   updateMachine: createAction(UPDATE_MACHINE, machineMapper),
   deleteMachine: createAction(DELETE_MACHINE),
 
-  listBookingsForUser: createAction(LIST_BOOKINGS_FOR_USER, (bookings) => bookings.map(bookingMapper)),
+  listBookingsForUser: createAction(LIST_BOOKINGS_FOR_USER, ({user, bookings}) => ({
+    user: user.model ? user.model.id : user,
+    bookings: bookings.map(bookingMapper)
+  })),
+
   listBookings: createAction(LIST_BOOKINGS, (bookings) => bookings.map(bookingMapper)),
   createBooking: createAction(CREATE_BOOKING, bookingMapper),
   updateBooking: createAction(UPDATE_BOOKING, bookingMapper),
   deleteBooking: createAction(DELETE_BOOKING),
 
+  listInvites: createAction(LIST_INVITATIONS, (invites) => invites.map(invitationMapper)),
+  createInvite: createAction(CREATE_INVITATION, invitationMapper),
+  deleteInvite: createAction(DELETE_INVITATION, invitationMapper),
+  updateInvite: createAction(UPDATE_INVITATION, invitationMapper),
   flash: createAction(FLASH)
 }

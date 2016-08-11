@@ -4,6 +4,18 @@
 
 const Handler = require('./handler')
 const {LaundryInvitationModel} = require('../models')
+const EventEmitter = require('events')
+const {linkEmitter} = require('../lib/redis')
+const pubStaticEmitter = new EventEmitter()
+const subStaticEmitter = new EventEmitter()
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'laundryInvitation',
+  ['create', 'delete', 'update'],
+  (invitation) => Promise.resolve(invitation.model.id),
+  (id) => LaundryInvitationHandler.findFromId(id))
 
 class LaundryInvitationHandler extends Handler {
 
@@ -20,14 +32,43 @@ class LaundryInvitationHandler extends Handler {
     return this._findFromId(LaundryInvitationModel, LaundryInvitationHandler, id)
   }
 
+  static on () {
+    return Handler._on(pubStaticEmitter, arguments)
+  }
+
+  static removeListener () {
+    return Handler._removeListener(pubStaticEmitter, arguments)
+  }
+
+  emitEvent (event) {
+    return this._emitEvent(subStaticEmitter, event)
+  }
+
   /**
    * Create a new invitation
    * @param {LaundryHandler} laundry
    * @param {string} email
    */
-  static createInvitation (laundry, email) {
-    return new LaundryInvitationModel({laundry: laundry.model._id, email}).save()
+  static _createInvitation (laundry, email) {
+    return new LaundryInvitationModel({laundry: laundry.model._id, email: email.toLowerCase()}).save()
       .then((model) => new LaundryInvitationHandler(model))
+      .then((invitation) => {
+        invitation.emitEvent('create')
+        return invitation
+      })
+  }
+
+  _deleteInvite () {
+    return this.model.remove().then(() => this)
+  }
+
+  toRestSummary () {
+    return {email: this.model.email, id: this.model.id}
+  }
+
+  markUsed () {
+    this.model.used = true
+    return this.model.save().then(() => this.emitEvent('update')).then(() => this)
   }
 }
 

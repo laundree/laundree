@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.3"
+  version: "0.0.4"
   title: Laundree App
 
 host: laundree.io
@@ -1049,7 +1049,14 @@ definitions:
         type: array
         items: 
           $ref: "#/definitions/UserSummary"
-
+      machines:
+        type: array
+        items:
+          $ref: "#/definitions/MachineSummary"
+      invites:
+        type: array
+        items:
+          $ref: "#/definitions/InviteSummary"
   LaundrySummary:
     required:
       - id
@@ -1157,6 +1164,16 @@ definitions:
         type: string
       name: 
         type: string
+  InviteSummary:
+    required:
+      - id
+      - email
+    properties:
+      id:
+        type: string
+      email: 
+        type: string
+        format: email
   Machine:
     required:
       - id

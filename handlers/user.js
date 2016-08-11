@@ -5,6 +5,7 @@
 const Handler = require('./handler')
 const TokenHandler = require('./token')
 const LaundryHandler = require('./laundry')
+const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const lodash = require('lodash')
 const utils = require('../utils')
@@ -228,6 +229,7 @@ class UserHandler extends Handler {
    * @return {Promise.<string>}
    */
   generateVerifyEmailToken (email) {
+    email = email.toLowerCase()
     if (this.model.emails.indexOf(email) < 0) return Promise.resolve()
     return utils.password
       .generateToken()
@@ -246,6 +248,7 @@ class UserHandler extends Handler {
    * @returns {Promise.<boolean>}
    */
   verifyEmail (email, token) {
+    email = email.toLowerCase()
     const storedToken = this.model.explicitVerificationEmailTokens.find((element) => element.email === email)
     if (!storedToken) return Promise.resolve(false)
     return utils.password.comparePassword(token, storedToken.hash).then((result) => {
@@ -265,14 +268,13 @@ class UserHandler extends Handler {
   static createUserFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return new UserModel({
-      profiles: [profile],
-      laundries: [],
+      profiles: [Object.assign({}, profile, {emails: profile.emails.map(({value}) => ({value: value.toLowerCase()}))})],
       latestProvider: profile.provider
     }).save()
-      .then((model) => UserHandler.findFromId(model.id))
+      .then((model) => new UserHandler(model))
       .then((user) => {
         user.emitEvent('create')
-        return user
+        return user.addLaundriesFromInvites().then(() => user)
       })
   }
 
@@ -296,6 +298,15 @@ class UserHandler extends Handler {
         user.model.password = passwordHash
         return user.model.save().then((model) => UserHandler.findFromId(model.id))
       })
+  }
+
+  addLaundriesFromInvites () {
+    return LaundryInvitationHandler
+      .find({email: {$in: this.model.emails}})
+      .then((invites) => LaundryHandler
+        .find({_id: {$in: invites.map(({model: {laundry}}) => laundry)}})
+        .then((laundries) => Promise.all(laundries.map((laundry) => this.addLaundry(laundry))))
+        .then(() => Promise.all(invites.map((invite) => invite.markUsed()))))
   }
 
   resetPassword (password) {

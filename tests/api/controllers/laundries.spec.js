@@ -5,7 +5,7 @@ chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {LaundryHandler, LaundryInvitationHandler} = require('../../../handlers')
+const {LaundryHandler, LaundryInvitationHandler, UserHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
 const lodash = require('lodash')
 
@@ -365,7 +365,96 @@ describe('controllers', function () {
             })
         })
       })
-      // TODO add more happy paths
+      it('should create invitation in lower case', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: 'ALICE@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryInvitationHandler
+                .find({email: 'alice@example.com', laundry: laundry.model._id})
+                .then(([invitation]) => {
+                  chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
+                  done()
+                }).catch(done)
+            })
+        })
+      })
+      it('should not create another invitation', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          laundry.inviteUserByEmail('alice@example.com').then(() => {
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: 'alice@example.com'})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)
+              .end((err, res) => {
+                if (err) return done(err)
+                LaundryInvitationHandler
+                  .find({email: 'alice@example.com', laundry: laundry.model._id})
+                  .then((invitations) => {
+                    invitations.should.have.length(1)
+                    done()
+                  }).catch(done)
+              })
+          })
+        })
+      })
+      it('should add existing user instead of create invitation', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: user.model.emails[0]})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryInvitationHandler
+                .find({email: user.model.emails[0], laundry: laundry.model._id})
+                .then((invitations) => {
+                  invitations.should.have.length(0)
+                  done()
+                }).catch(done)
+            })
+        })
+      })
+      it('should add existing user instead of create invitation 2', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          return dbUtils.populateUsers(1).then(([user2]) => {
+            const email = user2.model.emails[0]
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)
+              .end((err, res) => {
+                if (err) return done(err)
+                LaundryInvitationHandler
+                  .find({email, laundry: laundry.model._id})
+                  .then((invitations) => {
+                    invitations.should.have.length(0)
+                    return UserHandler.findFromEmail(email)
+                      .then((user) => {
+                        user.model.laundries[0].toString().should.equal(laundry.model.id)
+                        done()
+                      })
+                  }).catch(done)
+              })
+          })
+        })
+          .catch(done)
+      })
       it('should fail when only user', (done) => {
         dbUtils.populateTokens(1)
           .then(({user, token}) => {
