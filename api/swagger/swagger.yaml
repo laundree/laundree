@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.2"
+  version: "0.0.4"
   title: Laundree App
 
 host: laundree.io
@@ -663,6 +663,45 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /laundries/{id}/invite-by-email:
+    x-swagger-router-controller: laundries
+    post:
+      operationId: inviteUserByEmail
+      security:
+        - userAccessToken: []
+      tags:
+        - Laundries
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - email
+            properties:
+              email:
+                type: string
+                format: email
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /machines/{id}:
     x-swagger-router-controller: machines
     get:
@@ -1010,7 +1049,14 @@ definitions:
         type: array
         items: 
           $ref: "#/definitions/UserSummary"
-
+      machines:
+        type: array
+        items:
+          $ref: "#/definitions/MachineSummary"
+      invites:
+        type: array
+        items:
+          $ref: "#/definitions/InviteSummary"
   LaundrySummary:
     required:
       - id
@@ -1118,6 +1164,16 @@ definitions:
         type: string
       name: 
         type: string
+  InviteSummary:
+    required:
+      - id
+      - email
+    properties:
+      id:
+        type: string
+      email: 
+        type: string
+        format: email
   Machine:
     required:
       - id

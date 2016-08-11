@@ -4,12 +4,39 @@
 const {createStore} = require('redux')
 const reducer = require('./reducer')
 const actions = require('./actions')
-const lodash = require('lodash')
 
 function mapFlash (flashArray, type) {
   return flashArray
     .map((message) => ({type: type, message: message}))
     .map((flash) => actions.flash(flash))
+}
+
+/**
+ * @param laundry
+ * @returns {Promise.<{machines, users, invites}>}
+ */
+function fetchLaundry (laundry) {
+  return Promise
+    .all([laundry.fetchMachines(), laundry.fetchUsers(), laundry.fetchInvites()])
+    .then(([machines, users, invites]) => ({machines, users, invites}))
+}
+
+function fetchLaundries (laundries) {
+  return Promise
+    .all(laundries.map(fetchLaundry))
+    .then((r) => r.reduce((obj, next) => {
+      return {
+        machines: obj.machines.concat(next.machines),
+        users: obj.users.concat(next.users),
+        invites: obj.invites.concat(next.invites)
+      }
+    }, {machines: [], users: [], invites: []}))
+    .then(({machines, users, invites}) => ({
+      machines,
+      users,
+      invites,
+      laundries
+    }))
 }
 
 /**
@@ -26,14 +53,17 @@ function createInitialEvents (currentUser, successFlash = [], errorFlash = []) {
   events.push(actions.signInUser(currentUser))
 
   return currentUser.fetchLaundries()
-    .then((laundries) => Promise.all(laundries.map((laundry) => laundry.fetchMachines()))
-      .then((machines) => ({laundries, machines: lodash.flatten(machines)})))
-    .then(({laundries, machines}) => {
+    .then(fetchLaundries)
+    .then(({laundries, machines, users, invites}) => {
       laundries = laundries.filter((l) => l)
-      machines = machines.filter((m) => m)
       if (!laundries.length) return events
+      machines = machines.filter((m) => m)
+      users = users.filter((u) => u)
+      invites = invites.filter((i) => i)
       events.push(actions.listLaundries(laundries))
       events.push(actions.listMachines(machines))
+      events.push(actions.listUsers(users))
+      events.push(actions.listInvites(invites))
       return events
     })
 }

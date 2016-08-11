@@ -38,6 +38,15 @@ class LaundryClientApi {
     })
       .catch(wrapError)
   }
+
+  inviteUserByEmail (email) {
+    return client({
+      path: `/api/laundries/${this.id}/invite-by-email`,
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      entity: {email}
+    })
+  }
 }
 
 module.exports = LaundryClientApi

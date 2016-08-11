@@ -11,35 +11,36 @@ class ValidationElement extends React.Component {
 
   constructor (props) {
     super(props)
-    this.valid = undefined
-    this.value = undefined
+    this.initialState = {initial: true}
     this.state = {initial: true}
   }
 
-  handle (valid) {
-    valid = Boolean(valid)
-    if (valid === this.valid) return
-    this.valid = valid
-    if (!this.context.validation.handler) return
-    this.context.validation.handler(this.name, valid)
+  handle (valid, initial = false) {
+    this.context.validation.handler(this.name, Boolean(valid), initial)
   }
 
   componentDidMount () {
     this.id = newId()
-    this.handle(false)
+    this.reset()
   }
 
-  componentWillReceiveProps (nextProps) {
-    if (nextProps.value === this.props.value) return
+  reset () {
+    this.setState(this.initialState)
+    this.handle(false, true)
+  }
+
+  componentWillReceiveProps ({value, sesh}) {
+    if (value === this.props.value) return
     this.setState({initial: false})
+    this.handle(this.validate(value), sesh !== this.props.sesh)
   }
 
   get name () {
     return `id${this.id}`
   }
 
-  validate () {
-    var value = this.props.value
+  validate (value) {
+    value = value || this.props.value
     if (this.props.trim) value = value.trim()
     if (this.props.validator) return this.props.validator(value)
     if (this.props.notOneOf) return this.props.notOneOf.indexOf(value) < 0
@@ -47,10 +48,6 @@ class ValidationElement extends React.Component {
     if (this.props.email) return regex.email.exec(value)
     if (this.props.password) return regex.password.exec(value)
     return true
-  }
-
-  componentDidUpdate () {
-    this.handle(this.validate())
   }
 
   render () {
@@ -68,6 +65,7 @@ ValidationElement.contextTypes = {
 }
 
 ValidationElement.propTypes = {
+  sesh: React.PropTypes.number,
   children: React.PropTypes.any,
   notOneOf: React.PropTypes.arrayOf(React.PropTypes.string),
   trim: React.PropTypes.bool,

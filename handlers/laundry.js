@@ -5,9 +5,9 @@ const {LaundryModel} = require('../models')
 const Handler = require('./handler')
 const MachineHandler = require('./machine')
 const BookingHandler = require('./booking')
+const LaundryInvitationHandler = require('./laundry_invitation')
 const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
-
 const pubStaticEmitter = new EventEmitter()
 const subStaticEmitter = new EventEmitter()
 
@@ -71,7 +71,12 @@ class LaundryHandler extends Handler {
    * @return {Promise.<LaundryHandler>}
    */
   _deleteLaundry () {
-    return this.model.remove().then(() => this)
+    return this.fetchMachines()
+      .then((machines) => machines.map((machine) => machine._deleteMachine()))
+      .then(() => this.fetchInvites())
+      .then((invites) => invites.map((invite) => invite._deleteInvite()))
+      .then(() => this.model.remove())
+      .then(() => this)
   }
 
   /**
@@ -103,7 +108,7 @@ class LaundryHandler extends Handler {
   createMachine (name, type) {
     return MachineHandler._createMachine(this, name, type).then((machine) => {
       this.model.machines.push(machine.model._id)
-      return this.model.save().then(() => machine).then((machine) => {
+      return this.model.save().then(() => {
         this.emitEvent('update')
         return machine
       })
@@ -127,9 +132,30 @@ class LaundryHandler extends Handler {
       })
   }
 
+  /**
+   * Fetch machines
+   * @returns {Promise.<MachineHandler[]>}
+   */
   fetchMachines () {
     return LaundryModel.populate(this.model, {path: 'machines'})
       .then(({machines}) => machines.map((l) => new MachineHandler(l)))
+  }
+
+  /**
+   * @returns {Promise.<LaundryInvitationHandler[]>}
+   */
+  fetchInvites () {
+    return LaundryModel.populate(this.model, {path: 'invites'})
+      .then(({invites}) => invites.map((invite) => new LaundryInvitationHandler(invite)))
+  }
+
+  /**
+   * @returns {Promise.<UserHandler[]>}
+   */
+  fetchUsers () {
+    const UserHandler = require('./user')
+    return LaundryModel.populate(this.model, {path: 'users'})
+      .then(({users}) => users.map((user) => new UserHandler(user)))
   }
 
   /**
@@ -137,6 +163,27 @@ class LaundryHandler extends Handler {
    */
   get machineIds () {
     return (this.model.populated('machines') || this.model.machines).map((id) => id.toString())
+  }
+
+  /**
+   * @return {string[]}
+   */
+  get userIds () {
+    return (this.model.populated('users') || this.model.users).map((id) => id.toString())
+  }
+
+  /**
+   * @return {string[]}
+   */
+  get ownerIds () {
+    return (this.model.populated('owners') || this.model.owners).map((id) => id.toString())
+  }
+
+  /**
+   * @return {string[]}
+   */
+  get inviteIds () {
+    return (this.model.populated('invites') || this.model.invites).map((id) => id.toString())
   }
 
   /**
@@ -149,6 +196,7 @@ class LaundryHandler extends Handler {
     this.model.users.push(user.model._id)
     return this.model.save().then((model) => {
       this.model = model
+      this.emitEvent('update')
       return this
     })
   }
@@ -178,14 +226,48 @@ class LaundryHandler extends Handler {
     return BookingHandler._fetchBookings(from, to, this.model.machines)
   }
 
+  /**
+   * Invite a user by email address.
+   * @param {string} email
+   * @return {Promise}
+   */
+  inviteUserByEmail (email) {
+    const UserHandler = require('./user')
+    return UserHandler
+      .findFromEmail(email)
+      .then((user) => {
+        if (user) return user.addLaundry(this)
+        return LaundryInvitationHandler
+          .find({email, laundry: this.model._id})
+          .then(([invite]) => {
+            if (invite) return invite
+            return this.createInvitation(email)
+          })
+      })
+  }
+
+  createInvitation (email) {
+    return LaundryInvitationHandler
+      ._createInvitation(this, email)
+      .then((invite) => {
+        this.model.invites.push(invite.model._id)
+        return this.model.save().then(() => {
+          this.emitEvent('update')
+          return invite
+        })
+      })
+  }
+
   toRest () {
     const UserHandler = require('./user')
-    return LaundryModel.populate(this.model, {path: 'owners users'}).then((model) => ({
+    return LaundryModel.populate(this.model, {path: 'owners users machines invites'}).then((model) => ({
       name: model.name,
       id: model.id,
       href: this.restUrl,
       owners: model.owners.map((m) => new UserHandler(m).toRestSummary()),
-      users: model.users.map((m) => new UserHandler(m).toRestSummary())
+      users: model.users.map((m) => new UserHandler(m).toRestSummary()),
+      machines: model.machines.map((m) => new MachineHandler(m).toRestSummary()),
+      invites: model.invites.map((m) => new LaundryInvitationHandler(m).toRestSummary())
     }))
   }
 

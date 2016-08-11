@@ -16,23 +16,28 @@ function arrayToObject (array) {
  * @param {string[]} addActions Will add an entry
  * @param {string[]} deleteActions Will delete a given id
  * @param {string[]} listActions Will replace state with given entries.
+ * @param {Object.<string, Function>} mappers
  */
-function setupCollection (addActions, deleteActions = [], listActions = []) {
+function setupCollection (addActions, deleteActions = [], listActions = [], mappers = {}) {
   const actionMap = {}
   addActions.forEach((action) => {
-    actionMap[action] = (state, action) => object.assignImmutable(state, action.payload.id, action.payload)
+    const mapper = mappers[action] || ((p) => p)
+    actionMap[action] = (state, {payload}) => {
+      payload = mapper(payload)
+      return object.assignImmutable(state, payload.id, payload)
+    }
   })
   deleteActions.forEach((deleteAction) => {
-    actionMap[deleteAction] = (state, action) => Object.keys(state).reduce((s, key) => {
-      if (key === action.payload) return s
+    const mapper = mappers[deleteAction] || ((p) => p)
+    actionMap[deleteAction] = (state, {payload}) => Object.keys(state).reduce((s, key) => {
+      if (key === mapper(payload)) return s
       s[key] = state[key]
       return s
     }, {})
   })
   listActions.forEach((listAction) => {
-    if (listAction) {
-      actionMap[listAction] = (state, action) => Object.assign({}, state, arrayToObject(action.payload))
-    }
+    const mapper = mappers[listAction] || ((p) => p)
+    actionMap[listAction] = (state, {payload}) => Object.assign({}, state, arrayToObject(mapper(payload)))
   })
   return handleActions(actionMap, {})
 }

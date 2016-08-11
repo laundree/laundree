@@ -3,6 +3,7 @@
  */
 
 const Initializer = require('./initializer')
+const debug = require('debug')('laundree.initializers.app')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
@@ -24,11 +25,12 @@ function fetchStore () {
     var store
     var actions = []
     nsp.on('action', (action) => {
-      console.log(action)
+      debug(action)
       if (store) return store.dispatch(action)
       actions.push(action)
     })
     nsp.on('init', (events) => {
+      debug(events)
       if (!store) store = createStore(reducer)
       events.forEach((event) => store.dispatch(event))
       resolve(store)
@@ -83,6 +85,10 @@ function deleteBooking (id) {
   return new BookingClientApi(id).deleteBooking()
 }
 
+function inviteUserByEmail (laundryId, email) {
+  return new LaundryClientApi(laundryId).inviteUserByEmail(email)
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -99,7 +105,8 @@ class AppInitializer extends Initializer {
         createBooking,
         deleteBooking,
         listBookingsInTime,
-        listBookingsForUser
+        listBookingsForUser,
+        inviteUserByEmail
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

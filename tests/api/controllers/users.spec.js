@@ -275,6 +275,17 @@ describe('controllers', function () {
             .expect(204)
             .end(done)
         }))
+      it('should succeed on crazy case', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var [user] = users
+          request(app)
+            .post(`/api/users/${user.model.id}/start-email-verification`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({email: user.model.emails[0].toUpperCase()})
+            .expect(204)
+            .end(done)
+        }))
       it('should fail on wrong email', (done) =>
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
@@ -402,6 +413,21 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({token: token, email: user.model.emails[0]})
+            .expect(204)
+            .end((err) => done(err))
+        }))
+      it('success on crazy case token', (done) =>
+        dbUtils.populateUsers(1).then((users) => {
+          var user = users[0]
+          return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
+        }).then((result) => {
+          // noinspection UnnecessaryLocalVariableJS
+          var [user, token] = result
+          request(app)
+            .post(`/api/users/${user.model.id}/verify-email`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({token: token, email: user.model.emails[0].toUpperCase()})
             .expect(204)
             .end((err) => done(err))
         }))

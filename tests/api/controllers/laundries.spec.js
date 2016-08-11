@@ -5,7 +5,7 @@ chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {LaundryHandler} = require('../../../handlers')
+const {LaundryHandler, LaundryInvitationHandler, UserHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
 const lodash = require('lodash')
 
@@ -269,6 +269,220 @@ describe('controllers', function () {
         })
       })
     })
+    describe('POST /laundries/{id}/invite-by-email', () => {
+      it('should fail on not authenticated', (done) => {
+        request(app)
+          .post('/api/laundries/id/invite-by-email')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end((err, res) => done(err))
+      })
+      it('should return 404 on invalid id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .post('/api/laundries/id/invite-by-email')
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Laundry not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on missing id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .post('/api/laundries/id/invite-by-email')
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Laundry not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on other id', (done) => {
+        dbUtils.populateLaundries(1).then(({laundries}) => {
+          const [laundry] = laundries
+          dbUtils.populateLaundries(1).then(({user, token}) => {
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: 'alice@example.com'})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Laundry not found'})
+                done()
+              })
+          })
+        })
+      })
+      it('should succeed', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => done(err))
+        })
+      })
+      it('should create invitation', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: 'alice@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryInvitationHandler
+                .find({email: 'alice@example.com', laundry: laundry.model._id})
+                .then(([invitation]) => {
+                  chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
+                  done()
+                }).catch(done)
+            })
+        })
+      })
+      it('should create invitation in lower case', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: 'ALICE@example.com'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryInvitationHandler
+                .find({email: 'alice@example.com', laundry: laundry.model._id})
+                .then(([invitation]) => {
+                  chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
+                  done()
+                }).catch(done)
+            })
+        })
+      })
+      it('should not create another invitation', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          laundry.inviteUserByEmail('alice@example.com').then(() => {
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: 'alice@example.com'})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)
+              .end((err, res) => {
+                if (err) return done(err)
+                LaundryInvitationHandler
+                  .find({email: 'alice@example.com', laundry: laundry.model._id})
+                  .then((invitations) => {
+                    invitations.should.have.length(1)
+                    done()
+                  }).catch(done)
+              })
+          })
+        })
+      })
+      it('should add existing user instead of create invitation', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .send({email: user.model.emails[0]})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryInvitationHandler
+                .find({email: user.model.emails[0], laundry: laundry.model._id})
+                .then((invitations) => {
+                  invitations.should.have.length(0)
+                  done()
+                }).catch(done)
+            })
+        })
+      })
+      it('should add existing user instead of create invitation 2', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          return dbUtils.populateUsers(1).then(([user2]) => {
+            const email = user2.model.emails[0]
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)
+              .end((err, res) => {
+                if (err) return done(err)
+                LaundryInvitationHandler
+                  .find({email, laundry: laundry.model._id})
+                  .then((invitations) => {
+                    invitations.should.have.length(0)
+                    return UserHandler.findFromEmail(email)
+                      .then((user) => {
+                        user.model.laundries[0].toString().should.equal(laundry.model.id)
+                        done()
+                      })
+                  }).catch(done)
+              })
+          })
+        })
+          .catch(done)
+      })
+      it('should fail when only user', (done) => {
+        dbUtils.populateTokens(1)
+          .then(({user, token}) => {
+            return dbUtils
+              .populateLaundries(1)
+              .then(({laundry}) => {
+                return user
+                  .addLaundry(laundry)
+                  .then(() => {
+                    request(app)
+                      .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+                      .send({email: 'alice@example.com'})
+                      .set('Accept', 'application/json')
+                      .set('Content-Type', 'application/json')
+                      .auth(user.model.id, token.secret)
+                      .expect('Content-Type', /json/)
+                      .expect(403)
+                      .end((err, res) => {
+                        if (err) return done(err)
+                        res.body.should.deep.equal({message: 'Not allowed'})
+                        done()
+                      })
+                  })
+              })
+          })
+          .catch(done)
+      })
+    })
     describe('DELETE /laundries/{id}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
@@ -348,26 +562,27 @@ describe('controllers', function () {
                 })
             })
         })
-        it('should fail when only user', (done) => {
-          dbUtils.populateTokens(1).then(({user, tokens}) => {
-            const [token] = tokens
-            return dbUtils.populateLaundries(1).then(({laundries}) => {
-              const [laundry] = laundries
-              return user.addLaundry(laundry)
-                .then(() => {
-                  request(app)
-                    .get(`/api/laundries/${laundries[0].model.id}`)
-                    .set('Accept', 'application/json')
-                    .set('Content-Type', 'application/json')
-                    .auth(user.model.id, token.secret)
-                    .expect('Content-Type', /json/)
-                    .expect(403)
-                    .end((err, res) => {
-                      if (err) return done(err)
-                      res.body.should.deep.equal({message: 'Not allowed'})
-                    })
-                })
-            })
+      })
+      it('should fail when only user', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          const [token] = tokens
+          return dbUtils.populateLaundries(1).then(({laundries}) => {
+            const [laundry] = laundries
+            return user.addLaundry(laundry)
+              .then(() => {
+                request(app)
+                  .delete(`/api/laundries/${laundries[0].model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .auth(user.model.id, token.secret)
+                  .expect('Content-Type', /json/)
+                  .expect(403)
+                  .end((err, res) => {
+                    if (err) return done(err)
+                    res.body.should.deep.equal({message: 'Not allowed'})
+                    done()
+                  })
+              })
           })
         })
       })

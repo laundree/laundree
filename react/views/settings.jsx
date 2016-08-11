@@ -11,7 +11,7 @@ class Settings extends React.Component {
     return <DocumentTitle title='Settings'>
       <main className='naved' id='LaundryMain'>
         <h1>Laundry settings</h1>
-        <ValidationForm>
+        <ValidationForm id='LaundrySettingsForm'>
           <div>
             <ValidationElement value='' nonEmpty>
               <label data-default-label='Name' className='has_label' data-validate-error='A laundry must have a name'>

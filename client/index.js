@@ -2,7 +2,9 @@
  * Created by budde on 12/04/16.
  */
 
-console.log('┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴')
+const debug = require('debug')('laundree.client')
+
+debug('┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴')
 
 var initializers = require('./initializers')
 

@@ -14,5 +14,5 @@ function generateChangeHandler (self, name) {
 }
 
 module.exports = {
-  generateChangeHandler: generateChangeHandler
+  generateChangeHandler
 }
