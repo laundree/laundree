@@ -12,6 +12,7 @@ class LeftNav extends React.Component {
   }
 
   render () {
+    if (!this.props.laundry) return null
     const clickHandler = () => this.setState({expanded: !this.state.expanded})
     const owner = this.isOwner
     return <div>
@@ -84,7 +85,7 @@ class LeftNav extends React.Component {
 LeftNav.propTypes = {
   children: React.PropTypes.any,
   currentUser: React.PropTypes.string.isRequired,
-  laundry: React.PropTypes.object.isRequired
+  laundry: React.PropTypes.object
 }
 
 module.exports = LeftNav

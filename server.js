@@ -2,7 +2,7 @@
  * Module dependencies.
  */
 
-const appPromise = require('./app')
+const app = require('./app')
 const debug = require('debug')('laundree.server')
 const http = require('http')
 const config = require('config')
@@ -10,7 +10,7 @@ const {socketIoSetup} = require('./lib')
 
 const port = normalizePort(config.get('web.port'))
 
-module.exports = appPromise.then((app) => {
+module.exports = app.promise.then((app) => {
   /**
    * Get port from environment and store in Express.
    */

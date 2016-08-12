@@ -58,7 +58,7 @@ function deleteLaundry (req, res) {
       if (!laundry) return api.returnError(res, 404, 'Laundry not found')
       if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
       if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
-      return req.user.deleteLaundry(laundry).then(() => api.returnSuccess(res))
+      return laundry.deleteLaundry().then(() => api.returnSuccess(res))
     })
     .catch(api.generateErrorHandler(res))
 }

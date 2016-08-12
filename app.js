@@ -41,40 +41,42 @@ app.use(flash())
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Swagger
-module.exports = setups.swaggerSetup(app).then(() => {
-  app.use('/', routes)
+module.exports = {
+  app, promise: setups.swaggerSetup(app).then(() => {
+    app.use('/', routes)
 
-  app.get('/err', (req, res, next) => {
-    next(new Error('This is a test error'))
-  })
+    app.get('/err', (req, res, next) => {
+      next(new Error('This is a test error'))
+    })
 
-  app.use(function (req, res, next) {
-    res.status(404)
-    res.render('error-404',
-      {
-        title: ['Page not found'],
-        styles: ['/stylesheets/error.css']
+    app.use(function (req, res, next) {
+      res.status(404)
+      res.render('error-404',
+        {
+          title: ['Page not found'],
+          styles: ['/stylesheets/error.css']
+        })
+    })
+
+    if (app.get('env') === 'development') {
+      app.use((err, req, res, next) => {
+        logError(err)
+        res.status(err.status || 500)
+        res.render('error-500', {
+          message: err.message,
+          error: err,
+          styles: ['/stylesheets/error.css']
+        })
       })
-  })
+    }
 
-  if (app.get('env') === 'development') {
     app.use((err, req, res, next) => {
-      logError(err)
       res.status(err.status || 500)
       res.render('error-500', {
         message: err.message,
-        error: err,
         styles: ['/stylesheets/error.css']
       })
     })
-  }
-
-  app.use((err, req, res, next) => {
-    res.status(err.status || 500)
-    res.render('error-500', {
-      message: err.message,
-      styles: ['/stylesheets/error.css']
-    })
+    return app
   })
-  return app
-})
+}

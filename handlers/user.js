@@ -4,7 +4,6 @@
 
 const Handler = require('./handler')
 const TokenHandler = require('./token')
-const LaundryHandler = require('./laundry')
 const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const lodash = require('lodash')
@@ -126,6 +125,7 @@ class UserHandler extends Handler {
    * @return {Promise<LaundryHandler[]>}
    */
   findOwnedLaundries () {
+    const LaundryHandler = require('./laundry')
     return LaundryHandler.find({owners: this.model._id})
   }
 
@@ -166,13 +166,8 @@ class UserHandler extends Handler {
    * @return {Promise.<LaundryHandler>}
    */
   createLaundry (name) {
-    return LaundryHandler._createLaundry(this, name).then((laundry) => {
-      this.model.laundries.push(laundry.model._id)
-      return this.model.save().then(() => {
-        this.emitEvent('update')
-        return laundry
-      })
-    })
+    const LaundryHandler = require('./laundry')
+    return LaundryHandler.createLaundry(this, name)
   }
 
   /**
@@ -180,12 +175,18 @@ class UserHandler extends Handler {
    * @param {LaundryHandler} laundry
    * @return {Promise.<UserHandler>}
    */
-  addLaundry (laundry) {
-    return laundry._addUser(this)
+  _addLaundry (laundry) {
+    this.model.laundries.push(laundry.model._id)
+    return this.model.save()
       .then(() => {
-        this.model.laundries.push(laundry.model._id)
-        return this.model.save()
+        this.emitEvent('update')
+        return this
       })
+  }
+
+  _removeLaundry (laundry) {
+    this.model.laundries.pull(laundry.model._id)
+    return this.model.save()
       .then(() => {
         this.emitEvent('update')
         return this
@@ -206,19 +207,8 @@ class UserHandler extends Handler {
       .then(() => this)
   }
 
-  deleteLaundry (laundry) {
-    return laundry._deleteLaundry()
-      .then(() => {
-        this.model.laundries.pull(laundry.model._id)
-        return this.model.save()
-      })
-      .then(() => {
-        this.emitEvent('update')
-        return this
-      })
-  }
-
   fetchLaundries () {
+    const LaundryHandler = require('./laundry')
     return UserModel.populate(this.model, {path: 'laundries'})
       .then(({laundries}) => laundries.map((l) => new LaundryHandler(l)))
   }
@@ -301,11 +291,12 @@ class UserHandler extends Handler {
   }
 
   addLaundriesFromInvites () {
+    const LaundryHandler = require('./laundry')
     return LaundryInvitationHandler
       .find({email: {$in: this.model.emails}})
       .then((invites) => LaundryHandler
         .find({_id: {$in: invites.map(({model: {laundry}}) => laundry)}})
-        .then((laundries) => Promise.all(laundries.map((laundry) => this.addLaundry(laundry))))
+        .then((laundries) => Promise.all(laundries.map((laundry) => laundry.addUser(this))))
         .then(() => Promise.all(invites.map((invite) => invite.markUsed()))))
   }
 
@@ -345,11 +336,12 @@ class UserHandler extends Handler {
   }
 
   deleteUser () {
+    const LaundryHandler = require('./laundry')
     return UserModel.populate(this.model, {path: 'authTokens laundries'})
       .then((model) =>
         Promise.all([
           Promise.all(model.authTokens.map((t) => new TokenHandler(t).deleteToken())),
-          Promise.all(model.laundries.map((l) => new LaundryHandler(l)._removeUser(this)))]))
+          Promise.all(model.laundries.map((l) => new LaundryHandler(l).removeUser(this)))]))
       .then(() => this.model.remove())
       .then(() => this)
   }

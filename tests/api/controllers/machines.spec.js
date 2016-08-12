@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../../../app')
+const app = require('../../../app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
@@ -198,7 +198,7 @@ describe('controllers', function () {
           .then(([r1, r2]) => {
             const {laundry} = r1
             const {user, token} = r2
-            laundry._addUser(user).then(() => {
+            laundry.addUser(user).then(() => {
               request(app)
                 .post(`/api/laundries/${laundry.model.id}/machines`)
                 .send({name: 'Machine 2000', type: 'wash'})
@@ -341,7 +341,7 @@ describe('controllers', function () {
           .then(([r1, r2]) => {
             const {machine, laundry} = r1
             const {user, token} = r2
-            laundry._addUser(user).then(() => {
+            laundry.addUser(user).then(() => {
               request(app)
                 .put(`/api/machines/${machine.model.id}`)
                 .send({name: 'Machine 2000', type: 'wash'})
@@ -514,7 +514,7 @@ describe('controllers', function () {
         dbUtils.populateTokens(1).then(({user, tokens}) => {
           const [token] = tokens
           return dbUtils.populateMachines(1).then(({machine, laundry}) => {
-            return user.addLaundry(laundry)
+            return laundry.addUser(user)
               .then(() => {
                 request(app)
                   .get(`/api/machines/${machine.model.id}`)
@@ -532,7 +532,7 @@ describe('controllers', function () {
                   })
               })
           })
-        })
+        }).catch(done)
       })
     })
     describe('DELETE /machines/{id}', () => {

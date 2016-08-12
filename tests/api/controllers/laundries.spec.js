@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../../../app')
+const app = require('../../../app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
@@ -244,29 +244,30 @@ describe('controllers', function () {
         })
       })
       it('should succeed when only user', (done) => {
-        dbUtils.populateTokens(1).then(({user, tokens}) => {
-          const [token] = tokens
-          return dbUtils.populateLaundries(1).then(({laundries}) => {
-            const [laundry] = laundries
-            return user.addLaundry(laundry)
-              .then(() => {
-                request(app)
-                  .get(`/api/laundries/${laundries[0].model.id}`)
-                  .set('Accept', 'application/json')
-                  .set('Content-Type', 'application/json')
-                  .auth(user.model.id, token.secret)
-                  .expect('Content-Type', /json/)
-                  .expect(200)
-                  .end((err, res) => {
-                    if (err) return done(err)
-                    laundry.toRest().then((result) => {
-                      res.body.should.deep.equal(result)
-                      done()
+        dbUtils.populateTokens(1)
+          .then(({user, tokens}) => {
+            const [token] = tokens
+            return dbUtils.populateLaundries(1).then(({laundries}) => {
+              const [laundry] = laundries
+              return laundry.addUser(user)
+                .then(() => {
+                  request(app)
+                    .get(`/api/laundries/${laundries[0].model.id}`)
+                    .set('Accept', 'application/json')
+                    .set('Content-Type', 'application/json')
+                    .auth(user.model.id, token.secret)
+                    .expect('Content-Type', /json/)
+                    .expect(200)
+                    .end((err, res) => {
+                      if (err) return done(err)
+                      laundry.toRest().then((result) => {
+                        res.body.should.deep.equal(result)
+                        done()
+                      })
                     })
-                  })
-              })
-          })
-        })
+                })
+            })
+          }).catch(done)
       })
     })
     describe('POST /laundries/{id}/invite-by-email', () => {
@@ -408,24 +409,26 @@ describe('controllers', function () {
         })
       })
       it('should add existing user instead of create invitation', (done) => {
-        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
-          request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
-            .send({email: user.model.emails[0]})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect(204)
-            .end((err, res) => {
-              if (err) return done(err)
-              LaundryInvitationHandler
-                .find({email: user.model.emails[0], laundry: laundry.model._id})
-                .then((invitations) => {
-                  invitations.should.have.length(0)
-                  done()
-                }).catch(done)
-            })
-        })
+        dbUtils.populateLaundries(1)
+          .then(({user, token, laundry}) => {
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: user.model.emails[0]})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)
+              .end((err, res) => {
+                if (err) return done(err)
+                LaundryInvitationHandler
+                  .find({email: user.model.emails[0], laundry: laundry.model._id})
+                  .then((invitations) => {
+                    invitations.should.have.length(0)
+                    done()
+                  }).catch(done)
+              })
+          })
+          .catch(done)
       })
       it('should add existing user instead of create invitation 2', (done) => {
         dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
@@ -461,8 +464,8 @@ describe('controllers', function () {
             return dbUtils
               .populateLaundries(1)
               .then(({laundry}) => {
-                return user
-                  .addLaundry(laundry)
+                return laundry
+                  .addUser(user)
                   .then(() => {
                     request(app)
                       .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
@@ -568,7 +571,7 @@ describe('controllers', function () {
           const [token] = tokens
           return dbUtils.populateLaundries(1).then(({laundries}) => {
             const [laundry] = laundries
-            return user.addLaundry(laundry)
+            return laundry.addUser(user)
               .then(() => {
                 request(app)
                   .delete(`/api/laundries/${laundries[0].model.id}`)

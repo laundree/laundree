@@ -37,6 +37,10 @@ class TopNav extends React.Component {
     document.addEventListener('keyup', this.escListener)
   }
 
+  get laundry () {
+    return this.props.laundries[this.props.currentLaundry]
+  }
+
   renderUserLoggedInMenu () {
     const clickHandler = () => this.setState({open: !this.state.open})
     return <nav id='TopNav'>
@@ -46,7 +50,7 @@ class TopNav extends React.Component {
         </svg>
       </Link>
       <div className='laundries'>
-        {this.props.currentLaundry ? <span>{this.props.laundries[this.props.currentLaundry].name}</span> : null}
+        {this.laundry ? <span>{this.laundry.name}</span> : null}
       </div>
       <div className={'user dropdown ' + (this.state.open ? 'open' : '')} ref={this.refPuller}>
         <img src={this.props.user.photo} className='avatar' onClick={clickHandler}/>

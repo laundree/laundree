@@ -3,6 +3,7 @@
  */
 const {LaundryModel} = require('../models')
 const Handler = require('./handler')
+const UserHandler = require('./user')
 const MachineHandler = require('./machine')
 const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
@@ -18,6 +19,14 @@ linkEmitter(
   ['update', 'create'],
   (laundry) => Promise.resolve(laundry.model.id),
   (id) => LaundryHandler.findFromId(id))
+
+linkEmitter(
+  subStaticEmitter,
+  pubStaticEmitter,
+  'laundry',
+  ['delete'],
+  (laundry) => Promise.resolve(laundry.model.id),
+  (id) => Promise.resolve(id))
 
 class LaundryHandler extends Handler {
 
@@ -48,7 +57,7 @@ class LaundryHandler extends Handler {
    * @param {string} name
    * @return {Promise.<LaundryHandler>}
    */
-  static _createLaundry (owner, name) {
+  static createLaundry (owner, name) {
     return new LaundryModel({
       name: name,
       owners: [owner.model._id],
@@ -58,7 +67,7 @@ class LaundryHandler extends Handler {
       .then((model) => new LaundryHandler(model))
       .then((laundry) => {
         laundry.emitEvent('create')
-        return laundry
+        return owner._addLaundry(laundry).then(() => laundry)
       })
   }
 
@@ -70,13 +79,18 @@ class LaundryHandler extends Handler {
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}
    */
-  _deleteLaundry () {
+  deleteLaundry () {
     return this.fetchMachines()
-      .then((machines) => machines.map((machine) => machine._deleteMachine()))
+      .then((machines) => Promise.all(machines.map((machine) => machine._deleteMachine())))
       .then(() => this.fetchInvites())
-      .then((invites) => invites.map((invite) => invite._deleteInvite()))
+      .then((invites) => Promise.all(invites.map((invite) => invite._deleteInvite())))
+      .then(() => this.fetchUsers())
+      .then((users) => Promise.all(users.map((user) => user._removeLaundry(this))))
       .then(() => this.model.remove())
-      .then(() => this)
+      .then(() => {
+        this.emitEvent('delete')
+        return this
+      })
   }
 
   /**
@@ -153,7 +167,6 @@ class LaundryHandler extends Handler {
    * @returns {Promise.<UserHandler[]>}
    */
   fetchUsers () {
-    const UserHandler = require('./user')
     return LaundryModel.populate(this.model, {path: 'users'})
       .then(({users}) => users.map((user) => new UserHandler(user)))
   }
@@ -191,14 +204,14 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {Promise.<LaundryHandler>}
    */
-  _addUser (user) {
+  addUser (user) {
     if (this.isUser(user)) return Promise.resolve(this)
     this.model.users.push(user.model._id)
-    return this.model.save().then((model) => {
-      this.model = model
-      this.emitEvent('update')
-      return this
-    })
+    return this.model.save()
+      .then(() => {
+        this.emitEvent('update')
+        return user._addLaundry(this).then(() => this)
+      })
   }
 
   /**
@@ -206,12 +219,12 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {Promise.<LaundryHandler>}
    */
-  _removeUser (user) {
+  removeUser (user) {
     this.model.users.pull(user.model._id)
     this.model.owners.pull(user.model._id)
-    return this.model.save().then((m) => {
-      this.model = m
-      return this
+    return this.model.save().then(() => {
+      this.emitEvent('update')
+      return user._removeLaundry(this).then(() => this)
     })
   }
 
@@ -232,11 +245,10 @@ class LaundryHandler extends Handler {
    * @return {Promise}
    */
   inviteUserByEmail (email) {
-    const UserHandler = require('./user')
     return UserHandler
       .findFromEmail(email)
       .then((user) => {
-        if (user) return user.addLaundry(this)
+        if (user) return this.addUser(user)
         return LaundryInvitationHandler
           .find({email, laundry: this.model._id})
           .then(([invite]) => {

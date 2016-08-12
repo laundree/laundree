@@ -1,12 +1,7 @@
 /**
  * Created by budde on 06/05/16.
  */
-const rest = require('rest')
-const mime = require('rest/interceptor/mime')
-const errorCode = require('rest/interceptor/errorCode')
-const {wrapError} = require('../utils')
-
-const client = rest.wrap(mime).wrap(errorCode)
+const request = require('superagent')
 
 class UserClientApi {
 
@@ -21,56 +16,43 @@ class UserClientApi {
    * @return {Promise.<UserClientApi>}
    */
   static userFromEmail (email) {
-    return client({
-      path: `/api/users?email=${email}`,
-      method: 'GET'
-    }).catch(wrapError).then((response) => {
-      const entity = response.entity
-      if (!entity) return null
-      if (entity.length !== 1) return null
-      return new UserClientApi(entity[0].id, entity[0])
-    })
+    return request
+      .get(`/api/users?email=${email}`)
+      .then(({body}) => {
+        if (!body) return null
+        if (body.length !== 1) return null
+        return new UserClientApi(body[0].id, body[0])
+      })
   }
 
   resetPassword (token, password) {
-    return client({
-      path: `/api/users/${this.id}/password-reset`,
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      entity: {token: token, password: password}
-    }).catch(wrapError)
+    request
+      .post(`/api/users/${this.id}/password-reset`)
+      .send({token, password})
+      .then()
   }
 
   static createUser (displayName, email, password) {
-    return client({
-      path: '/api/users',
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      entity: {displayName: displayName, email: email, password: password}
-    })
-      .catch(wrapError)
-      .then((response) => {
-        const entity = response.entity
-        if (!entity) return null
-        return new UserClientApi(entity.id, entity)
+    return request
+      .post('/api/users')
+      .send({displayName, email, password})
+      .then(({body}) => {
+        if (!body) return null
+        return new UserClientApi(body.id, body)
       })
   }
 
   startPasswordReset () {
-    return client({
-      path: `/api/users/${this.id}/start-password-reset`,
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'}
-    }).catch(wrapError)
+    return request
+      .post(`/api/users/${this.id}/start-password-reset`)
+      .then()
   }
 
   startEmailVerification (email) {
-    return client({
-      path: `/api/users/${this.id}/start-email-verification`,
-      method: 'POST',
-      entity: {email: email},
-      headers: {'Content-Type': 'application/json'}
-    }).catch(wrapError)
+    return request
+      .post(`/api/users/${this.id}/start-email-verification`)
+      .send({email})
+      .then()
   }
 }
 
