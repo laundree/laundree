@@ -41,7 +41,7 @@ app.use(flash())
 app.use(express.static(path.join(__dirname, 'public')))
 
 // Swagger
-setups.swaggerSetup(app).then(() => {
+module.exports = setups.swaggerSetup(app).then(() => {
   app.use('/', routes)
 
   app.get('/err', (req, res, next) => {
@@ -76,6 +76,5 @@ setups.swaggerSetup(app).then(() => {
       styles: ['/stylesheets/error.css']
     })
   })
+  return app
 })
-
-module.exports = app

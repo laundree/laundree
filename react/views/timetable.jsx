@@ -94,13 +94,22 @@ class Timetable extends React.Component {
     })
   }
 
+  componentWillReceiveProps ({laundry: {machines}}) {
+    if (machines.length === this.props.laundry.machines.length) return
+    this.setState({numDays: this.calculateNumDays(machines.length)})
+  }
+
   componentWillUnmount () {
     window.removeEventListener('resize', this.handleResize)
   }
 
   get numDays () {
+    return this.calculateNumDays(this.props.laundry.machines.length)
+  }
+
+  calculateNumDays (numMachines) {
     if (!this._mainRef) return 0
-    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (this.props.laundry.machines.length * 100)), 1), 7)
+    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (numMachines * 100)), 1), 7)
   }
 
   get offsetDays () {
@@ -120,7 +129,7 @@ class Timetable extends React.Component {
     })
   }
 
-  renderTables () {
+  render () {
     const refPuller = (ref) => {
       this._mainRef = ref
     }
@@ -144,21 +153,6 @@ class Timetable extends React.Component {
       </div>
     </main>
   }
-
-  renderEmpty () {
-    return <main className='naved'>
-      <h1 className='alignLeft'>There are no machines registered</h1>
-      <section>
-        Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
-      </section>
-    </main>
-  }
-
-  render () {
-    return <DocumentTitle title='Timetable'>
-      {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
-    </DocumentTitle>
-  }
 }
 
 Timetable.propTypes = {
@@ -173,4 +167,43 @@ Timetable.propTypes = {
   })
 }
 
-module.exports = Timetable
+class TimetableWrapper extends React.Component {
+  renderEmpty () {
+    return <main className='naved'>
+      <h1 className='alignLeft'>There are no machines registered</h1>
+      <section>
+        Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
+      </section>
+    </main>
+  }
+
+  renderTables () {
+    return <Timetable
+      activeBooking={this.props.activeBooking}
+      offsetDate={this.props.offsetDate}
+      machines={this.props.machines}
+      bookings={this.props.bookings}
+      laundry={this.props.laundry}
+    />
+  }
+
+  render () {
+    return <DocumentTitle title='Timetable'>
+      {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
+    </DocumentTitle>
+  }
+}
+
+TimetableWrapper.propTypes = {
+  activeBooking: React.PropTypes.string,
+  offsetDate: React.PropTypes.string,
+  machines: React.PropTypes.object,
+  bookings: React.PropTypes.object,
+  laundry: React.PropTypes.shape({
+    id: React.PropTypes.string,
+    name: React.PropTypes.string,
+    machines: React.PropTypes.array
+  })
+}
+
+module.exports = TimetableWrapper

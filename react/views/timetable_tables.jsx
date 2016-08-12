@@ -23,11 +23,13 @@ class TimetableTable extends React.Component {
       now = new Date(now.getTime() + 10 * 60 * 1000)
       tooLate = now ? now.getHours() + (now.getMinutes() / 60) >= key / 2 : false
     }
+    const machines = this.props.laundry.machines
+      .map((id) => this.props.machines[id])
+      .filter((m) => m)
     return <tr
       key={key}
       className={(tooLate ? 'too_late' : '') + (this.props.hoverRow === key ? ' hover' : '')}>
-      {this.props.laundry.machines
-        .map((id) => this.props.machines[id])
+      {machines
         .map((m) => {
           const isBooked = this.isBooked(m.id, key)
           if (!isBooked) return <td key={m.id}/>
