@@ -8,6 +8,9 @@ const string = require('../../utils/string')
 const {Link} = require('react-router')
 
 const TimetableHeader = (props) => {
+  const machines = props.laundry.machines
+    .map((id) => props.machines[id])
+    .filter((m) => m)
   return <div className='header_container'>
     <div className='date'>
       <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={props.date}/>
@@ -15,8 +18,7 @@ const TimetableHeader = (props) => {
     <table>
       <tbody>
       <tr className='machines'>
-        {props.laundry.machines
-          .map((id) => props.machines[id])
+        {machines
           .map((machine, i) => <td
             key={machine.id}
             className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '')}>
@@ -26,8 +28,7 @@ const TimetableHeader = (props) => {
           </td>)}
       </tr>
       <tr className='labels'>
-        {props.laundry.machines
-          .map((id) => props.machines[id])
+        {machines
           .map((machine, i) => <td key={machine.id} className={props.hoverColumn === i ? ' hoverColumn' : ''}>
             <div><span>{string.shortName(machine.name)}</span></div>
           </td>)}

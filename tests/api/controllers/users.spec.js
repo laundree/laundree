@@ -2,7 +2,7 @@ var nodemailer = require('nodemailer')
 var stubTransport = require('nodemailer-stub-transport')
 require('../../../utils').mail.transporter = nodemailer.createTransport(stubTransport())
 var request = require('supertest')
-var app = require('../../../app')
+var app = require('../../../app').app
 var chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
@@ -542,9 +542,8 @@ describe('controllers', function () {
       it('should succeed when only user', (done) => {
         dbUtils.populateTokens(1).then(({user, tokens}) => {
           const [token] = tokens
-          return dbUtils.populateLaundries(1).then(({laundries}) => {
-            const [laundry] = laundries
-            return user.addLaundry(laundry)
+          return dbUtils.populateLaundries(1).then(({laundry}) => {
+            return laundry.addUser(user)
               .then(() => {
                 request(app)
                   .delete(`/api/users/${user.model.id}`)
@@ -563,7 +562,7 @@ describe('controllers', function () {
                   })
               })
           })
-        })
+        }).catch(done)
       })
     })
   })

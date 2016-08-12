@@ -89,6 +89,10 @@ function inviteUserByEmail (laundryId, email) {
   return new LaundryClientApi(laundryId).inviteUserByEmail(email)
 }
 
+function deleteLaundry (laundryId) {
+  return new LaundryClientApi(laundryId).deleteLaundry()
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -106,7 +110,8 @@ class AppInitializer extends Initializer {
         deleteBooking,
         listBookingsInTime,
         listBookingsForUser,
-        inviteUserByEmail
+        inviteUserByEmail,
+        deleteLaundry
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

@@ -16,14 +16,29 @@ class BookingInfo extends React.Component {
     this.deleteHandler = () => this.context.actions.deleteBooking(this.props.booking.id)
   }
 
+  renderActions () {
+    if (!this.isOwner) return null
+    return <div className='actions'>
+      <button className='red' onClick={this.deleteHandler}>Delete booking</button>
+    </div>
+  }
+
+  get isOwner () {
+    return this.props.booking.owner === this.props.currentUser || this.props.laundry.owners.indexOf(this.props.currentUser) >= 0
+  }
+
   renderBooking () {
-    const fromDate = new Date(this.props.booking.from)
-    const toDate = new Date(this.props.booking.to)
+    const booking = this.props.booking
+    const owner = this.props.users[booking.owner]
+    const fromDate = new Date(booking.from)
+    const toDate = new Date(booking.to)
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
     return <div>
       <h1>Booking info</h1>
-      <div>From{' '}
+      <img src={owner.photo} className='avatar'/>
+      <div className='text'>
+        {owner.displayName} has booked <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}
           month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
@@ -32,11 +47,8 @@ class BookingInfo extends React.Component {
         <FormattedDate
           weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
           day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric' value={this.props.booking.to}/> {' '}
-        on <span>{this.props.machines[this.props.booking.machine].name}</span>
       </div>
-      <div className='actions'>
-        <button className='red' onClick={this.deleteHandler}>Delete booking</button>
-      </div>
+      {this.renderActions()}
     </div>
   }
 
@@ -61,10 +73,12 @@ BookingInfo.contextTypes = {
 }
 
 BookingInfo.propTypes = {
+  currentUser: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   laundry: React.PropTypes.object,
   booking: React.PropTypes.object,
-  machines: React.PropTypes.object
+  machines: React.PropTypes.object,
+  users: React.PropTypes.object
 }
 
 const diffDates = (d1, d2) => {
@@ -94,13 +108,22 @@ class Timetable extends React.Component {
     })
   }
 
+  componentWillReceiveProps ({laundry: {machines}}) {
+    if (machines.length === this.props.laundry.machines.length) return
+    this.setState({numDays: this.calculateNumDays(machines.length)})
+  }
+
   componentWillUnmount () {
     window.removeEventListener('resize', this.handleResize)
   }
 
   get numDays () {
+    return this.calculateNumDays(this.props.laundry.machines.length)
+  }
+
+  calculateNumDays (numMachines) {
     if (!this._mainRef) return 0
-    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (this.props.laundry.machines.length * 100)), 1), 7)
+    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (numMachines * 100)), 1), 7)
   }
 
   get offsetDays () {
@@ -120,7 +143,7 @@ class Timetable extends React.Component {
     })
   }
 
-  renderTables () {
+  render () {
     const refPuller = (ref) => {
       this._mainRef = ref
     }
@@ -131,12 +154,15 @@ class Timetable extends React.Component {
           hoverColumn={this.state.hoverColumn}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <TimetableTables
+          currentUser={this.props.currentUser}
           activeBooking={this.props.activeBooking}
           offsetDate={this.props.offsetDate}
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <BookingInfo
+          currentUser={this.props.currentUser}
+          users={this.props.users}
           laundry={this.props.laundry}
           offsetDate={this.props.offsetDate}
           booking={this.props.bookings[this.props.activeBooking]}
@@ -144,26 +170,13 @@ class Timetable extends React.Component {
       </div>
     </main>
   }
-
-  renderEmpty () {
-    return <main className='naved'>
-      <h1 className='alignLeft'>There are no machines registered</h1>
-      <section>
-        Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
-      </section>
-    </main>
-  }
-
-  render () {
-    return <DocumentTitle title='Timetable'>
-      {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
-    </DocumentTitle>
-  }
 }
 
 Timetable.propTypes = {
+  currentUser: React.PropTypes.string,
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
+  users: React.PropTypes.object,
   machines: React.PropTypes.object,
   bookings: React.PropTypes.object,
   laundry: React.PropTypes.shape({
@@ -173,4 +186,35 @@ Timetable.propTypes = {
   })
 }
 
-module.exports = Timetable
+class TimetableWrapper extends React.Component {
+  renderEmpty () {
+    return <main className='naved'>
+      <h1 className='alignLeft'>There are no machines registered</h1>
+      <section>
+        Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
+      </section>
+    </main>
+  }
+
+  renderTables () {
+    return <Timetable
+      users={this.props.users}
+      currentUser={this.props.currentUser}
+      activeBooking={this.props.activeBooking}
+      offsetDate={this.props.offsetDate}
+      machines={this.props.machines}
+      bookings={this.props.bookings}
+      laundry={this.props.laundry}
+    />
+  }
+
+  render () {
+    return <DocumentTitle title='Timetable'>
+      {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
+    </DocumentTitle>
+  }
+}
+
+TimetableWrapper.propTypes = Timetable.propTypes
+
+module.exports = TimetableWrapper

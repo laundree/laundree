@@ -1,12 +1,7 @@
 /**
  * Created by budde on 06/05/16.
  */
-const rest = require('rest')
-const mime = require('rest/interceptor/mime')
-const errorCode = require('rest/interceptor/errorCode')
-const {wrapError} = require('../utils')
-
-const client = rest.wrap(mime).wrap(errorCode)
+const request = require('superagent')
 
 class MachineClientApi {
 
@@ -15,11 +10,9 @@ class MachineClientApi {
   }
 
   deleteMachine () {
-    return client({
-      path: `/api/machines/${this.id}`,
-      method: 'DELETE'
-    })
-      .catch(wrapError)
+    return request
+      .delete(`/api/machines/${this.id}`)
+      .then()
   }
 
   /**
@@ -27,13 +20,10 @@ class MachineClientApi {
    * @param {{name:string=, type: string=}} params
    */
   updateMachine (params) {
-    return client({
-      path: `/api/machines/${this.id}`,
-      headers: {'Content-Type': 'application/json'},
-      method: 'PUT',
-      entity: params
-    })
-      .catch(wrapError)
+    return request
+      .put(`/api/machines/${this.id}`)
+      .send(params)
+      .then()
   }
 
   /**
@@ -42,13 +32,10 @@ class MachineClientApi {
    * @param {Date} to
    */
   createBooking (from, to) {
-    return client({
-      path: `/api/machines/${this.id}/bookings`,
-      headers: {'Content-Type': 'application/json'},
-      method: 'POST',
-      entity: {from: from.toISOString(), to: to.toISOString()}
-    })
-      .catch(wrapError)
+    return request
+      .post(`/api/machines/${this.id}/bookings`)
+      .send({from: from.toISOString(), to: to.toISOString()})
+      .then()
   }
 }
 

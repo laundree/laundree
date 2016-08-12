@@ -4,12 +4,11 @@
 
 const connect = require('react-redux').connect
 const {LeftNav} = require('../views')
-const lodash = require('lodash')
 
-const mapStateToProps = (store, {params: {id}}) => {
+const mapStateToProps = ({laundries, currentUser}, {params: {id}}) => {
   return {
-    laundries: lodash.cloneDeep(store.laundries),
-    currentLaundry: id
+    laundry: laundries[id],
+    currentUser
   }
 }
 

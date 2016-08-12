@@ -7,27 +7,27 @@ const debug = require('debug')('laundree.server')
 const http = require('http')
 const config = require('config')
 const {socketIoSetup} = require('./lib')
-/**
- * Get port from environment and store in Express.
- */
 
-var port = normalizePort(config.get('web.port'))
-app.set('port', port)
+const port = normalizePort(config.get('web.port'))
 
-/**
- * Create HTTP server.
- */
-var server = http.createServer(app)
+module.exports = app.promise.then((app) => {
+  /**
+   * Get port from environment and store in Express.
+   */
 
-/**
- * Listen on provided port, on all network interfaces.
- */
-module.exports.start = function () {
-  server.listen(port)
-  server.on('error', onError)
-  server.on('listening', onListening)
-  socketIoSetup(server)
-}
+  app.set('port', port)
+
+  /**
+   * Create HTTP server.
+   */
+  const server = http.createServer(app)
+  return () => {
+    server.listen(port)
+    server.on('error', onError)
+    server.on('listening', () => onListening(server))
+    socketIoSetup(server)
+  }
+})
 
 /**
  * Normalize a port into a number, string, or false.
@@ -81,7 +81,7 @@ function onError (error) {
  * Event listener for HTTP server "listening" event.
  */
 
-function onListening () {
+function onListening (server) {
   var addr = server.address()
   var bind = typeof addr === 'string'
     ? 'pipe ' + addr

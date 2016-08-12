@@ -1,5 +1,5 @@
 const request = require('supertest')
-const app = require('../../../app')
+const app = require('../../../app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
@@ -332,7 +332,7 @@ describe('controllers', function () {
       })
       it('should not merge tight booking from other user', (done) => {
         Promise.all([dbUtils.populateTokens(1), dbUtils.populateBookings(3)]).then(([{user, token}, {laundry, machine, bookings}]) => {
-          return user.addLaundry(laundry).then(() => {
+          return laundry.addUser(user).then(() => {
             request(app)
               .post(`/api/machines/${machine.model.id}/bookings`)
               .send({
@@ -398,7 +398,7 @@ describe('controllers', function () {
           .then(([r1, r2]) => {
             const {laundry, machine} = r1
             const {user, token} = r2
-            laundry._addUser(user).then(() => {
+            laundry.addUser(user).then(() => {
               request(app)
                 .post(`/api/machines/${machine.model.id}/bookings`)
                 .send({from: new Date(), to: new Date(Date.now() + 5)})
@@ -528,7 +528,7 @@ describe('controllers', function () {
         dbUtils.populateTokens(1).then(({user, tokens}) => {
           const [token] = tokens
           return dbUtils.populateBookings(1).then(({booking, laundry}) => {
-            return user.addLaundry(laundry)
+            return laundry.addUser(user)
               .then(() => {
                 request(app)
                   .get(`/api/bookings/${booking.model.id}`)
@@ -631,7 +631,7 @@ describe('controllers', function () {
       it('should fail when other user', (done) => {
         dbUtils.populateTokens(1).then(({user, token}) => {
           return dbUtils.populateBookings(1).then(({booking, laundry}) => {
-            return user.addLaundry(laundry)
+            return laundry.addUser(user)
               .then(() => {
                 request(app)
                   .delete(`/api/bookings/${booking.model.id}`)
@@ -652,7 +652,7 @@ describe('controllers', function () {
       it('should succeed when laundry owner', (done) => {
         dbUtils.populateMachines(1).then(({user, token, laundry, machine}) => {
           return dbUtils.populateUsers(1).then((minions) =>
-            laundry._addUser(minions[0]).then(() => machine.createBooking(minions[0], new Date(), new Date(Date.now() + 300))))
+            laundry.addUser(minions[0]).then(() => machine.createBooking(minions[0], new Date(), new Date(Date.now() + 300))))
             .then((booking) => {
               request(app)
                 .delete(`/api/bookings/${booking.model.id}`)

@@ -1,12 +1,7 @@
 /**
  * Created by budde on 06/05/16.
  */
-const rest = require('rest')
-const mime = require('rest/interceptor/mime')
-const errorCode = require('rest/interceptor/errorCode')
-const {wrapError} = require('../utils')
-
-const client = rest.wrap(mime).wrap(errorCode)
+const request = require('superagent')
 
 class LaundryClientApi {
 
@@ -15,37 +10,30 @@ class LaundryClientApi {
   }
 
   static createLaundry (name) {
-    return client({
-      path: '/api/laundries',
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      entity: {name}
-    })
-      .catch(wrapError)
-      .then((response) => {
-        const entity = response.entity
-        if (!entity) return null
-        return entity
-      })
+    return request
+      .post('/api/laundries')
+      .send({name})
+      .then((response) => response.body || null)
   }
 
   createMachine (name, type) {
-    return client({
-      path: `/api/laundries/${this.id}/machines`,
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      entity: {name, type}
-    })
-      .catch(wrapError)
+    return request
+      .post(`/api/laundries/${this.id}/machines`)
+      .send({name, type})
+      .then()
   }
 
   inviteUserByEmail (email) {
-    return client({
-      path: `/api/laundries/${this.id}/invite-by-email`,
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      entity: {email}
-    })
+    return request
+      .post(`/api/laundries/${this.id}/invite-by-email`)
+      .send({email})
+      .then()
+  }
+
+  deleteLaundry () {
+    return request
+      .delete(`/api/laundries/${this.id}`)
+      .then()
   }
 }
 

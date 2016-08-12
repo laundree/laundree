@@ -58,12 +58,15 @@ class Users extends React.Component {
 
   renderUser (user) {
     return <div>
-      <img className='avatar' src={user.photo}/>
+      <div className='avatarContainer'>
+        <img className='avatar' src={user.photo}/>
+        </div>
       <div className='name'>
-        {user.displayName}
+        {user.displayName}{' '}{this.isOwner(user.id) ? <span className='owner'>Owner</span> : ''}
       </div>
     </div>
   }
+
   renderInvite (invite) {
     return <div>
       <div className='avatar'/>
@@ -74,14 +77,14 @@ class Users extends React.Component {
   }
 
   isOwner (user) {
-    return this.props.laundry.owners.find((id) => id === user.id)
+    return this.props.laundry.owners.indexOf(user) >= 0
   }
 
   renderUsers () {
     return <ul>
       {this.users.map((user) => <li key={user.id}>{this.renderUser(user)}</li>)}
       {this.invites.map((invite) => <li key={invite.id}>{this.renderInvite(invite)}</li>)}
-      </ul>
+    </ul>
   }
 
   get users () {
