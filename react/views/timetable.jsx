@@ -16,14 +16,29 @@ class BookingInfo extends React.Component {
     this.deleteHandler = () => this.context.actions.deleteBooking(this.props.booking.id)
   }
 
+  renderActions () {
+    if (!this.isOwner) return null
+    return <div className='actions'>
+      <button className='red' onClick={this.deleteHandler}>Delete booking</button>
+    </div>
+  }
+
+  get isOwner () {
+    return this.props.booking.owner === this.props.currentUser || this.props.laundry.owners.indexOf(this.props.currentUser) >= 0
+  }
+
   renderBooking () {
-    const fromDate = new Date(this.props.booking.from)
-    const toDate = new Date(this.props.booking.to)
+    const booking = this.props.booking
+    const owner = this.props.users[booking.owner]
+    const fromDate = new Date(booking.from)
+    const toDate = new Date(booking.to)
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
     return <div>
       <h1>Booking info</h1>
-      <div>From{' '}
+      <img src={owner.photo} className='avatar'/>
+      <div className='text'>
+        {owner.displayName} has booked <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}
           month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
@@ -32,11 +47,8 @@ class BookingInfo extends React.Component {
         <FormattedDate
           weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
           day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric' value={this.props.booking.to}/> {' '}
-        on <span>{this.props.machines[this.props.booking.machine].name}</span>
       </div>
-      <div className='actions'>
-        <button className='red' onClick={this.deleteHandler}>Delete booking</button>
-      </div>
+      {this.renderActions()}
     </div>
   }
 
@@ -61,10 +73,12 @@ BookingInfo.contextTypes = {
 }
 
 BookingInfo.propTypes = {
+  currentUser: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   laundry: React.PropTypes.object,
   booking: React.PropTypes.object,
-  machines: React.PropTypes.object
+  machines: React.PropTypes.object,
+  users: React.PropTypes.object
 }
 
 const diffDates = (d1, d2) => {
@@ -140,12 +154,15 @@ class Timetable extends React.Component {
           hoverColumn={this.state.hoverColumn}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <TimetableTables
+          currentUser={this.props.currentUser}
           activeBooking={this.props.activeBooking}
           offsetDate={this.props.offsetDate}
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <BookingInfo
+          currentUser={this.props.currentUser}
+          users={this.props.users}
           laundry={this.props.laundry}
           offsetDate={this.props.offsetDate}
           booking={this.props.bookings[this.props.activeBooking]}
@@ -156,8 +173,10 @@ class Timetable extends React.Component {
 }
 
 Timetable.propTypes = {
+  currentUser: React.PropTypes.string,
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
+  users: React.PropTypes.object,
   machines: React.PropTypes.object,
   bookings: React.PropTypes.object,
   laundry: React.PropTypes.shape({
@@ -179,6 +198,8 @@ class TimetableWrapper extends React.Component {
 
   renderTables () {
     return <Timetable
+      users={this.props.users}
+      currentUser={this.props.currentUser}
       activeBooking={this.props.activeBooking}
       offsetDate={this.props.offsetDate}
       machines={this.props.machines}
@@ -194,16 +215,6 @@ class TimetableWrapper extends React.Component {
   }
 }
 
-TimetableWrapper.propTypes = {
-  activeBooking: React.PropTypes.string,
-  offsetDate: React.PropTypes.string,
-  machines: React.PropTypes.object,
-  bookings: React.PropTypes.object,
-  laundry: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    name: React.PropTypes.string,
-    machines: React.PropTypes.array
-  })
-}
+TimetableWrapper.propTypes = Timetable.propTypes
 
 module.exports = TimetableWrapper

@@ -271,11 +271,15 @@ main#TimeTableMain
                 border-width: 0.1em 0.1em 0.1em 0
               .booking
                 &.active
-                  background-color: #52b94c
+                  background-color: #c64f4f
+                &.mine
+                  background-color: rgb(73, 160, 68)
+                  &.active
+                    background-color: #52b94c
                 +transition(0.1s background-color)
                 +user-select(none)
                 z-index: 9
-                background-color: rgb(73, 160, 68)
+                background-color: #a04444
                 position: absolute
                 top: 0
                 left: 0
@@ -291,6 +295,9 @@ main#TimeTableMain
     color: #000
     background-color: #f9ffff
     z-index: 15
+    .avatar
+      +border-radius(0.1em)
+      float: left
     span
       font-style: italic
     .actions
@@ -314,6 +321,9 @@ main#TimeTableMain
       position: relative
       padding: 1em
       height: 13em
+      > div.text
+        padding: 0 1em 0 4em
+        max-width: 25em
     h1
       font-family: "Roboto Condensed", sans-serif
       padding-bottom: 1em

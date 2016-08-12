@@ -34,12 +34,24 @@ class TimetableTable extends React.Component {
           const isBooked = this.isBooked(m.id, key)
           if (!isBooked) return <td key={m.id}/>
           return <td key={m.id}>
-            <Link
-              to={this.bookingLink(isBooked)}
-              className={'booking' + (this.isActive(isBooked) ? ' active' : '')}/>
+            {this.createBookingLink(isBooked)}
           </td>
         })}
     </tr>
+  }
+
+  createBookingLink (bookingId) {
+    const active = this.isActive(bookingId)
+    const link = this.bookingLink(bookingId)
+    const mine = this.isMine(bookingId)
+    return <Link
+      to={link}
+      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')}/>
+  }
+
+  isMine (bookingId) {
+    const booking = this.props.bookings[bookingId]
+    return this.props.currentUser === booking.owner
   }
 
   bookingLink (bookingId) {
@@ -209,6 +221,7 @@ class TimetableTable extends React.Component {
 }
 
 TimetableTable.propTypes = {
+  currentUser: React.PropTypes.string.isRequired,
   onHoverColumn: React.PropTypes.func.isRequired,
   machines: React.PropTypes.object.isRequired,
   laundry: React.PropTypes.object.isRequired,
@@ -277,6 +290,7 @@ class TimetableTables extends React.Component {
           <li><span>23</span></li>
         </ul>
         {this.props.dates.map((date, i) => <TimetableTable
+          currentUser={this.props.currentUser}
           offsetDate={this.props.offsetDate}
           activeBooking={this.props.activeBooking}
           hoverRow={this.state.hoverRow}
@@ -322,6 +336,7 @@ TimetableTables.contextTypes = {
 }
 
 TimetableTables.propTypes = {
+  currentUser: React.PropTypes.string.isRequired,
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   onHoverColumn: React.PropTypes.func.isRequired,
