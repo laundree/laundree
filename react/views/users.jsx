@@ -69,7 +69,7 @@ class Users extends React.Component {
 
   renderInvite (invite) {
     return <div>
-      <div className='avatar'/>
+      <div className='avatarContainer'/>
       <div className='name'>
         {invite.email}
       </div>

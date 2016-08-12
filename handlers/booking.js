@@ -4,45 +4,8 @@
 
 const Handler = require('./handler')
 const {BookingModel} = require('../models')
-const EventEmitter = require('events')
-const {linkEmitter} = require('../lib/redis')
-
-const pubStaticEmitter = new EventEmitter()
-const subStaticEmitter = new EventEmitter()
-
-linkEmitter(
-  subStaticEmitter,
-  pubStaticEmitter,
-  'booking',
-  ['update', 'create'],
-  (machine) => Promise.resolve(machine.model.id),
-  (id) => BookingHandler.findFromId(id))
-
-linkEmitter(
-  subStaticEmitter,
-  pubStaticEmitter,
-  'booking',
-  ['delete'],
-  (machine) => Promise.resolve(machine.model.id),
-  (id) => Promise.resolve(id))
 
 class BookingHandler extends Handler {
-
-  static on () {
-    return Handler._on(pubStaticEmitter, arguments)
-  }
-
-  static removeListener () {
-    return Handler._removeListener(pubStaticEmitter, arguments)
-  }
-
-  static findFromId (id) {
-    return Handler._findFromId(BookingModel, BookingHandler, id)
-  }
-
-  static find (filter, options) {
-    return Handler._find(BookingModel, BookingHandler, filter, options)
-  }
 
   /**
    * Create a new booking
@@ -148,10 +111,6 @@ class BookingHandler extends Handler {
     return `/api/bookings/${this.model.id}`
   }
 
-  emitEvent (event) {
-    return this._emitEvent(subStaticEmitter, event)
-  }
-
   toRest () {
     return Promise.resolve({
       id: this.model.id,
@@ -161,5 +120,7 @@ class BookingHandler extends Handler {
     })
   }
 }
+
+Handler.setupHandler(BookingHandler, BookingModel)
 
 module.exports = BookingHandler
