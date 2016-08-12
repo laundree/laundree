@@ -8,19 +8,7 @@ const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const lodash = require('lodash')
 const utils = require('../utils')
-const EventEmitter = require('events')
-const {linkEmitter} = require('../lib/redis')
 
-const pubStaticEmitter = new EventEmitter()
-const subStaticEmitter = new EventEmitter()
-
-linkEmitter(
-  subStaticEmitter,
-  pubStaticEmitter,
-  'user',
-  ['update', 'create'],
-  (user) => Promise.resolve(user.model.id),
-  (id) => UserHandler.findFromId(id))
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -45,22 +33,6 @@ function displayNameToName (displayName) {
 
 class UserHandler extends Handler {
 
-  static on () {
-    return Handler._on(pubStaticEmitter, arguments)
-  }
-
-  static removeListener () {
-    return Handler._removeListener(pubStaticEmitter, arguments)
-  }
-
-  static find (filter, options) {
-    return this._find(UserModel, UserHandler, filter, options)
-  }
-
-  static findFromId (id) {
-    return this._findFromId(UserModel, UserHandler, id)
-  }
-
   /**
    * Find a user from given email address.
    * @param {string} email
@@ -80,10 +52,6 @@ class UserHandler extends Handler {
   static findOrCreateFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     return UserHandler.findFromEmail(profile.emails[0].value).then((user) => user ? user.updateProfile(profile) : UserHandler.createUserFromProfile(profile))
-  }
-
-  emitEvent (event) {
-    this._emitEvent(subStaticEmitter, event)
   }
 
   /**
@@ -389,5 +357,7 @@ class UserHandler extends Handler {
     }
   }
 }
+
+Handler.setupHandler(UserHandler, UserModel)
 
 module.exports = UserHandler

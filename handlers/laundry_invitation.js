@@ -4,44 +4,12 @@
 
 const Handler = require('./handler')
 const {LaundryInvitationModel} = require('../models')
-const EventEmitter = require('events')
-const {linkEmitter} = require('../lib/redis')
-const pubStaticEmitter = new EventEmitter()
-const subStaticEmitter = new EventEmitter()
-
-linkEmitter(
-  subStaticEmitter,
-  pubStaticEmitter,
-  'laundryInvitation',
-  ['create', 'delete', 'update'],
-  (invitation) => Promise.resolve(invitation.model.id),
-  (id) => LaundryInvitationHandler.findFromId(id))
 
 class LaundryInvitationHandler extends Handler {
 
   constructor (model, secret) {
     super(model)
     this.secret = secret
-  }
-
-  static find (filter, options) {
-    return this._find(LaundryInvitationModel, LaundryInvitationHandler, filter, options)
-  }
-
-  static findFromId (id) {
-    return this._findFromId(LaundryInvitationModel, LaundryInvitationHandler, id)
-  }
-
-  static on () {
-    return Handler._on(pubStaticEmitter, arguments)
-  }
-
-  static removeListener () {
-    return Handler._removeListener(pubStaticEmitter, arguments)
-  }
-
-  emitEvent (event) {
-    return this._emitEvent(subStaticEmitter, event)
   }
 
   /**
@@ -68,8 +36,10 @@ class LaundryInvitationHandler extends Handler {
 
   markUsed () {
     this.model.used = true
-    return this.model.save().then(() => this.emitEvent('update')).then(() => this)
+    return this.save()
   }
 }
+
+Handler.setupHandler(LaundryInvitationHandler, LaundryInvitationModel)
 
 module.exports = LaundryInvitationHandler

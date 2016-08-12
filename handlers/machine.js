@@ -5,45 +5,8 @@
 const Handler = require('./handler')
 const {MachineModel} = require('../models')
 const BookingHandler = require('./booking')
-const EventEmitter = require('events')
-const {linkEmitter} = require('../lib/redis')
-
-const pubStaticEmitter = new EventEmitter()
-const subStaticEmitter = new EventEmitter()
-
-linkEmitter(
-  subStaticEmitter,
-  pubStaticEmitter,
-  'machine',
-  ['update', 'create'],
-  (machine) => Promise.resolve(machine.model.id),
-  (id) => MachineHandler.findFromId(id))
-
-linkEmitter(
-  subStaticEmitter,
-  pubStaticEmitter,
-  'machine',
-  ['delete'],
-  (machine) => Promise.resolve(machine.model.id),
-  (id) => Promise.resolve(id))
 
 class MachineHandler extends Handler {
-
-  static on () {
-    return Handler._on(pubStaticEmitter, arguments)
-  }
-
-  static removeListener () {
-    return Handler._removeListener(pubStaticEmitter, arguments)
-  }
-
-  static find (filter, options) {
-    return this._find(MachineModel, MachineHandler, filter, options)
-  }
-
-  static findFromId (id) {
-    return this._findFromId(MachineModel, MachineHandler, id)
-  }
 
   /**
    * Create a new machine
@@ -60,10 +23,6 @@ class MachineHandler extends Handler {
         machine.emitEvent('create')
         return machine
       })
-  }
-
-  emitEvent (event) {
-    return this._emitEvent(subStaticEmitter, event)
   }
 
   /**
@@ -127,5 +86,7 @@ class MachineHandler extends Handler {
   }
 
 }
+
+Handler.setupHandler(MachineHandler, MachineModel)
 
 module.exports = MachineHandler
