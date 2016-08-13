@@ -65,17 +65,20 @@ function populateMachines (no) {
         })))
 }
 
-function populateBookings (no, length = 3600, space = 20) {
+function populateBookings (no, {length = 3600, space = 20, offset = 0} = {}) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise
-        .all(lodash.range(no).map((i) => machine.createBooking(user, new Date(i * (length + space)), new Date(i * (length + space) + length))))
+        .all(lodash.range(no).map((i) => machine.createBooking(user, new Date(offset + (i * (length + space))), new Date(i * (length + space) + length + offset))))
         .then((bookings) => ({
-          user: user,
-          token: token,
-          laundry: laundry,
-          machine: machine,
-          bookings: bookings,
+          offset,
+          space,
+          length,
+          user,
+          token,
+          laundry,
+          machine,
+          bookings,
           booking: bookings[0]
         })))
 }
