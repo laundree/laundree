@@ -6,6 +6,7 @@ var mongoose = require('mongoose')
 var config = require('config')
 
 mongoose.connect(config.get('mongo.url'))
+mongoose.Promise = require('promise')
 
 module.exports = {
   UserModel: require('./user'),

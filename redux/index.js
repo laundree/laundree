@@ -4,6 +4,7 @@
 const {createStore} = require('redux')
 const reducer = require('./reducer')
 const actions = require('./actions')
+const Promise = require('promise')
 
 function mapFlash (flashArray, type) {
   return flashArray

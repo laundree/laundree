@@ -4,6 +4,8 @@
 var bcrypt = require('bcrypt')
 var crypto = require('crypto')
 var config = require('config')
+const Promise = require('promise')
+
 /**
  * Hash a given password
  * @param {int=} saltRounds

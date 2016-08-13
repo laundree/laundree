@@ -5,6 +5,7 @@ const {regex, events} = require('../utils')
 const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
 const debug = require('debug')('laundree.handlers.handler')
+const Promise = require('promise')
 
 class Handler {
 

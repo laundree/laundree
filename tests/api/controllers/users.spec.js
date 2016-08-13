@@ -12,6 +12,7 @@ var assert = chai.assert
 var dbUtils = require('../../db_utils')
 var lodash = require('lodash')
 const {UserHandler, TokenHandler} = require('../../../handlers')
+const Promise = require('promise')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())

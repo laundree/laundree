@@ -1,7 +1,7 @@
 /**
  * Created by budde on 27/04/16.
  */
-
+const Promise = require('promise')
 var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)

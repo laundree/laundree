@@ -4,6 +4,7 @@
 
 const {BookingHandler, MachineHandler} = require('../../handlers')
 const {api} = require('../../utils')
+const Promise = require('promise')
 
 function listBookings (req, res) {
   const limit = req.swagger.params.page_size.value

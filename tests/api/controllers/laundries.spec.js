@@ -8,6 +8,7 @@ const assert = chai.assert
 const {LaundryHandler, LaundryInvitationHandler, UserHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
 const lodash = require('lodash')
+const Promise = require('promise')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())

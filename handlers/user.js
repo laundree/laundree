@@ -8,6 +8,7 @@ const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const lodash = require('lodash')
 const utils = require('../utils')
+const Promise = require('promise')
 
 /**
  * @param {string}displayName

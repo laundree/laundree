@@ -5,6 +5,7 @@ var mongoose = require('mongoose')
 var UserHandler = require('../handlers').UserHandler
 var lodash = require('lodash')
 var faker = require('faker')
+const Promise = require('promise')
 
 function clearDb () {
   return new Promise((resolve, reject) => {

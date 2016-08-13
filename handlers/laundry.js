@@ -7,6 +7,7 @@ const UserHandler = require('./user')
 const MachineHandler = require('./machine')
 const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
+const Promise = require('promise')
 
 class LaundryHandler extends Handler {
 

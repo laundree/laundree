@@ -4,6 +4,7 @@
 
 const Initializer = require('./initializer')
 const debug = require('debug')('laundree.initializers.app')
+const Promise = require('promise')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
