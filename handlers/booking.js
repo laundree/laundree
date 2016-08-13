@@ -4,6 +4,7 @@
 
 const Handler = require('./handler')
 const {BookingModel} = require('../models')
+const Promise = require('promise')
 
 class BookingHandler extends Handler {
 

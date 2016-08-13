@@ -1,7 +1,7 @@
 /**
  * Created by budde on 07/05/16.
  */
-
+const Promise = require('promise')
 var path = require('path')
 var EmailTemplate = require('email-templates').EmailTemplate
 var nodemailer = require('nodemailer')

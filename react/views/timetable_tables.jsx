@@ -1,7 +1,7 @@
 /**
  * Created by budde on 28/05/16.
  */
-
+const Promise = require('promise')
 const React = require('react')
 const lodash = require('lodash')
 const {Link} = require('react-router')
