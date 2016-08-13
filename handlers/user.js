@@ -65,10 +65,7 @@ class UserHandler extends Handler {
     this.model.profiles = this.model.profiles.filter((p) => p.provider !== profile.provider)
     this.model.profiles.push(profile)
     this.model.latestProvider = profile.provider
-    return this.model.save().then((model) => {
-      this.model = model
-      return this
-    })
+    return this.save()
   }
 
   /**
@@ -80,10 +77,7 @@ class UserHandler extends Handler {
       return utils.password.hashPassword(token).then((hash) => {
         this.model.resetPasswordToken = hash
         this.model.resetPasswordExpire = Date.now() + 3600000
-        return this.model.save().then((model) => {
-          this.model = model
-          return token
-        })
+        return this.model.save().then(() => token)
       })
     })
   }
@@ -145,20 +139,12 @@ class UserHandler extends Handler {
    */
   _addLaundry (laundry) {
     this.model.laundries.push(laundry.model._id)
-    return this.model.save()
-      .then(() => {
-        this.emitEvent('update')
-        return this
-      })
+    return this.save()
   }
 
   _removeLaundry (laundry) {
     this.model.laundries.pull(laundry.model._id)
-    return this.model.save()
-      .then(() => {
-        this.emitEvent('update')
-        return this
-      })
+    return this.save()
   }
 
   /**
@@ -251,7 +237,6 @@ class UserHandler extends Handler {
       [UserHandler.createUserFromProfile(profile),
         utils.password.hashPassword(password)])
       .then((result) => {
-        // noinspection UnnecessaryLocalVariableJS
         const [user, passwordHash] = result
         user.model.password = passwordHash
         return user.model.save().then((model) => UserHandler.findFromId(model.id))
