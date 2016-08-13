@@ -183,7 +183,7 @@ describe('controllers', function () {
       })
 
       it('should fail on invalid from', (done) => {
-        dbUtils.populateBookings(1).then(({user, token, machine, bookings}) => {
+        dbUtils.populateBookings(1).then(({user, token, machine}) => {
           request(app)
             .post(`/api/machines/${machine.model.id}/bookings`)
             .send({from: 'invalid date', to: new Date()})
@@ -244,95 +244,79 @@ describe('controllers', function () {
         }).catch(done)
       })
       it('should fail on double booking', (done) => {
-        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({to: new Date(booking.model.from.getTime() + 2), from: new Date(0)})
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(409)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Machine not available'})
-              done()
-            })
-        }).catch(done)
+        dbUtils.populateBookings(3, {offset: Date.now() + 60 * 60 * 1000})
+          .then(({user, token, machine, booking, offset}) => {
+            request(app)
+              .post(`/api/machines/${machine.model.id}/bookings`)
+              .send({to: new Date(booking.model.from.getTime() + 2), from: new Date(offset)})
+              .set('Accept', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(409)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Machine not available'})
+                done()
+              })
+          }).catch(done)
       })
       it('should fail on double booking 2', (done) => {
-        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(0)})
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(409)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Machine not available'})
-              done()
-            })
-        }).catch(done)
+        dbUtils.populateBookings(3, {offset: Date.now() + 60 * 60 * 1000})
+          .then(({user, token, machine, booking, offset}) => {
+            request(app)
+              .post(`/api/machines/${machine.model.id}/bookings`)
+              .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(offset)})
+              .set('Accept', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(409)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Machine not available'})
+                done()
+              })
+          }).catch(done)
       })
 
       it('should fail on double booking 3', (done) => {
-        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(2)})
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(409)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Machine not available'})
-              done()
-            })
-        }).catch(done)
+        dbUtils.populateBookings(3, {offset: Date.now() + 60 * 60 * 1000})
+          .then(({user, token, machine, booking, offset}) => {
+            request(app)
+              .post(`/api/machines/${machine.model.id}/bookings`)
+              .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(offset + 2)})
+              .set('Accept', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(409)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Machine not available'})
+                done()
+              })
+          }).catch(done)
       })
 
       it('should fail on double booking 4', (done) => {
-        dbUtils.populateBookings(3).then(({user, token, machine, booking}) => {
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(booking.model.from.getTime() - 2)})
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(409)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Machine not available'})
-              done()
-            })
-        }).catch(done)
+        dbUtils.populateBookings(3, {offset: Date.now() + 60 * 60 * 1000})
+          .then(({user, token, machine, booking}) => {
+            request(app)
+              .post(`/api/machines/${machine.model.id}/bookings`)
+              .send({to: new Date(booking.model.to.getTime() + 2), from: new Date(booking.model.from.getTime() - 2)})
+              .set('Accept', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(409)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Machine not available'})
+                done()
+              })
+          }).catch(done)
       })
-
+      // TODO test too early booking
       it('should succeed on tight booking', (done) => {
-        dbUtils.populateBookings(3).then(({user, token, machine, bookings}) => {
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({
-              from: bookings[1].model.to,
-              to: bookings[2].model.from
-            })
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.from.should.equal(bookings[1].model.from.toISOString())
-              res.body.to.should.equal(bookings[2].model.to.toISOString())
-              done()
-            })
-        }).catch(done)
-      })
-      it('should not merge tight booking from other user', (done) => {
-        Promise.all([dbUtils.populateTokens(1), dbUtils.populateBookings(3)]).then(([{user, token}, {laundry, machine, bookings}]) => {
-          return laundry.addUser(user).then(() => {
+        dbUtils.populateBookings(3, {offset: Date.now() + 60 * 60 * 1000})
+          .then(({user, token, machine, bookings}) => {
             request(app)
               .post(`/api/machines/${machine.model.id}/bookings`)
               .send({
@@ -345,33 +329,53 @@ describe('controllers', function () {
               .expect(200)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.from.should.equal(bookings[1].model.to.toISOString())
-                res.body.to.should.equal(bookings[2].model.from.toISOString())
+                res.body.from.should.equal(bookings[1].model.from.toISOString())
+                res.body.to.should.equal(bookings[2].model.to.toISOString())
                 done()
               })
-          })
-        }).catch(done)
+          }).catch(done)
+      })
+      it('should not merge tight booking from other user', (done) => {
+        Promise.all([dbUtils.populateTokens(1), dbUtils.populateBookings(3, {offset: Date.now() + 60 * 60 * 1000})])
+          .then(([{user, token}, {laundry, machine, bookings}]) => {
+            return laundry.addUser(user).then(() => {
+              request(app)
+                .post(`/api/machines/${machine.model.id}/bookings`)
+                .send({
+                  from: bookings[1].model.to,
+                  to: bookings[2].model.from
+                })
+                .set('Accept', 'application/json')
+                .auth(user.model.id, token.secret)
+                .expect('Content-Type', /json/)
+                .expect(200)
+                .end((err, res) => {
+                  if (err) return done(err)
+                  res.body.from.should.equal(bookings[1].model.to.toISOString())
+                  res.body.to.should.equal(bookings[2].model.from.toISOString())
+                  done()
+                })
+            })
+          }).catch(done)
       })
 
       it('should fail on no such machine', (done) => {
-        dbUtils.populateBookings(1).then(({user, token}) => {
-          request(app)
-            .post('/api/machines/foo/bookings')
-            .send({name: 'Machine 2000'})
-            .set('Accept', 'application/json')
-            .send({
-              from: new Date(Date.now() - 10),
-              to: new Date()
-            })
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(404)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Machine not found'})
-              done()
-            })
-        }).catch(done)
+        dbUtils.populateTokens(1)
+          .then(({user, token}) => {
+            request(app)
+              .post('/api/machines/foo/bookings')
+              .send({name: 'Machine 2000'})
+              .set('Accept', 'application/json')
+              .send({from: new Date(Date.now() + 60 * 60 * 1000), to: new Date(Date.now() + 2 * 60 * 60 * 1000)})
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Machine not found'})
+                done()
+              })
+          }).catch(done)
       })
 
       it('should only fetch from own machine', (done) => {
@@ -381,7 +385,7 @@ describe('controllers', function () {
             const {user, token} = r2
             request(app)
               .post(`/api/machines/${machine.model.id}/bookings`)
-              .send({from: new Date(), to: new Date(Date.now() + 5)})
+              .send({from: new Date(Date.now() + 60 * 60 * 1000), to: new Date(Date.now() + 2 * 60 * 60 * 1000)})
               .auth(user.model.id, token.secret)
               .set('Accept', 'application/json')
               .expect(404)
@@ -401,7 +405,7 @@ describe('controllers', function () {
             laundry.addUser(user).then(() => {
               request(app)
                 .post(`/api/machines/${machine.model.id}/bookings`)
-                .send({from: new Date(), to: new Date(Date.now() + 5)})
+                .send({from: new Date(Date.now() + 60 * 60 * 1000), to: new Date(Date.now() + 2 * 60 * 60 * 1000)})
                 .auth(user.model.id, token.secret)
                 .set('Accept', 'application/json')
                 .expect(200)
@@ -425,7 +429,7 @@ describe('controllers', function () {
         dbUtils.populateBookings(1).then(({user, token, machine, bookings}) => {
           request(app)
             .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({from: new Date(), to: new Date(Date.now() + 5)})
+            .send({from: new Date(Date.now() + 60 * 60 * 1000), to: new Date(Date.now() + 2 * 60 * 60 * 1000)})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -444,8 +448,24 @@ describe('controllers', function () {
             })
         }).catch(done)
       })
+      it('should fail on too soon booking', (done) => {
+        dbUtils.populateMachines(1).then(({user, token, machine}) => {
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({from: new Date(Date.now()), to: new Date(Date.now() + 2 * 60 * 60 * 1000)})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .end((err, res) => {
+              res.body.should.deep.equal({message: 'Too soon'})
+              done(err)
+            })
+        })
+          .catch(done)
+      })
     })
-
     describe('GET /bookings/{id}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
