@@ -50,32 +50,30 @@ module.exports = {
     })
 
     app.use(function (req, res, next) {
-      res.status(404)
-      res.render('error-404',
-        {
-          title: ['Page not found'],
-          styles: ['/stylesheets/error.css']
-        })
+      const error = new Error('Not found')
+      error.status = 404
+      next(error)
     })
 
-    if (app.get('env') === 'development') {
-      app.use((err, req, res, next) => {
-        logError(err)
-        res.status(err.status || 500)
-        res.render('error-500', {
-          message: err.message,
-          error: err,
-          styles: ['/stylesheets/error.css']
-        })
-      })
-    }
-
     app.use((err, req, res, next) => {
-      res.status(err.status || 500)
-      res.render('error-500', {
-        message: err.message,
-        styles: ['/stylesheets/error.css']
-      })
+      logError(err)
+      const status = err.status || 500
+      switch (status) {
+        case 404:
+          res.status(404)
+          res.render('error-404',
+            {
+              title: ['Page not found'],
+              styles: ['/stylesheets/error.css']
+            })
+          break
+        default:
+          res.status(status)
+          res.render('error-500', {
+            message: err.message,
+            styles: ['/stylesheets/error.css']
+          })
+      }
     })
     return app
   })
