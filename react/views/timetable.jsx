@@ -190,10 +190,16 @@ class TimetableWrapper extends React.Component {
   renderEmpty () {
     return <main className='naved'>
       <h1 className='alignLeft'>There are no machines registered</h1>
-      <section>
+      {this.isOwner ? <section>
         Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
-      </section>
+      </section> : <section>
+        Please tell your landlord to register some machines.
+      </section>}
     </main>
+  }
+
+  get isOwner () {
+    return this.props.laundry.owners.indexOf(this.props.currentUser) >= 0
   }
 
   renderTables () {
