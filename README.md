@@ -6,6 +6,8 @@
 [![Build Status](https://travis-ci.org/laundree/laundree.svg?branch=master)](https://travis-ci.org/laundree/laundree)
 [![Code Style](https://img.shields.io/badge/code%20style-standard-blue.svg?style=flat)](https://github.com/feross/standard)
 
+[![dependencies Status](https://david-dm.org/laundree/laundree/status.svg)](https://david-dm.org/laundree/laundree)
+[![devDependencies Status](https://david-dm.org/laundree/laundree/dev-status.svg)](https://david-dm.org/laundree/laundree?type=dev)
 ## System requirements
 
 The system requires Node 6, a MongoDB server and a Redis server.
