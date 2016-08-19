@@ -47,22 +47,22 @@ class Dropdown extends React.Component {
 
   render () {
     return <div className={'dropdown' + (this.state.open ? ' open' : '')} ref={this.refPuller}>
-      <div className='currentValue' onClick={this.clickHandler}>
+      <div className="currentValue" onClick={this.clickHandler}>
         <svg>
           <use xlinkHref={this.props.selected === 'wash' ? '#Drop' : '#Waves'}/>
         </svg>
       </div>
-      <div className='dropdown_content'>
+      <div className="dropdown_content">
         <ul>
           <li className={this.props.selected === 'wash' ? 'selected' : ''} onClick={this.selectGenerator('wash')}>
             <svg>
-              <use xlinkHref='#Drop'/>
+              <use xlinkHref="#Drop"/>
             </svg>
             Washing machine
           </li>
           <li className={this.props.selected === 'dry' ? 'selected' : ''} onClick={this.selectGenerator('dry')}>
             <svg>
-              <use xlinkHref='#Waves'/>
+              <use xlinkHref="#Waves"/>
             </svg>
             Dryer
           </li>
@@ -150,7 +150,7 @@ class MachineListItem extends React.Component {
     return <div>
       <Modal
         show={this.state.showModal}
-        message='Are you sure that you want to delete this machine?'
+        message="Are you sure that you want to delete this machine?"
         onClose={this.onCloseModal}
         actions={[
           {label: 'Delete', className: 'delete red', action: this.onDeleteModal},
@@ -158,7 +158,7 @@ class MachineListItem extends React.Component {
       />
       <ValidationForm
         sesh={this.state.sesh}
-        className='machine_form'
+        className="machine_form"
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
         <Dropdown selected={this.selected} onSelect={this.onSelect}/>
@@ -167,18 +167,18 @@ class MachineListItem extends React.Component {
           trim
           notOneOf={this.blacklist}
           value={this.value} initial={this.state.initial}>
-          <label data-validate-error='Please enter a unique machine name'>
+          <label data-validate-error="Please enter a unique machine name">
             <input
               onBlur={this.onUpdateName}
-              type='text'
+              type="text"
               placeholder={this.selected === 'wash' ? 'Washing machine name' : 'Dryer name'}
               value={this.value} onChange={this.onChange}/>
           </label>
         </ValidationElement>
         {this.props.onDelete
-          ? <div className='delete action'>
+          ? <div className="delete action">
           <svg onClick={this.onDelete}>
-            <use xlinkHref='#Trash'/>
+            <use xlinkHref="#Trash"/>
           </svg>
         </div>
           : null
@@ -223,11 +223,11 @@ class Machines extends React.Component {
       .map((id) => this.props.machines[id])
       .filter((m) => m)
       .map((m) => m.name)
-    return <DocumentTitle title='Machines'>
-      <main className='naved' id='LaundryMain'>
+    return <DocumentTitle title="Machines">
+      <main className="naved" id="LaundryMain">
         <h1>Machines</h1>
         {laundry.machines.length
-          ? <ul className='machine_list'>
+          ? <ul className="machine_list">
           {laundry.machines.map((machineId) => <li key={machineId}>
             <MachineListItem
               blacklist={blacklist}
@@ -236,14 +236,14 @@ class Machines extends React.Component {
               onDelete={this.generateDeleter(machineId)}/>
           </li>)}
         </ul>
-          : <div className='empty_list'><span>There are no machines registered to this laundry</span></div>}
-        <div className='create_machine'>
+          : <div className="empty_list"><span>There are no machines registered to this laundry</span></div>}
+        <div className="create_machine">
           <h2>Create machine</h2>
           <MachineListItem
             blacklist={blacklist}
             onSubmit={this.creator}>
-            <div className='buttons'>
-              <input type='submit' value='Create'/>
+            <div className="buttons">
+              <input type="submit" value="Create"/>
             </div>
           </MachineListItem>
         </div>

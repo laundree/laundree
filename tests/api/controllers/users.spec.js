@@ -203,7 +203,7 @@ describe('controllers', function () {
     })
 
     describe('POST /api/users/{id}/start-password-reset', () => {
-      it('should fail on no user', (done) =>
+      it('should fail on no user', (done) => {
         dbUtils.populateUsers(2).then((users) => {
           request(app)
             .post('/api/users/aaa/start-password-reset')
@@ -212,9 +212,10 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('should fail on no user', (done) =>
+      it('should fail on no user', (done) => {
         dbUtils.populateUsers(2).then((users) => {
           request(app)
             .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/start-password-reset')
@@ -224,9 +225,10 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('should succeed', (done) =>
+      it('should succeed', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
           request(app)
@@ -236,11 +238,12 @@ describe('controllers', function () {
             .send()
             .expect(204)
             .end(done)
-        }))
+        })
+      })
     })
 
     describe('POST /api/users/{id}/start-email-verification', () => {
-      it('should fail on no user', (done) =>
+      it('should fail on no user', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
           request(app)
@@ -250,9 +253,10 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('should fail on no user', (done) =>
+      it('should fail on no user', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
           request(app)
@@ -263,9 +267,10 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('should succeed', (done) =>
+      it('should succeed', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
           request(app)
@@ -275,8 +280,9 @@ describe('controllers', function () {
             .send({email: user.model.emails[0]})
             .expect(204)
             .end(done)
-        }))
-      it('should succeed on crazy case', (done) =>
+        })
+      })
+      it('should succeed on crazy case', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
           request(app)
@@ -286,8 +292,9 @@ describe('controllers', function () {
             .send({email: user.model.emails[0].toUpperCase()})
             .expect(204)
             .end(done)
-        }))
-      it('should fail on wrong email', (done) =>
+        })
+      })
+      it('should fail on wrong email', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var [user] = users
           request(app)
@@ -297,11 +304,12 @@ describe('controllers', function () {
             .send({email: 'not-right-' + user.model.emails[0]})
             .expect(400)
             .end(done)
-        }))
+        })
+      })
     })
 
     describe('POST /api/users/{id}/password-reset', () => {
-      it('should fail on no body', (done) =>
+      it('should fail on no body', (done) => {
         dbUtils.populateUsers(2).then((users) => {
           request(app)
             .post(`/api/users/${users[0].model.id}/password-reset`)
@@ -310,9 +318,10 @@ describe('controllers', function () {
             .send({})
             .expect(400)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('fail on no token', (done) =>
+      it('fail on no token', (done) => {
         dbUtils.populateUsers(2).then((users) => {
           request(app)
             .post(`/api/users/${users[0].model.id}/password-reset`)
@@ -321,9 +330,10 @@ describe('controllers', function () {
             .send({token: 'someToken', password: 'password1234'})
             .expect(400)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('fail on invalid password', (done) =>
+      it('fail on invalid password', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var user = users[0]
           return user.generateResetToken().then((token) => [user, token])
@@ -337,8 +347,9 @@ describe('controllers', function () {
             .send({token: token, password: 'pass'})
             .expect(400)
             .end((err) => done(err))
-        }))
-      it('success on right token', (done) =>
+        })
+      })
+      it('success on right token', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var user = users[0]
           return user.generateResetToken().then((token) => [user, token])
@@ -352,7 +363,8 @@ describe('controllers', function () {
             .send({token: token, password: 'password1234'})
             .expect(204)
             .end((err) => done(err))
-        }))
+        })
+      })
 
       it('fail on no invalid id', (done) => {
         request(app)
@@ -366,7 +378,7 @@ describe('controllers', function () {
     })
 
     describe('POST /api/users/{id}/verify-email', () => {
-      it('should fail on no body', (done) =>
+      it('should fail on no body', (done) => {
         dbUtils.populateUsers(2).then((users) => {
           request(app)
             .post(`/api/users/${users[0].model.id}/verify-email`)
@@ -375,9 +387,10 @@ describe('controllers', function () {
             .send({})
             .expect(400)
             .end((err) => done(err))
-        }))
+        })
+      })
 
-      it('fail on no token', (done) =>
+      it('fail on no token', (done) => {
         dbUtils.populateUsers(2).then((users) => {
           request(app)
             .post(`/api/users/${users[0].model.id}/verify-email`)
@@ -386,8 +399,9 @@ describe('controllers', function () {
             .send({token: 'someToken', email: users[0].model.emails[0]})
             .expect(400)
             .end((err) => done(err))
-        }))
-      it('fail on invalid email', (done) =>
+        })
+      })
+      it('fail on invalid email', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var user = users[0]
           return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
@@ -401,8 +415,9 @@ describe('controllers', function () {
             .send({token: token, email: 'bob'})
             .expect(400)
             .end((err) => done(err))
-        }))
-      it('success on right token', (done) =>
+        })
+      })
+      it('success on right token', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var user = users[0]
           return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
@@ -416,8 +431,9 @@ describe('controllers', function () {
             .send({token: token, email: user.model.emails[0]})
             .expect(204)
             .end((err) => done(err))
-        }))
-      it('success on crazy case token', (done) =>
+        })
+      })
+      it('success on crazy case token', (done) => {
         dbUtils.populateUsers(1).then((users) => {
           var user = users[0]
           return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
@@ -431,7 +447,8 @@ describe('controllers', function () {
             .send({token: token, email: user.model.emails[0].toUpperCase()})
             .expect(204)
             .end((err) => done(err))
-        }))
+        })
+      })
 
       it('fail on no invalid id', (done) => {
         request(app)

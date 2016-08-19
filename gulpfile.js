@@ -10,7 +10,7 @@ var exec = require('child_process').exec
 var runSequence = require('run-sequence')
 
 gulp.task('lint', function () {
-  return gulp.src(['{client,handlers,models,routes,setups,tests,utils,views}/**/*.{js,jsx}', '*.js'])
+  return gulp.src(['{api,bin,client,email-templates,handlers,models,public,react,redux,routes,tests,utils,views}/**/*.{js,jsx}', '*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())

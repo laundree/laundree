@@ -11,23 +11,23 @@ const TimetableHeader = (props) => {
   const machines = props.laundry.machines
     .map((id) => props.machines[id])
     .filter((m) => m)
-  return <div className='header_container'>
-    <div className='date'>
-      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={props.date}/>
+  return <div className="header_container">
+    <div className="date">
+      <reactIntl.FormattedDate weekday="short" month="numeric" day="numeric" value={props.date}/>
     </div>
     <table>
       <tbody>
-      <tr className='machines'>
+      <tr className="machines">
         {machines
           .map((machine, i) => <td
             key={machine.id}
             className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '')}>
             <svg>
-              <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}></use>
+              <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'} />
             </svg>
           </td>)}
       </tr>
-      <tr className='labels'>
+      <tr className="labels">
         {machines
           .map((machine, i) => <td key={machine.id} className={props.hoverColumn === i ? ' hoverColumn' : ''}>
             <div><span>{string.shortName(machine.name)}</span></div>
@@ -68,36 +68,36 @@ class TimeTableHeaderNav extends React.Component {
 
   render () {
     const calendar = <Link to={`/laundries/${this.props.laundry.id}/timetable`}>
-      <svg className='today'>
-        <use xlinkHref='#Calendar'/>
+      <svg className="today">
+        <use xlinkHref="#Calendar"/>
       </svg>
     </Link>
     if (this.props.dates.length === 0) return null
     const navLeft = <Link
-      className='left arrow'
+      className="left arrow"
       to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.getTime()}`}/>
     const navRight = <Link
-      className='right arrow'
+      className="right arrow"
       to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.getTime()}`}/>
     if (this.props.dates.length === 1) {
-      return <div className='nav'>
+      return <div className="nav">
         {navLeft}
         {calendar}
         <reactIntl.FormattedDate
-          weekday='short' month='numeric' day='numeric'
+          weekday="short" month="numeric" day="numeric"
           value={this.firstDate}/>
         {navRight}
       </div>
     }
 
-    return <div className='nav'>
+    return <div className="nav">
       {navLeft}
       {calendar}
       from{' '}
-      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={this.firstDate}/>
+      <reactIntl.FormattedDate weekday="short" month="numeric" day="numeric" value={this.firstDate}/>
       {' '}
       to{' '}
-      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={this.lastDate}/>
+      <reactIntl.FormattedDate weekday="short" month="numeric" day="numeric" value={this.lastDate}/>
       {navRight}
     </div>
   }
@@ -111,7 +111,7 @@ TimeTableHeaderNav.propTypes = {
 const TimetableHeaders = (props) => {
   return <header
     className={props.dates.length && props.dates[0].setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) ? 'today' : undefined}>
-    <div className='date_nav'>
+    <div className="date_nav">
       <h1>
         Timetable
       </h1>
@@ -119,7 +119,7 @@ const TimetableHeaders = (props) => {
         laundry={props.laundry}
         dates={props.dates}/>
     </div>
-    <div id='TimeTableHeader'>
+    <div id="TimeTableHeader">
       {props.dates.map((date, i) => <TimetableHeader
         hoverColumn={props.hoverColumn - (i * props.laundry.machines.length)}
         laundry={props.laundry} machines={props.machines} date={date}
