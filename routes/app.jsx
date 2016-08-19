@@ -27,7 +27,7 @@ router.use((req, res, next) => {
         }
         const html = renderToString(
           <ActionProvider>
-            <IntlProvider locale='en'>
+            <IntlProvider locale="en">
               <Provider store={store}>
                 {React.createElement(RouterContext, Object.assign({}, renderProps))}
               </Provider>

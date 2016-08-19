@@ -26,10 +26,10 @@ class Modal extends React.Component {
   render () {
     const actions = this.props.actions || []
     if (!this.props.show) return null
-    return <div className='confirmation_container'>
-      <div className='confirmation_overlay' onClick={this.props.onClose}/>
-      <div className='confirmation_box'>
-        <div className='message'>
+    return <div className="confirmation_container">
+      <div className="confirmation_overlay" onClick={this.props.onClose}/>
+      <div className="confirmation_box">
+        <div className="message">
           {this.props.message}
         </div>
         <ul>

@@ -30,20 +30,20 @@ class Forgot extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title='Reset password'>
+    return <DocumentTitle title="Reset password">
       <div>
         <h1>
           Reset your password
         </h1>
-        <Link to='/' id='Logo'>
+        <Link to="/" id="Logo">
           <svg>
-            <use xlinkHref='#Logo'/>
+            <use xlinkHref="#Logo"/>
           </svg>
         </Link>
         <ValidationForm
           className={this.state.loading ? 'blur' : ''}
           onSubmit={this.submitHandler}
-          id='ForgotPassword'>
+          id="ForgotPassword">
           {this.state.message
             ? <div className={'notion ' + (this.state.message.type || '')}>{this.state.message.message}</div>
             : null}
@@ -52,26 +52,26 @@ class Forgot extends React.Component {
             trim
             initial={this.state.values.email === undefined}
             value={this.state.values.email || ''}>
-            <label data-validate-error='Please enter your e-mail address.'>
+            <label data-validate-error="Please enter your e-mail address.">
               <input
                 onChange={generateChangeHandler(this, 'email')}
                 value={this.state.values.email || ''}
-                type='text' name='email'
-                placeholder='E-mail address'
-                data-validate-type='email'/>
+                type="text" name="email"
+                placeholder="E-mail address"
+                data-validate-type="email"/>
             </label>
           </ValidationElement>
-          <div className='buttons'>
-            <input type='submit' value='Reset'/>
+          <div className="buttons">
+            <input type="submit" value="Reset"/>
           </div>
-          <div className='forgot'>
+          <div className="forgot">
             <div>
               Did you remember your password?{' '}
-              <Link to='/auth' className='forgot'>Log in.</Link>
+              <Link to="/auth" className="forgot">Log in.</Link>
             </div>
             <div>
               Do you not have an account?{' '}
-              <Link to='/auth/sign-up'>Sign-up here.</Link>
+              <Link to="/auth/sign-up">Sign-up here.</Link>
             </div>
           </div>
         </ValidationForm>

@@ -14,8 +14,8 @@ class Settings extends React.Component {
 
   render () {
     const handleDeleteClick = () => this.deleteLaundry()
-    return <DocumentTitle title='Settings'>
-      <main className='naved' id='LaundryMain'>
+    return <DocumentTitle title="Settings">
+      <main className="naved" id="LaundryMain">
         <h1>Laundry settings</h1>
         <button onClick={handleDeleteClick}>Delete Laundry</button>
       </main>
