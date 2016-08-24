@@ -42,7 +42,8 @@ app.use(express.static(path.join(__dirname, 'public')))
 
 // Swagger
 module.exports = {
-  app, promise: setups.swaggerSetup(app).then(() => {
+  app,
+  promise: setups.swaggerSetup(app).then(() => {
     app.use('/', routes)
 
     app.get('/err', (req, res, next) => {

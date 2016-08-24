@@ -8,7 +8,8 @@ const {Users} = require('../views')
 const mapStateToProps = ({laundries, users, invites}, {params: {id}}) => {
   return {
     laundry: laundries[id],
-    users, invites
+    users,
+    invites
   }
 }
 
