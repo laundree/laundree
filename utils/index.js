@@ -11,5 +11,6 @@ module.exports = {
   error: require('./error'),
   events: require('./events'),
   object: require('./object'),
-  string: require('./string')
+  string: require('./string'),
+  flash: require('./flash')
 }

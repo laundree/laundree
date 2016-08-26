@@ -16,7 +16,7 @@ const Home = () => <DocumentTitle title='Home'>
         <h2>An easy and free booking system for your laundry.</h2>
       </div>
       <div>
-        <video src='/videos/v13.mov' reload='auto' loop='loop' autoPlay/>
+        <video src='/videos/v13.mov' loop='loop' autoPlay/>
       </div>
     </header>
     <main>

@@ -11,6 +11,7 @@ module.exports = {
   SignUp: require('../views').SignUp,
   Reset: require('../views').Reset,
   Home: require('../views').Home,
+  Verification: require('../views').Verification,
   Settings: require('./settings'),
   Bookings: require('./bookings'),
   Machines: require('./machines'),
