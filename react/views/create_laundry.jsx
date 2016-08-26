@@ -51,8 +51,8 @@ class CreateLaundry extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title="Create Laundry">
-      <main id="CreateLaundry">
+    return <DocumentTitle title='Create Laundry'>
+      <main id='CreateLaundry'>
         <section>
           <h1>Couldn't find any laundry...</h1>
           <div>
@@ -64,18 +64,18 @@ class CreateLaundry extends ValueUpdater {
               {this.state.notion
                 ? <div className={this.state.notion.type + ' notion'}>{this.state.notion.message}</div>
                 : null}
-              <ValidationElement name="name" nonEmpty value={this.state.values.name || ''}>
-                <label data-validate-error="Please enter a name for your laundry.">
+              <ValidationElement name='name' nonEmpty value={this.state.values.name || ''}>
+                <label data-validate-error='Please enter a name for your laundry.'>
                   <input
-                    type="text" value={this.state.values.name || ''} onChange={this.generateValueUpdater('name')}
-                    placeholder="Laundry name"/>
+                    type='text' value={this.state.values.name || ''} onChange={this.generateValueUpdater('name')}
+                    placeholder='Laundry name'/>
                 </label>
               </ValidationElement>
-              <div className="buttons">
-                <input type="submit" value="Create"/>
+              <div className='buttons'>
+                <input type='submit' value='Create'/>
               </div>
             </ValidationForm>
-            <div className="expand_button">
+            <div className='expand_button'>
               <button onClick={this.expander}>Create a laundry</button>
             </div>
           </div>

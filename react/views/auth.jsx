@@ -5,7 +5,7 @@ const React = require('react')
 
 const Auth = ({children}) => <div>
   <main>
-    <section id="Auth">
+    <section id='Auth'>
       {children}
     </section>
   </main>

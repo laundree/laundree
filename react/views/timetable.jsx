@@ -18,8 +18,8 @@ class BookingInfo extends React.Component {
 
   renderActions () {
     if (!this.isOwner) return null
-    return <div className="actions">
-      <button className="red" onClick={this.deleteHandler}>Delete booking</button>
+    return <div className='actions'>
+      <button className='red' onClick={this.deleteHandler}>Delete booking</button>
     </div>
   }
 
@@ -36,17 +36,17 @@ class BookingInfo extends React.Component {
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
     return <div>
       <h1>Booking info</h1>
-      <img src={owner.photo} className="avatar"/>
-      <div className="text">
+      <img src={owner.photo} className='avatar'/>
+      <div className='text'>
         {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}
-          month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour="numeric" minute="numeric"
+          month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
           value={this.props.booking.from}/> {' '}
         to{' '}
         <FormattedDate
           weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
-          day={sameDay ? undefined : 'numeric'} hour="numeric" minute="numeric" value={this.props.booking.to}/> {' '}
+          day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric' value={this.props.booking.to}/> {' '}
       </div>
       {this.renderActions()}
     </div>
@@ -54,11 +54,11 @@ class BookingInfo extends React.Component {
 
   render () {
     const query = this.props.offsetDate ? '?offsetDate=' + this.props.offsetDate : ''
-    return <div id="ActiveBooking" className={this.props.booking ? '' : 'no_booking'}>
+    return <div id='ActiveBooking' className={this.props.booking ? '' : 'no_booking'}>
       <Link
         to={`/laundries/${this.props.laundry.id}/timetable${query}`}>
-        <svg className="close">
-          <use xlinkHref="#CloseX"/>
+        <svg className='close'>
+          <use xlinkHref='#CloseX'/>
         </svg>
       </Link>
       {this.props.booking ? this.renderBooking() : null}
@@ -148,7 +148,7 @@ class Timetable extends React.Component {
       this._mainRef = ref
     }
     const days = this.days
-    return <main id="TimeTableMain" ref={refPuller}>
+    return <main id='TimeTableMain' ref={refPuller}>
       <div className={this.state.loading ? 'loading blur' : ''}>
         <TimetableHeaders
           hoverColumn={this.state.hoverColumn}
@@ -188,8 +188,8 @@ Timetable.propTypes = {
 
 class TimetableWrapper extends React.Component {
   renderEmpty () {
-    return <main className="naved">
-      <h1 className="alignLeft">There are no machines registered</h1>
+    return <main className='naved'>
+      <h1 className='alignLeft'>There are no machines registered</h1>
       {this.isOwner ? <section>
         Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
       </section> : <section>
@@ -215,7 +215,7 @@ class TimetableWrapper extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title="Timetable">
+    return <DocumentTitle title='Timetable'>
       {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
     </DocumentTitle>
   }

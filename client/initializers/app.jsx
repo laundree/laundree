@@ -118,7 +118,7 @@ class AppInitializer extends Initializer {
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
         ReactDOM.render(
           <ActionProvider actions={actions}>
-            <IntlProvider locale="en">
+            <IntlProvider locale='en'>
               <Provider store={store}>
                 {React.createElement(Router, Object.assign({}, renderProps))}
               </Provider>

@@ -45,32 +45,32 @@ function routeGenerator (store) {
 
   if (state.currentUser) {
     return [
-      <Route component={App} path="/">
+      <Route component={App} path='/'>
         <IndexRoute component={CreateLaundry} onEnter={checkLaundryGenerator(store)}/>
-        <Route path="laundries/:id" component={LeftNav} onEnter={checkExistingLaundryGenerator(store)}>
-          <Route path="timetable" component={Timetable}/>
-          <Route path="bookings" component={Bookings}/>
-          <Route path="settings" component={Settings}/>
-          <Route path="machines" component={Machines} onEnter={checkLaundryOwnerGenerator(store)}/>
-          <Route path="users" component={Users} onEnter={checkLaundryOwnerGenerator(store)}/>
+        <Route path='laundries/:id' component={LeftNav} onEnter={checkExistingLaundryGenerator(store)}>
+          <Route path='timetable' component={Timetable}/>
+          <Route path='bookings' component={Bookings}/>
+          <Route path='settings' component={Settings}/>
+          <Route path='machines' component={Machines} onEnter={checkLaundryOwnerGenerator(store)}/>
+          <Route path='users' component={Users} onEnter={checkLaundryOwnerGenerator(store)}/>
         </Route>
       </Route>,
-      <Route path="/auth">
-        <IndexRedirect to="/"/>
+      <Route path='/auth'>
+        <IndexRedirect to='/'/>
       </Route>]
   }
   return [
-    <Route component={App} path="/">
+    <Route component={App} path='/'>
       <IndexRoute component={Home}/>
     </Route>,
-    <Route path="/laundries/*">
-      <IndexRedirect to="/auth"/>
+    <Route path='/laundries/*'>
+      <IndexRedirect to='/auth'/>
     </Route>,
-    <Route path="/auth" component={Auth}>
+    <Route path='/auth' component={Auth}>
       <IndexRoute component={LogIn}/>
-      <Route path="forgot" component={Forgot}/>
-      <Route path="sign-up" component={SignUp}/>
-      <Route path="reset" component={Reset}/>
+      <Route path='forgot' component={Forgot}/>
+      <Route path='sign-up' component={SignUp}/>
+      <Route path='reset' component={Reset}/>
     </Route>]
 }
 

@@ -201,11 +201,11 @@ class TimetableTable extends React.Component {
     const refPuller = (ref) => {
       this.ref = ref
     }
-    return <div className="overlay_container" ref={refPuller}>
-      <div className="overlay">
-        <div className="off_limits" style={{height: this.state.offLimitsPosition + '%'}}/>
+    return <div className='overlay_container' ref={refPuller}>
+      <div className='overlay'>
+        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}/>
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
-          ? <div className="now" style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
+          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
       </div>
       <table
         onMouseOver={tableMouseOverHandler}
@@ -262,9 +262,9 @@ class TimetableTables extends React.Component {
   }
 
   render () {
-    return <section id="TimeTable">
-      <div className="timetable_container">
-        <ul className="times">
+    return <section id='TimeTable'>
+      <div className='timetable_container'>
+        <ul className='times'>
           <li><span>1</span></li>
           <li><span>2</span></li>
           <li><span>3</span></li>
@@ -299,7 +299,7 @@ class TimetableTables extends React.Component {
           date={date} machines={this.props.machines} laundry={this.props.laundry}
           bookings={this.props.bookings}
           key={date}/>)}
-        <ul className="times">
+        <ul className='times'>
           <li><span>1</span></li>
           <li><span>2</span></li>
           <li><span>3</span></li>
