@@ -6,6 +6,7 @@ redis:
   port: 6379
 
 mailer:
+  dryRun: false
   smtp:
     transport: 'smtps://user%40gmail.com:pass@smtp.gmail.com'
 

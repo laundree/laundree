@@ -5,7 +5,7 @@ const React = require('react')
 const {Route, IndexRoute, IndexRedirect} = require('react-router')
 const {
   Users, App, LeftNav, CreateLaundry, Home, Forgot, SignUp, Auth,
-  LogIn, Timetable, Bookings, Settings, Machines, Reset
+  LogIn, Timetable, Bookings, Settings, Machines, Reset, Verification
 } = require('../containers')
 function checkLaundryGenerator (store) {
   return (state, replace) => {
@@ -71,6 +71,7 @@ function routeGenerator (store) {
       <Route path='forgot' component={Forgot}/>
       <Route path='sign-up' component={SignUp}/>
       <Route path='reset' component={Reset}/>
+      <Route path='verification' component={Verification}/>
     </Route>]
 }
 

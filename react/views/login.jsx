@@ -6,11 +6,24 @@ const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {generateChangeHandler} = require('../../utils/react')
+const {USER_NOT_VERIFIED} = require('../../utils/flash')
+
 class LogIn extends React.Component {
 
   constructor (props) {
     super(props)
     this.state = {values: {}}
+  }
+
+  handleNotion () {
+    if (!this.props.flash.length) return null
+    const {type, message} = this.props.flash[0]
+    if (message !== USER_NOT_VERIFIED) return <div className={'notion ' + type}>{message}</div>
+    return <div className={`notion ${type}`}>
+      The email provided isn't verified. <br />
+      Please check your inbox or <br />
+      <Link to='/auth/verification'>send a new verification email</Link>.
+    </div>
   }
 
   render () {
@@ -42,9 +55,7 @@ class LogIn extends React.Component {
           <span>OR</span>
         </div>
         <ValidationForm id='SignIn' method='post' action='/auth/local'>
-          {this.props.flash.length
-            ? <div className={'notion ' + this.props.flash[0].type}>{this.props.flash[0].message}</div>
-            : null}
+          {this.handleNotion()}
           <ValidationElement email trim value={this.state.values.email || ''}>
             <label
               data-validate-error='Please enter a valid e-mail address'>
@@ -97,6 +108,12 @@ LogIn.propTypes = {
     type: React.PropTypes.string.isRequired,
     message: React.PropTypes.string.isRequired
   })).isRequired
+}
+
+LogIn.contextTypes = {
+  actions: React.PropTypes.shape({
+    startEmailVerification: React.PropTypes.func
+  })
 }
 
 module.exports = LogIn

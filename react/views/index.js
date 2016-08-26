@@ -17,5 +17,6 @@ module.exports = {
   LogIn: require('./login.jsx'),
   Machines: require('./machines.jsx'),
   Settings: require('./settings.jsx'),
-  Users: require('./users.jsx')
+  Users: require('./users.jsx'),
+  Verification: require('./verification.jsx')
 }

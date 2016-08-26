@@ -6,6 +6,7 @@ var path = require('path')
 var EmailTemplate = require('email-templates').EmailTemplate
 var nodemailer = require('nodemailer')
 var config = require('config')
+const debug = require('debug')('laundree.utils.mail')
 /**
  * Render a template
  * @param {Object} data
@@ -35,6 +36,9 @@ function sendRenderedEmail (address, content) {
     html: content.html
   }
   return new Promise((resolve, reject) => {
+    debug('Sending mail')
+    debug(options)
+    if (config.get('mailer.dryRun')) return resolve()
     transporter.sendMail(options, (err, info) => {
       if (err) return reject(err)
       resolve(info)

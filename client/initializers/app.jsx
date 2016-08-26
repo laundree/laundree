@@ -46,6 +46,15 @@ function signUpUser (name, email, password) {
     .then((user) => user.startEmailVerification(email))
 }
 
+function startEmailVerification (email) {
+  return UserClientApi
+    .userFromEmail(email)
+    .then(user => {
+      if (!user) throw new Error('User not found')
+      return user.startPasswordReset()
+    })
+}
+
 function userForgotPassword (email) {
   return UserClientApi.userFromEmail(email).then((user) => {
     if (!user) throw new Error('User not found')
@@ -112,7 +121,8 @@ class AppInitializer extends Initializer {
         listBookingsInTime,
         listBookingsForUser,
         inviteUserByEmail,
-        deleteLaundry
+        deleteLaundry,
+        startEmailVerification
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

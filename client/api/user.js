@@ -17,7 +17,7 @@ class UserClientApi {
    */
   static userFromEmail (email) {
     return request
-      .get(`/api/users?email=${email}`)
+      .get(`/api/users?email=${encodeURIComponent(email)}`)
       .then(({body}) => {
         if (!body) return null
         if (body.length !== 1) return null
