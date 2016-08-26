@@ -43,18 +43,18 @@ class TopNav extends React.Component {
 
   renderUserLoggedInMenu () {
     const clickHandler = () => this.setState({open: !this.state.open})
-    return <nav id="TopNav">
-      <Link to="/" className="home" activeClassName="active">
+    return <nav id='TopNav'>
+      <Link to='/' className='home' activeClassName='active'>
         <svg>
-          <use xlinkHref="#SmallLogo"/>
+          <use xlinkHref='#SmallLogo'/>
         </svg>
       </Link>
-      <div className="laundries">
+      <div className='laundries'>
         {this.laundry ? <span>{this.laundry.name}</span> : null}
       </div>
       <div className={'user dropdown ' + (this.state.open ? 'open' : '')} ref={this.refPuller}>
-        <img src={this.props.user.photo} className="avatar" onClick={clickHandler}/>
-        <div className="dropdown_content right">
+        <img src={this.props.user.photo} className='avatar' onClick={clickHandler}/>
+        <div className='dropdown_content right'>
           <ul>
             <li>
               <Link to={'/app/accounts/' + this.props.user.id} onClick={clickHandler}>
@@ -62,7 +62,7 @@ class TopNav extends React.Component {
               </Link>
             </li>
             <li>
-              <a href="/logout">
+              <a href='/logout'>
                 Log out
               </a>
             </li>
@@ -73,31 +73,31 @@ class TopNav extends React.Component {
   }
 
   renderNotLoggedInMenu () {
-    return <nav id="TopNav">
-      <Link to="/" className="home" activeClassName="active">
+    return <nav id='TopNav'>
+      <Link to='/' className='home' activeClassName='active'>
         <svg>
-          <use xlinkHref="#SmallLogo"/>
+          <use xlinkHref='#SmallLogo'/>
         </svg>
       </Link>
-      <a href="/about" className="icon about">
+      <a href='/about' className='icon about'>
         <svg>
-          <use xlinkHref="#Info"/>
+          <use xlinkHref='#Info'/>
         </svg>
         About us
       </a>
-      <a href="/help" className="icon help">
+      <a href='/help' className='icon help'>
         <svg>
-          <use xlinkHref="#LifeBuoy"/>
+          <use xlinkHref='#LifeBuoy'/>
         </svg>
         Help
       </a>
-      <a href="/contact" className="icon contact">
+      <a href='/contact' className='icon contact'>
         <svg>
-          <use xlinkHref="#EMail4"/>
+          <use xlinkHref='#EMail4'/>
         </svg>
         Contact
       </a>
-      <Link to="/auth" className="log-in">Log in</Link>
+      <Link to='/auth' className='log-in'>Log in</Link>
     </nav>
   }
 

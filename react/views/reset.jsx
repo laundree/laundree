@@ -32,43 +32,43 @@ class Reset extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title="Reset password">
+    return <DocumentTitle title='Reset password'>
       <div>
         <h1>
           Reset your password
         </h1>
-        <Link to="/" id="Logo">
+        <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref="#Logo"/>
+            <use xlinkHref='#Logo'/>
           </svg>
         </Link>
         <ValidationForm
           onSubmit={this.submitHandler}
-          id="ResetPassword">
+          id='ResetPassword'>
           {this.state.message
             ? <div className={'notion ' + (this.state.message.type || '')}>{this.state.message.message}</div>
             : null}
           <ValidationElement
             initial={this.state.values.password === undefined}
             password trim value={this.state.values.password || ''}>
-            <label data-validate-error="Please enter at least 6 characters">
+            <label data-validate-error='Please enter at least 6 characters'>
               <input
                 onChange={generateChangeHandler(this, 'password')}
                 value={this.state.values.password || ''}
-                type="password" name="password" placeholder="New password" data-validate-type="password"/>
+                type='password' name='password' placeholder='New password' data-validate-type='password'/>
             </label>
           </ValidationElement>
-          <div className="buttons">
-            <input type="submit" value="Reset"/>
+          <div className='buttons'>
+            <input type='submit' value='Reset'/>
           </div>
-          <div className="forgot">
+          <div className='forgot'>
             <div>
               Did you remember your password?{' '}
-              <Link to="/auth" className="forgot">Log in.</Link>
+              <Link to='/auth' className='forgot'>Log in.</Link>
             </div>
             <div>
               Do you not have an account?{' '}
-              <Link to="/auth/sign-up">Sign-up here.</Link>
+              <Link to='/auth/sign-up'>Sign-up here.</Link>
             </div>
           </div>
         </ValidationForm>

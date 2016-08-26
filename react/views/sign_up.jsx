@@ -35,31 +35,31 @@ class SignUp extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title="Sign up">
+    return <DocumentTitle title='Sign up'>
       <div>
         <h1>
           Sign-up for an account
         </h1>
-        <Link to="/" id="Logo">
+        <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref="#Logo"/>
+            <use xlinkHref='#Logo'/>
           </svg>
         </Link>
-        <div className="auth_alternatives">
-          <a href="/auth/facebook" className="facebook">
+        <div className='auth_alternatives'>
+          <a href='/auth/facebook' className='facebook'>
             <svg>
-              <use xlinkHref="#Facebook"/>
+              <use xlinkHref='#Facebook'/>
             </svg>
             Sign up with Facebook
           </a>
-          <a href="/auth/google" className="google">
+          <a href='/auth/google' className='google'>
             <svg>
-              <use xlinkHref="#GooglePlus"/>
+              <use xlinkHref='#GooglePlus'/>
             </svg>
             Sign up with Google
           </a>
         </div>
-        <div className="or">
+        <div className='or'>
           <span>OR</span>
         </div>
         <ValidationForm
@@ -73,9 +73,9 @@ class SignUp extends React.Component {
             trim
             initial={this.state.values.name === undefined}
             value={this.state.values.name || ''}>
-            <label data-validate-error="Please enter your full name">
+            <label data-validate-error='Please enter your full name'>
               <input
-                type="text" name="name" placeholder="Full name"
+                type='text' name='name' placeholder='Full name'
                 value={this.state.values.name || ''}
                 onChange={generateChangeHandler(this, 'name')}
               />
@@ -87,11 +87,11 @@ class SignUp extends React.Component {
             initial={this.state.values.email === undefined}
             value={this.state.values.email || ''}>
             <label
-              data-validate-error="Please enter a valid e-mail address">
+              data-validate-error='Please enter a valid e-mail address'>
               <input
                 value={this.state.values.email || ''}
                 onChange={generateChangeHandler(this, 'email')}
-                type="text" name="email" placeholder="E-mail address"/>
+                type='text' name='email' placeholder='E-mail address'/>
             </label>
           </ValidationElement>
           <ValidationElement
@@ -99,27 +99,27 @@ class SignUp extends React.Component {
             password
             trim
             value={this.state.values.password || ''}>
-            <label data-validate-error="Min. 6 characters containing at least one letter">
+            <label data-validate-error='Min. 6 characters containing at least one letter'>
               <input
                 value={this.state.values.password || ''}
                 onChange={generateChangeHandler(this, 'password')}
-                type="password" name="password" placeholder="Password"/>
+                type='password' name='password' placeholder='Password'/>
             </label>
           </ValidationElement>
-          <div className="accept">
+          <div className='accept'>
             By signing up you agree with our {' '}
-            <a href="/auth/terms-and-conditions" target="_blank">Terms and Conditions</a>,{' '}
-            <a href="/auth/cookie-policy" target="_blank">Cookie Policy</a>, and{' '}
-            <a href="/auth/privacy-policy" target="_blank">Privacy Policy</a>.
+            <a href='/auth/terms-and-conditions' target='_blank'>Terms and Conditions</a>,{' '}
+            <a href='/auth/cookie-policy' target='_blank'>Cookie Policy</a>, and{' '}
+            <a href='/auth/privacy-policy' target='_blank'>Privacy Policy</a>.
           </div>
-          <div className="buttons">
-            <input type="submit" value="Create your account" className="create"/>
+          <div className='buttons'>
+            <input type='submit' value='Create your account' className='create'/>
           </div>
-          <div className="forgot">
-            <div>Already have an account? <Link to="/auth">Log in here.</Link></div>
+          <div className='forgot'>
+            <div>Already have an account? <Link to='/auth'>Log in here.</Link></div>
             <div>
               Forgot your password?
-              <Link to="/auth/forgot" className="forgot">Let us send you a new one.</Link>
+              <Link to='/auth/forgot' className='forgot'>Let us send you a new one.</Link>
             </div>
           </div>
         </ValidationForm>
