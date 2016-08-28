@@ -94,9 +94,8 @@ class LogIn extends React.Component {
         </ValidationForm>
         <div className='notice'>
           Notice: By logging in without an account, we will register you and you will be accepting our{' '}
-          <a href='/auth/terms-and-conditions' target='_blank'>Terms and Conditions</a>,{' '}
-          <a href='/auth/cookie-policy' target='_blank'>Cookie Policy</a>, and{' '}
-          <a href='/auth/privacy-policy' target='_blank'>Privacy Policy</a>.
+          <a href='/terms-and-conditions' target='_blank'>Terms and Conditions</a>{' '} and{' '}
+          <a href='/privacy' target='_blank'>Privacy Policy</a>.
         </div>
       </div>
     </DocumentTitle>

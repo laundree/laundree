@@ -12,6 +12,8 @@ module.exports = {
   Reset: require('../views').Reset,
   Home: require('../views').Home,
   Verification: require('../views').Verification,
+  Privacy: require('../views').Privacy,
+  TermsAndConditions: require('../views').TermsAndConditions,
   Settings: require('./settings'),
   Bookings: require('./bookings'),
   Machines: require('./machines'),

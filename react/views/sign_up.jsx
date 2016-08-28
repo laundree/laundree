@@ -108,9 +108,8 @@ class SignUp extends React.Component {
           </ValidationElement>
           <div className='accept'>
             By signing up you agree with our {' '}
-            <a href='/auth/terms-and-conditions' target='_blank'>Terms and Conditions</a>,{' '}
-            <a href='/auth/cookie-policy' target='_blank'>Cookie Policy</a>, and{' '}
-            <a href='/auth/privacy-policy' target='_blank'>Privacy Policy</a>.
+            <a href='/terms-and-conditions' target='_blank'>Terms and Conditions</a>{' '}and{' '}
+            <a href='/privacy' target='_blank'>Privacy Policy</a>.
           </div>
           <div className='buttons'>
             <input type='submit' value='Create your account' className='create'/>

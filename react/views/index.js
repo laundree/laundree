@@ -18,5 +18,7 @@ module.exports = {
   Machines: require('./machines.jsx'),
   Settings: require('./settings.jsx'),
   Users: require('./users.jsx'),
-  Verification: require('./verification.jsx')
+  Verification: require('./verification.jsx'),
+  Privacy: require('../privacy.jsx'),
+  TermsAndConditions: require('../terms_and_conditions.jsx')
 }
