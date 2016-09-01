@@ -6,6 +6,8 @@
     list-style-type: none
     padding-right: 2em
     > li
+      position: relative
+      overflow: hidden
       border:
         width: 0.1em
         color: #5eb9b9
@@ -14,11 +16,19 @@
         border-top-style: solid
       min-height: 3em
       padding: 1em 1em
+      .machineName
+        line-height: 3em
+        top: 1em
+        left: 1em
+        position: absolute
       .name
         line-height: 3em
-        float: left
+        position: absolute
+        left: 5em
+        top: 1em
       .time_action_wrapper
-        float: right
+        position: absolute
+        right: 0
         .time
           margin: 0.5em
           float: left
