@@ -15,6 +15,7 @@ module.exports = {
   Privacy: require('../views').Privacy,
   TermsAndConditions: require('../views').TermsAndConditions,
   LaundrySettings: require('./laundry_settings'),
+  About: require('../views').About,
   Bookings: require('./bookings'),
   Machines: require('./machines'),
   LogIn: require('./login'),
