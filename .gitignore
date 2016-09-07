@@ -29,11 +29,10 @@ node_modules
 # Debug log from npm
 npm-debug.log
 
-public/stylesheets/*.css
-public/stylesheets/*.css.map
 .idea
 
 *.ai
 public/videos
 reports
 config/local.yaml
+dist
