@@ -157,15 +157,15 @@ class LaundryHandler extends Handler {
   /**
    * Add a user
    * @param {UserHandler} user
-   * @return {Promise.<LaundryHandler>}
+   * @return {Promise.<int>} The number of new users added
    */
   addUser (user) {
-    if (this.isUser(user)) return Promise.resolve(this)
+    if (this.isUser(user)) return Promise.resolve(0)
     this.model.users.push(user.model._id)
     return this
       .save()
       .then(() => user._addLaundry(this))
-      .then(() => this)
+      .then(() => 1)
   }
 
   /**
@@ -195,19 +195,23 @@ class LaundryHandler extends Handler {
 
   /**
    * Invite a user by email address.
+   * Returns an object containing either:
+   *  * The user if a user exists and isn't invited
+   *  * The invite if an invite hasn't already been sent
+   *  * Neither
    * @param {string} email
-   * @return {Promise}
+   * @return {Promise.<{user: UserHandler=, invite: LaundryInvitationHandler=}>}
    */
   inviteUserByEmail (email) {
     return UserHandler
       .findFromEmail(email)
       .then((user) => {
-        if (user) return this.addUser(user)
+        if (user) return this.addUser(user).then((num) => num ? {user} : {})
         return LaundryInvitationHandler
           .find({email, laundry: this.model._id})
           .then(([invite]) => {
-            if (invite) return invite
-            return this.createInvitation(email)
+            if (invite) return {}
+            return this.createInvitation(email).then(invite => ({invite}))
           })
       })
   }

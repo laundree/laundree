@@ -1,5 +1,5 @@
 const {LaundryHandler} = require('../../handlers')
-const {api} = require('../../utils')
+const {api, mail} = require('../../utils')
 /**
  * Created by budde on 02/06/16.
  */
@@ -74,6 +74,10 @@ function inviteUserByEmail (req, res) {
       if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
       return laundry
         .inviteUserByEmail(email)
+        .then(({user, invite}) => {
+          if (user) return mail.sendEmail({email, laundry: laundry.model, user: user.model}, 'invite-user', email)
+          if (invite) return mail.sendEmail({email, laundry: laundry.model}, 'invite', email)
+        })
         .then(() => api.returnSuccess(res))
     })
     .catch(api.generateErrorHandler(res))
