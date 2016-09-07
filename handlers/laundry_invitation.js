@@ -31,7 +31,27 @@ class LaundryInvitationHandler extends Handler {
   }
 
   toRestSummary () {
-    return {email: this.model.email, id: this.model.id}
+    return {email: this.model.email, id: this.model.id, href: this.href}
+  }
+
+  fetchLaundry () {
+    const LaundryHandler = require('./laundry')
+    return LaundryInvitationModel.populate(this.model, {path: 'laundry'})
+      .then((model) => new LaundryHandler(model.laundry))
+  }
+
+  get href () {
+    return `/api/invites/${this.model.id}`
+  }
+
+  toRest () {
+    return this.fetchLaundry()
+      .then(laundry => ({
+        email: this.model.email,
+        id: this.model.id,
+        laundry: laundry.toRestSummary(),
+        href: this.href
+      }))
   }
 
   markUsed () {

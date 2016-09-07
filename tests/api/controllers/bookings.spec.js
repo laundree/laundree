@@ -14,7 +14,7 @@ describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
   describe('bookings', function () {
     this.timeout(5000)
-    describe('GET /api/bookings/{id}/bookings', () => {
+    describe('GET /api/machines/{id}/bookings', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
           .get('/api/machines/lid/bookings')

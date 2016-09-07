@@ -78,7 +78,10 @@ class LaundryHandler extends Handler {
   createMachine (name, type) {
     return MachineHandler._createMachine(this, name, type).then((machine) => {
       this.model.machines.push(machine.model._id)
-      return this.save().then(() => machine)
+      return this.save().then(() => {
+        this.emitEvent('update')
+        return machine
+      })
     })
   }
 
@@ -92,6 +95,21 @@ class LaundryHandler extends Handler {
       .then(() => {
         this.model.machines.pull(machine.model._id)
         return this.save()
+          .then(() => this.emitEvent('update'))
+      })
+  }
+
+  /**
+   * Delete the given invite
+   * @param {LaundryInvitationHandler} invite
+   * @return {Promise}
+   */
+  deleteInvite (invite) {
+    return invite._deleteInvite()
+      .then(() => {
+        this.model.invites.pull(invite.model._id)
+        return this.save()
+          .then(() => this.emitEvent('update'))
       })
   }
 
@@ -165,7 +183,10 @@ class LaundryHandler extends Handler {
     return this
       .save()
       .then(() => user._addLaundry(this))
-      .then(() => 1)
+      .then(() => {
+        this.emitEvent('update')
+        return 1
+      })
   }
 
   /**
@@ -179,6 +200,7 @@ class LaundryHandler extends Handler {
     return this
       .save()
       .then(() => user._removeLaundry(this))
+      .then(() => this.emitEvent('update'))
       .then(() => this)
   }
 
@@ -223,6 +245,7 @@ class LaundryHandler extends Handler {
         this.model.invites.push(invite.model._id)
         return this
           .save()
+          .then(() => this.emitEvent('update'))
           .then(() => invite)
       })
   }

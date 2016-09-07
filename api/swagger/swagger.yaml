@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.4"
+  version: "0.0.5"
   title: Laundree App
 
 host: laundree.io
@@ -970,6 +970,57 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /invites/{id}:
+    x-swagger-router-controller: invites
+    get:
+      security:
+        - userAccessToken: []
+      operationId: fetchInvite
+      tags:
+        - Invites
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Invite id
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Invite"
+        "404":
+          description: Invite not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      security:
+        - userAccessToken: []
+      operationId: deleteInvite
+      tags:
+        - Invites
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: Invite id
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Invite not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /swagger:
     x-swagger-pipe: swagger_raw
 # complex objects have schema definitions
@@ -1164,14 +1215,33 @@ definitions:
         type: string
       name: 
         type: string
+  Invite:
+    required:
+      - id
+      - href
+      - email
+      - laundry
+    properties:
+      id:
+        type: string
+      href:
+        type: string
+      email:
+        type: string
+        format: email
+      laundry:
+        $ref: "#/definitions/LaundrySummary"
   InviteSummary:
     required:
       - id
+      - href
       - email
     properties:
       id:
         type: string
-      email: 
+      href:
+        type: string
+      email:
         type: string
         format: email
   Machine:
