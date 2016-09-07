@@ -31,14 +31,16 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(require('node-sass-middleware')({
-  src: path.join(__dirname, 'public'),
-  dest: path.join(__dirname, 'public'),
+  src: path.join(__dirname, 'stylesheets'),
+  dest: path.join(__dirname, 'dist/stylesheets'),
+  prefix: '/stylesheets',
   outputStyle: config.get('sass.outputStyle'),
   indentedSyntax: true,
   sourceMap: true
 }))
 app.use(flash())
 app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'dist')))
 
 // Swagger
 module.exports = {
