@@ -1,23 +1,41 @@
 #UserList
-  .name
-    .owner
-      font-size: 0.8em
-      font-weight: bold
-      text-transform: uppercase
-      padding: 0 1em
-      color: #c73544
-  .avatarContainer
-    float: left
-    position: relative
-    margin-right: 1em
-    height: 3em
-    width: 3em
-    .avatar
+  li
+    &:hover
+      .name
+        .action.delete
+          opacity: 1
+    .name
+      .action
+        float: right
+        height: 2em
+        padding: 0.5em 0.5em 0.5em 1em
+        &.delete
+          opacity: 0
+          overflow: hidden
+          +transition(opacity 0.1s)
+          svg
+            cursor: pointer
+            fill: #dc3f50
+        svg
+          height: 2em
+          width: 2em
+      .owner
+        font-size: 0.8em
+        font-weight: bold
+        text-transform: uppercase
+        padding: 0 1em
+        color: #c73544
+    .avatarContainer
       float: left
+      position: relative
+      margin-right: 1em
       height: 3em
       width: 3em
-      background-color: #ffffff
-      +border-radius(0.2em)
-
+      .avatar
+        float: left
+        height: 3em
+        width: 3em
+        background-color: #ffffff
+        +border-radius(0.2em)
 #InviteUserForm
   padding-top: 2em

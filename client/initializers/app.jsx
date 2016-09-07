@@ -17,7 +17,7 @@ const {createStore} = require('redux')
 const {reducer} = require('../../redux')
 const reduxActions = require('../../redux/actions')
 const {ActionProvider} = require('../../react/views/providers')
-const {UserClientApi, LaundryClientApi, MachineClientApi, BookingClientApi} = require('../api')
+const {UserClientApi, LaundryClientApi, MachineClientApi, BookingClientApi, InviteClientApi} = require('../api')
 
 const nsp = io('/redux')
 
@@ -103,6 +103,10 @@ function deleteLaundry (laundryId) {
   return new LaundryClientApi(laundryId).deleteLaundry()
 }
 
+function deleteInvite (id) {
+  return new InviteClientApi(id).deleteInvite()
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -122,7 +126,8 @@ class AppInitializer extends Initializer {
         listBookingsForUser,
         inviteUserByEmail,
         deleteLaundry,
-        startEmailVerification
+        startEmailVerification,
+        deleteInvite
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

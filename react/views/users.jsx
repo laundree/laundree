@@ -2,6 +2,7 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {generateChangeHandler} = require('../../utils/react')
+const Modal = require('./modal.jsx')
 
 class InviteUserForm extends React.Component {
   constructor (props) {
@@ -56,11 +57,16 @@ InviteUserForm.propTypes = {
 
 class Users extends React.Component {
 
+  constructor (props) {
+    super(props)
+    this.state = {showModal: undefined}
+  }
+
   renderUser (user) {
     return <div>
       <div className='avatarContainer'>
         <img className='avatar' src={user.photo}/>
-        </div>
+      </div>
       <div className='name'>
         {user.displayName}{' '}{this.isOwner(user.id) ? <span className='owner'>Owner</span> : ''}
       </div>
@@ -68,10 +74,26 @@ class Users extends React.Component {
   }
 
   renderInvite (invite) {
+    const onShowModal = () => this.setState({showModal: invite.id})
+    const handleCloseModal = () => this.setState({showModal: undefined})
+    const handleDeleteClick = () => this.context.actions.deleteInvite(this.state.showModal)
     return <div>
+      <Modal
+        show={this.state.showModal === invite.id}
+        onClose={handleCloseModal}
+        message='Are you absolutely sure that you want to delete this invitation?'
+        actions={[
+          {label: 'Yes', className: 'delete red', action: handleDeleteClick},
+          {label: 'No', action: handleCloseModal}
+        ]}/>
       <div className='avatarContainer'/>
       <div className='name'>
         {invite.email}
+        <div className='delete action'>
+          <svg onClick={onShowModal}>
+            <use xlinkHref='#Trash'/>
+          </svg>
+        </div>
       </div>
     </div>
   }
@@ -109,6 +131,12 @@ class Users extends React.Component {
       </main>
     </DocumentTitle>
   }
+}
+
+Users.contextTypes = {
+  actions: React.PropTypes.shape({
+    deleteInvite: React.PropTypes.func
+  })
 }
 
 Users.propTypes = {

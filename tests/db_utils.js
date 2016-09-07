@@ -84,11 +84,21 @@ function populateBookings (no, {length = 3600, space = 20, offset = 0} = {}) {
         })))
 }
 
+function populateInvites (no) {
+  return this.populateLaundries(1)
+    .then(({user, token, laundry}) =>
+      Promise
+        .all(lodash.range(no).map(i => laundry.inviteUserByEmail(faker.internet.email())))
+        .then((invites) => invites.map(({invite}) => invite).filter(i => i))
+        .then(invites => ({user, token, laundry, invites, invite: invites[0]})))
+}
+
 module.exports = {
-  clearDb: clearDb,
-  populateUsers: populateUsers,
-  populateLaundries: populateLaundries,
-  populateTokens: populateTokens,
-  populateBookings: populateBookings,
-  populateMachines: populateMachines
+  clearDb,
+  populateUsers,
+  populateLaundries,
+  populateTokens,
+  populateBookings,
+  populateMachines,
+  populateInvites
 }
