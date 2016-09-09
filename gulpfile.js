@@ -1,13 +1,18 @@
 require('babel-register')
 process.env.NODE_ENV = 'test'
-var gulp = require('gulp')
-var babel = require('gulp-babel')
-var eslint = require('gulp-eslint')
-var mocha = require('gulp-mocha')
-var istanbul = require('gulp-babel-istanbul')
-var isparta = require('isparta')
-var exec = require('child_process').exec
-var runSequence = require('run-sequence')
+const gulp = require('gulp')
+const babel = require('gulp-babel')
+const eslint = require('gulp-eslint')
+const mocha = require('gulp-mocha')
+const istanbul = require('gulp-babel-istanbul')
+const isparta = require('isparta')
+const exec = require('child_process').exec
+const runSequence = require('run-sequence')
+const browserify = require('browserify')
+const babelify = require('babelify')
+const source = require('vinyl-source-stream')
+const uglify = require('gulp-uglify')
+const buffer = require('vinyl-buffer')
 
 gulp.task('lint', function () {
   return gulp.src(['{api,bin,client,email-templates,handlers,models,public,react,redux,routes,tests,utils,views}/**/*.{js,jsx}', '*.js'])
@@ -66,7 +71,7 @@ gulp.task('test:unit-coverage', function (done) {
 })
 
 gulp.task('send-coverage', (done) => {
-  var config = require('config')
+  const config = require('config')
   if (!config.has('codeClimate.repoToken')) {
     console.log('Skipping sending coverage because of missing configuration')
     return done()
@@ -89,4 +94,17 @@ gulp.task('exit', (done) => {
 
 gulp.task('test', (done) => {
   runSequence('lint', 'test:unit-coverage', 'send-coverage', 'exit', done)
+})
+
+gulp.task('build', function () {
+  process.env.NODE_ENV = 'production'
+  return browserify({
+    entries: './client/index.js',
+    transform: [ babelify ]
+  })
+    .bundle()
+    .pipe(source('bundle.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(gulp.dest('./dist/javascripts'))
 })
