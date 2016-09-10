@@ -107,6 +107,10 @@ function deleteInvite (id) {
   return new InviteClientApi(id).deleteInvite()
 }
 
+function removeUserFromLaundry (laundryId, userId) {
+  return new LaundryClientApi(laundryId).removeUserFromLaundry(userId)
+}
+
 class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
@@ -127,7 +131,8 @@ class AppInitializer extends Initializer {
         inviteUserByEmail,
         deleteLaundry,
         startEmailVerification,
-        deleteInvite
+        deleteInvite,
+        removeUserFromLaundry
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
