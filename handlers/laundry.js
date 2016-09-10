@@ -190,6 +190,24 @@ class LaundryHandler extends Handler {
   }
 
   /**
+   * Add a owner to this laundry
+   * @param {UserHandler} user
+   * @return {Promise.<int>} The number of owners added
+   */
+  addOwner (user) {
+    return this
+      .addUser(user)
+      .then(() => {
+        if (this.isOwner(user)) return 0
+        this.model.owners.push(user.model._id)
+        this.save().then(() => {
+          this.emitEvent('update')
+          return 1
+        })
+      })
+  }
+
+  /**
    * Will remove given user from laundry. Both as user or potential owner.
    * @param {UserHandler} user
    * @return {Promise.<LaundryHandler>}

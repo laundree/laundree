@@ -35,6 +35,12 @@ class LaundryClientApi {
       .delete(`/api/laundries/${this.id}`)
       .then()
   }
+
+  removeUserFromLaundry (userId) {
+    return request
+      .delete(`/api/laundries/${this.id}/users/${userId}`)
+      .then()
+  }
 }
 
 module.exports = LaundryClientApi

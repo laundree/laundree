@@ -271,6 +271,7 @@ describe('controllers', function () {
           }).catch(done)
       })
     })
+
     describe('POST /laundries/{id}/invite-by-email', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
@@ -487,6 +488,7 @@ describe('controllers', function () {
           .catch(done)
       })
     })
+
     describe('DELETE /laundries/{id}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
@@ -589,6 +591,174 @@ describe('controllers', function () {
               })
           })
         })
+      })
+    })
+
+    describe('DELETE /laundries/{id}/users/{userId}', () => {
+      it('should fail on not authenticated', (done) => {
+        request(app)
+          .delete('/api/laundries/id/users/id')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end((err, res) => done(err))
+      })
+      it('should return 404 on invalid id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .delete('/api/laundries/id/users/userId')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(404)
+            .expect('Content-Type', /json/)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Laundry not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on missing id', (done) => {
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateUsers(1)])
+          .then(([{user, token, laundry}, [user2]]) => laundry.addUser(user2).then(() => ({
+            owner: user,
+            token,
+            laundry,
+            user: user2
+          })))
+          .then(({owner, token, laundry}) => {
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/id`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(owner.model.id, token.secret)
+              .expect(404)
+              .expect('Content-Type', /json/)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'User not found'})
+                done()
+              })
+          })
+          .catch(done)
+      })
+      it('should return 404 on other id', (done) => {
+        dbUtils.populateLaundries(1).then(({laundries}) => {
+          const [laundry] = laundries
+          return dbUtils.populateLaundries(1).then(({user, token}) => {
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/id`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(404)
+              .expect('Content-Type', /json/)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Laundry not found'})
+                done()
+              })
+          })
+            .catch(done)
+        })
+      })
+      it('should return 403 on other user id', (done) => {
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateUsers(1)])
+          .then(([{user, token, laundry}, [user2]]) => ({owner: user, token, laundry, user: user2}))
+          .then(({owner, user, token, laundry}) => {
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(owner.model.id, token.secret)
+              .expect(403)
+              .expect('Content-Type', /json/)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Not allowed'})
+                done()
+              })
+          })
+          .catch(done)
+      })
+      it('should succeed', (done) => {
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateUsers(1)])
+          .then(([{user, token, laundry}, [user2]]) => laundry.addUser(user2).then(() => ({
+            owner: user,
+            token,
+            laundry,
+            user: user2
+          })))
+          .then(({user, owner, token, laundry}) => {
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(owner.model.id, token.secret)
+              .expect(204)
+              .end((err, res) => {
+                if (err) return done(err)
+                LaundryHandler
+                  .findFromId(laundry.model.id)
+                  .then((laundry) => {
+                    Boolean(laundry.isUser(user)).should.be.false
+                    done()
+                  })
+                  .catch(done)
+              })
+          })
+          .catch(done)
+      })
+      it('should fail when only user', (done) => {
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateTokens(1), dbUtils.populateUsers(1)])
+          .then(([{laundry}, {token, user}, [user2]]) => Promise
+            .all([laundry.addUser(user), laundry.addUser(user2)])
+            .then(() => ({
+              token,
+              laundry,
+              user1: user,
+              user2: user2
+            })))
+          .then(({user1, user2, token, laundry}) => {
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/${user2.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user1.model.id, token.secret)
+              .expect(403)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Not allowed'})
+                done()
+              })
+          })
+          .catch(done)
+      })
+      it('should fail when deleting owner', (done) => {
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateUsers(1)])
+          .then(([{laundry, token, user}, [user2]]) => laundry.addOwner(user2)
+            .then(() => ({
+              token,
+              laundry,
+              user1: user,
+              user2: user2
+            })))
+          .then(({user1, user2, token, laundry}) => {
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/${user2.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user1.model.id, token.secret)
+              .expect(403)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Not allowed'})
+                done()
+              })
+          })
+          .catch(done)
       })
     })
   })
