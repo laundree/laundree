@@ -1,4 +1,4 @@
-const {LaundryHandler} = require('../../handlers')
+const {LaundryHandler, UserHandler} = require('../../handlers')
 const {api, mail} = require('../../utils')
 /**
  * Created by budde on 02/06/16.
@@ -83,10 +83,27 @@ function inviteUserByEmail (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function removeUserFromLaundry (req, res) {
+  const id = req.swagger.params.id.value
+  const userId = req.swagger.params.userId.value
+  Promise.all([LaundryHandler.findFromId(id), UserHandler.findFromId(userId)])
+    .then(([laundry, user]) => {
+      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
+      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
+      if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
+      if (!user) return api.returnError(res, 404, 'User not found')
+      if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
+      if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')
+      return laundry.removeUser(user).then(() => api.returnSuccess(res))
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
 module.exports = {
   inviteUserByEmail,
   listLaundries,
   fetchLaundry,
   deleteLaundry,
-  createLaundry
+  createLaundry,
+  removeUserFromLaundry
 }
