@@ -1,78 +1,54 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
 const Modal = require('./modal.jsx')
 
-class Dropdown extends React.Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {open: false}
-    var ref
-    this.refPuller = (r) => {
-      ref = r
-    }
-    this.clickListener = (event) => {
-      var target = event.target
-      while (target && target.classList) {
-        if (target === ref) return
-        target = target.parentNode
-      }
-      this.setState({open: false})
-    }
-    this.escListener = (event) => {
-      if (event.keyCode !== 27) return
-      this.setState({open: false})
-    }
-    this.clickHandler = () => this.setState(({open}) => ({open: !open}))
-  }
+class MachineDropdown extends React.Component {
 
   selectGenerator (value) {
     return () => {
-      this.clickHandler()
       this.props.onSelect(value)
       return null
     }
   }
 
-  componentWillUnmount () {
-    document.removeEventListener('click', this.clickListener)
-    document.removeEventListener('keyup', this.escListener)
-  }
-
-  componentDidMount () {
-    document.addEventListener('click', this.clickListener)
-    document.addEventListener('keyup', this.escListener)
-  }
-
   render () {
-    return <div className={'dropdown' + (this.state.open ? ' open' : '')} ref={this.refPuller}>
-      <div className='currentValue' onClick={this.clickHandler}>
+    return <DropDown>
+      <DropDownTitle>
         <svg>
           <use xlinkHref={this.props.selected === 'wash' ? '#Drop' : '#Waves'}/>
         </svg>
-      </div>
-      <div className='dropdown_content'>
-        <ul>
-          <li className={this.props.selected === 'wash' ? 'selected' : ''} onClick={this.selectGenerator('wash')}>
-            <svg>
-              <use xlinkHref='#Drop'/>
-            </svg>
-            Washing machine
-          </li>
-          <li className={this.props.selected === 'dry' ? 'selected' : ''} onClick={this.selectGenerator('dry')}>
-            <svg>
-              <use xlinkHref='#Waves'/>
-            </svg>
-            Dryer
-          </li>
+      </DropDownTitle>
+      <DropDownContent>
+        <ul className='dropDownList'>
+          <DropDownCloser>
+            <li className={this.props.selected === 'wash' ? 'active' : ''} onClick={this.selectGenerator('wash')}>
+              <span className='link'>
+                <svg>
+                  <use xlinkHref='#Drop'/>
+                </svg>
+                Washing machine
+              </span>
+            </li>
+          </DropDownCloser>
+          <DropDownCloser>
+            <li className={this.props.selected === 'dry' ? 'active' : ''} onClick={this.selectGenerator('dry')}>
+              <span className='link'>
+                <svg>
+                  <use xlinkHref='#Waves'/>
+                </svg>
+                Dryer
+              </span>
+            </li>
+          </DropDownCloser>
         </ul>
-      </div>
-    </div>
+      </DropDownContent>
+    </DropDown>
   }
 }
 
-Dropdown.propTypes = {
+MachineDropdown.propTypes = {
   onSelect: React.PropTypes.func.isRequired,
   selected: React.PropTypes.string
 }
@@ -116,6 +92,7 @@ class MachineListItem extends React.Component {
   reset () {
     this.setState(({sesh}) => Object.assign({}, this.initialState, {sesh: sesh + 1}))
   }
+
   componentWillReceiveProps ({machine}) {
     if (!machine) return
     this.setState({value: machine.name, selected: machine.type})
@@ -161,7 +138,7 @@ class MachineListItem extends React.Component {
         className='machine_form'
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
-        <Dropdown selected={this.selected} onSelect={this.onSelect}/>
+        <MachineDropdown selected={this.selected} onSelect={this.onSelect}/>
         <ValidationElement
           sesh={this.state.sesh}
           trim

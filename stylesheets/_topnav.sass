@@ -1,0 +1,151 @@
+#TopNav
+  position: absolute
+  top: 0
+  width: 100%
+  z-index: 201
+  height: 4em
+  background-color: #E55564
+
+  .laundries
+    position: absolute
+    left: 4em
+    line-height: 2em
+    color: #fff
+    font-family: 'Roboto Condensed', sans-serif
+    .dropDown
+      position: relative
+      padding-left: 3em
+      &:before
+        left: 1.8em
+        top: 1.9em
+        content: ''
+        position: absolute
+        +arrow(#fff, 0.4em)
+      .dropDownContent
+        left: 1em
+        padding: 0
+        .dropDownList
+          a
+            padding: 0 2em
+    > div
+      padding: 1em 2em
+      span, .dropDownTitle
+        display: block
+        height: calc(1em + 1 / 3)
+        overflow: hidden
+        font-size: 1.5em
+
+  a.home
+    background-color: #E5954C
+    margin: 0
+    display: block
+    width: 4em
+    height: 4em
+    padding: 0
+
+    svg
+      $height: (44.1/28.6)
+      margin: (2-($height / 2))*1em 1.5em
+      width: 1em
+      height: $height * 1em
+      fill: #ffffff
+
+  > a, > span
+    line-height: 4em
+    color: #ffffff
+    display: block
+    float: left
+    padding: 0 0.5em
+    margin: 0 2em
+    font-weight: normal
+
+  a.icon
+
+    svg
+      width: 1.2em
+      float: left
+      height: 4em
+      margin: 0 0.5em
+      fill: #fff
+
+    &:hover
+      $color: #ffb734
+      text-decoration: none
+      color: $color
+      svg
+        fill: $color
+
+  div.language
+    float: right
+    font-size: 0.8em
+    > span
+      background: transparent url("/images/arrow-down.svg") no-repeat left center
+    a, span
+      padding-left: 1.5em
+      background-size: 1em
+      font-size: 1em
+    ul
+      overflow: hidden
+      opacity: 0
+      height: 0
+      list-style-type: none
+      position: absolute
+      z-index: 11
+      top: 2.5em
+      background-color: #E55564
+      +border-radius(0 0 0.4em 0.4em)
+      +transition(0.3s opacity)
+
+    &:hover
+      > span
+        opacity: 0.4
+      ul
+        opacity: 1
+        height: auto
+
+  div.user.dropDown
+    background-color: #e55564
+    float: right
+    margin: 0
+    img.avatar
+      margin: 0.5em 1em
+      display: block
+      float: right
+      height: 3em
+      width: 3em
+      +border-radius(0.2em)
+      cursor: pointer
+      background-color: #ffffff
+    .dropDownContent
+      right: 1em
+
+  a.log-in
+    float: right
+    text-transform: uppercase
+    background: #E5954C
+    height: 3em
+    margin: 0.5em 1em
+    line-height: 3em
+    padding: 0 3em
+    +border-radius(0.2em)
+    +transition(0.1s background)
+    text-decoration: none
+    &:hover
+      background: #f3a34e
+
+@media only screen and (max-width: 45em)
+  #TopNav
+    a.icon
+      width: 2.2em
+      margin: 0 0.5em
+      height: 4em
+      padding: 0
+      background-position-x: 50%
+      color: transparent
+      overflow: hidden
+
+@media only screen and (max-width: 30em)
+  #TopNav
+    a.log-in
+      margin: 0.5em
+      padding: 0 1em

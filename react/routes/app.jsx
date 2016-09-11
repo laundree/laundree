@@ -49,6 +49,7 @@ function routeGenerator (store) {
       <Route component={App} path='/'>
         <IndexRoute component={CreateLaundry} onEnter={checkLaundryGenerator(store)}/>
         <Route path='laundries/:id' component={LeftNav} onEnter={checkExistingLaundryGenerator(store)}>
+          <IndexRedirect to='timetable'/>
           <Route path='timetable' component={Timetable}/>
           <Route path='bookings' component={Bookings}/>
           <Route path='settings' component={Settings}/>
