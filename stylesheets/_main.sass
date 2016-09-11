@@ -494,49 +494,8 @@ footer
   div:not(.expanded_left_nav)
     > #LeftNav
       width: 4em
-
       li
         overflow: hidden
-
-        &:before, &:after
-          +transition(0.1s opacity)
-
-        &:hover
-          overflow: visible
-          &:before, &:after
-            opacity: 1
-
-        &:before
-          content: ""
-          position: absolute
-          z-index: 121
-          height: 0
-          width: 0
-          top: 1.5em
-          right: -1em
-          opacity: 0
-          border:
-            width: 0.5em
-            style: solid
-            color: transparent #0a7288 transparent transparent
-
-        &:after
-          z-index: 120
-          content: attr(data-label)
-          background: #0a7288
-          padding: 0.5em
-          position: absolute
-          left: 5em
-          +border-radius(0.2em)
-          color: #fff
-          display: block
-          top: 0.75em
-          font-family: 'Roboto Condensed', sans-serif
-          line-height: 1.5em
-          width: 8em
-          +box-shadow(0 0 0.1em #000)
-          text-align: center
-          opacity: 0
 
   #RightContent
     margin-left: 4em
