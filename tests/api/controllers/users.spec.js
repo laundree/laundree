@@ -64,7 +64,7 @@ describe('controllers', function () {
                     o[k] = u[k]
                     return o
                   }, {})
-                  res.body.should.be.deep.equal(u)
+                  res.body.should.be.deep.equal(cleanUser)
                   done()
                 })
                 .catch(done)
