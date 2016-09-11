@@ -16,9 +16,10 @@ module.exports = {
   CreateLaundry: require('./create_laundry.jsx'),
   LogIn: require('./login.jsx'),
   Machines: require('./machines.jsx'),
-  Settings: require('./settings.jsx'),
+  LaundrySettings: require('./laundry_settings.jsx'),
   Users: require('./users.jsx'),
   Verification: require('./verification.jsx'),
   Privacy: require('./privacy.jsx'),
-  TermsAndConditions: require('./terms_and_conditions.jsx')
+  TermsAndConditions: require('./terms_and_conditions.jsx'),
+  Settings: require('./settings.jsx')
 }

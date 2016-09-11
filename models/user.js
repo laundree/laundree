@@ -3,7 +3,7 @@
  */
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema
-var lodash = require('lodash')
+const {union} = require('../utils/array')
 
 var userSchema = new Schema({
   password: {type: String},
@@ -38,7 +38,7 @@ userSchema
   .virtual('latestProfile')
   .get(function () {
     if (!this.latestProvider) return null
-    return lodash.find(this.profiles, (profile) => profile.provider === this.latestProvider) || null
+    return this.profiles.find((profile) => profile.provider === this.latestProvider) || null
   })
 
 function fromLatestProfile (attribute) {
@@ -81,7 +81,7 @@ userSchema
 userSchema
   .virtual('verifiedEmails')
   .get(function () {
-    return lodash.union(this.explicitVerifiedEmails, this.implicitVerifiedEmails)
+    return union(this.explicitVerifiedEmails, this.implicitVerifiedEmails)
   })
 
 userSchema

@@ -3,8 +3,9 @@
  */
 const Promise = require('promise')
 const React = require('react')
-const lodash = require('lodash')
 const {Link} = require('react-router')
+const {range} = require('../../utils/array')
+
 function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
 }
@@ -77,7 +78,7 @@ class TimetableTable extends React.Component {
         .reduce((obj, {machine, from, to, id}) => {
           const fromY = day === from.getDate() ? TimetableTable.dateToY(from) : 0
           const toY = day === to.getDate() ? TimetableTable.dateToY(to) : 48
-          lodash.range(fromY, toY).forEach((y) => {
+          range(fromY, toY).forEach((y) => {
             obj[`${machine}:${y}`] = id
           })
           return obj
@@ -153,8 +154,7 @@ class TimetableTable extends React.Component {
   book (from, to) {
     const {max, min} = TimetableTable._fixPos(from, to)
     const maxExclusive = {x: max.x + 1, y: max.y + 1}
-    return Promise.all(lodash
-      .range(min.x, maxExclusive.x)
+    return Promise.all(range(min.x, maxExclusive.x)
       .map((x) => this.context.actions.createBooking(this.props.laundry.machines[x], this.posToDate(min), this.posToDate(maxExclusive))))
   }
 
@@ -213,7 +213,7 @@ class TimetableTable extends React.Component {
         onMouseDown={tableMouseDownHandler}
         onMouseUp={tableMouseUpHandler}>
         <tbody>
-        {lodash.range(48).map((key) => this._row(key, today ? now : undefined))}
+        {range(48).map((key) => this._row(key, today ? now : undefined))}
         </tbody>
       </table>
     </div>

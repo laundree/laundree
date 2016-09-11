@@ -7,7 +7,6 @@ chai.should()
 const assert = chai.assert
 const {BookingHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
-const lodash = require('lodash')
 const Promise = require('promise')
 
 describe('controllers', function () {
@@ -35,7 +34,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)), 0, 10).map((machine) => machine.toRestSummary())
+              var arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -53,7 +52,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)), 5, 9).map((machine) => machine.toRestSummary())
+              var arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 9).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -71,7 +70,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)), 5, 8).map((machine) => machine.toRestSummary())
+              var arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 8).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -105,7 +104,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)), 0, 12).map((booking) => booking.toRestSummary())
+              var arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((booking) => booking.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })

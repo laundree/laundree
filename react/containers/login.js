@@ -4,10 +4,7 @@
 
 const connect = require('react-redux').connect
 const {LogIn} = require('../views')
-const lodash = require('lodash')
 
-const mapStateToProps = (store) => {
-  return {flash: lodash.cloneDeep(store.flash)}
-}
+const mapStateToProps = ({flash}) => ({flash})
 
 module.exports = connect(mapStateToProps)(LogIn)
