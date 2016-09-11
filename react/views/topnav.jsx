@@ -3,46 +3,44 @@
  */
 const React = require('react')
 const {Link} = require('react-router')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
 
 class TopNav extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.state = {open: false}
-    var ref
-    this.refPuller = (r) => {
-      ref = r
-    }
-    this.clickListener = (event) => {
-      var target = event.target
-      while (target && target.classList) {
-        if (target === ref) return
-        target = target.parentNode
-      }
-      this.setState({open: false})
-    }
-    this.escListener = (event) => {
-      if (event.keyCode !== 27) return
-      this.setState({open: false})
-    }
+  get laundries () {
+    return this.props.user.laundries.map(id => this.props.laundries[id])
   }
 
-  componentWillUnmount () {
-    document.removeEventListener('click', this.clickListener)
-    document.removeEventListener('keyup', this.escListener)
-  }
-
-  componentDidMount () {
-    document.addEventListener('click', this.clickListener)
-    document.addEventListener('keyup', this.escListener)
-  }
-
-  get laundry () {
-    return this.props.laundries[this.props.currentLaundry]
+  renderLaundries () {
+    const laundries = this.laundries
+    const currentLaundry = this.props.laundries[this.props.currentLaundry]
+    if (!currentLaundry) return null
+    switch (laundries.length) {
+      case 0:
+        return null
+      case 1:
+        return <div><span>{currentLaundry.name}</span></div>
+      default:
+        return <DropDown>
+          <DropDownTitle>
+            {currentLaundry.name}
+          </DropDownTitle>
+          <DropDownContent className='noArrow'>
+            <ul className='dropDownList'>
+              {laundries
+                .map(({id, name}) =>
+                  <li key={id} className={id === this.props.currentLaundry ? 'active' : ''}>
+                    <DropDownCloser>
+                      <Link to={'/laundries/' + id}>{name}</Link>
+                    </DropDownCloser>
+                  </li>)}
+            </ul>
+          </DropDownContent>
+        </DropDown>
+    }
   }
 
   renderUserLoggedInMenu () {
-    const clickHandler = () => this.setState({open: !this.state.open})
     return <nav id='TopNav'>
       <Link to='/' className='home' activeClassName='active'>
         <svg>
@@ -50,16 +48,20 @@ class TopNav extends React.Component {
         </svg>
       </Link>
       <div className='laundries'>
-        {this.laundry ? <span>{this.laundry.name}</span> : null}
+        {this.renderLaundries()}
       </div>
-      <div className={'user dropdown ' + (this.state.open ? 'open' : '')} ref={this.refPuller}>
-        <img src={this.props.user.photo} className='avatar' onClick={clickHandler}/>
-        <div className='dropdown_content right'>
-          <ul>
+      <DropDown className='user'>
+        <DropDownTitle>
+          <img src={this.props.user.photo} className='avatar'/>
+        </DropDownTitle>
+        <DropDownContent className='right'>
+          <ul className='dropDownList'>
             <li>
-              <Link to={'/app/accounts/' + this.props.user.id} onClick={clickHandler}>
-                Manage your account
-              </Link>
+              <DropDownCloser>
+                <Link to={'/app/accounts/' + this.props.user.id}>
+                  Manage your account
+                </Link>
+              </DropDownCloser>
             </li>
             <li>
               <a href='/logout'>
@@ -67,8 +69,8 @@ class TopNav extends React.Component {
               </a>
             </li>
           </ul>
-        </div>
-      </div>
+        </DropDownContent>
+      </DropDown>
     </nav>
   }
 
@@ -108,7 +110,8 @@ class TopNav extends React.Component {
 TopNav.propTypes = {
   user: React.PropTypes.shape({
     id: React.PropTypes.string,
-    photo: React.PropTypes.string
+    photo: React.PropTypes.string,
+    laundries: React.PropTypes.arrayOf(React.PropTypes.string)
   }),
   currentLaundry: React.PropTypes.string,
   laundries: React.PropTypes.object
