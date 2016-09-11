@@ -109,7 +109,11 @@ main#TimeTableMain
                 color: #ffffff
                 overflow: hidden
                 div
+                  height: 2em
+                  line-height: 2em
                   overflow: hidden
+                  .shortName
+                    display: none
                   span
                     font-size: 0.8em
   > div.loading
@@ -125,7 +129,7 @@ main#TimeTableMain
           display: none
   #TimeTable
     background-color: #7DD8D5
-    margin-top: 15em
+    margin-top: 15.7em
     position: absolute
     top: 0
     bottom: 0
@@ -349,13 +353,19 @@ main#TimeTableMain
     header
       padding-left: 4em
     #TimeTable
-      margin-top: 15em
       width: calc(100% - 4em)
       padding-left: 4em
 
 @media only screen and (max-width: 45em)
   main#TimeTableMain
     header
+      #TimeTableHeader
+        .header_container
+          table.compressed tr.labels td div
+            .shortName
+              display: inline
+            .longName
+              display: none
       .date_nav
         .nav
           display: block

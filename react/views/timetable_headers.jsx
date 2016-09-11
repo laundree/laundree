@@ -15,7 +15,7 @@ const TimetableHeader = (props) => {
     <div className='date'>
       <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={props.date}/>
     </div>
-    <table>
+    <table className={machines.length > 5 ? 'compressed' : ''}>
       <tbody>
       <tr className='machines'>
         {machines
@@ -23,14 +23,15 @@ const TimetableHeader = (props) => {
             key={machine.id}
             className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '')}>
             <svg>
-              <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'} />
+              <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}/>
             </svg>
           </td>)}
       </tr>
       <tr className='labels'>
         {machines
           .map((machine, i) => <td key={machine.id} className={props.hoverColumn === i ? ' hoverColumn' : ''}>
-            <div><span>{string.shortName(machine.name)}</span></div>
+            <div><span className='longName'>{machine.name}</span><span
+              className='shortName'>{string.shortName(machine.name)}</span></div>
           </td>)}
       </tr>
       </tbody>
