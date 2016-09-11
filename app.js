@@ -3,7 +3,6 @@ const opbeat = require('./lib/opbeat')
 
 const express = require('express')
 const path = require('path')
-const favicon = require('serve-favicon')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const flash = require('connect-flash')
@@ -25,7 +24,8 @@ app.use(setups.sessionSetup)
 setups.passportSetup(app)
 setups.morganSetup(app)
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')))
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'dist')))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
@@ -39,8 +39,6 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }))
 app.use(flash())
-app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'dist')))
 
 // Swagger
 module.exports = {
