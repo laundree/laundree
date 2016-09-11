@@ -3,10 +3,11 @@
  */
 
 function union (array1, array2) {
-  return Object.keys(array1.concat(array2).reduce((o, k) => {
-    o[k] = true
-    return 0
-  }, {}))
+  return array1.concat(array2).reduce((arr, v) => {
+    if (arr.indexOf(v) >= 0) return arr
+    arr.push(v)
+    return arr
+  }, [])
 }
 
 function range (start, end) {

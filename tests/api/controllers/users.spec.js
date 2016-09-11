@@ -60,7 +60,7 @@ describe('controllers', function () {
               if (err) return done(err)
               users[5].toRest()
                 .then((u) => {
-                  const cleanUser = Object.keys(u).filter(k => u[k]).reduce((o, k) => {
+                  const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
                     o[k] = u[k]
                     return o
                   }, {})
