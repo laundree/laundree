@@ -5,6 +5,11 @@ redis:
   host: 'REDIS_HOST'
   port: 'REDIS_PORT'
 
+opbeat:
+  appId: 'OPBEAT_APP_ID'
+  organizationId: 'OPBEAT_ORGANIZATION_ID'
+  secretToken: 'OPBEAT_SECRET_TOKEN'
+
 mongo:
   url: 'MONGO_URL'
 

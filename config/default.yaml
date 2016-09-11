@@ -23,6 +23,12 @@ sass:
 mongo:
   url: 'mongodb://localhost/laundree'
 
+opbeat:
+  appId: null
+  organizationId: null
+  secretToken: null
+
+
 facebook:
   appId: '0000000000000000'
   appSecret: '00000000000000000000000000000000'

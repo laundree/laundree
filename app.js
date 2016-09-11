@@ -1,4 +1,5 @@
 require('babel-register')
+const opbeat = require('./lib/opbeat')
 
 const express = require('express')
 const path = require('path')
@@ -6,7 +7,6 @@ const favicon = require('serve-favicon')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const flash = require('connect-flash')
-const {logError} = require('./utils/error')
 const routes = require('./routes')
 const setups = require('./lib')
 const config = require('config')
@@ -57,9 +57,7 @@ module.exports = {
       error.status = 404
       next(error)
     })
-
     app.use((err, req, res, next) => {
-      logError(err)
       const status = err.status || 500
       switch (status) {
         case 404:
@@ -71,12 +69,19 @@ module.exports = {
             })
           break
         default:
-          res.status(status)
-          res.render('error-500', {
-            message: err.message,
-            styles: ['/stylesheets/error.css']
-          })
+          next(err)
       }
+    })
+
+    if (opbeat) app.use(opbeat.middleware.express())
+
+    app.use((err, req, res, next) => {
+      const status = err.status || 500
+      res.status(status)
+      res.render('error-500', {
+        message: err.message,
+        styles: ['/stylesheets/error.css']
+      })
     })
     return app
   })
