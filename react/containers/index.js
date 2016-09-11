@@ -14,10 +14,11 @@ module.exports = {
   Verification: require('../views').Verification,
   Privacy: require('../views').Privacy,
   TermsAndConditions: require('../views').TermsAndConditions,
-  Settings: require('./settings'),
+  LaundrySettings: require('./laundry_settings'),
   Bookings: require('./bookings'),
   Machines: require('./machines'),
   LogIn: require('./login'),
   Users: require('./users'),
-  CreateLaundry: require('./create_laundry')
+  CreateLaundry: require('./create_laundry'),
+  Settings: require('./settings')
 }

@@ -58,7 +58,7 @@ class TopNav extends React.Component {
           <ul className='dropDownList'>
             <li>
               <DropDownCloser>
-                <Link to={'/app/accounts/' + this.props.user.id}>
+                <Link to='/settings'>
                   Manage your account
                 </Link>
               </DropDownCloser>

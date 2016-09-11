@@ -3,6 +3,7 @@
  */
 
 module.exports = {
+  array: require('./array'),
   regex: require('./regex'),
   password: require('./password'),
   mail: require('./mail'),

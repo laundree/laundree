@@ -7,7 +7,7 @@ const TimetableTables = require('./timetable_tables.jsx')
 const TimetableHeaders = require('./timetable_headers.jsx')
 const {Link} = require('react-router')
 const {FormattedDate} = require('react-intl')
-const lodash = require('lodash')
+const {range} = require('../../utils/array')
 
 class BookingInfo extends React.Component {
 
@@ -136,7 +136,7 @@ class Timetable extends React.Component {
     const startDay = new Date()
     startDay.setHours(0, 0, 0, 0)
     const offset = this.offsetDays
-    return lodash.range(offset, offset + this.state.numDays).map((i) => {
+    return range(offset, offset + this.state.numDays).map((i) => {
       const d = new Date(startDay.getTime())
       d.setDate(startDay.getDate() + i)
       return d

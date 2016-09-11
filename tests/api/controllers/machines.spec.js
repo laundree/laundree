@@ -7,7 +7,6 @@ chai.should()
 const assert = chai.assert
 const {MachineHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
-const lodash = require('lodash')
 const Promise = require('promise')
 
 describe('controllers', function () {
@@ -34,7 +33,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(machines.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)), 0, 10).map((machine) => machine.toRestSummary())
+              var arr = machines.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -67,7 +66,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)), 0, 12).map((laundry) => laundry.toRestSummary())
+              var arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((laundry) => laundry.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })

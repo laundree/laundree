@@ -6,7 +6,6 @@ const Handler = require('./handler')
 const TokenHandler = require('./token')
 const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
-const lodash = require('lodash')
 const utils = require('../utils')
 const Promise = require('promise')
 
@@ -23,7 +22,7 @@ function displayNameToName (displayName) {
   if (noNames === 2) return {givenName: names[0], familyName: names[1]}
   return {
     givenName: names[0],
-    middleName: lodash.slice(names, 1, names.length - 1).join(' '),
+    middleName: names.slice(1, names.length - 1).join(' '),
     familyName: names[names.length - 1]
   }
 }

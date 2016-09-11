@@ -1,10 +1,10 @@
 /**
  * Created by budde on 28/04/16.
  */
-var mongoose = require('mongoose')
-var UserHandler = require('../handlers').UserHandler
-var lodash = require('lodash')
-var faker = require('faker')
+const mongoose = require('mongoose')
+const UserHandler = require('../handlers').UserHandler
+const faker = require('faker')
+const {range} = require('../utils/array')
 const Promise = require('promise')
 
 function clearDb () {
@@ -32,7 +32,7 @@ function generateProfile () {
 }
 
 function populateUsers (no) {
-  return Promise.all(lodash.range(no).map(generateProfile).map((profile) => UserHandler.createUserFromProfile(profile)))
+  return Promise.all(range(no).map(generateProfile).map((profile) => UserHandler.createUserFromProfile(profile)))
 }
 
 function populateTokens (no) {
@@ -40,7 +40,7 @@ function populateTokens (no) {
   return userPromise
     .then(([user]) =>
       Promise
-        .all(lodash.range(no).map((i) => user.generateAuthToken(faker.name.findName())))
+        .all(range(no).map((i) => user.generateAuthToken(faker.name.findName())))
         .then((tokens) => ({user: user, tokens: tokens, token: tokens[0]})))
 }
 
@@ -48,7 +48,7 @@ function populateLaundries (no) {
   return populateTokens(1)
     .then(({user, token}) =>
       Promise
-        .all(lodash.range(no).map((i) => user.createLaundry(faker.name.findName())))
+        .all(range(no).map((i) => user.createLaundry(faker.name.findName())))
         .then((laundries) => ({user: user, token: token, laundries: laundries, laundry: laundries[0]})))
 }
 
@@ -56,7 +56,7 @@ function populateMachines (no) {
   return populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise
-        .all(lodash.range(no).map((i) => laundry.createMachine(faker.name.findName(), 'wash')))
+        .all(range(no).map((i) => laundry.createMachine(faker.name.findName(), 'wash')))
         .then((machines) => ({
           user: user,
           token: token,
@@ -70,7 +70,7 @@ function populateBookings (no, {length = 3600, space = 20, offset = 0} = {}) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise
-        .all(lodash.range(no).map((i) => machine.createBooking(user, new Date(offset + (i * (length + space))), new Date(i * (length + space) + length + offset))))
+        .all(range(no).map((i) => machine.createBooking(user, new Date(offset + (i * (length + space))), new Date(i * (length + space) + length + offset))))
         .then((bookings) => ({
           offset,
           space,
@@ -88,7 +88,7 @@ function populateInvites (no) {
   return this.populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise
-        .all(lodash.range(no).map(i => laundry.inviteUserByEmail(faker.internet.email())))
+        .all(range(no).map(i => laundry.inviteUserByEmail(faker.internet.email())))
         .then((invites) => invites.map(({invite}) => invite).filter(i => i))
         .then(invites => ({user, token, laundry, invites, invite: invites[0]})))
 }

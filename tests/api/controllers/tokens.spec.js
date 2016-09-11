@@ -7,7 +7,7 @@ chai.should()
 const assert = chai.assert
 const {TokenHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
-const lodash = require('lodash')
+
 const Promise = require('promise')
 
 describe('controllers', function () {
@@ -34,7 +34,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)), 0, 10).map((token) => token.toRestSummary())
+              var arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 10).map((token) => token.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -52,7 +52,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               if (err) return done(err)
-              var arr = lodash.slice(tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)), 0, 12).map((token) => token.toRestSummary())
+              var arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((token) => token.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })

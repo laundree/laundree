@@ -10,7 +10,6 @@ chai.should()
 
 var assert = chai.assert
 var dbUtils = require('../../db_utils')
-var lodash = require('lodash')
 const {UserHandler, TokenHandler} = require('../../../handlers')
 const Promise = require('promise')
 
@@ -61,7 +60,11 @@ describe('controllers', function () {
               if (err) return done(err)
               users[5].toRest()
                 .then((u) => {
-                  res.body.should.be.deep.equal(lodash.omitBy(u, lodash.isNil))
+                  const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
+                    o[k] = u[k]
+                    return o
+                  }, {})
+                  res.body.should.be.deep.equal(cleanUser)
                   done()
                 })
                 .catch(done)
@@ -95,7 +98,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var arr = lodash.slice(users, 0, 10).map((user) => user.toRestSummary())
+              var arr = users.slice(0, 10).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })
@@ -112,7 +115,7 @@ describe('controllers', function () {
             .expect(200)
             .end(function (err, res) {
               assert(!err)
-              var arr = lodash.slice(users, 0, 12).map((user) => user.toRestSummary())
+              var arr = users.slice(0, 12).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
               done()
             })

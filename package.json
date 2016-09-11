@@ -25,7 +25,6 @@
     "hbs": "~4.0.0",
     "isparta": "^4.0.0",
     "jdenticon": "^1.3.2",
-    "lodash": "^4.11.2",
     "mongoose": "^4.4.13",
     "morgan": "~1.7.0",
     "node-sass-middleware": "^0.9.8",
