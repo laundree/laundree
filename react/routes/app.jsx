@@ -67,13 +67,13 @@ function routeGenerator (store) {
   return [
     <Route component={App} path='/'>
       <IndexRoute component={Home}/>
+      <Route path='about' component={About}/>
     </Route>,
     <Route path='/laundries/*'>
       <IndexRedirect to='/auth'/>
     </Route>,
     <Route path='/privacy' component={Privacy}/>,
     <Route path='/terms-and-conditions' component={TermsAndConditions}/>,
-    <Route path='/about' component={About}/>,
     <Route path='/auth' component={Auth}>
       <IndexRoute component={LogIn}/>
       <Route path='forgot' component={Forgot}/>
