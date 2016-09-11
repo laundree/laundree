@@ -1,5 +1,7 @@
 const React = require('react')
 
-const Settings = () => <h1>Hello Bob</h1>
+const Settings = () => <main className='topNaved'>
+  <h1>Profile settings</h1>
+</main>
 
 module.exports = Settings
