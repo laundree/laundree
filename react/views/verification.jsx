@@ -62,7 +62,7 @@ class Forgot extends React.Component {
             </label>
           </ValidationElement>
           <div className='buttons'>
-            <input type='submit' value='Reset'/>
+            <input type='submit' value='Resend'/>
           </div>
           <div className='forgot'>
             <div>

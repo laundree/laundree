@@ -51,7 +51,7 @@ function startEmailVerification (email) {
     .userFromEmail(email)
     .then(user => {
       if (!user) throw new Error('User not found')
-      return user.startPasswordReset()
+      return user.startEmailVerification(email)
     })
 }
 
