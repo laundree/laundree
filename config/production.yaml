@@ -1,6 +1,10 @@
 sass:
   outputStyle: 'compressed'
 
+opbeat:
+  trackRelease: true
+  enable: true
+
 logging:
   http:
     enabled: true
