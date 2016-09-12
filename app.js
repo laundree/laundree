@@ -1,5 +1,5 @@
 require('babel-register')
-const opbeat = require('./lib/opbeat')
+const {opbeat, trackRelease} = require('./lib/opbeat')
 
 const express = require('express')
 const path = require('path')
@@ -81,6 +81,7 @@ module.exports = {
         styles: ['/stylesheets/error.css']
       })
     })
+    trackRelease()
     return app
   })
 }

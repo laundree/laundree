@@ -24,6 +24,8 @@ mongo:
   url: 'mongodb://localhost/laundree'
 
 opbeat:
+  enable: false
+  trackRelease: false
   appId: null
   organizationId: null
   secretToken: null
