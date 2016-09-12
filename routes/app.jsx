@@ -13,6 +13,7 @@ const {createInitialStore} = require('../redux')
 const utils = require('../utils')
 const DocumentTitle = require('react-document-title')
 const {ActionProvider} = require('../react/views/providers')
+const {opbeat} = require('../lib/opbeat')
 
 router.use((req, res, next) => {
   createInitialStore(req.user, req.flash('success'), req.flash('error'))
@@ -24,6 +25,10 @@ router.use((req, res, next) => {
           const err = new Error('Not found')
           err.status = 404
           return next(error)
+        }
+        if (opbeat) {
+          const pattern = renderProps.routes.map(r => r.path).join('/').replace('//', '/')
+          opbeat.setTransactionName(`${req.method} ${pattern}`)
         }
         const html = renderToString(
           <ActionProvider>
