@@ -17,7 +17,14 @@ class BookingHandler extends Handler {
    * @returns {Promise.<BookingHandler>}
    */
   static _createBooking (machine, owner, from, to) {
-    return new BookingModel({machine: machine.model._id, owner: owner.model._id, from, to})
+    return new BookingModel({
+      docVersion: 1,
+      laundry: machine.model.laundry,
+      machine: machine.model._id,
+      owner: owner.model._id,
+      from,
+      to
+    })
       .save()
       .then((model) => new BookingHandler(model))
       .then((booking) => {
@@ -110,6 +117,25 @@ class BookingHandler extends Handler {
 
   get restUrl () {
     return `/api/bookings/${this.model.id}`
+  }
+
+  /**
+   * Array of update actions
+   * @returns {(function (handler: Handler) : Promise.<Handler>)[]}
+   */
+  get updateActions () {
+    return [
+      (booking) => {
+        const MachineHandler = require('./machine')
+        return MachineHandler
+          .find({_id: booking.model.machine})
+          .then(([machine]) => {
+            booking.model.laundry = machine.model.laundry
+            booking.model.docVersion = 1
+            return booking.model.save().then((model) => new BookingHandler(model))
+          })
+      }
+    ]
   }
 
   toRest () {

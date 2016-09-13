@@ -20,14 +20,14 @@ class Handler {
     return Model
       .find(filter, null, options)
       .exec()
-      .then((tokens) => tokens.map((model) => new Handler(model)))
+      .then((models) => Promise.all(models.map((model) => new Handler(model).updateDocument())))
   }
 
   static _findFromId (Model, Handler, id) {
     if (!regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
     return Model.findFromId(id)
       .exec()
-      .then((m) => m ? new Handler(m) : undefined)
+      .then((m) => m ? new Handler(m).updateDocument() : undefined)
   }
 
   static setupHandler (_Handler, _Model) {
@@ -58,21 +58,22 @@ class Handler {
     }
     _Handler.find = (filter, options) => Handler._find(_Model, _Handler, filter, options)
     _Handler.findFromId = (id) => Handler._findFromId(_Model, _Handler, id)
-    _Handler.setupSocket = (socket, {createAction, updateAction, deleteAction}) => Handler._setupSocket(_Handler, socket, createAction, updateAction, deleteAction)
+    _Handler.setupSocket = (socket, {createAction, updateAction, deleteAction}, filter = () => Promise.resolve(true)) => Handler._setupSocket(_Handler, socket, createAction, updateAction, deleteAction, filter)
   }
 
-  static _setupListener (_Handler, socket, event, action) {
-    return events.on(_Handler, event, (item) => {
+  static _setupListener (_Handler, socket, event, action, filter) {
+    return events.on(_Handler, event, (item) => filter(item).then(f => {
+      if (!f) return
       debug(`Emitting ${_Handler.name} ${event} action`)
       socket.emit('action', action(item))
-    })
+    }))
   }
 
-  static _setupSocket (_Handler, socket, createAction, updateAction, deleteAction) {
+  static _setupSocket (_Handler, socket, createAction, updateAction, deleteAction, filter) {
     const removers = []
-    if (createAction) removers.push(Handler._setupListener(_Handler, socket, 'create', createAction))
-    if (updateAction) removers.push(Handler._setupListener(_Handler, socket, 'update', updateAction))
-    if (deleteAction) removers.push(Handler._setupListener(_Handler, socket, 'delete', deleteAction))
+    if (createAction) removers.push(Handler._setupListener(_Handler, socket, 'create', createAction, filter))
+    if (updateAction) removers.push(Handler._setupListener(_Handler, socket, 'update', updateAction, filter))
+    if (deleteAction) removers.push(Handler._setupListener(_Handler, socket, 'delete', deleteAction, filter))
     return removers
   }
 
@@ -91,6 +92,37 @@ class Handler {
       .save()
       .then(() => this.emitEvent('update'))
       .then(() => this)
+  }
+
+  /**
+   * Get the current document version
+   * @returns {number}
+   */
+  get docVersion () {
+    return this.model.docVersion || 0
+  }
+
+  /**
+   * Array of update actions
+   * @returns {(function (handler: Handler) : Promise.<Handler>)[]}
+   */
+  get updateActions () {
+    return []
+  }
+
+  /**
+   * Update this document
+   * @returns {Promise.<Handler>}
+   */
+  updateDocument () {
+    const updater = this.updateActions[this.docVersion]
+    if (!updater) return Promise.resolve(this)
+    const name = this.constructor.name
+    debug(`Updating ${name} document`)
+    return updater(this).then((handler) => {
+      debug(`${name} document updated to version ${handler.docVersion}`)
+      return handler.updateDocument()
+    })
   }
 
 }
