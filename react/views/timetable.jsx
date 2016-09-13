@@ -38,7 +38,8 @@ class BookingInfo extends React.Component {
       <h1>Booking info</h1>
       <img src={owner.photo} className='avatar'/>
       <div className='text'>
-        {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
+        {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked
+        <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}
           month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
@@ -123,7 +124,7 @@ class Timetable extends React.Component {
 
   calculateNumDays (numMachines) {
     if (!this._mainRef) return 0
-    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (numMachines * 100)), 1), 7)
+    return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (Math.max(numMachines * 100, 200))), 1), 7)
   }
 
   get offsetDays () {
