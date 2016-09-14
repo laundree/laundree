@@ -12,7 +12,7 @@ class Settings extends React.Component {
           <h2>Basic user-info</h2>
           <form>
             <label>
-              <input type='text' value={user.displayName}/>
+              <input type='text' defaultValue={user.displayName}/>
             </label>
             <div className='buttons'>
               <input type='submit' value='Update name'/>
