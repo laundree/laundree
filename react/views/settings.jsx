@@ -46,16 +46,26 @@ class Settings extends React.Component {
         </section>
         <section>
           <h2>Laundries</h2>
-          <ul className='laundryList'>
-            {user.laundries.map(id => this.props.laundries[id]).map(laundry =>
-              <li key={laundry.id}>
-                <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
-              </li>)}
-          </ul>
+          {this.renderLaundries(user)}
         </section>
       </main>
     </DocumentTitle>
   }
+
+  renderLaundries (user) {
+    if (user.laundries.length === 0) {
+      return <div className='emptyLaundryList'>
+        No laundry found.
+      </div>
+    }
+    return <ul className='laundryList'>
+      {user.laundries.map(id => this.props.laundries[id]).map(laundry =>
+        <li key={laundry.id}>
+          <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
+        </li>)}
+    </ul>
+  }
+
 }
 
 Settings.propTypes = {
