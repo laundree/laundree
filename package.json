@@ -51,7 +51,8 @@
     "socket.io-redis": "^1.0.0",
     "superagent": "^2.1.0",
     "swagger-tools": "^0.10.1",
-    "yamljs": "^0.2.7"
+    "yamljs": "^0.2.7",
+    "nodemailer-stub-transport": "^1.0.0"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.2",
@@ -78,7 +79,6 @@
     "gulp-mocha": "^3.0.1",
     "gulp-uglify": "^2.0.0",
     "mocha": "^3.0.2",
-    "nodemailer-stub-transport": "^1.0.0",
     "run-sequence": "^1.1.5",
     "supertest": "^2.0.0",
     "vinyl-buffer": "^1.0.0",
