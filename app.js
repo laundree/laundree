@@ -24,12 +24,6 @@ app.use(setups.sessionSetup)
 setups.passportSetup(app)
 setups.morganSetup(app)
 
-app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'dist')))
-
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended: false}))
-app.use(cookieParser())
 app.use(require('node-sass-middleware')({
   src: path.join(__dirname, 'stylesheets'),
   dest: path.join(__dirname, 'dist/stylesheets'),
@@ -38,6 +32,13 @@ app.use(require('node-sass-middleware')({
   indentedSyntax: true,
   sourceMap: true
 }))
+
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'dist')))
+
+app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({extended: false}))
+app.use(cookieParser())
 app.use(flash())
 
 // Swagger
