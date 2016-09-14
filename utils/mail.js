@@ -2,10 +2,10 @@
  * Created by budde on 07/05/16.
  */
 const Promise = require('promise')
-var path = require('path')
-var EmailTemplate = require('email-templates').EmailTemplate
-var nodemailer = require('nodemailer')
-var config = require('config')
+const path = require('path')
+const EmailTemplate = require('email-templates').EmailTemplate
+const {createTransport} = require('nodemailer')
+const config = require('config')
 const debug = require('debug')('laundree.utils.mail')
 /**
  * Render a template
@@ -18,16 +18,18 @@ function render (data, template) {
   return t.render(data)
 }
 
-var standardTransporter = nodemailer.createTransport(config.get('mailer.smtp.transport'))
+var standardTransporter = config.get('mailer.stubTransporter')
+  ? createTransport(require('nodemailer-stub-transport')())
+  : createTransport(config.get('mailer.smtp.transport'))
 
 /**
  * Send email
  * @param {string} address Receiver
  * @param {{html: string, text: string, subject: string}} content
+ * @param transporter=
  * @return {Promise}
  */
-function sendRenderedEmail (address, content) {
-  var transporter = module.exports.transporter || standardTransporter
+function sendRenderedEmail (address, content, transporter = standardTransporter) {
   var options = {
     from: '"Laundree.io" <no-reply@laundree.io>',
     to: address,
@@ -51,9 +53,10 @@ function sendRenderedEmail (address, content) {
  * @param {Object} data
  * @param {string} template
  * @param {string} address
+ * @param transporter=
  */
-function sendEmail (data, template, address) {
-  return render(data, template).then((rendered) => sendRenderedEmail(address, rendered))
+function sendEmail (data, template, address, transporter) {
+  return render(data, template).then((rendered) => sendRenderedEmail(address, rendered, transporter))
 }
 
 module.exports = {

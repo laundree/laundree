@@ -8,3 +8,7 @@ logging:
 security:
   password:
     saltRounds: 1
+
+mailer:
+  stubTransporter: true
+  dryRun: false

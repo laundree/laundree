@@ -1,6 +1,3 @@
-var nodemailer = require('nodemailer')
-var stubTransport = require('nodemailer-stub-transport')
-require('../../../utils').mail.transporter = nodemailer.createTransport(stubTransport())
 var request = require('supertest')
 var app = require('../../../app').app
 var chai = require('chai')
