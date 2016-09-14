@@ -14,13 +14,18 @@
     font-family: 'Roboto Condensed', sans-serif
     .dropDown
       position: relative
-      padding-left: 3em
+      padding-left: 1em
       &:before
-        left: 1.8em
+        left: 1.6em
         top: 1.9em
         content: ''
         position: absolute
         +arrow(#fff, 0.4em)
+      .dropDownTitle
+        padding-left: 2 / 1.5 * 1em
+        display: block
+        z-index: 1
+        position: relative
       .dropDownContent
         left: 1em
         padding: 0
@@ -145,10 +150,6 @@
       color: transparent
       overflow: hidden
     .laundries
-      .dropDown
-        padding-left: 2em
-        &:before
-          left: 0.8em
       > div
         padding: 1em 1em
 
