@@ -58,7 +58,7 @@ class TopNav extends React.Component {
           <ul className='dropDownList'>
             <li>
               <DropDownCloser>
-                <Link to='/settings'>
+                <Link to='/settings' activeClassName='active'>
                   Manage your account
                 </Link>
               </DropDownCloser>
@@ -71,6 +71,12 @@ class TopNav extends React.Component {
           </ul>
         </DropDownContent>
       </DropDown>
+      <a href='/support' className='icon help'>
+        <svg>
+          <use xlinkHref='#LifeBuoy'/>
+        </svg>
+        Support
+      </a>
     </nav>
   }
 
@@ -87,11 +93,11 @@ class TopNav extends React.Component {
         </svg>
         About us
       </a>
-      <a href='/help' className='icon help'>
+      <a href='/support' className='icon help'>
         <svg>
           <use xlinkHref='#LifeBuoy'/>
         </svg>
-        Help
+        Support
       </a>
       <a href='/contact' className='icon contact'>
         <svg>

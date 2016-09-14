@@ -36,7 +36,7 @@ class LaundrySettings extends React.Component {
           {label: 'Yes', className: 'delete red', action: handleDeleteClick},
           {label: 'No', action: handleCloseModal}
         ]}/>
-      Deleting the laundry will remove all data associated with it and remove all users from it.
+      Deleting the laundry will remove all data associated with it and remove all users from it.<br />
       It can NOT be undone!
       <div className='buttonContainer'>
         <button onClick={handleOpenModal} className='red'>Delete Laundry</button>
@@ -44,11 +44,17 @@ class LaundrySettings extends React.Component {
     </section>
   }
 
+  renderApologeticMessage () {
+    return <section>
+      There's nothing to see here yet!
+    </section>
+  }
+
   render () {
     return <DocumentTitle title='Settings'>
       <main className='naved' id='LaundryMain'>
         <h1>Laundry settings</h1>
-        {this.renderDelete()}
+        {this.isOwner ? this.renderDelete() : this.renderApologeticMessage()}
       </main>
     </DocumentTitle>
   }

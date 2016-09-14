@@ -164,7 +164,7 @@ $max_page_width: 70em
         &:hover
           background-color: #eee
           color: #56828d
-        &.active
+        &.active, a.active
           color: #28aaba
         a, span.link
           padding: 0 1em
@@ -383,7 +383,8 @@ h2
 
 main
   &.topNaved
-    padding-top: 5em
+    padding: 5em 2em 0
+    +transition(0.2s padding)
   &.naved
     +transition(0.2s padding)
     padding: 5em 0 0 17em
@@ -439,6 +440,9 @@ form
       ul
         display: block
         list-style-type: none
+
+.buttonContainer
+  padding-top: 2em
 
 svg.step
   +active-step-style
@@ -563,6 +567,10 @@ footer
     margin-left: 0
 
 @media only screen and (max-width: 25em)
+  main.topNaved
+    padding:
+      left: 0
+      right: 0
   main.naved
     padding-left: 0
   .confirmation_container .confirmation_box > ul li
