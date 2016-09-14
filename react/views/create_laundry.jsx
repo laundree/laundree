@@ -53,8 +53,8 @@ class CreateLaundry extends ValueUpdater {
   render () {
     return <DocumentTitle title='Create Laundry'>
       <main id='CreateLaundry'>
+        <h1>Couldn't find any laundry...</h1>
         <section>
-          <h1>Couldn't find any laundry...</h1>
           <div>
             It doesn't seem like you have any laundry attached to your account.
             If you want to share your machines with your tenants, please create a new laundry.
