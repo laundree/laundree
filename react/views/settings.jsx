@@ -40,7 +40,7 @@ class Settings extends React.Component {
           <h2>Delete account</h2>
           <p>
             Deleting your account is currently a manual process.<br />
-            Please concat us at <a href='mailto:delete-my-account@laundre.io'>delete-my-account@laundre.io</a> if you
+            Please contact us at <a href='mailto:delete-my-account@laundre.io'>delete-my-account@laundre.io</a> if you
             which to do so.
           </p>
         </section>

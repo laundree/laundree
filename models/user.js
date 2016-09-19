@@ -11,6 +11,7 @@ var userSchema = new Schema({
   resetPasswordExpire: Date,
   latestProvider: String,
   lastSeen: Date,
+  overrideDisplayName: String,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
   laundries: [{type: Schema.Types.ObjectId, ref: 'Laundry'}],
   explicitVerifiedEmails: [{type: String}],
@@ -41,19 +42,22 @@ userSchema
     return this.profiles.find((profile) => profile.provider === this.latestProvider) || null
   })
 
-function fromLatestProfile (attribute) {
-  userSchema
-    .virtual(attribute)
-    .get(function () {
-      var profile = this.latestProfile
-      if (!profile) return null
-      return profile[attribute]
-    })
-}
+userSchema
+  .virtual('displayName')
+  .get(function () {
+    if (this.overrideDisplayName) return this.overrideDisplayName
+    const profile = this.latestProfile
+    if (!profile) return null
+    return profile.displayName
+  })
 
-fromLatestProfile('displayName')
-
-fromLatestProfile('name')
+userSchema
+  .virtual('name')
+  .get(function () {
+    var profile = this.latestProfile
+    if (!profile) return null
+    return profile.name
+  })
 
 userSchema
   .virtual('emails')

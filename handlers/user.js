@@ -123,6 +123,18 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Update the name of the user.
+   * @param name
+   */
+  updateName (name) {
+    this.model.overrideDisplayName = name
+    return this.model
+      .save()
+      .then(() => this.emitEvent('update'))
+      .then(() => this)
+  }
+
+  /**
    * Create a new laundry with the current user as owner.
    * @param {string} name
    * @return {Promise.<LaundryHandler>}
@@ -266,6 +278,9 @@ class UserHandler extends Handler {
       })
   }
 
+  get hasPassword () {
+    return Boolean(this.model.password)
+  }
   /**
    * Verifies given password.
    * @param {string} password

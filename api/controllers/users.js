@@ -115,13 +115,49 @@ function deleteUser (req, res) {
     .catch(utils.api.generateErrorHandler(res))
 }
 
+function updateUser (req, res) {
+  const id = req.swagger.params.id.value
+  const {name} = req.swagger.params.body.value
+  UserHandler
+    .findFromId(id)
+    .then((user) => {
+      if (!user) return utils.api.returnError(res, 404, 'User not found')
+      if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
+      return user.updateName(name).then(() => utils.api.returnSuccess(res))
+    })
+    .catch(utils.api.generateErrorHandler(res))
+}
+
+function changeUserPassword (req, res) {
+  const id = req.swagger.params.id.value
+  const {currentPassword, newPassword} = req.swagger.params.body.value
+  UserHandler
+    .findFromId(id)
+    .then((user) => {
+      if (!user) return utils.api.returnError(res, 404, 'User not found')
+      if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
+      return (user.hasPassword
+        ? user.verifyPassword(currentPassword)
+        : Promise.resolve(true))
+        .then(result => {
+          if (!result) return utils.api.returnError(res, 403, 'Invalid current password')
+          return user
+            .resetPassword(newPassword)
+            .then(() => utils.api.returnSuccess(res))
+        })
+    })
+    .catch(utils.api.generateErrorHandler(res))
+}
+
 module.exports = {
-  getUser: getUser,
-  listUsers: listUsers,
-  createUser: createUser,
-  startPasswordReset: startPasswordReset,
-  passwordReset: passwordReset,
-  startEmailVerification: startEmailVerification,
-  verifyEmail: verifyEmail,
-  deleteUser: deleteUser
+  getUser,
+  listUsers,
+  createUser,
+  startPasswordReset,
+  passwordReset,
+  startEmailVerification,
+  verifyEmail,
+  deleteUser,
+  updateUser,
+  changeUserPassword
 }

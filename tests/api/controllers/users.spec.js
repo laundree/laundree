@@ -69,6 +69,189 @@ describe('controllers', function () {
         })
       })
     })
+    describe('PUT /api/users/{id}', () => {
+      it('should fail on auth', (done) => {
+        request(app)
+          .put('/api/users/asd123')
+          .send({name: 'Kurt Frandsen'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end(function (err) {
+            done(err)
+          })
+      })
+
+      it('should return error on missing but right format', (done) => {
+        dbUtils
+          .populateTokens(1)
+          .then(({token, user}) => {
+            request(app)
+              .put('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
+              .send({name: 'Kurt Frandsen'})
+              .auth(user.model.id, token.secret)
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .end(err => done(err))
+          })
+      })
+      it('should update user', (done) => {
+        dbUtils.populateTokens(1).then(({user, token}) => {
+          request(app)
+            .put(`/api/users/${user.model.id}`)
+            .auth(user.model.id, token.secret)
+            .send({name: 'Kurt Frandsen'})
+            .set('Accept', 'application/json')
+            .expect(204)
+            .end(function (err, res) {
+              if (err) return done(err)
+              return UserHandler.find({_id: user.model._id})
+                .then(([user]) => {
+                  user.model.displayName.should.equal('Kurt Frandsen')
+                })
+                .then(() => done(), done)
+            })
+        })
+      })
+      it('should not update user', (done) => {
+        Promise
+          .all([
+            dbUtils.populateTokens(1),
+            dbUtils.populateTokens(1)
+          ])
+          .then(([{user: user1, token}, {user: user2}]) => {
+            request(app)
+              .put(`/api/users/${user2.model.id}`)
+              .auth(user1.model.id, token.secret)
+              .send({name: 'Kurt Frandsen'})
+              .set('Accept', 'application/json')
+              .expect(403)
+              .end(err => done(err))
+          })
+      })
+    })
+
+    describe('POST /api/users/{id}/password-change', () => {
+      it('should fail on auth', (done) => {
+        request(app)
+          .post('/api/users/asd123/password-change')
+          .send({currentPassword: 'password', newPassword: 'password'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end(function (err) {
+            done(err)
+          })
+      })
+
+      it('should return error on missing but right format', (done) => {
+        dbUtils
+          .populateTokens(1)
+          .then(({token, user}) => {
+            request(app)
+              .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/password-change')
+              .send({currentPassword: 'password', newPassword: 'password'})
+              .auth(user.model.id, token.secret)
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .end(err => done(err))
+          })
+      })
+      it('should update user', (done) => {
+        dbUtils.populateTokens(1).then(({user, token}) => {
+          user
+            .resetPassword('password')
+            .then(() => {
+              request(app)
+                .post(`/api/users/${user.model.id}/password-change`)
+                .auth(user.model.id, token.secret)
+                .send({currentPassword: 'password', newPassword: 'password2'})
+                .set('Accept', 'application/json')
+                .expect(204)
+                .end(function (err, res) {
+                  if (err) return done(err)
+                  return UserHandler
+                    .find({_id: user.model._id})
+                    .then(([user]) => {
+                      return user
+                        .verifyPassword('password2')
+                        .then(r => Boolean(r))
+                        .should
+                        .eventually.be.true
+                    })
+                    .then(() => done(), done)
+                })
+            })
+        })
+      })
+      it('should update user when no current password', (done) => {
+        dbUtils.populateTokens(1).then(({user, token}) => {
+          request(app)
+            .post(`/api/users/${user.model.id}/password-change`)
+            .auth(user.model.id, token.secret)
+            .send({currentPassword: 'password', newPassword: 'password2'})
+            .set('Accept', 'application/json')
+            .expect(204)
+            .end(function (err, res) {
+              if (err) return done(err)
+              return UserHandler
+                .find({_id: user.model._id})
+                .then(([user]) => {
+                  return user
+                    .verifyPassword('password2')
+                    .then(r => Boolean(r))
+                    .should
+                    .eventually.be.true
+                })
+                .then(() => done(), done)
+            })
+        })
+      })
+      it('should fail with invalid input', (done) => {
+        dbUtils.populateTokens(1).then(({user, token}) => {
+          request(app)
+            .post(`/api/users/${user.model.id}/password-change`)
+            .auth(user.model.id, token.secret)
+            .send({currentPassword: 'p', newPassword: 'p2'})
+            .set('Accept', 'application/json')
+            .expect(400)
+            .end(err => done(err))
+        })
+      })
+      it('should fail with wrong current password', (done) => {
+        dbUtils.populateTokens(1).then(({user, token}) => {
+          user
+            .resetPassword('password')
+            .then(() => {
+              request(app)
+                .post(`/api/users/${user.model.id}/password-change`)
+                .auth(user.model.id, token.secret)
+                .send({currentPassword: 'password1', newPassword: 'password2'})
+                .set('Accept', 'application/json')
+                .expect(403)
+                .end(err => done(err))
+            })
+        })
+      })
+      it('should not update user', (done) => {
+        Promise
+          .all([
+            dbUtils.populateTokens(1),
+            dbUtils.populateTokens(1)
+          ])
+          .then(([{user: user1, token}, {user: user2}]) => {
+            request(app)
+              .post(`/api/users/${user2.model.id}/password-change`)
+              .auth(user1.model.id, token.secret)
+              .send({currentPassword: 'password', newPassword: 'password'})
+              .set('Accept', 'application/json')
+              .expect(403)
+              .end(err => done(err))
+          })
+      })
+    })
 
     describe('GET /api/users', () => {
       it('should return an empty list', (done) => {
@@ -204,7 +387,7 @@ describe('controllers', function () {
 
     describe('POST /api/users/{id}/start-password-reset', () => {
       it('should fail on no user', (done) => {
-        dbUtils.populateUsers(2).then((users) => {
+        dbUtils.populateUsers(2).then(() => {
           request(app)
             .post('/api/users/aaa/start-password-reset')
             .set('Accept', 'application/json')
