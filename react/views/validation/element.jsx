@@ -31,8 +31,9 @@ class ValidationElement extends React.Component {
 
   componentWillReceiveProps ({value, sesh}) {
     if (value === this.props.value) return
-    this.setState({initial: false})
-    this.handle(this.validate(value), sesh !== this.props.sesh)
+    const initial = sesh !== this.props.sesh
+    this.setState({initial})
+    this.handle(this.validate(value), initial)
   }
 
   get name () {
@@ -55,7 +56,7 @@ class ValidationElement extends React.Component {
     const child = React.Children.only(this.props.children)
     return React.cloneElement(child, {
       className: (child.props.className || '') + (valid ? '' : ' invalid') +
-      (this.props.initial || this.state.initial ? ' initial' : '')
+      (this.state.initial ? ' initial' : '')
     })
   }
 }
@@ -71,7 +72,6 @@ ValidationElement.propTypes = {
   trim: React.PropTypes.bool,
   nonEmpty: React.PropTypes.bool,
   password: React.PropTypes.bool,
-  initial: React.PropTypes.bool,
   email: React.PropTypes.bool,
   value: React.PropTypes.string.isRequired,
   validator: React.PropTypes.func

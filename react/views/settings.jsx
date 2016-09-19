@@ -1,8 +1,52 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
+const {ValidationElement, ValidationForm} = require('./validation')
+const {ValueUpdater} = require('./helpers')
+
+class UserNameForm extends ValueUpdater {
+
+  constructor (props) {
+    super(props)
+    this.state = {
+      sesh: 0,
+      values: this.initialState
+    }
+  }
+
+  get initialState () {
+    return {displayName: this.props.user.displayName}
+  }
+
+  reset () {
+    this.setState(({sesh}) => ({sesh: sesh + 1, values: this.initialState}))
+  }
+
+  render () {
+    return <ValidationForm>
+      <ValidationElement
+        sesh={this.state.sesh}
+        trim
+        value={this.state.values.displayName}>
+        <label>
+          <input
+            onChange={this.generateValueUpdater('displayName')}
+            type='text' value={this.state.values.displayName}/>
+        </label>
+      </ValidationElement>
+      <div className='buttons'>
+        <input type='submit' value='Update name'/>
+      </div>
+    </ValidationForm>
+  }
+}
+
+UserNameForm.propTypes = {
+  user: React.PropTypes.object.isRequired
+}
 
 class Settings extends React.Component {
+
   render () {
     const user = this.props.users[this.props.currentUser]
     return <DocumentTitle title='Profile settings'>
@@ -10,14 +54,7 @@ class Settings extends React.Component {
         <h1>Profile settings</h1>
         <section>
           <h2>Basic user-info</h2>
-          <form>
-            <label>
-              <input type='text' defaultValue={user.displayName}/>
-            </label>
-            <div className='buttons'>
-              <input type='submit' value='Update name'/>
-            </div>
-          </form>
+          <UserNameForm user={user}/>
         </section>
         <section>
           <h2>Change password</h2>
