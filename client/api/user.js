@@ -41,7 +41,7 @@ class UserClientApi {
 
   changePassword (currentPassword, newPassword) {
     return request
-      .post(`/api/users/password-change`)
+      .post(`/api/users/${this.id}/password-change`)
       .send({currentPassword, newPassword})
       .then()
   }

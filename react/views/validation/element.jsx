@@ -41,8 +41,9 @@ class ValidationElement extends React.Component {
   }
 
   validate (value) {
-    value = value || this.props.value
     if (this.props.trim) value = value.trim()
+    if (this.props.equal !== undefined) return this.props.equal === value
+    if (this.props.not !== undefined) return this.props.not !== value
     if (this.props.validator) return this.props.validator(value)
     if (this.props.notOneOf) return this.props.notOneOf.indexOf(value) < 0
     if (this.props.nonEmpty) return value
@@ -52,7 +53,7 @@ class ValidationElement extends React.Component {
   }
 
   render () {
-    const valid = this.validate()
+    const valid = this.validate(this.props.value)
     const child = React.Children.only(this.props.children)
     return React.cloneElement(child, {
       className: (child.props.className || '') + (valid ? '' : ' invalid') +
@@ -69,6 +70,8 @@ ValidationElement.propTypes = {
   sesh: React.PropTypes.number,
   children: React.PropTypes.any,
   notOneOf: React.PropTypes.arrayOf(React.PropTypes.string),
+  equal: React.PropTypes.string,
+  not: React.PropTypes.string,
   trim: React.PropTypes.bool,
   nonEmpty: React.PropTypes.bool,
   password: React.PropTypes.bool,
