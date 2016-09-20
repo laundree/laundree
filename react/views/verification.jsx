@@ -5,21 +5,19 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {generateChangeHandler} = require('../../utils/react')
+const {ValueUpdater} = require('./helpers')
 
-class Forgot extends React.Component {
+class Forgot extends ValueUpdater {
   constructor (props) {
     super(props)
-    this.state = {values: {}}
     this.submitHandler = (evt) => {
       this.setState({loading: true})
       evt.preventDefault()
       if (!this.context.actions.startEmailVerification) return
       return this.context.actions.startEmailVerification(this.state.values.email)
         .then(
-          () => this.setState({
+          () => this.reset({
             loading: false,
-            values: {},
             message: {message: 'A new verification link has been sent.', type: 'success'}
           }),
           () => this.setState({
@@ -41,6 +39,7 @@ class Forgot extends React.Component {
           </svg>
         </Link>
         <ValidationForm
+          sesh={this.state.sesh}
           className={this.state.loading ? 'blur' : ''}
           onSubmit={this.submitHandler}
           id='ForgotPassword'>
@@ -50,11 +49,11 @@ class Forgot extends React.Component {
           <ValidationElement
             email
             trim
-            initial={this.state.values.email === undefined}
+            sesh={this.state.sesh}
             value={this.state.values.email || ''}>
             <label data-validate-error='Please enter your e-mail address.'>
               <input
-                onChange={generateChangeHandler(this, 'email')}
+                onChange={this.generateValueUpdater('email')}
                 value={this.state.values.email || ''}
                 type='text' name='email'
                 placeholder='E-mail address'

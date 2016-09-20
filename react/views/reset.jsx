@@ -5,13 +5,12 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {generateChangeHandler} = require('../../utils/react')
+const {ValueUpdater} = require('./helpers')
 
-class Reset extends React.Component {
+class Reset extends ValueUpdater {
 
   constructor (props) {
     super(props)
-    this.state = {values: {}}
     this.submitHandler = (evt) => {
       const {location: {query: {user, token}}} = this.props
       this.setState({loading: true})
@@ -19,9 +18,8 @@ class Reset extends React.Component {
       return this.context.actions
         .userResetPassword(user, token, this.state.values.password)
         .then(
-          () => this.setState({
+          () => this.reset({
             loading: false,
-            values: {},
             message: {message: 'Your password has been reset', type: 'success'}
           }),
           () => this.setState({
@@ -43,19 +41,20 @@ class Reset extends React.Component {
           </svg>
         </Link>
         <ValidationForm
+          sesh={this.state.sesh}
           onSubmit={this.submitHandler}
           id='ResetPassword'>
           {this.state.message
             ? <div className={'notion ' + (this.state.message.type || '')}>{this.state.message.message}</div>
             : null}
           <ValidationElement
-            initial={this.state.values.password === undefined}
+            sesh={this.state.sesh}
             password trim value={this.state.values.password || ''}>
             <label data-validate-error='Please enter at least 6 characters'>
               <input
-                onChange={generateChangeHandler(this, 'password')}
+                onChange={this.generateValueUpdater('password')}
                 value={this.state.values.password || ''}
-                type='password' name='password' placeholder='New password' data-validate-type='password'/>
+                type='password' name='password' placeholder='New password'/>
             </label>
           </ValidationElement>
           <div className='buttons'>

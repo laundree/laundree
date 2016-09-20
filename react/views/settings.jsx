@@ -6,22 +6,6 @@ const {ValueUpdater} = require('./helpers')
 
 class UserNameForm extends ValueUpdater {
 
-  constructor (props) {
-    super(props)
-    this.state = {
-      sesh: 0,
-      values: this.initialState
-    }
-  }
-
-  get initialState () {
-    return {displayName: this.props.user.displayName}
-  }
-
-  reset () {
-    this.setState(({sesh}) => ({sesh: sesh + 1, values: this.initialState}))
-  }
-
   render () {
     return <ValidationForm>
       <ValidationElement
