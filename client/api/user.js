@@ -26,9 +26,23 @@ class UserClientApi {
   }
 
   resetPassword (token, password) {
-    request
+    return request
       .post(`/api/users/${this.id}/password-reset`)
       .send({token, password})
+      .then()
+  }
+
+  updateName (name) {
+    return request
+      .put(`/api/users/${this.id}`)
+      .send({name})
+      .then()
+  }
+
+  changePassword (currentPassword, newPassword) {
+    return request
+      .post(`/api/users/${this.id}/password-change`)
+      .send({currentPassword, newPassword})
       .then()
   }
 

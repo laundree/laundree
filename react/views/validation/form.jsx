@@ -56,10 +56,10 @@ class ValidationForm extends React.Component {
   }
 
   get className () {
-    return (this.props.className || '') + ' ' +
-      (this.valid ? '' : 'invalid') + ' ' +
-      (this.initial ? 'initial' : '') + ' ' +
-      (this.failed ? 'failed' : '')
+    return (this.props.className || '') +
+      (this.valid ? '' : ' invalid') +
+      (this.initial ? ' initial' : '') +
+      (this.failed ? ' failed' : '')
   }
 
   render () {

@@ -1,23 +1,18 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {generateChangeHandler} = require('../../utils/react')
+const {ValueUpdater} = require('./helpers')
 const Modal = require('./modal.jsx')
 
-class InviteUserForm extends React.Component {
+class InviteUserForm extends ValueUpdater {
   constructor (props) {
     super(props)
-    this.state = {values: {}, sesh: 0}
     this.submitHandler = (evt) => {
       evt.preventDefault()
       return this.context.actions
         .inviteUserByEmail(this.props.laundryId, this.state.values.email)
         .then(() => this.reset())
     }
-  }
-
-  reset () {
-    this.setState(({sesh}) => ({values: {}, sesh: sesh + 1}))
   }
 
   render () {
@@ -33,7 +28,7 @@ class InviteUserForm extends React.Component {
             data-validate-error='Please enter a valid email address'>
             <input
               placeholder='Email address'
-              type='text' onChange={generateChangeHandler(this, 'email')}
+              type='text' onChange={this.generateValueUpdater('email')}
               value={this.state.values.email || ''}/>
           </label>
         </ValidationElement>

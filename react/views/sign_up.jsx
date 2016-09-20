@@ -5,13 +5,12 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {generateChangeHandler} = require('../../utils/react')
+const {ValueUpdater} = require('./helpers')
 
-class SignUp extends React.Component {
+class SignUp extends ValueUpdater {
 
   constructor (props) {
     super(props)
-    this.state = {values: {}}
     this.submitHandler = (evt) => {
       this.setState({loading: true})
       evt.preventDefault()
@@ -22,9 +21,8 @@ class SignUp extends React.Component {
         this.state.values.password
       )
         .then(
-          () => this.setState({
+          () => this.reset({
             loading: false,
-            values: {},
             message: {message: 'A verification link has been sent', type: 'success'}
           }),
           (err) => this.setState({
@@ -63,6 +61,7 @@ class SignUp extends React.Component {
           <span>OR</span>
         </div>
         <ValidationForm
+          sesh={this.state.sesh}
           className={this.state.loading ? 'blur' : ''}
           onSubmit={this.submitHandler}>
           {this.state.message
@@ -70,39 +69,39 @@ class SignUp extends React.Component {
             : null}
           <ValidationElement
             nonEmpty
-            trim
+            trim sesh={this.state.sesh}
             initial={this.state.values.name === undefined}
             value={this.state.values.name || ''}>
             <label data-validate-error='Please enter your full name'>
               <input
                 type='text' name='name' placeholder='Full name'
                 value={this.state.values.name || ''}
-                onChange={generateChangeHandler(this, 'name')}
+                onChange={this.generateValueUpdater('name')}
               />
             </label>
           </ValidationElement>
           <ValidationElement
             email
-            trim
+            trim sesh={this.state.sesh}
             initial={this.state.values.email === undefined}
             value={this.state.values.email || ''}>
             <label
               data-validate-error='Please enter a valid e-mail address'>
               <input
                 value={this.state.values.email || ''}
-                onChange={generateChangeHandler(this, 'email')}
+                onChange={this.generateValueUpdater('email')}
                 type='text' name='email' placeholder='E-mail address'/>
             </label>
           </ValidationElement>
           <ValidationElement
             initial={this.state.values.password === undefined}
             password
-            trim
+            trim sesh={this.state.sesh}
             value={this.state.values.password || ''}>
             <label data-validate-error='Min. 6 characters containing at least one letter'>
               <input
                 value={this.state.values.password || ''}
-                onChange={generateChangeHandler(this, 'password')}
+                onChange={this.generateValueUpdater('password')}
                 type='password' name='password' placeholder='Password'/>
             </label>
           </ValidationElement>

@@ -114,9 +114,44 @@ paths:
         - Users
       responses:
         "200":
-          description: User
+          description: Success
           schema:
             $ref: "#/definitions/User"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    put:
+      description: Update a user
+      operationId: updateUser
+      security:
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          description: The user to be updated
+          required: true
+          type: string
+        - name: body
+          in: body
+          description: New info
+          schema:
+            properties:
+              name:
+                $ref: "#/definitions/name"
+      tags:
+        - Users
+      responses:
+        "204":
+          description: Success
         "404":
           description: Not found
           schema:
@@ -221,6 +256,46 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /users/{id}/password-change:
+    x-swagger-router-controller: users
+    post:
+      description: Start password change
+      operationId: changeUserPassword
+      security:
+        - userAccessToken: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - currentPassword
+              - newPassword
+            properties:
+              currentPassword:
+                $ref: "#/definitions/password"
+              newPassword:
+                $ref: "#/definitions/password"
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /users/{id}/start-email-verification:
     x-swagger-router-controller: users
     post:
