@@ -10,4 +10,4 @@ logging:
     enabled: true
     format: 'common'
   error:
-    enabled: false
+    enabled: true
