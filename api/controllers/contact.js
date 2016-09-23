@@ -20,9 +20,8 @@ function contact (req, res) {
     template = 'contact'
     receiver = config.get('emails.contact')
   }
-  Promise.all([
-    sendEmail({message, subject, name}, 'contact-receipt', sender),
-    sendEmail({message, subject, email, name, userId}, template, receiver, sender)])
+  sendEmail({message, subject, email, name, userId}, template, receiver, sender)
+    .then(sendEmail({message, subject, name}, 'contact-receipt', sender))
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
