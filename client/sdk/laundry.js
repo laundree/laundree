@@ -3,7 +3,7 @@
  */
 const request = require('superagent')
 
-class LaundryClientApi {
+class LaundryClientSdk {
 
   constructor (id) {
     this.id = id
@@ -43,4 +43,4 @@ class LaundryClientApi {
   }
 }
 
-module.exports = LaundryClientApi
+module.exports = LaundryClientSdk

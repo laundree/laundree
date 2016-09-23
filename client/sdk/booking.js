@@ -4,17 +4,17 @@
 
 const request = require('superagent')
 
-class BookingClientApi {
+class BookingClientSdk {
 
   constructor (id) {
     this.id = id
   }
 
-  deleteInvite () {
+  deleteBooking () {
     return request
-      .delete(`/api/invites/${this.id}`)
+      .delete(`/api/bookings/${this.id}`)
       .then()
   }
 }
 
-module.exports = BookingClientApi
+module.exports = BookingClientSdk

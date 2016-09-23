@@ -1132,6 +1132,42 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /contact:
+    x-swagger-router-controller: contact
+    post:
+      operationId: contact
+      tags:
+        - Contact
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - message
+              - subject
+            properties:
+              message:
+                $ref: "#/definitions/nonEmpty"
+              name:
+                $ref: "#/definitions/nonEmpty"
+              subject:
+                $ref: "#/definitions/nonEmpty"
+              email:
+                type: string
+                format: email
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
 
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -1384,6 +1420,9 @@ definitions:
     format: password
     pattern: ([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])
   name:
+    type: string
+    pattern: ([^\s]+)
+  nonEmpty:
     type: string
     pattern: ([^\s]+)
 

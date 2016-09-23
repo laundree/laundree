@@ -16,6 +16,19 @@ function shortName (name) {
   return name.toLocaleLowerCase().trim().match(/(^(.)| ([^\s])|[0-9])/g).map((m) => m.trim()).join('').toLocaleUpperCase()
 }
 
+var entityMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+  '/': '&#x2F;'
+}
+
+function escapeHtml (string) {
+  return String(string).replace(/[&<>"'\/]/g, s => entityMap[s])
+}
+
 module.exports = {
-  hexToBase64Url, base64UrlToHex, shortName
+  hexToBase64Url, base64UrlToHex, shortName, escapeHtml
 }

@@ -24,15 +24,16 @@ var standardTransporter = config.get('mailer.stubTransporter')
 
 /**
  * Send email
- * @param {string} address Receiver
+ * @param {string} to Receiver
  * @param {{html: string, text: string, subject: string}} content
- * @param transporter=
+ * @param from
+ * @param transporter
  * @return {Promise}
  */
-function sendRenderedEmail (address, content, transporter = standardTransporter) {
+function sendRenderedEmail (to, content, from, transporter) {
   var options = {
-    from: '"Laundree.io" <no-reply@laundree.io>',
-    to: address,
+    from,
+    to,
     subject: content.subject,
     text: content.text,
     html: content.html
@@ -52,11 +53,13 @@ function sendRenderedEmail (address, content, transporter = standardTransporter)
  * Render and send an email.
  * @param {Object} data
  * @param {string} template
- * @param {string} address
+ * @param {string} to
+ * @param from=
  * @param transporter=
+ * @returns {Promise}
  */
-function sendEmail (data, template, address, transporter) {
-  return render(data, template).then((rendered) => sendRenderedEmail(address, rendered, transporter))
+function sendEmail (data, template, to, from = config.get('emails.from'), transporter = standardTransporter) {
+  return render(data, template).then((rendered) => sendRenderedEmail(to, rendered, from, transporter))
 }
 
 module.exports = {

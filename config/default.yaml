@@ -49,6 +49,11 @@ security:
   password:
     saltRounds: 10
 
+emails:
+  contact: contact@laundree.io
+  support: support@laundree.io
+  from: '"Laundree.io" <no-reply@laundree.io>'
+
 swagger:
 
   fittingsDirs: [ api/fittings ]

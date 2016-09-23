@@ -3,7 +3,7 @@
  */
 const request = require('superagent')
 
-class MachineClientApi {
+class MachineClientSdk {
 
   constructor (id) {
     this.id = id
@@ -39,4 +39,4 @@ class MachineClientApi {
   }
 }
 
-module.exports = MachineClientApi
+module.exports = MachineClientSdk

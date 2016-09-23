@@ -3,7 +3,7 @@
  */
 const request = require('superagent')
 
-class UserClientApi {
+class UserClientSdk {
 
   constructor (id, model) {
     this.id = id
@@ -13,7 +13,7 @@ class UserClientApi {
   /**
    * Returns user if available else null.
    * @param {string} email
-   * @return {Promise.<UserClientApi>}
+   * @return {Promise.<UserClientSdk>}
    */
   static userFromEmail (email) {
     return request
@@ -21,7 +21,7 @@ class UserClientApi {
       .then(({body}) => {
         if (!body) return null
         if (body.length !== 1) return null
-        return new UserClientApi(body[0].id, body[0])
+        return new UserClientSdk(body[0].id, body[0])
       })
   }
 
@@ -52,7 +52,7 @@ class UserClientApi {
       .send({displayName, email, password})
       .then(({body}) => {
         if (!body) return null
-        return new UserClientApi(body.id, body)
+        return new UserClientSdk(body.id, body)
       })
   }
 
@@ -70,4 +70,4 @@ class UserClientApi {
   }
 }
 
-module.exports = UserClientApi
+module.exports = UserClientSdk

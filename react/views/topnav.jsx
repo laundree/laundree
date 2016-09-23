@@ -71,12 +71,12 @@ class TopNav extends React.Component {
           </ul>
         </DropDownContent>
       </DropDown>
-      <a href='/support' className='icon help'>
+      <Link to='/support' className='icon help' activeClassName='active'>
         <svg>
           <use xlinkHref='#LifeBuoy'/>
         </svg>
         Support
-      </a>
+      </Link>
     </nav>
   }
 
@@ -87,24 +87,18 @@ class TopNav extends React.Component {
           <use xlinkHref='#SmallLogo'/>
         </svg>
       </Link>
-      <a href='/about' className='icon about'>
+      <Link to='/about' className='icon about' activeClassName='active'>
         <svg>
           <use xlinkHref='#Info'/>
         </svg>
         About us
-      </a>
-      <a href='/support' className='icon help'>
-        <svg>
-          <use xlinkHref='#LifeBuoy'/>
-        </svg>
-        Support
-      </a>
-      <a href='/contact' className='icon contact'>
+      </Link>
+      <Link to='/contact' className='icon contact' activeClassName='active'>
         <svg>
           <use xlinkHref='#EMail4'/>
         </svg>
         Contact
-      </a>
+      </Link>
       <Link to='/auth' className='log-in'>Log in</Link>
     </nav>
   }

@@ -21,5 +21,8 @@ module.exports = {
   Verification: require('./verification.jsx'),
   Privacy: require('./privacy.jsx'),
   TermsAndConditions: require('./terms_and_conditions.jsx'),
-  Settings: require('./settings.jsx')
+  Settings: require('./settings.jsx'),
+  Support: require('./support.jsx'),
+  About: require('./about.jsx'),
+  Contact: require('./contact.jsx')
 }

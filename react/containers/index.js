@@ -15,10 +15,13 @@ module.exports = {
   Privacy: require('../views').Privacy,
   TermsAndConditions: require('../views').TermsAndConditions,
   LaundrySettings: require('./laundry_settings'),
+  About: require('../views').About,
   Bookings: require('./bookings'),
   Machines: require('./machines'),
   LogIn: require('./login'),
   Users: require('./users'),
   CreateLaundry: require('./create_laundry'),
-  Settings: require('./settings')
+  Settings: require('./settings'),
+  Support: require('./support'),
+  Contact: require('../views').Contact
 }
