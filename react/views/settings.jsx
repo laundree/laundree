@@ -3,7 +3,7 @@ const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
-const {UserClientApi} = require('../../client/api')
+const {UserClientSdk} = require('../../client/sdk')
 
 class UserNameForm extends ValueUpdater {
 
@@ -12,7 +12,7 @@ class UserNameForm extends ValueUpdater {
     this.onSubmit = (event) => {
       this.setState({loading: true})
       event.preventDefault()
-      new UserClientApi(this.props.user.id)
+      new UserClientSdk(this.props.user.id)
         .updateName(this.state.values.displayName)
         .then(() => this.setState({loading: false}))
     }
@@ -61,7 +61,7 @@ class UserPasswordForm extends ValueUpdater {
     this.onSubmit = (event) => {
       this.setState({loading: true})
       event.preventDefault()
-      new UserClientApi(this.props.user.id)
+      new UserClientSdk(this.props.user.id)
         .changePassword(
           this.state.values.currentPassword,
           this.state.values.newPassword)

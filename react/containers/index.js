@@ -21,5 +21,7 @@ module.exports = {
   LogIn: require('./login'),
   Users: require('./users'),
   CreateLaundry: require('./create_laundry'),
-  Settings: require('./settings')
+  Settings: require('./settings'),
+  Support: require('./support'),
+  Contact: require('../views').Contact
 }

@@ -17,7 +17,7 @@ const {createStore} = require('redux')
 const {reducer} = require('../../redux')
 const reduxActions = require('../../redux/actions')
 const {ActionProvider} = require('../../react/views/providers')
-const {UserClientApi, LaundryClientApi, MachineClientApi, BookingClientApi, InviteClientApi} = require('../api')
+const {UserClientSdk, LaundryClientSdk, MachineClientSdk, BookingClientSdk, InviteClientSdk} = require('../sdk')
 
 const nsp = io('/redux')
 
@@ -41,13 +41,13 @@ function fetchStore () {
 }
 
 function signUpUser (name, email, password) {
-  return UserClientApi
+  return UserClientSdk
     .createUser(name, email, password)
     .then((user) => user.startEmailVerification(email))
 }
 
 function startEmailVerification (email) {
-  return UserClientApi
+  return UserClientSdk
     .userFromEmail(email)
     .then(user => {
       if (!user) throw new Error('User not found')
@@ -56,31 +56,31 @@ function startEmailVerification (email) {
 }
 
 function userForgotPassword (email) {
-  return UserClientApi.userFromEmail(email).then((user) => {
+  return UserClientSdk.userFromEmail(email).then((user) => {
     if (!user) throw new Error('User not found')
     return user.startPasswordReset()
   })
 }
 
 function userResetPassword (userId, token, newPassword) {
-  return new UserClientApi(userId).resetPassword(token, newPassword)
+  return new UserClientSdk(userId).resetPassword(token, newPassword)
 }
 
 function createLaundry (name) {
-  return LaundryClientApi.createLaundry(name)
+  return LaundryClientSdk.createLaundry(name)
 }
 
 function createMachine (id, name, type) {
-  return new LaundryClientApi(id).createMachine(name, type)
+  return new LaundryClientSdk(id).createMachine(name, type)
 }
 function deleteMachine (id) {
-  return new MachineClientApi(id).deleteMachine()
+  return new MachineClientSdk(id).deleteMachine()
 }
 function updateMachine (id, params) {
-  return new MachineClientApi(id).updateMachine(params)
+  return new MachineClientSdk(id).updateMachine(params)
 }
 function createBooking (id, from, to) {
-  return new MachineClientApi(id).createBooking(from, to)
+  return new MachineClientSdk(id).createBooking(from, to)
 }
 
 function listBookingsInTime (laundryId, from, to) {
@@ -92,23 +92,23 @@ function listBookingsForUser (laundryId, userId, filter = {}) {
 }
 
 function deleteBooking (id) {
-  return new BookingClientApi(id).deleteBooking()
+  return new BookingClientSdk(id).deleteBooking()
 }
 
 function inviteUserByEmail (laundryId, email) {
-  return new LaundryClientApi(laundryId).inviteUserByEmail(email)
+  return new LaundryClientSdk(laundryId).inviteUserByEmail(email)
 }
 
 function deleteLaundry (laundryId) {
-  return new LaundryClientApi(laundryId).deleteLaundry()
+  return new LaundryClientSdk(laundryId).deleteLaundry()
 }
 
 function deleteInvite (id) {
-  return new InviteClientApi(id).deleteInvite()
+  return new InviteClientSdk(id).deleteInvite()
 }
 
 function removeUserFromLaundry (laundryId, userId) {
-  return new LaundryClientApi(laundryId).removeUserFromLaundry(userId)
+  return new LaundryClientSdk(laundryId).removeUserFromLaundry(userId)
 }
 
 class AppInitializer extends Initializer {
