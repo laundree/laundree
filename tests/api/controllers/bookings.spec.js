@@ -87,7 +87,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .end(function (err, res) {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Machine not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         }).catch(done)
@@ -146,7 +146,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .end(function (err, res) {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Machine not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           }).catch(done)
@@ -372,7 +372,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Machine not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           }).catch(done)
@@ -392,7 +392,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .end(function (err, res) {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Machine not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           })
@@ -487,7 +487,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Booking not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         }).catch(done)
@@ -503,7 +503,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Booking not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         }).catch(done)
@@ -520,7 +520,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Booking not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           }).catch(done)
@@ -590,7 +590,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Booking not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -606,7 +606,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Booking not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         }).catch(done)
@@ -623,7 +623,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Booking not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           }).catch(done)
@@ -686,6 +686,23 @@ describe('controllers', function () {
             })
             .catch(done)
         })
+      })
+      it('should succeed when not laundry owner but booking owner', (done) => {
+        dbUtils.populateMachines(1)
+          .then(({laundry, machine}) => dbUtils
+            .populateTokens(1)
+            .then(({user, token}) => laundry
+              .addUser(user).then(() => machine.createBooking(user, new Date(), new Date(Date.now() + 300)))
+              .then((booking) => {
+                request(app)
+                  .delete(`/api/bookings/${booking.model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .auth(user.model.id, token.secret)
+                  .expect(204)
+                  .end((err, res) => done(err))
+              })))
+          .catch(done)
       })
     })
   })
