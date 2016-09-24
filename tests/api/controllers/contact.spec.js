@@ -8,6 +8,7 @@ chai.should()
 var dbUtils = require('../../db_utils')
 
 describe('controllers', function () {
+  this.timeout(2000)
   beforeEach(() => dbUtils.clearDb())
   describe('contact', function () {
     it('should fail when not logged in and omitting sender', (done) => {
@@ -38,6 +39,18 @@ describe('controllers', function () {
         .send({message: 'foo', subject: 'bar', name: 'Bob', email: 'a@example.com'})
         .expect(204)
         .end((err) => done(err))
+    })
+    it('should when logged in and omitting sender', (done) => {
+      dbUtils.populateTokens(1)
+        .then(({user, token}) => {
+          request(app)
+            .post('/api/contact')
+            .auth(user.model.id, token.secret)
+            .send({message: 'foo', subject: 'bar'})
+            .expect(204)
+            .end((err) => done(err))
+        })
+        .catch(done)
     })
   })
 })
