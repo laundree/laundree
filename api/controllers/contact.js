@@ -9,7 +9,7 @@ function contact (req, res) {
   var template, receiver, sender, userId
   const user = req.user
   if (user) {
-    sender = `"${user.model.displayName}" <${user.model.email}>`
+    sender = `"${user.model.displayName}" <${user.model.emails[0]}>`
     template = 'support'
     receiver = config.get('emails.support')
     userId = user.model.id
