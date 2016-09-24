@@ -6,17 +6,15 @@ const config = require('config')
 
 function contact (req, res) {
   const {message, subject, email, name} = req.swagger.params.body.value
-  var template, receiver, sender, userId
+  var template, receiver, userId
   const user = req.user
   if (user) {
-    sender = `"${user.model.displayName}" <${user.model.email}>`
     template = 'support'
     receiver = config.get('emails.support')
     userId = user.model.id
   } else {
     if (!name) return api.returnError(res, 400, 'Name is required')
     if (!email) return api.returnError(res, 400, 'E-mail is required')
-    sender = `"${name}" <${email}>`
     template = 'contact'
     receiver = config.get('emails.contact')
   }
