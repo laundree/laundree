@@ -185,7 +185,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -201,7 +201,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -219,7 +219,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Laundry not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           })
@@ -293,7 +293,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -310,7 +310,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -329,7 +329,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Laundry not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           })
@@ -509,7 +509,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -525,7 +525,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -543,7 +543,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Laundry not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           })
@@ -614,7 +614,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Laundry not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -656,7 +656,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Laundry not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           })

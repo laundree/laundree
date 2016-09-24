@@ -102,49 +102,35 @@ function verifyEmail (req, res) {
 }
 
 function deleteUser (req, res) {
-  const id = req.swagger.params.id.value
-  UserHandler.findFromId(id)
-    .then((user) => {
-      if (!user) return utils.api.returnError(res, 404, 'User not found')
-      if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
-      return user.findOwnedLaundries().then((laundries) => {
-        if (laundries.length) return utils.api.returnError(res, 403, 'Not allowed')
-        return user.deleteUser().then(() => utils.api.returnSuccess(res))
-      })
+  const user = req.subjects.user
+  user.findOwnedLaundries()
+    .then((laundries) => {
+      if (laundries.length) return utils.api.returnError(res, 403, 'Not allowed')
+      return user.deleteUser().then(() => utils.api.returnSuccess(res))
     })
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function updateUser (req, res) {
-  const id = req.swagger.params.id.value
+  const user = req.subjects.user
   const {name} = req.swagger.params.body.value
-  UserHandler
-    .findFromId(id)
-    .then((user) => {
-      if (!user) return utils.api.returnError(res, 404, 'User not found')
-      if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
-      return user.updateName(name).then(() => utils.api.returnSuccess(res))
-    })
+  user.updateName(name)
+    .then(() => utils.api.returnSuccess(res))
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function changeUserPassword (req, res) {
-  const id = req.swagger.params.id.value
   const {currentPassword, newPassword} = req.swagger.params.body.value
-  UserHandler
-    .findFromId(id)
-    .then((user) => {
-      if (!user) return utils.api.returnError(res, 404, 'User not found')
-      if (user.model.id !== req.user.model.id) return utils.api.returnError(res, 403, 'Not allowed')
-      return (user.hasPassword
-        ? user.verifyPassword(currentPassword)
-        : Promise.resolve(true))
-        .then(result => {
-          if (!result) return utils.api.returnError(res, 403, 'Invalid current password')
-          return user
-            .resetPassword(newPassword)
-            .then(() => utils.api.returnSuccess(res))
-        })
+  const user = req.subjects.user
+  const promise = user.hasPassword
+    ? user.verifyPassword(currentPassword)
+    : Promise.resolve(true)
+  promise
+    .then(result => {
+      if (!result) return utils.api.returnError(res, 403, 'Invalid current password')
+      return user
+        .resetPassword(newPassword)
+        .then(() => utils.api.returnSuccess(res))
     })
     .catch(utils.api.generateErrorHandler(res))
 }

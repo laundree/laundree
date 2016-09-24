@@ -39,58 +39,35 @@ function createLaundry (req, res) {
 }
 
 function fetchLaundry (req, res) {
-  const id = req.swagger.params.id.value
-  LaundryHandler
-    .findFromId(id)
-    .then((laundry) => {
-      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
-      return api.returnSuccess(res, laundry.toRest())
-    })
-    .catch(api.generateErrorHandler(res))
+  const laundry = req.subjects.laundry
+  api.returnSuccess(res, laundry.toRest())
 }
 
 function deleteLaundry (req, res) {
-  const id = req.swagger.params.id.value
-  LaundryHandler
-    .findFromId(id)
-    .then((laundry) => {
-      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
-      return laundry.deleteLaundry().then(() => api.returnSuccess(res))
-    })
+  const laundry = req.subjects.laundry
+  laundry.deleteLaundry()
+    .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
 
 function inviteUserByEmail (req, res) {
-  const id = req.swagger.params.id.value
   const email = req.swagger.params.body.value.email
-  LaundryHandler
-    .findFromId(id)
-    .then((laundry) => {
-      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
-      return laundry
-        .inviteUserByEmail(email)
-        .then(({user, invite}) => {
-          if (user) return mail.sendEmail({email, laundry: laundry.model, user: user.model}, 'invite-user', email)
-          if (invite) return mail.sendEmail({email, laundry: laundry.model}, 'invite', email)
-        })
-        .then(() => api.returnSuccess(res))
+  const laundry = req.subjects.laundry
+  return laundry
+    .inviteUserByEmail(email)
+    .then(({user, invite}) => {
+      if (user) return mail.sendEmail({email, laundry: laundry.model, user: user.model}, 'invite-user', email)
+      if (invite) return mail.sendEmail({email, laundry: laundry.model}, 'invite', email)
     })
+    .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
 
 function removeUserFromLaundry (req, res) {
-  const id = req.swagger.params.id.value
   const userId = req.swagger.params.userId.value
-  Promise.all([LaundryHandler.findFromId(id), UserHandler.findFromId(userId)])
-    .then(([laundry, user]) => {
-      if (!laundry) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isUser(req.user)) return api.returnError(res, 404, 'Laundry not found')
-      if (!laundry.isOwner(req.user)) return api.returnError(res, 403, 'Not allowed')
+  const laundry = req.subjects.laundry
+  UserHandler.findFromId(userId)
+    .then((user) => {
       if (!user) return api.returnError(res, 404, 'User not found')
       if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
       if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')

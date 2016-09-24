@@ -92,7 +92,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
-              .expect(404)
+              .expect(403)
               .end(err => done(err))
           })
       })
@@ -155,7 +155,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
-              .expect(404)
+              .expect(403)
               .end(err => done(err))
           })
       })
@@ -653,7 +653,7 @@ describe('controllers', function () {
           .expect(403)
           .end((err, res) => done(err))
       })
-      it('should return 404 on invalid id', (done) => {
+      it('should return 403 on invalid id', (done) => {
         dbUtils.populateTokens(1).then(({user, tokens}) => {
           request(app)
             .delete('/api/users/id')
@@ -661,15 +661,15 @@ describe('controllers', function () {
             .set('Content-Type', 'application/json')
             .auth(user.model.id, tokens[0].secret)
             .expect('Content-Type', /json/)
-            .expect(404)
+            .expect(403)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'User not found'})
+              res.body.should.deep.equal({message: 'Not allowed'})
               done()
             })
         })
       })
-      it('should return 404 on missing id', (done) => {
+      it('should return 403 on missing id', (done) => {
         dbUtils.populateTokens(1).then(({user, tokens}) => {
           request(app)
             .delete('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
@@ -677,10 +677,10 @@ describe('controllers', function () {
             .set('Content-Type', 'application/json')
             .auth(user.model.id, tokens[0].secret)
             .expect('Content-Type', /json/)
-            .expect(404)
+            .expect(403)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'User not found'})
+              res.body.should.deep.equal({message: 'Not allowed'})
               done()
             })
         })
