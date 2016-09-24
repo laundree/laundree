@@ -33,7 +33,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Invite not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         }).catch(done)
@@ -49,7 +49,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Invite not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         }).catch(done)
@@ -66,7 +66,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Invite not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           }).catch(done)
@@ -101,10 +101,10 @@ describe('controllers', function () {
                   .set('Content-Type', 'application/json')
                   .auth(user.model.id, token.secret)
                   .expect('Content-Type', /json/)
-                  .expect(404)
+                  .expect(403)
                   .end((err, res) => {
                     if (err) return done(err)
-                    res.body.should.deep.equal({message: 'Invite not found'})
+                    res.body.should.deep.equal({message: 'Not allowed'})
                     done()
                   })
               })
@@ -133,7 +133,7 @@ describe('controllers', function () {
             .expect(404)
             .end((err, res) => {
               if (err) return done(err)
-              res.body.should.deep.equal({message: 'Invite not found'})
+              res.body.should.deep.equal({message: 'Not found'})
               done()
             })
         })
@@ -150,7 +150,7 @@ describe('controllers', function () {
               .expect(404)
               .end((err, res) => {
                 if (err) return done(err)
-                res.body.should.deep.equal({message: 'Invite not found'})
+                res.body.should.deep.equal({message: 'Not found'})
                 done()
               })
           }).catch(done)
@@ -186,10 +186,10 @@ describe('controllers', function () {
                   .set('Content-Type', 'application/json')
                   .auth(user.model.id, token.secret)
                   .expect('Content-Type', /json/)
-                  .expect(404)
+                  .expect(403)
                   .end((err, res) => {
                     if (err) return done(err)
-                    res.body.should.deep.equal({message: 'Invite not found'})
+                    res.body.should.deep.equal({message: 'Not allowed'})
                     done()
                   })
               })

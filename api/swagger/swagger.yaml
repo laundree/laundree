@@ -18,9 +18,39 @@ produces:
   - application/json
 
 securityDefinitions:
-  userAccessToken:
+  userAccess:
     type: basic
     description: Basic auth with user access token auth.
+  self:
+    type: basic
+    description: Is the requested user the one logged in
+  tokenOwner:
+    type: basic
+    description: Is the requested token owned by current user
+  laundryOwner:
+    type: basic
+    description: Is the requested laundry owned by current user
+  laundryUser:
+    type: basic
+    description: Is the requested laundry used by current user
+  machineOwner:
+    type: basic
+    description: Is the requested machine owned by current user
+  machineUser:
+    type: basic
+    description: Is the requested machine used by current user
+  bookingOwner:
+    type: basic
+    description: Is the requested booking owned by current user
+  bookingUser:
+    type: basic
+    description: Is the requested booking used by current user
+  bookingCreator:
+    type: basic
+    description: Is the requested booking created by current user
+  inviteOwner:
+    type: basic
+    description: Is the requested invite owned by current user
 
 paths:
   /users:
@@ -133,7 +163,7 @@ paths:
       description: Update a user
       operationId: updateUser
       security:
-        - userAccessToken: []
+        - self: []
       parameters:
         - name: id
           in: path
@@ -168,7 +198,7 @@ paths:
       description: Delete a given user
       operationId: deleteUser
       security: 
-        - userAccessToken: []
+        - self: []
       tags: 
         - Users
       parameters:
@@ -262,7 +292,7 @@ paths:
       description: Start password change
       operationId: changeUserPassword
       security:
-        - userAccessToken: []
+        - self: []
       parameters:
         - name: id
           in: path
@@ -378,7 +408,7 @@ paths:
     get:
       description: List available tokens
       security: 
-        - userAccessToken: []
+        - userAccess: []
       operationId: listTokens
       tags:
         - Tokens
@@ -421,7 +451,7 @@ paths:
       description: Create a new token
       operationId: createToken
       security: 
-        - userAccessToken: []
+        - userAccess: []
       tags:
         - Tokens
       parameters:
@@ -455,7 +485,7 @@ paths:
       tags:
         - Tokens
       security: 
-        - userAccessToken: []
+        - tokenOwner: []
       parameters:
         - name: id
           in: path
@@ -483,7 +513,7 @@ paths:
       tags:
         - Tokens
       security: 
-        - userAccessToken: []
+        - tokenOwner: []
       parameters:
         - name: id
           in: path
@@ -508,7 +538,7 @@ paths:
     x-swagger-router-controller: laundries
     get:
       security: 
-        - userAccessToken: []
+        - userAccess: []
       description: Lists the current laundries
       operationId: listLaundries
       parameters:
@@ -554,7 +584,7 @@ paths:
       tags:
         - Laundries
       security: 
-        - userAccessToken: []
+        - userAccess: []
       description: Create a laundry
       operationId: createLaundry
       parameters:
@@ -590,7 +620,7 @@ paths:
       tags:
         - Laundries
       security: 
-        - userAccessToken: []
+        - laundryUser: []
       parameters:
         - name: id
           in: path
@@ -618,7 +648,7 @@ paths:
       tags:
         - Laundries
       security: 
-        - userAccessToken: []
+        - laundryOwner: []
       parameters:
         - name: id
           in: path
@@ -649,7 +679,7 @@ paths:
         - Machines
         - Laundries
       security:
-        - userAccessToken: []
+        - laundryUser: []
       parameters:
         - name: id
           in: path
@@ -695,7 +725,7 @@ paths:
     post:
       operationId: createMachine
       security:
-        - userAccessToken: []
+        - laundryOwner: []
       tags:
         - Machines
         - Laundries
@@ -744,7 +774,7 @@ paths:
     delete:
       operationId: removeUserFromLaundry
       security:
-        - userAccessToken: []
+        - laundryOwner: []
       tags:
         - Laundries
         - Users
@@ -780,7 +810,7 @@ paths:
     post:
       operationId: inviteUserByEmail
       security:
-        - userAccessToken: []
+        - laundryOwner: []
       tags:
         - Laundries
       parameters:
@@ -821,7 +851,7 @@ paths:
       tags:
         - Machines
       security:
-        - userAccessToken: []
+        - machineUser: []
       parameters:
         - name: id
           in: path
@@ -848,7 +878,7 @@ paths:
     put:
       operationId: updateMachine
       security:
-        - userAccessToken: []
+        - machineOwner: []
       tags:
         - Machines
       parameters:
@@ -887,7 +917,7 @@ paths:
     delete:
       operationId: deleteMachine
       security:
-        - userAccessToken: []
+        - machineOwner: []
       tags:
         - Machines
       parameters:
@@ -912,7 +942,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
       
-  /machines/{machineId}/bookings:
+  /machines/{id}/bookings:
     x-swagger-router-controller: bookings
     get:
       description: Lists the bookings
@@ -921,9 +951,9 @@ paths:
         - Bookings
         - Machines
       security:
-        - userAccessToken: []
+        - machineUser: []
       parameters:
-        - name: machineId
+        - name: id
           in: path
           required: true
           type: string
@@ -984,9 +1014,9 @@ paths:
       tags:
         - Bookings
       security:
-        - userAccessToken: []
+        - machineUser: []
       parameters:
-        - name: machineId
+        - name: id
           in: path
           required: true
           type: string
@@ -1036,7 +1066,7 @@ paths:
     x-swagger-router-controller: bookings
     get:
       security:
-        - userAccessToken: []
+        - bookingUser: []
       operationId: fetchBooking
       tags:
         - Bookings
@@ -1061,7 +1091,8 @@ paths:
             $ref: "#/definitions/Error"
     delete:
       security:
-        - userAccessToken: []
+        - bookingOwner: []
+        - bookingCreator: []
       operationId: deleteBooking
       tags:
         - Bookings
@@ -1086,7 +1117,7 @@ paths:
     x-swagger-router-controller: invites
     get:
       security:
-        - userAccessToken: []
+        - inviteOwner: []
       operationId: fetchInvite
       tags:
         - Invites
@@ -1111,7 +1142,7 @@ paths:
             $ref: "#/definitions/Error"
     delete:
       security:
-        - userAccessToken: []
+        - inviteOwner: []
       operationId: deleteInvite
       tags:
         - Invites

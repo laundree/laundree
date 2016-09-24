@@ -13,5 +13,5 @@ function on (emitter, event, handler) {
 }
 
 module.exports = {
-  on: on
+  on
 }

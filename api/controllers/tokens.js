@@ -41,24 +41,12 @@ function createToken (req, res) {
 }
 
 function fetchToken (req, res) {
-  const id = req.swagger.params.id.value
-  TokenHandler.findFromId(id)
-    .then((token) => {
-      if (!token) return api.returnError(res, 404, 'Token not found')
-      if (!token.isOwner(req.user)) return api.returnError(res, 404, 'Token not found')
-      api.returnSuccess(res, token.toRest())
-    })
-    .catch(api.generateErrorHandler(res))
+  api.returnSuccess(res, req.subjects.token.toRest())
 }
 
 function deleteToken (req, res) {
-  const id = req.swagger.params.id.value
-  TokenHandler.findFromId(id)
-    .then((token) => {
-      if (!token) return api.returnError(res, 404, 'Token not found')
-      if (!token.isOwner(req.user)) return api.returnError(res, 404, 'Token not found')
-      return req.user.removeAuthToken(token).then(() => api.returnSuccess(res))
-    })
+  req.user.removeAuthToken(req.subjects.token)
+    .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
 

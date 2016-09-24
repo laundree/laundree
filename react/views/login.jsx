@@ -5,15 +5,10 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {generateChangeHandler} = require('../../utils/react')
 const {USER_NOT_VERIFIED} = require('../../utils/flash')
+const {ValueUpdater} = require('./helpers')
 
-class LogIn extends React.Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {values: {}}
-  }
+class LogIn extends ValueUpdater {
 
   handleNotion () {
     if (!this.props.flash.length) return null
@@ -64,7 +59,7 @@ class LogIn extends React.Component {
                 name='username'
                 placeholder='E-mail address'
                 value={this.state.values.email || ''}
-                onChange={generateChangeHandler(this, 'email')}/>
+                onChange={this.generateValueUpdater('email')}/>
             </label>
           </ValidationElement>
           <ValidationElement
@@ -75,7 +70,7 @@ class LogIn extends React.Component {
               <input
                 type='password' name='password' placeholder='Password'
                 value={this.state.values.password || ''}
-                onChange={generateChangeHandler(this, 'password')}/>
+                onChange={this.generateValueUpdater('password')}/>
             </label>
           </ValidationElement>
           <div className='buttons'>

@@ -8,7 +8,6 @@
     "babel-preset-react": "^6.5.0",
     "babel-register": "^6.9.0",
     "babelify": "^7.2.0",
-    "base64-url": "^1.2.2",
     "bcrypt": "^0.8.6",
     "body-parser": "~1.15.2",
     "browserify-middleware": "^7.0.0",
@@ -29,6 +28,7 @@
     "morgan": "~1.7.0",
     "node-sass-middleware": "^0.9.8",
     "nodemailer": "^2.3.2",
+    "nodemailer-stub-transport": "^1.0.0",
     "opbeat": "^3.17.1",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
@@ -51,8 +51,7 @@
     "socket.io-redis": "^1.0.0",
     "superagent": "^2.1.0",
     "swagger-tools": "^0.10.1",
-    "yamljs": "^0.2.7",
-    "nodemailer-stub-transport": "^1.0.0"
+    "yamljs": "^0.2.7"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.2",
