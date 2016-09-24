@@ -40,7 +40,7 @@ describe('controllers', function () {
         })
       })
       it('fail on wrong laundry id', (done) => {
-        dbUtils.populateMachines(50).then(({user, token, laundry, machines}) => {
+        dbUtils.populateMachines(50).then(({user, token, machines}) => {
           request(app)
             .get('/api/laundries/foo/machines')
             .set('Accept', 'application/json')
