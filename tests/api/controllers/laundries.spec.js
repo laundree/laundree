@@ -162,9 +162,34 @@ describe('controllers', function () {
             })
         })
       })
+      it('should trim', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          const name = `${laundry.model.name} 2   `
+          request(app)
+            .post('/api/laundries')
+            .send({name})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .end((err, res) => {
+              if (err) return done(err)
+              const id = res.body.id
+              res.body.name.should.equal(name.trim())
+              LaundryHandler.findFromId(id).then((laundry) => {
+                laundry.should.not.be.undefined
+                return laundry.toRest().then((result) => {
+                  res.body.should.deep.equal(result)
+                  done()
+                })
+              }).catch(done)
+            })
+        })
+      })
     })
 
-    describe('GET /laundries/{id}', () => {
+    describe('GET /api/laundries/{id}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
           .get('/api/laundries/id')
@@ -271,7 +296,159 @@ describe('controllers', function () {
       })
     })
 
-    describe('POST /laundries/{id}/invite-by-email', () => {
+    describe('PUT /api/laundries/{id}', () => {
+      it('should fail on not authenticated', (done) => {
+        request(app)
+          .put('/api/laundries/id')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({name: 'L1'})
+          .expect('Content-Type', /json/)
+          .expect(403)
+          .end((err, res) => done(err))
+      })
+      it('should return 404 on invalid id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .put('/api/laundries/id')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .send({name: 'L1'})
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on missing id', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .put('/api/laundries/id')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: 'L1'})
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .end((err, res) => {
+              if (err) return done(err)
+              res.body.should.deep.equal({message: 'Not found'})
+              done()
+            })
+        })
+      })
+      it('should return 404 on other id', (done) => {
+        dbUtils.populateLaundries(1).then(({laundries}) => {
+          const [laundry] = laundries
+          dbUtils.populateLaundries(1).then(({user, token}) => {
+            request(app)
+              .put(`/api/laundries/${laundry.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .send({name: 'L1'})
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .end((err, res) => {
+                if (err) return done(err)
+                res.body.should.deep.equal({message: 'Not found'})
+                done()
+              })
+          })
+        })
+      })
+      it('should succeed', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) => {
+          request(app)
+            .put(`/api/laundries/${laundries[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: 'L1'})
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryHandler
+                .findFromId(laundries[0].model.id)
+                .then(laundry => laundry.model.name.should.equal('L1'))
+                .then(() => done(), done)
+            })
+        })
+      })
+      it('should succeed same name', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          request(app)
+            .put(`/api/laundries/${laundry.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: laundry.model.name})
+            .expect(204)
+            .end((err, res) => done(err))
+        })
+      })
+      it('should succeed same name trimmed', (done) => {
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
+          const name = laundry.model.name
+          request(app)
+            .put(`/api/laundries/${laundry.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: `${name}    `})
+            .expect(204)
+            .end((err, res) => {
+              if (err) return done(err)
+              LaundryHandler
+                .findFromId(laundry.model.id)
+                .then(laundry => laundry.model.name.should.equal(name))
+                .then(() => done(), done)
+            })
+        })
+      })
+      it('should fail on other laundry', (done) => {
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) => {
+          request(app)
+            .put(`/api/laundries/${laundry1.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: laundry2.model.name})
+            .expect(409)
+            .end((err, res) => done(err))
+        })
+      })
+      it('should fail when only user', (done) => {
+        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          const [token] = tokens
+          return dbUtils.populateLaundries(1).then(({laundries}) => {
+            const [laundry] = laundries
+            return laundry.addUser(user)
+              .then(() => {
+                request(app)
+                  .put(`/api/laundries/${laundries[0].model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .send({name: 'L1'})
+                  .auth(user.model.id, token.secret)
+                  .expect('Content-Type', /json/)
+                  .expect(403)
+                  .end((err, res) => {
+                    if (err) return done(err)
+                    res.body.should.deep.equal({message: 'Not allowed'})
+                    done()
+                  })
+              })
+          })
+        })
+      })
+    })
+
+    describe('POST /api/laundries/{id}/invite-by-email', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
           .post('/api/laundries/id/invite-by-email')
@@ -488,7 +665,7 @@ describe('controllers', function () {
       })
     })
 
-    describe('DELETE /laundries/{id}', () => {
+    describe('DELETE /api/laundries/{id}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
           .delete('/api/laundries/id')
@@ -593,7 +770,7 @@ describe('controllers', function () {
       })
     })
 
-    describe('DELETE /laundries/{id}/users/{userId}', () => {
+    describe('DELETE /api/laundries/{id}/users/{userId}', () => {
       it('should fail on not authenticated', (done) => {
         request(app)
           .delete('/api/laundries/id/users/id')

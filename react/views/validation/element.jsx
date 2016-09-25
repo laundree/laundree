@@ -29,26 +29,30 @@ class ValidationElement extends React.Component {
     this.handle(false, true)
   }
 
-  componentWillReceiveProps ({value, sesh}) {
-    if (value === this.props.value) return
+  componentWillReceiveProps (props) {
+    const {value, sesh} = props
     const initial = sesh !== this.props.sesh
-    this.setState({initial})
-    this.handle(this.validate(value), initial)
+    if (initial) {
+      this.setState({initial})
+      return this.handle(this.validate(value, props), initial)
+    }
+    if (value === this.props.value) return
+    this.handle(this.validate(value, props), initial)
   }
 
   get name () {
     return `id${this.id}`
   }
 
-  validate (value) {
-    if (this.props.trim) value = value.trim()
-    if (this.props.equal !== undefined) return this.props.equal === value
-    if (this.props.not !== undefined) return this.props.not !== value
-    if (this.props.validator) return this.props.validator(value)
-    if (this.props.notOneOf) return this.props.notOneOf.indexOf(value) < 0
-    if (this.props.nonEmpty) return value
-    if (this.props.email) return regex.email.exec(value)
-    if (this.props.password) return regex.password.exec(value)
+  validate (value, props = this.props) {
+    if (props.trim) value = value.trim()
+    if (props.equal !== undefined) return props.equal === value
+    if (props.not !== undefined) return props.not !== value
+    if (props.validator) return props.validator(value)
+    if (props.notOneOf) return props.notOneOf.indexOf(value) < 0
+    if (props.nonEmpty) return value
+    if (props.email) return regex.email.exec(value)
+    if (props.password) return regex.password.exec(value)
     return true
   }
 

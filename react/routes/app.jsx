@@ -61,8 +61,8 @@ function routeGenerator (store) {
       </Route>,
       <Route path='/privacy' component={Privacy}/>,
       <Route path='/terms-and-conditions' component={TermsAndConditions}/>,
-      <Route path='/support'>
-        <IndexRedirect to='/contact'/>
+      <Route path='/contact'>
+        <IndexRedirect to='/support'/>
       </Route>,
       <Route path='/auth'>
         <IndexRedirect to='/'/>
