@@ -16,6 +16,13 @@ class LaundryClientSdk {
       .then((response) => response.body || null)
   }
 
+  updateName (name) {
+    return request
+      .put(`/api/laundries/${this.id}`)
+      .send({name})
+      .then()
+  }
+
   createMachine (name, type) {
     return request
       .post(`/api/laundries/${this.id}/machines`)

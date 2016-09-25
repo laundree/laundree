@@ -289,6 +289,8 @@ paths:
   /users/{id}/password-change:
     x-swagger-router-controller: users
     post:
+      tags:
+        - Users
       description: Start password change
       operationId: changeUserPassword
       security:
@@ -615,6 +617,44 @@ paths:
             $ref: "#/definitions/Error"
   /laundries/{id}:
     x-swagger-router-controller: laundries
+    put:
+      operationId: updateLaundry
+      tags:
+        - Laundries
+      security:
+        - laundryOwner: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              name:
+                type: string
+      responses:
+        "204":
+          description: Success
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "409":
+          description: Machine conflict
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
     get:
       operationId: fetchLaundry
       tags:

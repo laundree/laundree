@@ -170,6 +170,10 @@ class Users extends React.Component {
     </ul>
   }
 
+  componentDidMount () {
+    this.context.actions.listUsersAndInvites(this.props.laundry.id)
+  }
+
   get users () {
     return this.props.laundry.users.map((id) => this.props.users[id]).filter((u) => u)
   }
@@ -192,6 +196,12 @@ class Users extends React.Component {
       </main>
     </DocumentTitle>
   }
+}
+
+Users.contextTypes = {
+  actions: React.PropTypes.shape({
+    listUsersAndInvites: React.PropTypes.func
+  })
 }
 
 Users.propTypes = {

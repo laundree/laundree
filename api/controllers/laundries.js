@@ -29,11 +29,24 @@ function listLaundries (req, res) {
 function createLaundry (req, res) {
   const name = req.swagger.params.body.value.name.trim()
   LaundryHandler
-    .find({name: name})
+    .find({name})
     .then(([laundry]) => {
       if (laundry) return api.returnError(res, 409, 'Laundry already exists', {Location: laundry.restUrl})
       return req.user.createLaundry(name)
         .then((laundry) => api.returnSuccess(res, laundry.toRest()))
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
+function updateLaundry (req, res) {
+  const {laundry} = req.subjects
+  const name = req.swagger.params.body.value.name.trim()
+  if (name === laundry.model.name) return api.returnSuccess(res)
+  LaundryHandler
+    .find({name})
+    .then(([l]) => {
+      if (l) return api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
+      return laundry.updateName(name).then(() => api.returnSuccess(res))
     })
     .catch(api.generateErrorHandler(res))
 }
@@ -79,6 +92,7 @@ function removeUserFromLaundry (req, res) {
 module.exports = {
   inviteUserByEmail,
   listLaundries,
+  updateLaundry,
   fetchLaundry,
   deleteLaundry,
   createLaundry,
