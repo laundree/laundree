@@ -99,6 +99,7 @@ class Timetable extends React.Component {
   }
 
   componentDidMount () {
+    this.context.actions.listMachinesAndUsers(this.props.laundry.id)
     window.addEventListener('resize', this.handleResize)
     const numDays = this.numDays
     this.setState({numDays: numDays, loading: false}, () => {
@@ -171,6 +172,12 @@ class Timetable extends React.Component {
       </div>
     </main>
   }
+}
+
+Timetable.contextTypes = {
+  actions: React.PropTypes.shape({
+    listMachinesAndUsers: React.PropTypes.func
+  })
 }
 
 Timetable.propTypes = {

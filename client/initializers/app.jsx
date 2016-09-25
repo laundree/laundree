@@ -70,15 +70,6 @@ function createLaundry (name) {
   return LaundryClientSdk.createLaundry(name)
 }
 
-function createMachine (id, name, type) {
-  return new LaundryClientSdk(id).createMachine(name, type)
-}
-function deleteMachine (id) {
-  return new MachineClientSdk(id).deleteMachine()
-}
-function updateMachine (id, params) {
-  return new MachineClientSdk(id).updateMachine(params)
-}
 function createBooking (id, from, to) {
   return new MachineClientSdk(id).createBooking(from, to)
 }
@@ -89,6 +80,18 @@ function listBookingsInTime (laundryId, from, to) {
 
 function listBookingsForUser (laundryId, userId, filter = {}) {
   return nsp.emit('listBookingsForUser', laundryId, userId, filter)
+}
+
+function listUsersAndInvites (laundryId) {
+  return nsp.emit('listUsersAndInvites', laundryId)
+}
+
+function listMachines (laundryId) {
+  return nsp.emit('listMachines', laundryId)
+}
+
+function listMachinesAndUsers (laundryId) {
+  return nsp.emit('listMachinesAndUsers', laundryId)
 }
 
 function deleteBooking (id) {
@@ -119,10 +122,7 @@ class AppInitializer extends Initializer {
       const actions = {
         userForgotPassword,
         signUpUser,
-        createMachine,
         createLaundry,
-        deleteMachine,
-        updateMachine,
         userResetPassword,
         createBooking,
         deleteBooking,
@@ -132,7 +132,10 @@ class AppInitializer extends Initializer {
         deleteLaundry,
         startEmailVerification,
         deleteInvite,
-        removeUserFromLaundry
+        removeUserFromLaundry,
+        listUsersAndInvites,
+        listMachines,
+        listMachinesAndUsers
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

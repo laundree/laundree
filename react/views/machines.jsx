@@ -3,6 +3,7 @@ const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
 const Modal = require('./modal.jsx')
+const {MachineClientSdk, LaundryClientSdk} = require('../../client/sdk')
 
 class MachineDropdown extends React.Component {
 
@@ -179,7 +180,7 @@ class Machines extends React.Component {
   constructor (props) {
     super(props)
     this.state = {}
-    this.creator = (type, name) => this.context.actions.createMachine(this.props.currentLaundry, name, type)
+    this.creator = (type, name) => new LaundryClientSdk(this.props.currentLaundry).createMachine(name, type)
   }
 
   get laundry () {
@@ -187,11 +188,15 @@ class Machines extends React.Component {
   }
 
   generateDeleter (id) {
-    return () => this.context.actions.deleteMachine(id)
+    return () => new MachineClientSdk(id).deleteMachine()
   }
 
   generateUpdater (id) {
-    return (params) => this.context.actions.updateMachine(id, params)
+    return (params) => new MachineClientSdk(id).updateMachine(params)
+  }
+
+  componentDidMount () {
+    this.context.actions.listMachines(this.props.currentLaundry)
   }
 
   render () {
@@ -231,9 +236,7 @@ class Machines extends React.Component {
 
 Machines.contextTypes = {
   actions: React.PropTypes.shape({
-    createMachine: React.PropTypes.func,
-    deleteMachine: React.PropTypes.func,
-    updateMachine: React.PropTypes.func
+    listUsersAndInvites: React.PropTypes.func
   })
 }
 
