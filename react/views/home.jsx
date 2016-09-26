@@ -14,9 +14,12 @@ const Home = () => <DocumentTitle title='Home'>
           </svg>
         </a>
         <h2>An easy and free booking system for your laundry.</h2>
+        <div className='credit'>
+          Clip by <a href='http://www.beachfrontbroll.com' target='_blank'>Beachfront</a>
+        </div>
       </div>
       <div>
-        <video src='/videos/v13.mov' loop='loop' autoPlay/>
+        <video src='/videos/v.mp4' loop='loop' autoPlay/>
       </div>
     </header>
     <main>

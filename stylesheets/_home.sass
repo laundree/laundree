@@ -1,14 +1,15 @@
 #Home
+  padding-top: 4em
   header
     position: relative
     background: #F3FCFF
     overflow: hidden
-    div:first-of-type
+    > div:first-of-type
       padding: 8em 0
       z-index: 10
       position: relative
 
-      a
+      > a
         width: 15em
         margin: auto
         display: block
@@ -16,6 +17,16 @@
           width: 15em
           height: logo_ratio_w_to_h(15em)
           display: block
+      .credit
+        position: absolute
+        bottom: 1em
+        right: 1em
+        color: #b5b5b5
+        font-weight: 300
+        font-size: 0.8em
+        a
+          color: #b5b5b5
+          font-style: italic
 
       h2
         display: block
@@ -33,7 +44,7 @@
     $ratio: 1920/1080
     $width: $height*$ratio
 
-    div:last-of-type
+    > div:last-of-type
       z-index: 0
       top: 0
       left: 0
@@ -42,7 +53,7 @@
       height: 100%
       background:
         color: #ffffff
-        image: url(/videos/v13-snap.png)
+        image: url(/videos/v.png)
         size: cover
       video
         height: auto

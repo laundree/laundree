@@ -23,6 +23,9 @@
       rel='stylesheet' type='text/css'>
 <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="/stylesheets/style.css"/>
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.en" defer></script>
+{{#if flash}}<script type="application/javascript">window.__FLASH_MESSAGES__ = {{{flash}}}</script>{{/if}}
+<script type="application/javascript" src="/javascripts/bundle.js" defer></script>
 {{#each styles}}
     <link rel="stylesheet" href="{{this}}"/>
 {{/each}}
