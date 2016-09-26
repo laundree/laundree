@@ -1,5 +1,9 @@
 sudo: required
 language: node
+cache:
+  directories:
+    - node_modules
+    - public/videos
 env:
   global:
   - secure: YcZTCqPR2u9xi76hGaJtkR2zrF7y6QBXwxXYTQXLFjaxst75udDYQE1SHLuB/83sXyvLQIlApJ8tdJTO4Q/diPiRLXHyxy8s9GKBsEVlhB9fqFMFk3nQ6P9ydtEiEXE0krTuaCyWuBE6ulL9H6AAY9EWKmbWD00i7HInO1whuHsugu8BPk946KYq3uL1OIRx8rpLSc3OMoCQFOkyrwY/LdrMWSeECTxZA+qJHs34mobFlWtjDWipfJ1zzk+l83boLKoJ0+5tB8kc/cR2v4v9C8A2kMfY+R6lBQ+gz3zOMVlIR8/TXcwB0nBu8+VAT7qhr6Xzlns/3BcuC6nEjeQR1+gcPXGLg6RHgsQuT0uEf/E/oJO1f61iWGpZRIdnNvmJQrqj9DhaG0MMbSV2nz37jYotwFYDfP4ulLI+DjKkJa7glXJ8MNhOjJt58HA+2GHfDXgBfZ1IKV9+qCC3GZASvfOiKO+H5zUDrd/CFyOZQx/8ibs7fcLrQHq3GAkRXBQqwIjlLHmyHVddV+eA2AyClDdgcWzOxPnKS1jr8HuXCx2M6v1JrRxqy1b2qBeRKqBWisKo0O67hAqGQ4f2/OkdBu76CLePvrHiIuX8SEUneUdjhX2JZcpyiOFKLAHOPxBgKi9XXCm1eKAPHbekVI4Tzv2EhC5ta1W/t6IBvjucNs4=

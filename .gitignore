@@ -32,7 +32,7 @@ npm-debug.log
 .idea
 
 *.ai
-public/videos
+
 reports
 config/local.yaml
 dist
