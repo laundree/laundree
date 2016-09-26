@@ -19,7 +19,12 @@ const Home = () => <DocumentTitle title='Home'>
         </div>
       </div>
       <div>
-        <video src='/videos/v.mp4' loop='loop' autoPlay/>
+        <video loop='loop' autoPlay preload='meta' poster='/videos/v.png'>
+          <source src='/videos/v.mp4' type='video/mp4'/>
+          <source src='/videos/v.mov' type='video/mov'/>
+          <source src='/videos/v.webm' type='video/webm'/>
+          <source src='/videos/v.ogv' type='video/ogg'/>
+        </video>
       </div>
     </header>
     <main>
