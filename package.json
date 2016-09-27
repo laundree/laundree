@@ -57,7 +57,7 @@
     "babel-eslint": "^6.0.2",
     "browserify": "^13.1.0",
     "chai": "^3.5.0",
-    "chai-as-promised": "^5.3.0",
+    "chai-as-promised": "^6.0.0",
     "chai-things": "^0.2.0",
     "codeclimate-test-reporter": "^0.3.1",
     "eslint": "^3.3.1",
