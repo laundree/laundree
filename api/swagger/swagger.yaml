@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.6"
+  version: "0.0.7"
   title: Laundree App
 
 host: laundree.io
@@ -1262,7 +1262,7 @@ definitions:
         type: string
       lastSeen:
         type: string
-        format: date
+        format: date-time
       name:
         properties:
           familyName: 
@@ -1356,7 +1356,7 @@ definitions:
         type: string
       lastSeen:
         type: string
-        format: date
+        format: date-time
       owner:
         $ref: "#/definitions/UserSummary"
   TokenWithSecret:
@@ -1377,7 +1377,7 @@ definitions:
         type: string
       lastSeen:
         type: string
-        format: date
+        format: date-time
       owner:
         $ref: "#/definitions/UserSummary"
 

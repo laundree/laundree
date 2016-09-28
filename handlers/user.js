@@ -337,7 +337,7 @@ class UserHandler extends Handler {
       .then((model) => ({
         id: this.model.id,
         displayName: this.model.displayName,
-        lastSeen: this.model.lastSeen,
+        lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
         name: {
           familyName: this.model.name.familyName,
           givenName: this.model.name.givenName,

@@ -68,6 +68,74 @@ describe('controllers', function () {
             })
         })
       })
+      it('should find user 2', (done) => {
+        UserHandler
+          .createUserWithPassword('Foo Bob Bårsen', 'foo@bar.com', 'password')
+          .then(user => {
+            request(app)
+              .get(`/api/users/${user.model.id}`)
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function (err, res) {
+                if (err) return done(err)
+                user.toRest()
+                  .then((u) => {
+                    const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
+                      o[k] = u[k]
+                      return o
+                    }, {})
+                    res.body.should.be.deep.equal(cleanUser)
+                    done()
+                  })
+                  .catch(done)
+              })
+          })
+      })
+      it('should find user 3', (done) => {
+        const UserModel = require('../../../models/user')
+        new UserModel({
+          updatedAt: new Date('2016-09-23T06:39:16.495Z'),
+          createdAt: new Date('2016-09-23T06:37:49.206Z'),
+          latestProvider: 'local',
+          profiles: [{
+            id: 'asdasdasd@gmail.com',
+            displayName: 'Bob Bobe Bobbesen',
+            provider: 'local',
+            photos: [{value: '/identicon/asdasdasd@gmail.com/150.svg'}],
+            emails: [{value: 'asdasdasd@gmail.com'}],
+            name: {givenName: 'Bob', middleName: 'Bobe', familyName: 'Bobbesen'}
+          }],
+          explicitVerificationEmailTokens: [],
+          explicitVerifiedEmails: ['asdasdasd@gmail.com'],
+          laundries: [],
+          authTokens: [],
+          password: 'asdasdasd',
+          lastSeen: new Date('2016-09-23T06:38:33.364Z')
+        })
+          .save()
+          .then(u => UserHandler.findFromId(u.id))
+          .then(user => {
+            request(app)
+              .get(`/api/users/${user.model.id}`)
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .end(function (err, res) {
+                if (err) return done(err)
+                user.toRest()
+                  .then((u) => {
+                    const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
+                      o[k] = u[k]
+                      return o
+                    }, {})
+                    res.body.should.be.deep.equal(cleanUser)
+                    done()
+                  })
+                  .catch(done)
+              })
+          })
+      })
     })
     describe('PUT /api/users/{id}', () => {
       it('should fail on auth', (done) => {
