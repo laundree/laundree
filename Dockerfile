@@ -21,6 +21,6 @@ COPY . /opt/laundree
 WORKDIR /opt/laundree
 RUN chown -R laundree:laundree /opt/laundree
 USER laundree
-RUN git lfs pull && npm install
+RUN git remote set-url origin https://github.com/laundree/laundree && git lfs pull && npm install
 CMD ["start"]
 ENTRYPOINT ["npm"]
