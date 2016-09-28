@@ -54,7 +54,7 @@
     "yamljs": "^0.2.7"
   },
   "devDependencies": {
-    "babel-eslint": "^6.0.2",
+    "babel-eslint": "^7.0.0",
     "browserify": "^13.1.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
