@@ -1,21 +1,28 @@
-var browserify = require('browserify-middleware')
-var babelify = require('babelify')
-var reactify = require('reactify')
-var express = require('express')
-var path = require('path')
-var router = express.Router()
+const browserify = require('browserify')
+const babelify = require('babelify')
+const express = require('express')
+const path = require('path')
+const router = express.Router()
+const tmp = require('tmp')
+const fs = require('fs')
 
 if (process.env.NODE_ENV !== 'production') {
-  babelify.configure({presets: ['es2015']})
-  browserify.settings({
-    transform: [reactify, babelify],
-    standalone: 'Laundree'
+  const bundlePathPromise = new Promise((resolve, reject) => {
+    const b = browserify(path.join(__dirname, '../client/index.js'), {
+      insertGlobals: true,
+      debug: true,
+      transform: [babelify]
+    })
+    tmp.file((err, path) => {
+      if (err) return reject(err)
+      const bundleStream = b.bundle()
+      bundleStream.pipe(fs.createWriteStream(path))
+      bundleStream.on('end', () => resolve(path))
+    })
   })
-
-  router.get('/bundle.js', browserify(path.join(__dirname, '../client/index.js'), {
-    cache: true,
-    precompile: true
-  }))
+  router.get('/bundle.js', (req, res, next) => {
+    bundlePathPromise.then(path => fs.createReadStream(path).pipe(res))
+  })
 }
 
 module.exports = router

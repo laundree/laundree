@@ -10,7 +10,7 @@
     "babelify": "^7.2.0",
     "bcrypt": "^0.8.6",
     "body-parser": "~1.15.2",
-    "browserify-middleware": "^7.0.0",
+    "browserify": "^13.1.0",
     "config": "^1.20.1",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.0.2",
@@ -51,6 +51,7 @@
     "socket.io-redis": "^1.0.0",
     "superagent": "^2.1.0",
     "swagger-tools": "^0.10.1",
+    "tmp": "0.0.29",
     "yamljs": "^0.2.7"
   },
   "devDependencies": {
