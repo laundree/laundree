@@ -149,6 +149,50 @@ describe('controllers', function () {
         }))
     })
 
+    describe('POST /api/laundries/demo', () => {
+      it('should create a new user', () => request(app)
+        .post('/api/laundries/demo')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+        .then(res => UserHandler.findFromEmail(res.body.email).then(user => {
+          assert(user)
+        })))
+
+      it('should create a new user with one-time password', () => request(app)
+        .post('/api/laundries/demo')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+        .then(res => UserHandler.findFromEmail(res.body.email).then(user => user
+          .verifyPassword(res.body.password).then(result => {
+            assert(result)
+            return user.verifyPassword(res.body.password).should.eventually.be.false
+          }))))
+
+      it('should create a new user with one-time password', () => request(app)
+        .post('/api/laundries/demo')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+        .then(res => UserHandler.findFromEmail(res.body.email).then(user => {
+          assert(user.isVerified(res.body.email))
+        })))
+
+      it('should create a new user with a laundry', () => request(app)
+        .post('/api/laundries/demo')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+        .then(res => UserHandler.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(laundries => {
+          laundries.should.have.length(1)
+        }))))
+
+      it('should create a new user with a laundry and two machines', () => request(app)
+        .post('/api/laundries/demo')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+        .then(res => UserHandler.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(([laundry]) => {
+          laundry.machineIds.should.have.length(2)
+        }))))
+    })
+
     describe('GET /api/laundries/{id}', () => {
       it('should fail on not authenticated', () => request(app)
         .get('/api/laundries/id')
@@ -408,6 +452,21 @@ describe('controllers', function () {
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
             .expect(204)))
+
+      it('should fail if demo', () =>
+        dbUtils.populateLaundries(1)
+          .then(({user, token, laundry}) => {
+            laundry.model.demo = true
+            return laundry.model.save().then(() => ({user, token, laundry}))
+          })
+          .then(({user, token, laundry}) =>
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: 'alice@example.com'})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(403)))
 
       it('should create invitation', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>

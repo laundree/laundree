@@ -8,7 +8,7 @@ const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const utils = require('../utils')
 const Promise = require('promise')
-
+const uuid = require('uuid')
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -216,6 +216,10 @@ class UserHandler extends Handler {
     })
   }
 
+  isVerified (email) {
+    return this.model.verifiedEmails.indexOf(email) >= 0
+  }
+
   /**
    * Create a new user from given profile.
    * @param {Profile} profile
@@ -255,6 +259,33 @@ class UserHandler extends Handler {
       })
   }
 
+  /**
+   * Create a demo user
+   * @returns {Promise.<{email: string, password: string}>}
+   */
+  static createDemoUser () {
+    const displayName = 'Demo user'
+    const email = `demo-user-${uuid.v4()}@laundree.io`
+    const profile = {
+      id: email,
+      displayName,
+      name: displayNameToName(displayName),
+      provider: 'local',
+      emails: [{value: email}],
+      photos: [{value: `/identicon/${email}/150.svg`}]
+    }
+    return Promise
+      .all([
+        UserHandler.createUserFromProfile(profile),
+        utils.password.generateTokenAndHash()
+      ])
+      .then(([user, {token, hash}]) => {
+        user.model.oneTimePassword = hash
+        user.model.explicitVerifiedEmails.push(email)
+        return user.model.save().then(() => ({password: token, user, email}))
+      })
+  }
+
   addLaundriesFromInvites () {
     const LaundryHandler = require('./laundry')
     return LaundryInvitationHandler
@@ -281,14 +312,26 @@ class UserHandler extends Handler {
   get hasPassword () {
     return Boolean(this.model.password)
   }
+
   /**
    * Verifies given password.
    * @param {string} password
    * @return {Promise.<boolean>}
    */
   verifyPassword (password) {
-    if (!this.model.password) return Promise.resolve(false)
-    return utils.password.comparePassword(password, this.model.password)
+    if (this.model.password) return utils.password.comparePassword(password, this.model.password)
+    return this.verifyOneTimePassword(password)
+  }
+
+  verifyOneTimePassword (password) {
+    if (!this.model.oneTimePassword) return Promise.resolve(false)
+    return utils.password
+      .comparePassword(password, this.model.oneTimePassword)
+      .then(result => {
+        if (!result) return result
+        this.model.oneTimePassword = undefined
+        return this.model.save().then(() => true)
+      })
   }
 
   /**

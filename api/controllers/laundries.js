@@ -38,6 +38,15 @@ function createLaundry (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function createDemoLaundry (req, res) {
+  UserHandler
+    .createDemoUser()
+    .then(({user, email, password}) => LaundryHandler
+      .createDemoLaundry(user)
+      .then(() => api.returnSuccess(res, {email, password})))
+    .catch(api.generateErrorHandler(res))
+}
+
 function updateLaundry (req, res) {
   const {laundry} = req.subjects
   const name = req.swagger.params.body.value.name.trim()
@@ -66,6 +75,7 @@ function deleteLaundry (req, res) {
 function inviteUserByEmail (req, res) {
   const email = req.swagger.params.body.value.email
   const laundry = req.subjects.laundry
+  if (laundry.model.demo) return api.returnError(res, 403, 'Not allowed')
   return laundry
     .inviteUserByEmail(email)
     .then(({user, invite}) => {
@@ -90,6 +100,7 @@ function removeUserFromLaundry (req, res) {
 }
 
 module.exports = {
+  createDemoLaundry,
   inviteUserByEmail,
   listLaundries,
   updateLaundry,

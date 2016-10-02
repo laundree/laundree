@@ -9,6 +9,7 @@ const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
 const Promise = require('promise')
 const debug = require('debug')('laundree.handlers.laundry')
+const uuid = require('uuid')
 
 class LaundryHandler extends Handler {
 
@@ -16,13 +17,15 @@ class LaundryHandler extends Handler {
    * Create a new laundry.
    * @param {UserHandler} owner
    * @param {string} name
+   * @param {boolean} demo
    * @return {Promise.<LaundryHandler>}
    */
-  static createLaundry (owner, name) {
+  static createLaundry (owner, name, demo = false) {
     return new LaundryModel({
-      name: name,
+      name,
       owners: [owner.model._id],
-      users: [owner.model._id]
+      users: [owner.model._id],
+      demo
     })
       .save()
       .then((model) => new LaundryHandler(model))
@@ -30,6 +33,14 @@ class LaundryHandler extends Handler {
         laundry.emitEvent('create')
         return owner._addLaundry(laundry).then(() => laundry)
       })
+  }
+
+  static createDemoLaundry (owner) {
+    const name = `Demo Laundry ${uuid.v4()}`
+    return LaundryHandler
+      .createLaundry(owner, name, true)
+      .then(laundry => [{name: 'Washer', type: 'wash'}, {name: 'Dryer', type: 'dry'}]
+        .reduce((prom, {name, type}) => prom.then(() => laundry.createMachine(name, type)), Promise.resolve()))
   }
 
   /**

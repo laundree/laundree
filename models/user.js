@@ -6,6 +6,7 @@ var Schema = mongoose.Schema
 const {union} = require('../utils/array')
 
 var userSchema = new Schema({
+  oneTimePassword: {type: String},
   password: {type: String},
   resetPasswordToken: String,
   resetPasswordExpire: Date,

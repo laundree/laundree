@@ -52,6 +52,7 @@
     "superagent": "^2.1.0",
     "swagger-tools": "^0.10.1",
     "tmp": "0.0.29",
+    "uuid": "^2.0.3",
     "yamljs": "^0.2.7"
   },
   "devDependencies": {

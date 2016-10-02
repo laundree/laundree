@@ -12,3 +12,5 @@ var library = new initializers.InitializerLibrary()
 library.registerInitializer(initializers.AppInitializer)
 
 library.setup()
+
+module.exports = {sdk: require('./sdk')}
