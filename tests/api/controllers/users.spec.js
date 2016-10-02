@@ -1,11 +1,10 @@
-var request = require('supertest')
+var request = require('supertest-as-promised')
 var app = require('../../../app').app
 var chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 
-var assert = chai.assert
 var dbUtils = require('../../db_utils')
 const {UserHandler, TokenHandler} = require('../../../handlers')
 const Promise = require('promise')
@@ -15,46 +14,34 @@ describe('controllers', function () {
   describe('users', function () {
     this.timeout(5000)
     describe('GET /api/users/{id}', () => {
-      it('should fail on auth', (done) => {
+      it('should fail on auth', () =>
+        request(app)
+          .get('/api/users/asd123')
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/))
+
+      it('should return error', () =>
         request(app)
           .get('/api/users/asd123')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .end(function (err) {
-            done(err)
-          })
-      })
+          .expect(404))
 
-      it('should return error', (done) => {
-        request(app)
-          .get('/api/users/asd123')
-          .set('Accept', 'application/json')
-          .expect('Content-Type', /json/)
-          .expect(404)
-          .end(function (err) {
-            done(err)
-          })
-      })
-
-      it('should return error on missing but right format', (done) => {
+      it('should return error on missing but right format', () =>
         request(app)
           .get('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(404)
-          .end(function (err) {
-            done(err)
-          })
-      })
-      it('should find user', (done) => {
+          .expect(404))
+
+      it('should find user', () =>
         dbUtils.populateUsers(10).then((users) => {
           request(app)
             .get(`/api/users/${users[5].model.id}`)
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
-            .end(function (err, res) {
-              if (err) return done(err)
+            .then(res =>
               users[5].toRest()
                 .then((u) => {
                   const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
@@ -62,23 +49,20 @@ describe('controllers', function () {
                     return o
                   }, {})
                   res.body.should.be.deep.equal(cleanUser)
-                  done()
                 })
-                .catch(done)
-            })
-        })
-      })
-      it('should find user 2', (done) => {
+            )
+        }))
+
+      it('should find user 2', () =>
         UserHandler
           .createUserWithPassword('Foo Bob Bårsen', 'foo@bar.com', 'password')
-          .then(user => {
+          .then(user =>
             request(app)
               .get(`/api/users/${user.model.id}`)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
               .expect(200)
-              .end(function (err, res) {
-                if (err) return done(err)
+              .then(res =>
                 user.toRest()
                   .then((u) => {
                     const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
@@ -86,15 +70,11 @@ describe('controllers', function () {
                       return o
                     }, {})
                     res.body.should.be.deep.equal(cleanUser)
-                    done()
-                  })
-                  .catch(done)
-              })
-          })
-      })
-      it('should find user 3', (done) => {
+                  }))))
+
+      it('should find user 3', () => {
         const UserModel = require('../../../models/user')
-        new UserModel({
+        return new UserModel({
           updatedAt: new Date('2016-09-23T06:39:16.495Z'),
           createdAt: new Date('2016-09-23T06:37:49.206Z'),
           latestProvider: 'local',
@@ -121,8 +101,7 @@ describe('controllers', function () {
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
               .expect(200)
-              .end(function (err, res) {
-                if (err) return done(err)
+              .then(res => {
                 user.toRest()
                   .then((u) => {
                     const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
@@ -130,230 +109,176 @@ describe('controllers', function () {
                       return o
                     }, {})
                     res.body.should.be.deep.equal(cleanUser)
-                    done()
                   })
-                  .catch(done)
               })
           })
       })
     })
     describe('PUT /api/users/{id}', () => {
-      it('should fail on auth', (done) => {
+      it('should fail on auth', () =>
         request(app)
           .put('/api/users/asd123')
           .send({name: 'Kurt Frandsen'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403)
-          .end(function (err) {
-            done(err)
-          })
-      })
+          .expect(403))
 
-      it('should return error on missing but right format', (done) => {
+      it('should return error on missing but right format', () =>
         dbUtils
           .populateTokens(1)
-          .then(({token, user}) => {
+          .then(({token, user}) =>
             request(app)
               .put('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
               .send({name: 'Kurt Frandsen'})
               .auth(user.model.id, token.secret)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
-              .expect(403)
-              .end(err => done(err))
-          })
-      })
-      it('should update user', (done) => {
-        dbUtils.populateTokens(1).then(({user, token}) => {
+              .expect(404)))
+
+      it('should update user', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
           request(app)
             .put(`/api/users/${user.model.id}`)
             .auth(user.model.id, token.secret)
             .send({name: 'Kurt Frandsen'})
             .set('Accept', 'application/json')
             .expect(204)
-            .end(function (err, res) {
-              if (err) return done(err)
-              return UserHandler.find({_id: user.model._id})
+            .then(res =>
+              UserHandler.find({_id: user.model._id})
                 .then(([user]) => {
                   user.model.displayName.should.equal('Kurt Frandsen')
-                })
-                .then(() => done(), done)
-            })
-        })
-      })
-      it('should not update user', (done) => {
+                }))))
+      it('should not update user', () =>
         Promise
           .all([
             dbUtils.populateTokens(1),
             dbUtils.populateTokens(1)
           ])
-          .then(([{user: user1, token}, {user: user2}]) => {
+          .then(([{user: user1, token}, {user: user2}]) =>
             request(app)
               .put(`/api/users/${user2.model.id}`)
               .auth(user1.model.id, token.secret)
               .send({name: 'Kurt Frandsen'})
               .set('Accept', 'application/json')
-              .expect(403)
-              .end(err => done(err))
-          })
-      })
+              .expect(403)))
     })
 
     describe('POST /api/users/{id}/password-change', () => {
-      it('should fail on auth', (done) => {
+      it('should fail on auth', () =>
         request(app)
           .post('/api/users/asd123/password-change')
           .send({currentPassword: 'password', newPassword: 'password'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403)
-          .end(function (err) {
-            done(err)
-          })
-      })
+          .expect(403))
 
-      it('should return error on missing but right format', (done) => {
+      it('should return error on missing but right format', () =>
         dbUtils
           .populateTokens(1)
-          .then(({token, user}) => {
+          .then(({token, user}) =>
             request(app)
               .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/password-change')
               .send({currentPassword: 'password', newPassword: 'password'})
               .auth(user.model.id, token.secret)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
-              .expect(403)
-              .end(err => done(err))
-          })
-      })
-      it('should update user', (done) => {
-        dbUtils.populateTokens(1).then(({user, token}) => {
+              .expect(404)))
+
+      it('should update user', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
           user
             .resetPassword('password')
-            .then(() => {
+            .then(() =>
               request(app)
                 .post(`/api/users/${user.model.id}/password-change`)
                 .auth(user.model.id, token.secret)
                 .send({currentPassword: 'password', newPassword: 'password2'})
                 .set('Accept', 'application/json')
                 .expect(204)
-                .end(function (err, res) {
-                  if (err) return done(err)
-                  return UserHandler
-                    .find({_id: user.model._id})
-                    .then(([user]) => {
-                      return user
-                        .verifyPassword('password2')
-                        .then(r => Boolean(r))
-                        .should
-                        .eventually.be.true
-                    })
-                    .then(() => done(), done)
-                })
-            })
-        })
-      })
-      it('should update user when no current password', (done) => {
-        dbUtils.populateTokens(1).then(({user, token}) => {
+                .then(res => UserHandler
+                  .find({_id: user.model._id})
+                  .then(([user]) => user
+                    .verifyPassword('password2')
+                    .then(r => Boolean(r))
+                    .should
+                    .eventually.be.true)))))
+
+      it('should update user when no current password', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
           request(app)
             .post(`/api/users/${user.model.id}/password-change`)
             .auth(user.model.id, token.secret)
             .send({currentPassword: 'password', newPassword: 'password2'})
             .set('Accept', 'application/json')
             .expect(204)
-            .end(function (err, res) {
-              if (err) return done(err)
-              return UserHandler
-                .find({_id: user.model._id})
-                .then(([user]) => {
-                  return user
-                    .verifyPassword('password2')
-                    .then(r => Boolean(r))
-                    .should
-                    .eventually.be.true
-                })
-                .then(() => done(), done)
-            })
-        })
-      })
-      it('should fail with invalid input', (done) => {
-        dbUtils.populateTokens(1).then(({user, token}) => {
+            .then(res => UserHandler
+              .find({_id: user.model._id})
+              .then(([user]) => user
+                .verifyPassword('password2')
+                .then(r => Boolean(r))
+                .should.eventually.be.true))))
+
+      it('should fail with invalid input', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
           request(app)
             .post(`/api/users/${user.model.id}/password-change`)
             .auth(user.model.id, token.secret)
             .send({currentPassword: 'p', newPassword: 'p2'})
             .set('Accept', 'application/json')
-            .expect(400)
-            .end(err => done(err))
-        })
-      })
-      it('should fail with wrong current password', (done) => {
-        dbUtils.populateTokens(1).then(({user, token}) => {
+            .expect(400)))
+
+      it('should fail with wrong current password', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
           user
             .resetPassword('password')
-            .then(() => {
+            .then(() =>
               request(app)
                 .post(`/api/users/${user.model.id}/password-change`)
                 .auth(user.model.id, token.secret)
                 .send({currentPassword: 'password1', newPassword: 'password2'})
                 .set('Accept', 'application/json')
-                .expect(403)
-                .end(err => done(err))
-            })
-        })
-      })
-      it('should not update user', (done) => {
+                .expect(403))))
+
+      it('should not update user', () =>
         Promise
           .all([
             dbUtils.populateTokens(1),
             dbUtils.populateTokens(1)
           ])
-          .then(([{user: user1, token}, {user: user2}]) => {
+          .then(([{user: user1, token}, {user: user2}]) =>
             request(app)
               .post(`/api/users/${user2.model.id}/password-change`)
               .auth(user1.model.id, token.secret)
               .send({currentPassword: 'password', newPassword: 'password'})
               .set('Accept', 'application/json')
-              .expect(403)
-              .end(err => done(err))
-          })
-      })
+              .expect(403)))
     })
 
     describe('GET /api/users', () => {
-      it('should return an empty list', (done) => {
+      it('should return an empty list', () =>
         request(app)
           .get('/api/users')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect('Link', /rel=.first./)
           .expect(200)
-          .end(function (err, res) {
-            // noinspection BadExpressionStatementJS
-            assert(!err)
-            res.body.should.deep.equal([])
-            done()
-          })
-      })
-      it('should limit output size', (done) => {
-        dbUtils.populateUsers(100).then((users) => {
+          .then(res => res.body.should.deep.equal([])))
+
+      it('should limit output size', () =>
+        dbUtils.populateUsers(100).then((users) =>
           request(app)
             .get('/api/users')
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .expect(200)
-            .end(function (err, res) {
-              assert(!err)
+            .then(res => {
               var arr = users.slice(0, 10).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
-              done()
-            })
-        })
-      })
-      it('should allow custom output size', (done) => {
-        dbUtils.populateUsers(100).then((users) => {
+            })))
+
+      it('should allow custom output size', () =>
+        dbUtils.populateUsers(100).then((users) =>
           request(app)
             .get('/api/users')
             .query({page_size: 12})
@@ -361,16 +286,13 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .expect(200)
-            .end(function (err, res) {
-              assert(!err)
+            .then(res => {
               var arr = users.slice(0, 12).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
-              done()
-            })
-        })
-      })
-      it('should allow since', (done) => {
-        dbUtils.populateUsers(100).then((users) => {
+            })))
+
+      it('should allow since', () =>
+        dbUtils.populateUsers(100).then((users) =>
           request(app)
             .get('/api/users')
             .query({since: users[55].model.id, page_size: 1})
@@ -378,15 +300,10 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .expect(200)
-            .end(function (err, res) {
-              assert(!err)
-              res.body.should.deep.equal([users[56].toRestSummary()])
-              done()
-            })
-        })
-      })
-      it('should allow email filter', (done) => {
-        dbUtils.populateUsers(10).then((users) => {
+            .then(res => res.body.should.deep.equal([users[56].toRestSummary()]))))
+
+      it('should allow email filter', () =>
+        dbUtils.populateUsers(10).then((users) =>
           request(app)
             .get('/api/users')
             .query({email: users[5].model.emails[0]})
@@ -394,370 +311,262 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .expect(200)
-            .end(function (err, res) {
-              assert(!err)
-              res.body.should.be.deep.equal([users[5].toRestSummary()])
-              done()
-            })
-        })
-      })
+            .then(res => res.body.should.be.deep.equal([users[5].toRestSummary()]))))
     })
 
     describe('POST /api/users', () => {
-      it('should succede with right body', (done) => {
+      it('should succede with right body', () =>
         request(app)
           .post('/api/users')
           .send({displayName: 'Bob Bobbesen', email: 'bob@example.com', password: 'password1234'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
-          .end(() => {
-            UserHandler.findFromEmail('bob@example.com').then((u) => {
-              u.should.not.be.undefined
-              done()
-            })
-          })
-      })
-      it('should fail on invalid email in body', (done) => {
+          .then(() => UserHandler.findFromEmail('bob@example.com').then((u) => u.should.not.be.undefined)))
+
+      it('should fail on invalid email in body', () =>
         request(app)
           .post('/api/users')
           .send({displayName: 'Bob Bobbesen', email: 'invalid', password: 'password1234'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(400)
-          .end(() => {
-            done()
-          })
-      })
-      it('should fail on invalid name in body', (done) => {
+          .expect(400))
+
+      it('should fail on invalid name in body', () =>
         request(app)
           .post('/api/users')
           .send({displayName: '', email: 'a@example.com', password: 'password1234'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(400)
-          .end(() => {
-            done()
-          })
-      })
-      it('should fail on invalid password in body', (done) => {
+          .expect(400))
+
+      it('should fail on invalid password in body', () =>
         request(app)
           .post('/api/users')
           .send({displayName: 'Bob', email: 'a@example.com', password: 'asdfg'})
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(400)
-          .end(() => {
-            done()
-          })
-      })
+          .expect(400))
     })
 
     describe('POST /api/users/{id}/start-password-reset', () => {
-      it('should fail on no user', (done) => {
-        dbUtils.populateUsers(2).then(() => {
+      it('should fail on no user', () =>
+        dbUtils.populateUsers(2).then(() =>
           request(app)
             .post('/api/users/aaa/start-password-reset')
             .set('Accept', 'application/json')
             .send()
             .expect('Content-Type', /json/)
-            .expect(404)
-            .end((err) => done(err))
-        })
-      })
+            .expect(404)))
 
-      it('should fail on no user', (done) => {
-        dbUtils.populateUsers(2).then((users) => {
+      it('should fail on no user', () =>
+        dbUtils.populateUsers(2).then(() =>
           request(app)
             .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/start-password-reset')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send()
             .expect('Content-Type', /json/)
-            .expect(404)
-            .end((err) => done(err))
-        })
-      })
+            .expect(404)))
 
-      it('should succeed', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var [user] = users
+      it('should succeed', () =>
+        dbUtils.populateUsers(1).then(([user]) =>
           request(app)
             .post(`/api/users/${user.model.id}/start-password-reset`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send()
-            .expect(204)
-            .end(done)
-        })
-      })
+            .expect(204)))
     })
 
     describe('POST /api/users/{id}/start-email-verification', () => {
-      it('should fail on no user', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var [user] = users
+      it('should fail on no user', () =>
+        dbUtils.populateUsers(1).then(([user]) =>
           request(app)
             .post('/api/users/aaa/start-email-verification')
             .set('Accept', 'application/json')
             .send({email: user.model.emails[0]})
             .expect('Content-Type', /json/)
-            .expect(404)
-            .end((err) => done(err))
-        })
-      })
+            .expect(404)))
 
-      it('should fail on no user', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var [user] = users
+      it('should fail on no user', () =>
+        dbUtils.populateUsers(1).then(([user]) =>
           request(app)
             .post('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa/start-email-verification')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({email: user.model.emails[0]})
             .expect('Content-Type', /json/)
-            .expect(404)
-            .end((err) => done(err))
-        })
-      })
+            .expect(404)))
 
-      it('should succeed', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var [user] = users
+      it('should succeed', () =>
+        dbUtils.populateUsers(1).then(([user]) =>
           request(app)
             .post(`/api/users/${user.model.id}/start-email-verification`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({email: user.model.emails[0]})
-            .expect(204)
-            .end(done)
-        })
-      })
-      it('should succeed on crazy case', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var [user] = users
+            .expect(204)))
+
+      it('should succeed on crazy case', () =>
+        dbUtils.populateUsers(1).then(([user]) =>
           request(app)
             .post(`/api/users/${user.model.id}/start-email-verification`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({email: user.model.emails[0].toUpperCase()})
-            .expect(204)
-            .end(done)
-        })
-      })
-      it('should fail on wrong email', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var [user] = users
+            .expect(204)))
+
+      it('should fail on wrong email', () =>
+        dbUtils.populateUsers(1).then(([user]) =>
           request(app)
             .post(`/api/users/${user.model.id}/start-email-verification`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({email: 'not-right-' + user.model.emails[0]})
-            .expect(400)
-            .end(done)
-        })
-      })
+            .expect(400)))
     })
 
     describe('POST /api/users/{id}/password-reset', () => {
-      it('should fail on no body', (done) => {
-        dbUtils.populateUsers(2).then((users) => {
+      it('should fail on no body', () =>
+        dbUtils.populateUsers(2).then((users) =>
           request(app)
             .post(`/api/users/${users[0].model.id}/password-reset`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({})
-            .expect(400)
-            .end((err) => done(err))
-        })
-      })
+            .expect(400)))
 
-      it('fail on no token', (done) => {
-        dbUtils.populateUsers(2).then((users) => {
+      it('fail on no token', () =>
+        dbUtils.populateUsers(2).then((users) =>
           request(app)
             .post(`/api/users/${users[0].model.id}/password-reset`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({token: 'someToken', password: 'password1234'})
-            .expect(400)
-            .end((err) => done(err))
-        })
-      })
+            .expect(400)))
 
-      it('fail on invalid password', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var user = users[0]
-          return user.generateResetToken().then((token) => [user, token])
-        }).then((result) => {
-          // noinspection UnnecessaryLocalVariableJS
-          var [user, token] = result
-          request(app)
-            .post(`/api/users/${user.model.id}/password-reset`)
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .send({token: token, password: 'pass'})
-            .expect(400)
-            .end((err) => done(err))
-        })
-      })
-      it('success on right token', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var user = users[0]
-          return user.generateResetToken().then((token) => [user, token])
-        }).then((result) => {
-          // noinspection UnnecessaryLocalVariableJS
-          var [user, token] = result
-          request(app)
-            .post(`/api/users/${user.model.id}/password-reset`)
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .send({token: token, password: 'password1234'})
-            .expect(204)
-            .end((err) => done(err))
-        })
-      })
+      it('fail on invalid password', () =>
+        dbUtils.populateUsers(1)
+          .then(([user]) => user.generateResetToken().then((token) => ({user, token})))
+          .then(({user, token}) =>
+            request(app)
+              .post(`/api/users/${user.model.id}/password-reset`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .send({token: token, password: 'pass'})
+              .expect(400)))
 
-      it('fail on no invalid id', (done) => {
+      it('success on right token', () =>
+        dbUtils.populateUsers(1)
+          .then(([user]) => user.generateResetToken().then((token) => ({user, token})))
+          .then(({user, token}) =>
+            request(app)
+              .post(`/api/users/${user.model.id}/password-reset`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .send({token: token, password: 'password1234'})
+              .expect(204)))
+
+      it('fail on no invalid id', () =>
         request(app)
           .post('/api/users/aaa/password-reset')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .send({token: 'asdasdasdaasdsaasd', password: 'password1'})
-          .expect(404)
-          .end((err) => done(err))
-      })
+          .expect(404))
     })
 
     describe('POST /api/users/{id}/verify-email', () => {
-      it('should fail on no body', (done) => {
-        dbUtils.populateUsers(2).then((users) => {
+      it('should fail on no body', () =>
+        dbUtils.populateUsers(2).then((users) =>
           request(app)
             .post(`/api/users/${users[0].model.id}/verify-email`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({})
-            .expect(400)
-            .end((err) => done(err))
-        })
-      })
+            .expect(400)))
 
-      it('fail on no token', (done) => {
-        dbUtils.populateUsers(2).then((users) => {
+      it('fail on no token', () =>
+        dbUtils.populateUsers(2).then((users) =>
           request(app)
             .post(`/api/users/${users[0].model.id}/verify-email`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({token: 'someToken', email: users[0].model.emails[0]})
-            .expect(400)
-            .end((err) => done(err))
-        })
-      })
-      it('fail on invalid email', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var user = users[0]
-          return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
-        }).then((result) => {
-          // noinspection UnnecessaryLocalVariableJS
-          var [user, token] = result
-          request(app)
+            .expect(400)))
+
+      it('fail on invalid email', () =>
+        dbUtils.populateUsers(1)
+          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0]).then((token) => ({user, token})))
+          .then(({user, token}) => request(app)
             .post(`/api/users/${user.model.id}/password-reset`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({token: token, email: 'bob'})
-            .expect(400)
-            .end((err) => done(err))
-        })
-      })
-      it('success on right token', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var user = users[0]
-          return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
-        }).then((result) => {
-          // noinspection UnnecessaryLocalVariableJS
-          var [user, token] = result
-          request(app)
+            .expect(400)))
+
+      it('success on right token', () =>
+        dbUtils.populateUsers(1)
+          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0]).then((token) => ({user, token})))
+          .then(({user, token}) => request(app)
             .post(`/api/users/${user.model.id}/verify-email`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({token: token, email: user.model.emails[0]})
-            .expect(204)
-            .end((err) => done(err))
-        })
-      })
-      it('success on crazy case token', (done) => {
-        dbUtils.populateUsers(1).then((users) => {
-          var user = users[0]
-          return user.generateVerifyEmailToken(user.model.emails[0]).then((token) => [user, token])
-        }).then((result) => {
-          // noinspection UnnecessaryLocalVariableJS
-          var [user, token] = result
-          request(app)
+            .expect(204)))
+
+      it('success on crazy case token', () =>
+        dbUtils.populateUsers(1)
+          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0]).then((token) => ({user, token})))
+          .then(({user, token}) => request(app)
             .post(`/api/users/${user.model.id}/verify-email`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({token: token, email: user.model.emails[0].toUpperCase()})
-            .expect(204)
-            .end((err) => done(err))
-        })
-      })
+            .expect(204)))
 
-      it('fail on no invalid id', (done) => {
+      it('fail on no invalid id', () =>
         request(app)
           .post('/api/users/aaa/verify-email')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .send({token: 'asdasdasdaasdsaasd', email: 'bob@bobs.dk'})
-          .expect(404)
-          .end((err) => done(err))
-      })
+          .expect(404))
     })
     describe('DELETE /users/{id}', () => {
-      it('should fail on not authenticated', (done) => {
+      it('should fail on not authenticated', () =>
         request(app)
           .delete('/api/users/id')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403)
-          .end((err, res) => done(err))
-      })
-      it('should return 403 on invalid id', (done) => {
-        dbUtils.populateTokens(1).then(({user, tokens}) => {
+          .expect(403))
+
+      it('should return 403 on invalid id', () =>
+        dbUtils.populateTokens(1).then(({user, tokens}) =>
           request(app)
             .delete('/api/users/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, tokens[0].secret)
             .expect('Content-Type', /json/)
-            .expect(403)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Not allowed'})
-              done()
-            })
-        })
-      })
-      it('should return 403 on missing id', (done) => {
-        dbUtils.populateTokens(1).then(({user, tokens}) => {
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+      it('should return 403 on missing id', () =>
+        dbUtils.populateTokens(1).then(({user, tokens}) =>
           request(app)
             .delete('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, tokens[0].secret)
             .expect('Content-Type', /json/)
-            .expect(403)
-            .end((err, res) => {
-              if (err) return done(err)
-              res.body.should.deep.equal({message: 'Not allowed'})
-              done()
-            })
-        })
-      })
-      it('should return 403 on other id', (done) => {
-        dbUtils.populateTokens(1).then(({user}) => {
-          const user1 = user
-          dbUtils.populateTokens(1).then(({user, tokens}) => {
-            const [token2] = tokens
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should return 403 on other id', () =>
+        dbUtils.populateTokens(1).then(({user: user1}) =>
+          dbUtils.populateTokens(1).then(({user, token: token2}) =>
             request(app)
               .delete(`/api/users/${user1.model.id}`)
               .set('Accept', 'application/json')
@@ -765,35 +574,24 @@ describe('controllers', function () {
               .auth(user.model.id, token2.secret)
               .expect(403)
               .expect('Content-Type', /json/)
-              .end((err, res) => {
-                if (err) return done(err)
-                res.body.should.deep.equal({message: 'Not allowed'})
-                done()
-              })
-          })
-        })
-      })
-      it('should succeed', (done) => {
-        dbUtils.populateTokens(1).then(({user, tokens}) => {
+              .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
+
+      it('should succeed', () =>
+        dbUtils.populateTokens(1).then(({user, tokens}) =>
           request(app)
             .delete(`/api/users/${user.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, tokens[0].secret)
             .expect(204)
-            .end((err, res) => {
-              if (err) return done(err)
+            .then(res =>
               Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(tokens[0].model.id)])
                 .then((result) => {
                   result.should.be.deep.equal([undefined, undefined])
-                  done()
-                })
-                .catch(done)
-            })
-        })
-      })
-      it('should fail on owner', (done) => {
-        dbUtils.populateLaundries(1).then(({user, token}) => {
+                }))))
+
+      it('should fail on owner', () =>
+        dbUtils.populateLaundries(1).then(({user, token}) =>
           request(app)
             .delete(`/api/users/${user.model.id}`)
             .set('Accept', 'application/json')
@@ -801,38 +599,22 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(403)
             .expect('Content-Type', /json/)
-            .end((err, res) => {
-              if (err) done(err)
-              res.body.should.deep.equal({message: 'Not allowed'})
-              done()
-            })
-        })
-      })
-      it('should succeed when only user', (done) => {
-        dbUtils.populateTokens(1).then(({user, tokens}) => {
-          const [token] = tokens
-          return dbUtils.populateLaundries(1).then(({laundry}) => {
-            return laundry.addUser(user)
-              .then(() => {
+            .then(res => res.body.should.deep.equal({message: 'Not allowed'}))))
+
+      it('should succeed when only user', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
+          dbUtils.populateLaundries(1).then(({laundry}) =>
+            laundry.addUser(user)
+              .then(() =>
                 request(app)
                   .delete(`/api/users/${user.model.id}`)
                   .set('Accept', 'application/json')
                   .set('Content-Type', 'application/json')
                   .auth(user.model.id, token.secret)
                   .expect(204)
-                  .end((err, res) => {
-                    if (err) return done(err)
-                    Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(token.model.id)])
-                      .then((result) => {
-                        result.should.be.deep.equal([undefined, undefined])
-                        done()
-                      })
-                      .catch(done)
-                  })
-              })
-          })
-        }).catch(done)
-      })
+                  .then(res => Promise
+                    .all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(token.model.id)])
+                    .then((result) => result.should.be.deep.equal([undefined, undefined])))))))
     })
   })
 })
