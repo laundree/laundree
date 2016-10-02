@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.0.7"
+  version: "0.1.0"
   title: Laundree App
 
 host: laundree.io
@@ -616,6 +616,36 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/Laundry"
+        "409":
+          description: Conflict
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /laundries/demo:
+    x-swagger-router-controller: laundries
+    post:
+      tags:
+        - Laundries
+      description: Create a demo laundry
+      operationId: createDemoLaundry
+      parameters: []
+      responses:
+        "200":
+          description: Success
+          schema:
+            properties:
+              email:
+                type: string
+                format: email
+              password:
+                $ref: "#/definitions/password"
         "409":
           description: Conflict
           schema:

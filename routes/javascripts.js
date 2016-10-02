@@ -10,6 +10,7 @@ if (process.env.NODE_ENV !== 'production') {
   const bundlePathPromise = new Promise((resolve, reject) => {
     const b = browserify(path.join(__dirname, '../client/index.js'), {
       insertGlobals: true,
+      standalone: 'Laundree',
       debug: true,
       transform: [babelify]
     })

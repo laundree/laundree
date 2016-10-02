@@ -26,13 +26,13 @@ function returnError (res, statusCode, message, headers = {}) {
 /**
  * Return success
  * @param res
- * @param {Promise=} result
+ * @param {(Promise|Object)=} result
  * @returns {number|*}
  */
 function returnSuccess (res, result) {
   res.statusCode = result ? 200 : 204
   if (!result) return res.end()
-  result
+  Promise.resolve(result)
     .then((result) => res.json(result))
     .catch(error.logError)
 }

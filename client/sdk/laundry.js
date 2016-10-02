@@ -16,6 +16,16 @@ class LaundryClientSdk {
       .then((response) => response.body || null)
   }
 
+  /**
+   * Create a demo landry
+   * @returns {Promise.<{email: string, password: string}>}
+   */
+  static createDemoLaundry () {
+    return request
+      .post('/api/laundries/demo')
+      .then(({body}) => body)
+  }
+
   updateName (name) {
     return request
       .put(`/api/laundries/${this.id}`)

@@ -9,7 +9,8 @@ const laundrySchema = new Schema({
   machines: [{type: Schema.Types.ObjectId, ref: 'Machine'}],
   owners: [{type: Schema.Types.ObjectId, ref: 'User'}],
   users: [{type: Schema.Types.ObjectId, ref: 'User'}],
-  invites: [{type: Schema.Types.ObjectId, ref: 'LaundryInvitation'}]
+  invites: [{type: Schema.Types.ObjectId, ref: 'LaundryInvitation'}],
+  demo: {type: Boolean, default: false}
 }, {timestamps: true})
 
 laundrySchema.index({'name': 1})

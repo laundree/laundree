@@ -45,8 +45,17 @@ function generateToken () {
   }))
 }
 
+/**
+ * Generate a token and hash
+ * @returns {Promise.<{token: string, hash: string}>}
+ */
+function generateTokenAndHash () {
+  return generateToken().then(token => hashPassword(token).then(hash => ({hash, token})))
+}
+
 module.exports = {
-  hashPassword: hashPassword,
-  comparePassword: comparePassword,
-  generateToken: generateToken
+  hashPassword,
+  comparePassword,
+  generateToken,
+  generateTokenAndHash
 }
