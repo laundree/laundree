@@ -201,6 +201,34 @@ describe('controllers', function () {
             .expect(200)
             .then(res => laundries[0].toRest().then((result) => res.body.should.deep.equal(result)))))
 
+      it('should succeed 2', () =>
+        dbUtils.populateMachines(2).then(({user, token, laundry}) =>
+          request(app)
+            .get(`/api/laundries/${laundry.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => LaundryHandler
+              .findFromId(laundry.model.id)
+              .then(laundry => laundry.toRest())
+              .then((result) => res.body.should.deep.equal(result)))))
+
+      it('should succeed 3', () =>
+        dbUtils.populateInvites(2).then(({user, token, laundry}) =>
+          request(app)
+            .get(`/api/laundries/${laundry.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => LaundryHandler
+              .findFromId(laundry.model.id)
+              .then(laundry => laundry.toRest())
+              .then((result) => res.body.should.deep.equal(result)))))
+
       it('should succeed when only user', () =>
         Promise
           .all([dbUtils.populateTokens(1), dbUtils.populateLaundries(1)])

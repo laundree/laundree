@@ -93,23 +93,19 @@ describe('controllers', function () {
         })
           .save()
           .then(u => UserHandler.findFromId(u.id))
-          .then(user => {
+          .then(user =>
             request(app)
               .get(`/api/users/${user.model.id}`)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
               .expect(200)
-              .then(res => {
-                user.toRest()
-                  .then((u) => {
-                    const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
-                      o[k] = u[k]
-                      return o
-                    }, {})
-                    res.body.should.be.deep.equal(cleanUser)
-                  })
-              })
-          })
+              .then(res => user.toRest().then((u) => {
+                const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
+                  o[k] = u[k]
+                  return o
+                }, {})
+                res.body.should.be.deep.equal(cleanUser)
+              })))
       })
     })
     describe('PUT /api/users/{id}', () => {

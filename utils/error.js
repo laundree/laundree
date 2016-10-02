@@ -6,4 +6,4 @@ function logError (err) {
   if (opbeat) opbeat.captureError(err)
 }
 
-module.exports = {logError: logError}
+module.exports = {logError}
