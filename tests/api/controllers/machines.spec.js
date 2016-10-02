@@ -210,256 +210,255 @@ describe('controllers', function () {
                 return machine.toRest().then((result) => res.body.should.deep.equal(result))
               })
             })))
+    })
+    describe('PUT /api/machines/{id}', () => {
+      it('should fail on not authenticated', () =>
+        request(app)
+          .put('/api/machines/machine1')
+          .send({name: 'Machine 1', type: 'wash'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403))
 
-      describe('PUT /api/machines/{id}', () => {
-        it('should fail on not authenticated', () =>
+      it('should fail on empty name', () =>
+        dbUtils.populateMachines(1).then(({user, token, machine}) =>
           request(app)
-            .put('/api/machines/machine1')
-            .send({name: 'Machine 1', type: 'wash'})
+            .put(`/api/machines/${machine.model.id}`)
+            .send({name: ' ', type: 'wash'})
             .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(403))
+            .expect(400)))
 
-        it('should fail on empty name', () =>
-          dbUtils.populateMachines(1).then(({user, token, machine}) =>
+      it('should fail on no such machine', () =>
+        dbUtils.populateMachines(1).then(({user, token}) =>
+          request(app)
+            .put('/api/machines/foobar')
+            .send({name: 'Machine 2000', type: 'wash'})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should only fetch from own machine', () =>
+        Promise.all([dbUtils.populateMachines(1), dbUtils.populateMachines(2)])
+          .then(([{machine}, {user, token}]) =>
             request(app)
               .put(`/api/machines/${machine.model.id}`)
-              .send({name: ' ', type: 'wash'})
-              .set('Accept', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(400)))
-
-        it('should fail on no such machine', () =>
-          dbUtils.populateMachines(1).then(({user, token}) =>
-            request(app)
-              .put('/api/machines/foobar')
               .send({name: 'Machine 2000', type: 'wash'})
-              .set('Accept', 'application/json')
               .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
+              .set('Accept', 'application/json')
               .expect(404)
+              .expect('Content-Type', /json/)
               .then(res => res.body.should.deep.equal({message: 'Not found'}))))
 
-        it('should only fetch from own machine', () =>
-          Promise.all([dbUtils.populateMachines(1), dbUtils.populateMachines(2)])
-            .then(([{machine}, {user, token}]) =>
+      it('should fail when not owner', () =>
+        Promise.all([dbUtils.populateMachines(1), dbUtils.populateMachines(2)])
+          .then(([{machine, laundry}, {user, token}]) =>
+            laundry.addUser(user).then(() =>
               request(app)
                 .put(`/api/machines/${machine.model.id}`)
                 .send({name: 'Machine 2000', type: 'wash'})
                 .auth(user.model.id, token.secret)
                 .set('Accept', 'application/json')
-                .expect(404)
+                .expect(403)
                 .expect('Content-Type', /json/)
-                .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+                .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
 
-        it('should fail when not owner', () =>
-          Promise.all([dbUtils.populateMachines(1), dbUtils.populateMachines(2)])
-            .then(([{machine, laundry}, {user, token}]) =>
-              laundry.addUser(user).then(() =>
-                request(app)
-                  .put(`/api/machines/${machine.model.id}`)
-                  .send({name: 'Machine 2000', type: 'wash'})
-                  .auth(user.model.id, token.secret)
-                  .set('Accept', 'application/json')
-                  .expect(403)
-                  .expect('Content-Type', /json/)
-                  .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
+      it('should succeed on same name', () =>
+        dbUtils.populateMachines(1).then(({user, token, machine}) =>
+          request(app)
+            .put(`/api/machines/${machine.model.id}`)
+            .send({name: machine.model.name, type: machine.model.type})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)))
 
-        it('should succeed on same name', () =>
-          dbUtils.populateMachines(1).then(({user, token, machine}) =>
-            request(app)
-              .put(`/api/machines/${machine.model.id}`)
-              .send({name: machine.model.name, type: machine.model.type})
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(200)))
+      it('should fail on existing name', () =>
+        dbUtils.populateMachines(2).then(({user, token, machines: [m1, m2]}) =>
+          request(app)
+            .put(`/api/machines/${m1.model.id}`)
+            .send({name: m2.model.name, type: 'wash'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(409)
+            .then(res => res.body.should.deep.equal({message: 'Machine already exists'}))))
 
-        it('should fail on existing name', () =>
-          dbUtils.populateMachines(2).then(({user, token, machines: [m1, m2]}) =>
-            request(app)
-              .put(`/api/machines/${m1.model.id}`)
-              .send({name: m2.model.name, type: 'wash'})
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(409)
-              .then(res => res.body.should.deep.equal({message: 'Machine already exists'}))))
+      it('should succeed on existing name in another laundry', () =>
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [l1, l2]}) =>
+          Promise.all([l1.createMachine('m1', 'wash'), l2.createMachine('m2', 'wash')])
+            .then(([m1, m2]) =>
+              request(app)
+                .put(`/api/machines/${m1.model.id}`)
+                .send({name: m2.model.name, type: 'wash'})
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
+                .auth(user.model.id, token.secret)
+                .expect('Content-Type', /json/)
+                .expect(200))))
 
-        it('should succeed on existing name in another laundry', () =>
-          dbUtils.populateLaundries(2).then(({user, token, laundries: [l1, l2]}) =>
-            Promise.all([l1.createMachine('m1', 'wash'), l2.createMachine('m2', 'wash')])
-              .then(([m1, m2]) =>
-                request(app)
-                  .put(`/api/machines/${m1.model.id}`)
-                  .send({name: m2.model.name, type: 'wash'})
-                  .set('Accept', 'application/json')
-                  .set('Content-Type', 'application/json')
-                  .auth(user.model.id, token.secret)
-                  .expect('Content-Type', /json/)
-                  .expect(200))))
+      it('should succeed', () =>
+        dbUtils.populateMachines(1).then(({user, token, machine}) =>
+          request(app)
+            .put(`/api/machines/${machine.model.id}`)
+            .send({name: machine.model.name + ' 2', type: 'dry'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => MachineHandler.findFromId(machine.model.id).then((m) => {
+              m.model.name.should.equal(machine.model.name + ' 2')
+              m.model.type.should.equal('dry')
+              return m.toRest().then((rest) => {
+                res.body.should.deep.equal(rest)
+              })
+            }))))
+    })
 
-        it('should succeed', () =>
-          dbUtils.populateMachines(1).then(({user, token, machine}) =>
-            request(app)
-              .put(`/api/machines/${machine.model.id}`)
-              .send({name: machine.model.name + ' 2', type: 'dry'})
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(200)
-              .then(res => MachineHandler.findFromId(machine.model.id).then((m) => {
-                m.model.name.should.equal(machine.model.name + ' 2')
-                m.model.type.should.equal('dry')
-                return m.toRest().then((rest) => {
-                  res.body.should.deep.equal(rest)
-                })
-              }))))
-      })
+    describe('GET /machines/{id}', () => {
+      it('should fail on not authenticated', () =>
+        request(app)
+          .get('/api/machines/id')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403))
 
-      describe('GET /machines/{id}', () => {
-        it('should fail on not authenticated', () =>
+      it('should return 404 on invalid id', () =>
+        dbUtils.populateMachines(1).then(({user, token}) =>
           request(app)
             .get('/api/machines/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(403))
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
 
-        it('should return 404 on invalid id', () =>
+      it('should return 404 on missing id', () =>
+        dbUtils.populateMachines(1).then(({user, token}) =>
+          request(app)
+            .get('/api/machines/id')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should return 404 on other id', () =>
+        dbUtils.populateMachines(1).then(({machine}) =>
           dbUtils.populateMachines(1).then(({user, token}) =>
             request(app)
-              .get('/api/machines/id')
+              .get(`/api/machines/${machine.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+              .then(res => res.body.should.deep.equal({message: 'Not found'})))))
 
-        it('should return 404 on missing id', () =>
-          dbUtils.populateMachines(1).then(({user, token}) =>
-            request(app)
-              .get('/api/machines/id')
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+      it('should succeed', () =>
+        dbUtils.populateMachines(1).then(({user, token, machines}) =>
+          request(app)
+            .get(`/api/machines/${machines[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => machines[0].toRest().then((result) => res.body.should.deep.equal(result)))))
 
-        it('should return 404 on other id', () =>
-          dbUtils.populateMachines(1).then(({machine}) =>
-            dbUtils.populateMachines(1).then(({user, token}) =>
-              request(app)
-                .get(`/api/machines/${machine.model.id}`)
-                .set('Accept', 'application/json')
-                .set('Content-Type', 'application/json')
-                .auth(user.model.id, token.secret)
-                .expect('Content-Type', /json/)
-                .expect(404)
-                .then(res => res.body.should.deep.equal({message: 'Not found'})))))
+      it('should succeed when only user', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
+          dbUtils.populateMachines(1).then(({machine, laundry}) =>
+            laundry.addUser(user)
+              .then(() =>
+                request(app)
+                  .get(`/api/machines/${machine.model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .auth(user.model.id, token.secret)
+                  .expect('Content-Type', /json/)
+                  .expect(200)
+                  .then(res =>
+                    machine.toRest().then((result) => res.body.should.deep.equal(result)))))))
+    })
+    describe('DELETE /machines/{id}', () => {
+      it('should fail on not authenticated', () =>
+        request(app)
+          .delete('/api/machines/id')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403))
 
-        it('should succeed', () =>
-          dbUtils.populateMachines(1).then(({user, token, machines}) =>
-            request(app)
-              .get(`/api/machines/${machines[0].model.id}`)
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(200)
-              .then(res => machines[0].toRest().then((result) => res.body.should.deep.equal(result)))))
-
-        it('should succeed when only user', () =>
-          dbUtils.populateTokens(1).then(({user, token}) =>
-            dbUtils.populateMachines(1).then(({machine, laundry}) =>
-              laundry.addUser(user)
-                .then(() =>
-                  request(app)
-                    .get(`/api/machines/${machine.model.id}`)
-                    .set('Accept', 'application/json')
-                    .set('Content-Type', 'application/json')
-                    .auth(user.model.id, token.secret)
-                    .expect('Content-Type', /json/)
-                    .expect(200)
-                    .then(res =>
-                      machine.toRest().then((result) => res.body.should.deep.equal(result)))))))
-      })
-      describe('DELETE /machines/{id}', () => {
-        it('should fail on not authenticated', () =>
+      it('should return 404 on invalid id', () =>
+        dbUtils.populateMachines(1).then(({user, token}) =>
           request(app)
             .delete('/api/machines/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
-            .expect(403))
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
 
-        it('should return 404 on invalid id', () =>
+      it('should return 404 on missing id', () =>
+        dbUtils.populateMachines(1).then(({user, token}) =>
+          request(app)
+            .delete('/api/machines/id')
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should return 404 on other id', () =>
+        dbUtils.populateMachines(1).then(({machine}) =>
           dbUtils.populateMachines(1).then(({user, token}) =>
-            request(app)
-              .delete('/api/machines/id')
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
-
-        it('should return 404 on missing id', () =>
-          dbUtils.populateMachines(1).then(({user, token}) =>
-            request(app)
-              .delete('/api/machines/id')
-              .set('Accept', 'application/json')
-              .set('Content-Type', 'application/json')
-              .auth(user.model.id, token.secret)
-              .expect('Content-Type', /json/)
-              .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
-
-        it('should return 404 on other id', () =>
-          dbUtils.populateMachines(1).then(({machine}) =>
-            dbUtils.populateMachines(1).then(({user, token}) =>
-              request(app)
-                .delete(`/api/machines/${machine.model.id}`)
-                .set('Accept', 'application/json')
-                .set('Content-Type', 'application/json')
-                .auth(user.model.id, token.secret)
-                .expect('Content-Type', /json/)
-                .expect(404)
-                .then(res => res.body.should.deep.equal({message: 'Not found'})))))
-
-        it('should succeed', () =>
-          dbUtils.populateMachines(1).then(({user, token, machine}) =>
             request(app)
               .delete(`/api/machines/${machine.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
-              .expect(204)
-              .then(res => MachineHandler
-                .findFromId(machine.model.id)
-                .then((t) => assert(t === undefined)))))
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .then(res => res.body.should.deep.equal({message: 'Not found'})))))
 
-        it('should fail when only user', () =>
-          dbUtils.populateTokens(1).then(({user, token}) =>
-            dbUtils.populateMachines(1).then(({machine, laundry}) =>
-              laundry.addUser(user)
-                .then(() =>
-                  request(app)
-                    .delete(`/api/machines/${machine.model.id}`)
-                    .set('Accept', 'application/json')
-                    .set('Content-Type', 'application/json')
-                    .auth(user.model.id, token.secret)
-                    .expect('Content-Type', /json/)
-                    .expect(403)
-                    .then(res => res.body.should.deep.equal({message: 'Not allowed'}))))))
-      })
+      it('should succeed', () =>
+        dbUtils.populateMachines(1).then(({user, token, machine}) =>
+          request(app)
+            .delete(`/api/machines/${machine.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(204)
+            .then(res => MachineHandler
+              .findFromId(machine.model.id)
+              .then((t) => assert(t === undefined)))))
+
+      it('should fail when only user', () =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
+          dbUtils.populateMachines(1).then(({machine, laundry}) =>
+            laundry.addUser(user)
+              .then(() =>
+                request(app)
+                  .delete(`/api/machines/${machine.model.id}`)
+                  .set('Accept', 'application/json')
+                  .set('Content-Type', 'application/json')
+                  .auth(user.model.id, token.secret)
+                  .expect('Content-Type', /json/)
+                  .expect(403)
+                  .then(res => res.body.should.deep.equal({message: 'Not allowed'}))))))
     })
   })
 })

@@ -35,23 +35,21 @@ describe('controllers', function () {
           .expect(404))
 
       it('should find user', () =>
-        dbUtils.populateUsers(10).then((users) => {
+        dbUtils.populateTokens(1).then(({user}) =>
           request(app)
-            .get(`/api/users/${users[5].model.id}`)
+            .get(`/api/users/${user.model.id}`)
             .set('Accept', 'application/json')
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res =>
-              users[5].toRest()
+              user.toRest()
                 .then((u) => {
                   const cleanUser = Object.keys(u).filter(k => u[k] !== undefined).reduce((o, k) => {
                     o[k] = u[k]
                     return o
                   }, {})
                   res.body.should.be.deep.equal(cleanUser)
-                })
-            )
-        }))
+                }))))
 
       it('should find user 2', () =>
         UserHandler
