@@ -333,7 +333,7 @@ class UserHandler extends Handler {
 
   toRest () {
     return UserModel
-      .populate(this.model, {path: 'tokens', model: 'Token'})
+      .populate(this.model, {path: 'authTokens', model: 'Token'})
       .then((model) => ({
         id: this.model.id,
         displayName: this.model.displayName,

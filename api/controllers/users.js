@@ -7,12 +7,8 @@ var utils = require('../../utils')
 var UserHandler = require('../../handlers').UserHandler
 
 function getUser (req, res) {
-  var id = req.swagger.params.id.value
-  UserHandler.findFromId(id)
-    .then((user) => !user
-      ? utils.api.returnError(res, 404, 'User not found.')
-      : utils.api.returnSuccess(res, user.toRest()))
-    .catch(utils.api.generateErrorHandler(res))
+  const {user} = req.subjects
+  utils.api.returnSuccess(res, user.toRest())
 }
 
 function listUsers (req, res) {
@@ -42,10 +38,7 @@ function listUsers (req, res) {
 }
 
 function createUser (req, res) {
-  var body = req.swagger.params.body.value
-  var displayName = body.displayName
-  var email = body.email
-  var password = body.password
+  const {email, displayName, password} = req.swagger.params.body.value
   UserHandler
     .findFromEmail(email)
     .then((user) => user
@@ -56,48 +49,43 @@ function createUser (req, res) {
 }
 
 function startPasswordReset (req, res) {
-  var id = req.swagger.params.id.value
-  UserHandler.findFromId(id)
-    .then((user) => !user ? utils.api.returnError(res, 404, 'User not found.') : user.generateResetToken()
-      .then((token) => utils.mail.sendEmail({user: user.model, token: token}, 'password-reset', user.model.emails[0]))
-      .then(() => utils.api.returnSuccess(res)))
+  const {user} = req.subjects
+  user.generateResetToken()
+    .then((token) => utils.mail.sendEmail({user: user.model, token: token}, 'password-reset', user.model.emails[0]))
+    .then(() => utils.api.returnSuccess(res))
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function passwordReset (req, res) {
-  var id = req.swagger.params.id.value
-  var body = req.swagger.params.body.value
-  var token = body.token
-  var password = body.password
-  UserHandler.findFromId(id)
-    .then((user) => !user ? utils.api.returnError(res, 404, 'User not found.') : user.verifyResetPasswordToken(token)
-      .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : user.resetPassword(password)
-        .then(() => utils.api.returnSuccess(res))))
+  const {user} = req.subjects
+  const body = req.swagger.params.body.value
+  const token = body.token
+  const password = body.password
+  user.verifyResetPasswordToken(token)
+    .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : user.resetPassword(password)
+      .then(() => utils.api.returnSuccess(res)))
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function startEmailVerification (req, res) {
-  var id = req.swagger.params.id.value
+  const {user} = req.subjects
   var email = req.swagger.params.body.value.email
-  UserHandler.findFromId(id).then((user) => !user ? utils.api.returnError(res, 404, 'User not found') : user.generateVerifyEmailToken(email)
+  user.generateVerifyEmailToken(email)
     .then((token) => !token ? utils.api.returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
       email: email,
       emailEncoded: encodeURIComponent(email),
       token: token,
       user: user.model
     }, 'verify-email', email)
-      .then(() => utils.api.returnSuccess(res))))
+      .then(() => utils.api.returnSuccess(res)))
     .catch(utils.api.generateErrorHandler(res))
 }
 
 function verifyEmail (req, res) {
-  var id = req.swagger.params.id.value
-  var body = req.swagger.params.body.value
-  var email = body.email
-  var token = body.token
-  UserHandler.findFromId(id)
-    .then((user) => !user ? utils.api.returnError(res, 404, 'User not found') : user.verifyEmail(email, token)
-      .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : utils.api.returnSuccess(res)))
+  const {user} = req.subjects
+  const {email, token} = req.swagger.params.body.value
+  user.verifyEmail(email, token)
+    .then((result) => !result ? utils.api.returnError(res, 400, 'Invalid token') : utils.api.returnSuccess(res))
     .catch(utils.api.generateErrorHandler(res))
 }
 

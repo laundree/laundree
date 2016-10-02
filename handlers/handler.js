@@ -82,9 +82,10 @@ class Handler {
    * @template T
    * @param {T} model
    */
-  constructor (model) {
+  constructor (model, updateActions = []) {
     if (!model) throw new Error('Model may not be undefined!')
     this.model = model
+    this._updateActions = updateActions
   }
 
   save () {
@@ -107,7 +108,7 @@ class Handler {
    * @returns {(function (handler: Handler) : Promise.<Handler>)[]}
    */
   get updateActions () {
-    return []
+    return this._updateActions
   }
 
   /**

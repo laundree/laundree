@@ -8,7 +8,6 @@ const Promise = require('promise')
 
 function listBookings (req, res) {
   const limit = req.swagger.params.page_size.value
-  const id = req.swagger.params.id.value
   const since = req.swagger.params.since.value
   const from = req.swagger.params.from.value
   const to = req.swagger.params.to.value
@@ -25,10 +24,10 @@ function listBookings (req, res) {
     .then((bookings) => bookings.map((booking) => booking.toRestSummary()))
     .then((bookings) => {
       var links = {
-        first: `/api/machines/${id}/bookings?page_size=${limit}`
+        first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}`
       }
       if (bookings.length === limit) {
-        links.next = `/api/machines/${id}/bookings?since=${bookings[bookings.length - 1].id}&page_size=${limit}`
+        links.next = `/api/machines/${machine.model.id}/bookings?since=${bookings[bookings.length - 1].id}&page_size=${limit}`
       }
       res.links(links)
       res.json(bookings)

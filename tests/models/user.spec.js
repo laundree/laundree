@@ -15,6 +15,7 @@ describe('models', () => {
     var user
     beforeEach(() => clearDb().then(() => new UserModel({
       latestProvider: 'facebook',
+      explicitVerifiedEmails: 'alice@example.com',
       profiles: [
         {
           provider: 'google',
@@ -35,6 +36,9 @@ describe('models', () => {
     })
     describe('implicitVerifiedEmails', () => {
       it('should merge implicit verified emails', () => user.implicitVerifiedEmails.should.deep.equal(['bob1@a.dk', 'bob3@a.dk', 'bob2@a.dk']))
+    })
+    describe('verifiedEmails', () => {
+      it('should merge verified emails', () => user.verifiedEmails.should.deep.equal(['alice@example.com', 'bob1@a.dk', 'bob3@a.dk', 'bob2@a.dk']))
     })
     describe('photo', () => {
       it('should find right photo', () => user.photo.should.equal('photo3'))
