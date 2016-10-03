@@ -47,7 +47,8 @@ function laundryMapper (laundry) {
     machines: laundry.machineIds,
     users: laundry.userIds,
     owners: laundry.ownerIds,
-    invites: laundry.inviteIds
+    invites: laundry.inviteIds,
+    demo: laundry.model.demo
   }
 }
 

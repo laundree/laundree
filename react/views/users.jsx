@@ -10,7 +10,7 @@ class InviteUserForm extends ValueUpdater {
     this.submitHandler = (evt) => {
       evt.preventDefault()
       return this.context.actions
-        .inviteUserByEmail(this.props.laundryId, this.state.values.email)
+        .inviteUserByEmail(this.props.laundry.id, this.state.values.email)
         .then(() => this.reset())
     }
   }
@@ -19,22 +19,26 @@ class InviteUserForm extends ValueUpdater {
     return <ValidationForm
       sesh={this.state.sesh}
       onSubmit={this.submitHandler}>
-      <div>
-        <ValidationElement
-          sesh={this.state.sesh}
-          initial={this.state.values.email === undefined}
-          value={this.state.values.email || ''} email trim>
-          <label
-            data-validate-error='Please enter a valid email address'>
-            <input
-              placeholder='Email address'
-              type='text' onChange={this.generateValueUpdater('email')}
-              value={this.state.values.email || ''}/>
-          </label>
-        </ValidationElement>
-      </div>
-      <div className='buttons'>
-        <input type='submit' value='Invite'/>
+      <div
+        data-demo-message="You can't add users to a demo laundry"
+        className={this.props.laundry.demo ? 'demo' : ''}>
+        <div>
+          <ValidationElement
+            sesh={this.state.sesh}
+            initial={this.state.values.email === undefined}
+            value={this.state.values.email || ''} email trim>
+            <label
+              data-validate-error='Please enter a valid email address'>
+              <input
+                placeholder='Email address'
+                type='text' onChange={this.generateValueUpdater('email')}
+                value={this.state.values.email || ''}/>
+            </label>
+          </ValidationElement>
+        </div>
+        <div className='buttons'>
+          <input type='submit' value='Invite'/>
+        </div>
       </div>
     </ValidationForm>
   }
@@ -47,7 +51,7 @@ InviteUserForm.contextTypes = {
 }
 
 InviteUserForm.propTypes = {
-  laundryId: React.PropTypes.string.isRequired
+  laundry: React.PropTypes.object.isRequired
 }
 
 class UserItem extends React.Component {
@@ -191,7 +195,7 @@ class Users extends React.Component {
         </section>
         <section id='InviteUserForm'>
           <h2>Invite user</h2>
-          <InviteUserForm laundryId={this.props.laundry.id}/>
+          <InviteUserForm laundry={this.props.laundry}/>
         </section>
       </main>
     </DocumentTitle>

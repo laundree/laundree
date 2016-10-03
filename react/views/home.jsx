@@ -3,6 +3,39 @@
  */
 const React = require('react')
 const DocumentTitle = require('react-document-title')
+const {LaundryClientSdk} = require('../../client/sdk')
+
+class DemoButton extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {loading: false, email: '', password: ''}
+    this.clickHandler = () => {
+      this.setState({loading: true})
+      LaundryClientSdk.createDemoLaundry().then(({email, password}) => this.setState({
+        email,
+        password
+      }, () => this.ref.submit()))
+    }
+    this.refPuller = (ref) => {
+      this.ref = ref
+    }
+  }
+
+  render () {
+    return <div>
+      <span onClick={this.clickHandler} className={this.state.loading ? 'loading' : ''}>
+        <svg className='step'>
+          <use xlinkHref='#DemoMachine'/>
+        </svg>
+      </span>
+      <form hidden ref={this.refPuller} method='post' action='/auth/local'>
+        <input type='hidden' name='username' value={this.state.email}/>
+        <input type='hidden' name='password' value={this.state.password}/>
+      </form>
+    </div>
+  }
+}
 
 const Home = () => <DocumentTitle title='Home'>
   <div id='Home'>
@@ -71,13 +104,7 @@ const Home = () => <DocumentTitle title='Home'>
         <h1>
           ... or spin up a live demo before you decide.
         </h1>
-        <div>
-          <a href='#'>
-            <svg className='step'>
-              <use xlinkHref='#DemoMachine'/>
-            </svg>
-          </a>
-        </div>
+        <DemoButton/>
       </section>
     </main>
   </div>
