@@ -95,25 +95,30 @@ class LaundrySettings extends React.Component {
         <h2>Change name</h2>
         <LaundrySettingsForm laundry={this.laundry}/>
       </section>
-      <section>
-        <h2>Delete laundry</h2>
-        <Modal
-          show={this.state.modalOpen}
-          onClose={this.handleCloseModal}
-          message='Are you absolutely sure that you want to delete this laundry?'
-          actions={[
-            {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
-            {label: 'No', action: this.handleCloseModal}
-          ]}/>
-        <div className='text'>
-          Deleting the laundry will remove all data associated with it and remove all users from it.<br />
-          It can NOT be undone!
-          <div className='buttonContainer'>
-            <button onClick={this.handleOpenModal} className='red'>Delete Laundry</button>
-          </div>
-        </div>
-      </section>
+      {this.renderDelete()}
     </div>
+  }
+
+  renderDelete () {
+    if (this.laundry.demo) return null
+    return <section>
+      <h2>Delete laundry</h2>
+      <Modal
+        show={this.state.modalOpen}
+        onClose={this.handleCloseModal}
+        message='Are you absolutely sure that you want to delete this laundry?'
+        actions={[
+          {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
+          {label: 'No', action: this.handleCloseModal}
+        ]}/>
+      <div className='text'>
+        Deleting the laundry will remove all data associated with it and remove all users from it.<br />
+        It can NOT be undone!
+        <div className='buttonContainer'>
+          <button onClick={this.handleOpenModal} className='red'>Delete Laundry</button>
+        </div>
+      </div>
+    </section>
   }
 
   renderApologeticMessage () {
