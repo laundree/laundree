@@ -622,6 +622,20 @@ describe('controllers', function () {
               .findFromId(laundries[0].model.id)
               .then((t) => assert(t === undefined)))))
 
+      it('should fail if demo', () =>
+        dbUtils.populateLaundries(1)
+          .then(({user, token, laundry}) => {
+            laundry.model.demo = true
+            return laundry.save().then(() => ({user, token, laundry}))
+          })
+          .then(({user, token, laundry}) =>
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(403)))
+
       it('should fail when only user', () =>
         Promise
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])

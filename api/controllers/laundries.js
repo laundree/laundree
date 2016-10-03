@@ -67,6 +67,7 @@ function fetchLaundry (req, res) {
 
 function deleteLaundry (req, res) {
   const laundry = req.subjects.laundry
+  if (laundry.model.demo) return api.returnError(res, 403, 'Not allowed')
   laundry.deleteLaundry()
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
