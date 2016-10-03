@@ -125,8 +125,14 @@
     section#StartDemo
       div
         padding: 2em 0
-
-        a
+        span
+          &.loading
+            &:after
+              +loading_after()
+            &:before
+              +loading_before()
+          position: relative
+          cursor: pointer
           width: 10em
           margin: auto
           display: block

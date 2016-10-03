@@ -39,3 +39,21 @@
         +border-radius(0.2em)
 #InviteUserForm
   padding-top: 2em
+  form
+    .demo
+      position: relative
+      &:before
+        +loading_before()
+      &:after
+        content: attr(data-demo-message)
+        position: absolute
+        z-index: 101
+        font-weight: bold
+        font-size: 0.9em
+        top: 0
+        bottom: 0
+        left: 0
+        right: 0
+        text-align: center
+        line-height: 10em
+
