@@ -1,7 +1,7 @@
 /**
  * Created by budde on 27/04/16.
  */
-const {regex, events} = require('../utils')
+const {regex} = require('../utils')
 const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
 const debug = require('debug')('laundree.handlers.handler')
@@ -9,6 +9,33 @@ const Promise = require('promise')
 const {createAction} = require('redux-actions')
 
 var id = 0
+
+function findLaundries (handler) {
+  const {_id, laundry, laundries} = handler.model || {}
+  if (laundry) return [laundry.toString()]
+  if (laundries) return laundries.map(id => id.toString())
+  if (_id) return [_id.toString()]
+  return []
+}
+
+function buildReduxEventEmitter (_Handler) {
+  const emitter = new EventEmitter()
+  Object.keys(_Handler.reduxTypes).forEach((type) => {
+    const action = createAction(_Handler.reduxTypes[type], (handler) => handler.model ? handler.reduxModel : handler)
+    setupListener(_Handler, emitter, type, action)
+  })
+  return emitter
+}
+
+function setupListener (_Handler, emitter, event, action) {
+  const i = id++
+  debug(`Setting up socket with event "${event}" on "${_Handler.name}" (id: ${i})`)
+  _Handler.on(event, handler => {
+    const laundries = findLaundries(handler)
+    debug(`Emitting ${_Handler.name} ${event} action (id: ${i})`)
+    emitter.emit('action', {laundries, action: action(handler)})
+  })
+}
 
 class Handler {
 
@@ -67,29 +94,7 @@ class Handler {
     }
     _Handler.find = (filter, options) => Handler._find(_Model, _Handler, filter, options)
     _Handler.findFromId = (id) => Handler._findFromId(_Model, _Handler, id)
-    _Handler.setupSocket = (socket, filter = () => Promise.resolve(true)) => Handler._setupSocket(_Handler, socket, filter)
-  }
-
-  static _setupListener (_Handler, socket, event, action, filter) {
-    const i = id++
-    debug(`Setting up socket with event "${event}" on "${_Handler.name}" (id: ${i})`)
-    return events
-      .on(_Handler, event, (item) => filter(item)
-          .then(f => {
-            if (!f) return
-            debug(`Emitting ${_Handler.name} ${event} action (id: ${i})`)
-            socket.emit('action', action(item))
-          }),
-        () => debug(`Removing (id: ${i})`))
-  }
-
-  static _setupSocket (_Handler, socket, filter) {
-    const removers = []
-    Object.keys(_Handler.reduxTypes).forEach((type) => {
-      const action = createAction(_Handler.reduxTypes[type], (handler) => handler.model ? handler.reduxModel : handler)
-      removers.push(Handler._setupListener(_Handler, socket, type, action, filter))
-    })
-    return removers
+    _Handler.redux = buildReduxEventEmitter(_Handler)
   }
 
   /**
