@@ -54,8 +54,12 @@ emails:
   support: support@laundree.io
   from: '"Laundree.io" <no-reply@laundree.io>'
 
-swagger:
+defaultAdmins:
+  - budde@laundree.io
 
+mode: 'master'
+
+swagger:
   fittingsDirs: [ api/fittings ]
   defaultPipe: null
   swaggerControllerPipe: swagger_controllers  # defines the standard processing pipe for controllers

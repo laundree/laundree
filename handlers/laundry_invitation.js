@@ -4,6 +4,7 @@
 
 const Handler = require('./handler')
 const {LaundryInvitationModel} = require('../models')
+const {types: {DELETE_INVITATION, UPDATE_INVITATION, CREATE_INVITATION}} = require('../redux/actions')
 
 class LaundryInvitationHandler extends Handler {
 
@@ -58,8 +59,21 @@ class LaundryInvitationHandler extends Handler {
     this.model.used = true
     return this.save()
   }
+
+  get reduxModel () {
+    return {
+      used: this.model.used,
+      id: this.model.id,
+      email: this.model.email,
+      laundry: this.model.laundry.toString()
+    }
+  }
 }
 
-Handler.setupHandler(LaundryInvitationHandler, LaundryInvitationModel)
+Handler.setupHandler(LaundryInvitationHandler, LaundryInvitationModel, {
+  delete: DELETE_INVITATION,
+  update: UPDATE_INVITATION,
+  create: CREATE_INVITATION
+})
 
 module.exports = LaundryInvitationHandler

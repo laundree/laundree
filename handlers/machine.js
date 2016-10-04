@@ -6,6 +6,7 @@ const Handler = require('./handler')
 const {MachineModel} = require('../models')
 const BookingHandler = require('./booking')
 const Promise = require('promise')
+const {types: {DELETE_MACHINE, UPDATE_MACHINE, CREATE_MACHINE}} = require('../redux/actions')
 
 class MachineHandler extends Handler {
 
@@ -86,8 +87,19 @@ class MachineHandler extends Handler {
     return Promise.resolve({name: this.model.name, href: this.restUrl, id: this.model.id, type: this.model.type})
   }
 
+  get reduxModel () {
+    return {
+      id: this.model.id,
+      type: this.model.type,
+      name: this.model.name
+    }
+  }
 }
 
-Handler.setupHandler(MachineHandler, MachineModel)
+Handler.setupHandler(MachineHandler, MachineModel, {
+  delete: DELETE_MACHINE,
+  update: UPDATE_MACHINE,
+  create: CREATE_MACHINE
+})
 
 module.exports = MachineHandler

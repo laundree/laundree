@@ -38,7 +38,7 @@ class BookingInfo extends React.Component {
       <h1>Booking info</h1>
       <img src={owner.photo} className='avatar'/>
       <div className='text'>
-        {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked
+        {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked{' '}
         <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}

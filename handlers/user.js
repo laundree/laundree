@@ -9,6 +9,8 @@ const {UserModel} = require('../models')
 const utils = require('../utils')
 const Promise = require('promise')
 const uuid = require('uuid')
+const {types: {UPDATE_USER}} = require('../redux/actions')
+
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -132,6 +134,18 @@ class UserHandler extends Handler {
       .save()
       .then(() => this.emitEvent('update'))
       .then(() => this)
+  }
+
+  /**
+   * Update the role of the user
+   * @param role
+   * @returns {Promise}
+   */
+  updateRole (role) {
+    this.model.role = role
+    return this.model
+      .save()
+      .then(() => this.emitEvent('update'))
   }
 
   /**
@@ -399,8 +413,20 @@ class UserHandler extends Handler {
       href: this.restUrl
     }
   }
+
+  get reduxModel () {
+    return {
+      id: this.model.id,
+      photo: this.model.photo,
+      displayName: this.model.displayName,
+      laundries: this.model.laundries.map((id) => id.toString()),
+      lastSeen: this.model.lastSeen
+    }
+  }
 }
 
-Handler.setupHandler(UserHandler, UserModel)
+Handler.setupHandler(UserHandler, UserModel, {
+  update: UPDATE_USER
+})
 
 module.exports = UserHandler
