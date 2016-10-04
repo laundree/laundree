@@ -23,6 +23,7 @@ app.use(setups.sessionSetup)
 // Passport
 setups.passportSetup(app)
 setups.morganSetup(app)
+setups.defaultUserSetup()
 
 app.use(require('node-sass-middleware')({
   src: path.join(__dirname, 'stylesheets'),
@@ -33,6 +34,7 @@ app.use(require('node-sass-middleware')({
   sourceMap: true
 }))
 
+// Routes
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'dist')))
 

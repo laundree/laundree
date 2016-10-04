@@ -10,6 +10,7 @@ const LaundryInvitationHandler = require('./laundry_invitation')
 const Promise = require('promise')
 const debug = require('debug')('laundree.handlers.laundry')
 const uuid = require('uuid')
+const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
 
 class LaundryHandler extends Handler {
 
@@ -293,8 +294,24 @@ class LaundryHandler extends Handler {
   toRestSummary () {
     return {name: this.model.name, id: this.model.id, href: this.restUrl}
   }
+
+  get reduxModel () {
+    return {
+      id: this.model.id,
+      name: this.model.name,
+      machines: this.machineIds,
+      users: this.userIds,
+      owners: this.ownerIds,
+      invites: this.inviteIds,
+      demo: this.model.demo
+    }
+  }
 }
 
-Handler.setupHandler(LaundryHandler, LaundryModel)
+Handler.setupHandler(LaundryHandler, LaundryModel, {
+  create: CREATE_LAUNDRY,
+  delete: DELETE_LAUNDRY,
+  update: UPDATE_LAUNDRY
+})
 
 module.exports = LaundryHandler

@@ -6,6 +6,7 @@ const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
 const debug = require('debug')('laundree.handlers.handler')
 const Promise = require('promise')
+const {createAction} = require('redux-actions')
 
 class Handler {
 
@@ -30,7 +31,13 @@ class Handler {
       .then((m) => m ? new Handler(m).updateDocument() : undefined)
   }
 
-  static setupHandler (_Handler, _Model) {
+  /**
+   * @param _Handler
+   * @param _Model
+   * @param {{delete: string=, update: string=, create: string=}} reduxTypes
+   */
+  static setupHandler (_Handler, _Model, reduxTypes = {}) {
+    _Handler.reduxTypes = reduxTypes
     _Handler.subEmitter = new EventEmitter()
     _Handler.pubEmitter = new EventEmitter()
     linkEmitter(
@@ -58,7 +65,7 @@ class Handler {
     }
     _Handler.find = (filter, options) => Handler._find(_Model, _Handler, filter, options)
     _Handler.findFromId = (id) => Handler._findFromId(_Model, _Handler, id)
-    _Handler.setupSocket = (socket, {createAction, updateAction, deleteAction}, filter = () => Promise.resolve(true)) => Handler._setupSocket(_Handler, socket, createAction, updateAction, deleteAction, filter)
+    _Handler.setupSocket = (socket, filter = () => Promise.resolve(true)) => Handler._setupSocket(_Handler, socket, filter)
   }
 
   static _setupListener (_Handler, socket, event, action, filter) {
@@ -69,11 +76,12 @@ class Handler {
     }))
   }
 
-  static _setupSocket (_Handler, socket, createAction, updateAction, deleteAction, filter) {
+  static _setupSocket (_Handler, socket, filter) {
     const removers = []
-    if (createAction) removers.push(Handler._setupListener(_Handler, socket, 'create', createAction, filter))
-    if (updateAction) removers.push(Handler._setupListener(_Handler, socket, 'update', updateAction, filter))
-    if (deleteAction) removers.push(Handler._setupListener(_Handler, socket, 'delete', deleteAction, filter))
+    Object.keys(_Handler.reduxTypes).forEach((type) => {
+      const action = createAction(_Handler.reduxTypes[type], (handler) => handler.model ? handler.reduxModel : handler)
+      removers.push(Handler._setupListener(_Handler, socket, type, action, filter))
+    })
     return removers
   }
 
@@ -81,6 +89,7 @@ class Handler {
    * @constructor
    * @template T
    * @param {T} model
+   * @param updateActions
    */
   constructor (model, updateActions = []) {
     if (!model) throw new Error('Model may not be undefined!')
@@ -126,6 +135,9 @@ class Handler {
     })
   }
 
+  get reduxModel () {
+    return {}
+  }
 }
 
 module.exports = Handler

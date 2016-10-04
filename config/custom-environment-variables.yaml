@@ -32,3 +32,5 @@ codeClimate:
 mailer:
   smtp:
     transport: 'MAILER_SMTP_TRANSPORT'
+
+mode: 'MODE'

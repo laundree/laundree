@@ -5,6 +5,7 @@
 const Handler = require('./handler')
 const {BookingModel} = require('../models')
 const Promise = require('promise')
+const {types: {DELETE_BOOKING, UPDATE_BOOKING, CREATE_BOOKING}} = require('../redux/actions')
 
 class BookingHandler extends Handler {
 
@@ -146,8 +147,22 @@ class BookingHandler extends Handler {
       to: this.model.to.toISOString()
     })
   }
+
+  get reduxModel () {
+    return {
+      id: this.model.id,
+      from: this.model.from,
+      to: this.model.to,
+      machine: this.model.machine.toString(),
+      owner: this.model.owner.toString()
+    }
+  }
 }
 
-Handler.setupHandler(BookingHandler, BookingModel)
+Handler.setupHandler(BookingHandler, BookingModel, {
+  delete: DELETE_BOOKING,
+  update: UPDATE_BOOKING,
+  create: CREATE_BOOKING
+})
 
 module.exports = BookingHandler
