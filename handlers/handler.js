@@ -8,6 +8,8 @@ const debug = require('debug')('laundree.handlers.handler')
 const Promise = require('promise')
 const {createAction} = require('redux-actions')
 
+var id = 0
+
 class Handler {
 
   /**
@@ -69,11 +71,16 @@ class Handler {
   }
 
   static _setupListener (_Handler, socket, event, action, filter) {
-    return events.on(_Handler, event, (item) => filter(item).then(f => {
-      if (!f) return
-      debug(`Emitting ${_Handler.name} ${event} action`)
-      socket.emit('action', action(item))
-    }))
+    const i = id++
+    debug(`Setting up socket with event "${event}" on "${_Handler.name}" (id: ${i})`)
+    return events
+      .on(_Handler, event, (item) => filter(item)
+          .then(f => {
+            if (!f) return
+            debug(`Emitting ${_Handler.name} ${event} action (id: ${i})`)
+            socket.emit('action', action(item))
+          }),
+        () => debug(`Removing (id: ${i})`))
   }
 
   static _setupSocket (_Handler, socket, filter) {
