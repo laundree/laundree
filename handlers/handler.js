@@ -8,8 +8,6 @@ const debug = require('debug')('laundree.handlers.handler')
 const Promise = require('promise')
 const {createAction} = require('redux-actions')
 
-var id = 0
-
 function findLaundries (handler) {
   const {_id, laundry, laundries} = handler.model || {}
   if (laundry) return [laundry.toString()]
@@ -28,11 +26,10 @@ function buildReduxEventEmitter (_Handler) {
 }
 
 function setupListener (_Handler, emitter, event, action) {
-  const i = id++
-  debug(`Setting up socket with event "${event}" on "${_Handler.name}" (id: ${i})`)
+  debug(`Setting up socket with event "${event}" on "${_Handler.name}"`)
   _Handler.on(event, handler => {
     const laundries = findLaundries(handler)
-    debug(`Emitting ${_Handler.name} ${event} action (id: ${i})`)
+    debug(`Emitting ${_Handler.name} ${event} action`)
     emitter.emit('action', {laundries, action: action(handler)})
   })
 }
