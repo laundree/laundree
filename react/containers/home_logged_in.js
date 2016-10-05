@@ -3,10 +3,10 @@
  */
 
 const connect = require('react-redux').connect
-const CreateLaundry = require('../views').CreateLaundry
+const {HomeLoggedIn} = require('../views')
 
 const mapStateToProps = (store) => {
   return {user: store.users[store.currentUser]}
 }
 
-module.exports = connect(mapStateToProps)(CreateLaundry)
+module.exports = connect(mapStateToProps)(HomeLoggedIn)

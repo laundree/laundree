@@ -13,7 +13,7 @@ module.exports = {
   Home: require('./home.jsx'),
   Forgot: require('./forgot.jsx'),
   Reset: require('./reset.jsx'),
-  CreateLaundry: require('./create_laundry.jsx'),
+  HomeLoggedIn: require('./home_logged_in.jsx'),
   LogIn: require('./login.jsx'),
   Machines: require('./machines.jsx'),
   LaundrySettings: require('./laundry_settings.jsx'),
@@ -24,5 +24,6 @@ module.exports = {
   Settings: require('./settings.jsx'),
   Support: require('./support.jsx'),
   About: require('./about.jsx'),
-  Contact: require('./contact.jsx')
+  Contact: require('./contact.jsx'),
+  AdminPanel: require('./admin_panel.jsx')
 }
