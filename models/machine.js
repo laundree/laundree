@@ -15,8 +15,6 @@ machineSchema.index({name: 1, laundry: 1}, {unique: true})
 machineSchema.index({'from': 1})
 machineSchema.index({'to': 1})
 
-machineSchema.statics.findFromId = (id) => MachineModel.findById(new mongoose.Types.ObjectId(id))
-
 const MachineModel = mongoose.model('Machine', machineSchema)
 
 module.exports = MachineModel

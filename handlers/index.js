@@ -8,5 +8,6 @@ module.exports = {
   BookingHandler: require('./booking'),
   LaundryHandler: require('./laundry'),
   TokenHandler: require('./token'),
+  EventHandler: require('./event'),
   LaundryInvitationHandler: require('./laundry_invitation')
 }

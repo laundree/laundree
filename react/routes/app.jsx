@@ -8,6 +8,7 @@ const {
   LogIn, Timetable, Bookings, LaundrySettings, Machines, Reset, Verification,
   Privacy, TermsAndConditions, Settings, About, Support, Contact
 } = require('../containers')
+
 function checkLaundryGenerator (store) {
   return (state, replace) => {
     const {currentUser, users} = store.getState()

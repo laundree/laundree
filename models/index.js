@@ -20,6 +20,7 @@ mongoose.connection.on('error', (err) => {
 mongoose.connection.on('disconnected', () => debug('Mongoose disconnected...'))
 
 module.exports = {
+  EventModel: require('./event'),
   UserModel: require('./user'),
   TokenModel: require('./token'),
   LaundryModel: require('./laundry'),

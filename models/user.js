@@ -100,12 +100,6 @@ userSchema
     return profile.photos[0].value
   })
 
-/**
- * Find from id string
- * @param {string} id
- */
-userSchema.statics.findFromId = (id) => UserModel.findById(new mongoose.Types.ObjectId(id))
-
 var UserModel = mongoose.model('User', userSchema)
 
 module.exports = UserModel

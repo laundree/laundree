@@ -94,6 +94,10 @@ function listMachinesAndUsers (laundryId) {
   return nsp.emit('listMachinesAndUsers', laundryId)
 }
 
+function updateStats () {
+  return nsp.emit('updateStats')
+}
+
 function deleteBooking (id) {
   return new BookingClientSdk(id).deleteBooking()
 }
@@ -135,7 +139,8 @@ class AppInitializer extends Initializer {
         removeUserFromLaundry,
         listUsersAndInvites,
         listMachines,
-        listMachinesAndUsers
+        listMachinesAndUsers,
+        updateStats
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
       match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {

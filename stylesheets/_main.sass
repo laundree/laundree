@@ -75,7 +75,7 @@
   position: absolute
   z-index: 100
 
-=loading_after()
+=loading_after($size:3em)
   content: ""
   position: absolute
   top: 50%
@@ -89,10 +89,10 @@
   background:
     image: url("data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMjAuNjE0IDIwLjYxNCIgZmlsbD0iIzM1OWM5YyI+DQoJCTxwYXRoIGQ9Ik0xMC42LDE4LjU5OGM1LjIyOC0xLjgzNCw0LjgyNS01LjA4NSw0LjgyNS01LjA4NUM5Ljg3NCwxMy41MTMsMTAuNiwxOC41OTgsMTAuNiwxOC41OTh6Ii8+DQoJCTxwYXRoIGQ9Ik0yLjIyOCwxNS44MDZjLTAuMzcxLDAuMDM2LTEuODU5LDAuNjY3LTEuMDY2LDIuNTUxYzAuNjc3LDEuNTQxLDEuNzYyLDIuMzk2LDMuNDg3LDIuMjM5DQoJCQlDNC4zNTEsMTcuMDgzLDIuNTk4LDE1Ljg3MywyLjIyOCwxNS44MDZ6Ii8+DQoJCQk8cGF0aCBkPSJNMTkuMjUyLDEuOTAxYzAuMTgxLTAuNjg2LDAuMzMtMS4zMzEsMC40My0xLjkwMWgtNy4zMnYwLjAwMWMwLDAtMC4xMDcsMC43Ny0wLjMwMiwxLjlIMTkuMjUyeiIvPg0KCQkJPHBhdGggZD0iTTExLjg2LDMuMDE1Yy0wLjUyMywyLjc5MS0xLjQyNCw2LjcxMi0yLjU1OSw4LjEyMWMtMS41MzMsMi4wODctNi4zMSw0LjEwMS02LjMxLDQuMTAxDQoJCQkJYzIuOTA4LDIuMDczLDIuNDY0LDUuMTk5LDIuNDY0LDUuMTk5bDQuMTMtMS41NjNjMCwwLTAuODEzLTYuMjQ5LDUuOTA2LTYuMjQ5YzAsMCwyLjE4My01LjI5MSwzLjQ0OC05LjYwOEwxMS44NiwzLjAxNQ0KCQkJCUwxMS44NiwzLjAxNXoiLz4NCg0KPC9zdmc+DQo=")
     repeat: no-repeat
-  height: 3em
-  width: 3em
-  margin-left: -1.5em
-  margin-top: -1.5em
+  height: $size
+  width: $size
+  margin-left: $size / -2
+  margin-top: $size / -2
 
 @function logo_ratio_w_to_h($width)
   @return 105.7 / 184 * $width

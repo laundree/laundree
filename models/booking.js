@@ -17,8 +17,6 @@ const bookingSchema = new Schema({
 bookingSchema.index({'from': 1})
 bookingSchema.index({'to': 1})
 
-bookingSchema.statics.findFromId = (id) => BookingModel.findById(new mongoose.Types.ObjectId(id))
-
 const BookingModel = mongoose.model('Booking', bookingSchema)
 
 module.exports = BookingModel
