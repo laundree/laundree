@@ -4,15 +4,18 @@
 const React = require('react')
 const TopNav = require('./topnav.jsx')
 const Footer = require('./footer.jsx')
+const DocumentTitle = require('react-document-title')
 
 class App extends React.Component {
 
   render () {
-    return <div className={this.props.user ? '' : 'footer'}>
-      <TopNav user={this.props.user} currentLaundry={this.props.currentLaundry} laundries={this.props.laundries}/>
-      {this.props.children}
-      {this.props.user ? null : <Footer />}
-    </div>
+    return <DocumentTitle title='Laundree.io'>
+      <div className={this.props.user ? '' : 'footer'}>
+        <TopNav user={this.props.user} currentLaundry={this.props.currentLaundry} laundries={this.props.laundries}/>
+        {this.props.children}
+        {this.props.user ? null : <Footer />}
+      </div>
+    </DocumentTitle>
   }
 }
 

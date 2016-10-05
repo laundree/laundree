@@ -8,7 +8,7 @@ const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dr
 class TopNav extends React.Component {
 
   get laundries () {
-    return this.props.user.laundries.map(id => this.props.laundries[id])
+    return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
   }
 
   renderLaundries () {

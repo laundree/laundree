@@ -26,7 +26,7 @@ class CreateLaundry extends ValueUpdater {
 
   componentWillReceiveProps (nextProps) {
     if (!nextProps.user.laundries.length) return
-    this.context.router.replace(`/laundries/${nextProps.user.laundries[0]}/timetable`)
+    window.location = `/laundries/${nextProps.user.laundries[0]}/timetable`
   }
 
   calculateClassName () {
@@ -90,7 +90,6 @@ class CreateLaundry extends ValueUpdater {
   }
 }
 CreateLaundry.contextTypes = {
-  router: React.PropTypes.object,
   actions: React.PropTypes.shape({
     createLaundry: React.PropTypes.func
   })

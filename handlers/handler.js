@@ -29,8 +29,9 @@ function setupListener (_Handler, emitter, event, action) {
   debug(`Setting up socket with event "${event}" on "${_Handler.name}"`)
   _Handler.on(event, handler => {
     const laundries = findLaundries(handler)
+    const id = handler.model ? handler.model.id : handler
     debug(`Emitting ${_Handler.name} ${event} action`)
-    emitter.emit('action', {laundries, action: action(handler)})
+    emitter.emit('action', {id, laundries, action: action(handler)})
   })
 }
 
@@ -52,7 +53,7 @@ class Handler {
 
   static _findFromId (Model, Handler, id) {
     if (!regex.mongoDbId.exec(id)) return Promise.resolve(undefined)
-    return Model.findFromId(id)
+    return Model.findById(id)
       .exec()
       .then((m) => m ? new Handler(m).updateDocument() : undefined)
   }
@@ -87,11 +88,20 @@ class Handler {
       return _Handler.pubEmitter.removeListener.apply(_Handler.pubEmitter, arguments)
     }
     _Handler.prototype.emitEvent = function (event) {
+      const EventHandler = require('./event')
       _Handler.subEmitter.emit(event, this)
+      return EventHandler.createEvent(event, this)
+    }
+    _Handler.fetchCount = function () {
+      return _Model.count()
     }
     _Handler.find = (filter, options) => Handler._find(_Model, _Handler, filter, options)
     _Handler.findFromId = (id) => Handler._findFromId(_Model, _Handler, id)
     _Handler.redux = buildReduxEventEmitter(_Handler)
+    _Handler.fetchEvents = (filter = {}) => {
+      const EventHandler = require('./event')
+      return EventHandler.find(Object.assign(filter, {model: _Model.modelName}))
+    }
   }
 
   /**
@@ -144,8 +154,20 @@ class Handler {
     })
   }
 
+  fetchEvents (filter = {}) {
+    const EventHandler = require('./event')
+    return EventHandler.find(Object.assign(filter, {reference: this.model._id}))
+  }
+
   get reduxModel () {
     return {}
+  }
+}
+
+Handler.eventFilters = {
+  within24HoursDeleteUpdate: {
+    createdAt: {$gt: new Date(Date.now() - (60 * 60 * 24 * 1000))},
+    type: {$in: ['delete', 'create']}
   }
 }
 

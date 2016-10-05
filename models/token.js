@@ -15,12 +15,6 @@ tokenSchema.index({name: 1, owner: 1}, {unique: true})
 
 tokenSchema.index({'name': 1})
 
-/**
- * Find from id string
- * @param {string} id
- */
-tokenSchema.statics.findFromId = (id) => TokenModel.findById(new mongoose.Types.ObjectId(id))
-
 const TokenModel = mongoose.model('Token', tokenSchema)
 
 module.exports = TokenModel

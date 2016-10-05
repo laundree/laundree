@@ -12,12 +12,6 @@ var laundryInvitationSchema = new Schema({
 
 laundryInvitationSchema.index({email: 1})
 
-/**
- * Find from id string
- * @param {string} id
- */
-laundryInvitationSchema.statics.findFromId = (id) => LaundryInvitationModel.findById(new mongoose.Types.ObjectId(id))
-
 const LaundryInvitationModel = mongoose.model('LaundryInvitation', laundryInvitationSchema)
 
 module.exports = LaundryInvitationModel

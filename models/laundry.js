@@ -16,8 +16,6 @@ const laundrySchema = new Schema({
 laundrySchema.index({'name': 1})
 laundrySchema.index({'users': 1})
 
-laundrySchema.statics.findFromId = (id) => LaundryModel.findById(new mongoose.Types.ObjectId(id))
-
 const LaundryModel = mongoose.model('Laundry', laundrySchema)
 
 module.exports = LaundryModel

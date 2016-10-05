@@ -56,6 +56,15 @@ describe('handlers', () => {
                   })
               }))))
     })
+    describe('emitEvent', () => {
+      it('should log', () => {
+        user.fetchEvents()
+          .then(events => events.should.have.length(1))
+          .then(() => user.emitEvent('update'))
+          .then(() => user.fetchEvents())
+          .then(events => events.should.have.length(2))
+      })
+    })
 
     describe('findFromEmail', () => {
       it('should be possible to find existing profiles from email',

@@ -3,3 +3,41 @@
   margin: auto
   h1
     text-align: left
+
+  #Stats
+    ul
+      list-style-type: none
+      overflow: hidden
+      &.loading
+        li:after
+          +loading_after(1em)
+        li:before
+          +loading_before()
+      li
+        float: left
+        display: block
+        width: calc(25% - (3em / 4))
+        position: relative
+        background-color: #7FECEC
+        margin-right: 1em
+        text-align: center
+        padding: 1em 0
+        font-family: "Roboto Condensed", sans-serif
+        +border-radius(0.2em)
+
+        &:last-of-type
+          margin-right: 0
+
+        .label
+          display: block
+          line-height: 2em
+          font-size: 0.8em
+          bottom: 0
+          width: 100%
+          left: 0
+          right: 0
+        .value
+          height: 1em
+          font-size: 3em
+          line-height: 1em
+          display: block
