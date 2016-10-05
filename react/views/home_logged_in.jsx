@@ -2,6 +2,7 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
+const AdminPanel = require('../containers/admin_panel')
 
 class CreateLaundry extends ValueUpdater {
 
@@ -99,4 +100,10 @@ CreateLaundry.propTypes = {
   user: React.PropTypes.object
 }
 
-module.exports = CreateLaundry
+const CreateLaundryOrAdminPanel = ({user}) => user.role === 'admin' ? <AdminPanel/> : <CreateLaundry user={user}/>
+
+CreateLaundryOrAdminPanel.propTypes = {
+  user: React.PropTypes.object
+}
+
+module.exports = CreateLaundryOrAdminPanel

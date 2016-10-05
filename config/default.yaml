@@ -54,8 +54,8 @@ emails:
   support: support@laundree.io
   from: '"Laundree.io" <no-reply@laundree.io>'
 
-defaultAdmins:
-  - budde@laundree.io
+defaultUsers:
+  budde@laundree.io: admin
 
 mode: 'master'
 

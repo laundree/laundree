@@ -4,7 +4,7 @@
 const React = require('react')
 const {Route, IndexRoute, IndexRedirect} = require('react-router')
 const {
-  Users, App, LeftNav, CreateLaundry, Home, Forgot, SignUp, Auth,
+  Users, App, LeftNav, HomeLoggedIn, Home, Forgot, SignUp, Auth,
   LogIn, Timetable, Bookings, LaundrySettings, Machines, Reset, Verification,
   Privacy, TermsAndConditions, Settings, About, Support, Contact
 } = require('../containers')
@@ -12,7 +12,9 @@ function checkLaundryGenerator (store) {
   return (state, replace) => {
     const {currentUser, users} = store.getState()
     if (!currentUser) return
-    const laundries = users[currentUser].laundries
+    const user = users[currentUser]
+    if (user.role === 'admin') return
+    const laundries = user.laundries
     if (!laundries.length) return
     replace({
       pathname: `/laundries/${laundries[0]}/timetable`
@@ -47,7 +49,7 @@ function routeGenerator (store) {
   if (state.currentUser) {
     return [
       <Route component={App} path='/'>
-        <IndexRoute component={CreateLaundry} onEnter={checkLaundryGenerator(store)}/>
+        <IndexRoute component={HomeLoggedIn} onEnter={checkLaundryGenerator(store)}/>
         <Route path='laundries/:id' component={LeftNav} onEnter={checkExistingLaundryGenerator(store)}>
           <IndexRedirect to='timetable'/>
           <Route path='timetable' component={Timetable}/>

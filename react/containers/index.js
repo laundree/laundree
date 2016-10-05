@@ -20,8 +20,9 @@ module.exports = {
   Machines: require('./machines'),
   LogIn: require('./login'),
   Users: require('./users'),
-  CreateLaundry: require('./create_laundry'),
+  HomeLoggedIn: require('./home_logged_in'),
   Settings: require('./settings'),
   Support: require('./support'),
+  AdminPanel: require('./admin_panel'),
   Contact: require('../views').Contact
 }

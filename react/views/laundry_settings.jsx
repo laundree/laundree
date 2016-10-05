@@ -128,6 +128,7 @@ class LaundrySettings extends React.Component {
   }
 
   render () {
+    if (!this.laundry) return null
     return <DocumentTitle title='Laundry Settings'>
       <main className='naved' id='LaundrySettings'>
         <h1>Laundry settings</h1>
