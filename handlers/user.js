@@ -10,7 +10,7 @@ const utils = require('../utils')
 const Promise = require('promise')
 const uuid = require('uuid')
 const {types: {UPDATE_USER}} = require('../redux/actions')
-
+const config = require('config')
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -241,9 +241,11 @@ class UserHandler extends Handler {
    */
   static createUserFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
+    const role = profile.emails.reduce((role, {value}) => role || config.get('defaultUsers')[value], null) || 'user'
     return new UserModel({
       profiles: [Object.assign({}, profile, {emails: profile.emails.map(({value}) => ({value: value.toLowerCase()}))})],
-      latestProvider: profile.provider
+      latestProvider: profile.provider,
+      role
     }).save()
       .then((model) => new UserHandler(model))
       .then((user) => {

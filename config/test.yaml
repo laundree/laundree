@@ -12,3 +12,6 @@ security:
 mailer:
   stubTransporter: true
   dryRun: false
+
+defaultUsers:
+  test-admin@example.com: admin

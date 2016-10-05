@@ -28,6 +28,12 @@ describe('handlers', () => {
     }))
 
     describe('createUserFromProfile', () => {
+      it('should set role', () => user.model.role.should.equal('user'))
+
+      it('should set role from config', () => UserHandler
+        .createUserFromProfile(Object.assign({}, profile, {emails: [{value: 'test-admin@example.com'}]}))
+        .then(user => user.model.role.should.equal('admin')))
+
       it('should add laundry if invitations on creation', () =>
         user.createLaundry('Bobs Laundry').then((laundry) =>
           laundry
