@@ -7,6 +7,7 @@ const {union} = require('../utils/array')
 
 var userSchema = new Schema({
   role: {type: String, default: 'user', enum: ['user', 'admin']},
+  demo: Boolean,
   oneTimePassword: {type: String},
   password: {type: String},
   resetPasswordToken: String,
