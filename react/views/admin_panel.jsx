@@ -8,16 +8,23 @@ class AdminPanel extends React.Component {
   }
 
   renderStats () {
-    const {laundryCount, userCount, machineCount, bookingCount} = this.stats
-
+    const {realLaundryCount, realUserCount, demoUserCount, demoLaundryCount, machineCount, bookingCount} = this.stats
     return <ul className={this.props.stats ? '' : 'loading'}>
       <li>
-        <span className='value'>{userCount}</span>
+        <span className='value'>{realUserCount}</span>
         <span className='label'>Users</span>
       </li>
       <li>
-        <span className='value'>{laundryCount}</span>
+        <span className='value'>{demoUserCount}</span>
+        <span className='label'>Demo users</span>
+      </li>
+      <li>
+        <span className='value'>{realLaundryCount}</span>
         <span className='label'>Laundries</span>
+      </li>
+      <li>
+        <span className='value'>{demoLaundryCount}</span>
+        <span className='label'>Demo laundries</span>
       </li>
       <li>
         <span className='value'>{machineCount}</span>
@@ -31,7 +38,12 @@ class AdminPanel extends React.Component {
   }
 
   get stats () {
-    return this.props.stats || {}
+    if (!this.props.stats) return {}
+    const {laundryCount, demoLaundryCount, userCount, demoUserCount} = this.props.stats
+    return Object.assign({
+      realLaundryCount: laundryCount - demoLaundryCount,
+      realUserCount: userCount - demoUserCount
+    }, this.props.stats)
   }
 
   render () {

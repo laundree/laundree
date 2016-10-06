@@ -434,6 +434,10 @@ class UserHandler extends Handler {
       role: this.model.role
     }
   }
+
+  get eventData () {
+    return {demo: this.isDemo}
+  }
 }
 
 Handler.setupHandler(UserHandler, UserModel, {
