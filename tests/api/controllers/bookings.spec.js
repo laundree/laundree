@@ -337,6 +337,29 @@ describe('controllers', function () {
               })
             })))
 
+      it('should succeed and save events', () =>
+        dbUtils.populateMachines(1).then(({user, token, machine}) =>
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({from: new Date(Date.now() + 60 * 60 * 1000), to: new Date(Date.now() + 2 * 60 * 60 * 1000)})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+              const id = res.body.id
+              return BookingHandler
+                .findFromId(id)
+                .then(booking => booking.fetchEvents())
+                .then(events => {
+                  events.should.have.length(1)
+                  const [event] = events
+                  event.model.type.should.equal('create')
+                  event.model.user.toString().should.equal(user.model.id)
+                })
+            })))
+
       it('should fail on too soon booking', () =>
         dbUtils.populateMachines(1).then(({user, token, machine}) =>
           request(app)

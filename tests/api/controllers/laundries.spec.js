@@ -150,12 +150,13 @@ describe('controllers', function () {
     })
 
     describe('POST /api/laundries/demo', () => {
-      it('should create a new user', () => request(app)
+      it('should create a new demo user', () => request(app)
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.findFromEmail(res.body.email).then(user => {
           assert(user)
+          user.isDemo.should.be.true
         })))
 
       it('should create a new user with one-time password', () => request(app)
@@ -176,12 +177,13 @@ describe('controllers', function () {
           assert(user.isVerified(res.body.email))
         })))
 
-      it('should create a new user with a laundry', () => request(app)
+      it('should create a new user with a demo laundry', () => request(app)
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(laundries => {
           laundries.should.have.length(1)
+          laundries[0].isDemo.should.be.true
         }))))
 
       it('should create a new user with a laundry and two machines', () => request(app)

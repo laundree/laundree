@@ -162,6 +162,10 @@ class Handler {
   get reduxModel () {
     return {}
   }
+
+  get eventData () {
+    return null
+  }
 }
 
 Handler.eventFilters = {

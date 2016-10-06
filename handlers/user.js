@@ -85,6 +85,13 @@ class UserHandler extends Handler {
   }
 
   /**
+   * @returns {boolean}
+   */
+  get isDemo () {
+    return Boolean(this.model.demo)
+  }
+
+  /**
    * Finds the laundries owned by this user
    * @return {Promise<LaundryHandler[]>}
    */
@@ -297,6 +304,7 @@ class UserHandler extends Handler {
       ])
       .then(([user, {token, hash}]) => {
         user.model.oneTimePassword = hash
+        user.model.demo = true
         user.model.explicitVerifiedEmails.push(email)
         return user.model.save().then(() => ({password: token, user, email}))
       })

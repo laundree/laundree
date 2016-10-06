@@ -83,6 +83,14 @@ class LaundryHandler extends Handler {
   }
 
   /**
+   * Is this laundry a demo laundry
+   * @returns {boolean}
+   */
+  get isDemo () {
+    return Boolean(this.model.demo)
+  }
+
+  /**
    * Create a new machine with given name
    * @param {string} name
    * @param {string} type
