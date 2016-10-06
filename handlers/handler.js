@@ -92,8 +92,8 @@ class Handler {
       _Handler.subEmitter.emit(event, this)
       return EventHandler.createEvent(event, this)
     }
-    _Handler.fetchCount = function () {
-      return _Model.count()
+    _Handler.fetchCount = function (criteria = {}) {
+      return _Model.count(criteria)
     }
     _Handler.find = (filter, options) => Handler._find(_Model, _Handler, filter, options)
     _Handler.findFromId = (id) => Handler._findFromId(_Model, _Handler, id)

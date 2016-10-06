@@ -314,6 +314,10 @@ class LaundryHandler extends Handler {
       demo: this.model.demo
     }
   }
+
+  get eventData () {
+    return {demo: this.isDemo}
+  }
 }
 
 Handler.setupHandler(LaundryHandler, LaundryModel, {
