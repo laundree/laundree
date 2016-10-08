@@ -84,11 +84,6 @@ class LaundrySettings extends React.Component {
       .deleteLaundry(this.props.currentLaundry)
   }
 
-  componentWillReceiveProps ({user}) {
-    if (user.laundries.length) return
-    window.location = `/`
-  }
-
   get isOwner () {
     return this.laundry.owners.indexOf(this.props.user.id) >= 0
   }

@@ -5,10 +5,12 @@
 const connect = require('react-redux').connect
 const {LeftNav} = require('../views')
 
-const mapStateToProps = ({laundries, currentUser}, {params: {id}}) => {
+const mapStateToProps = ({users, laundries, currentUser}, {params: {id}}) => {
   return {
-    laundry: laundries[id],
-    currentUser
+    laundries,
+    currentLaundry: id,
+    currentUser,
+    users
   }
 }
 
