@@ -1,11 +1,14 @@
 #AdminPanel
+  padding-bottom: 4em
   max-width: 70em
   margin: auto
+  overflow: hidden
   h1
     text-align: left
 
   #Stats
     ul
+      padding-top: 2em
       list-style-type: none
       overflow: hidden
       &.loading
@@ -42,3 +45,24 @@
           font-size: 3em
           line-height: 1em
           display: block
+  #LaundryList
+    padding-right: 1em
+  #LaundryList, #UserList
+    width: calc(50% - 0.5em)
+    float: left
+    ul
+      padding-top: 2em
+
+@media only screen and (max-width: 40em)
+  #AdminPanel
+    #Stats
+      ul
+        li
+          width: calc(50% - 0.5em)
+          &:nth-of-type(2n)
+            margin-right: 0
+    #LaundryList
+      padding-bottom: 2em
+    #LaundryList, #UserList
+      width: 100%
+      padding-right: 0

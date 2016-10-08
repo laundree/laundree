@@ -86,8 +86,16 @@ function listUsersAndInvites (laundryId) {
   return nsp.emit('listUsersAndInvites', laundryId)
 }
 
+function listUsers () {
+  return nsp.emit('listUsers')
+}
+
 function listMachines (laundryId) {
   return nsp.emit('listMachines', laundryId)
+}
+
+function listLaundries () {
+  return nsp.emit('listLaundries')
 }
 
 function listMachinesAndUsers (laundryId) {
@@ -130,6 +138,7 @@ class AppInitializer extends Initializer {
         userResetPassword,
         createBooking,
         deleteBooking,
+        listUsers,
         listBookingsInTime,
         listBookingsForUser,
         inviteUserByEmail,
@@ -140,6 +149,7 @@ class AppInitializer extends Initializer {
         listUsersAndInvites,
         listMachines,
         listMachinesAndUsers,
+        listLaundries,
         updateStats
       }
       if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))

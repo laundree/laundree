@@ -168,7 +168,7 @@ InviteItem.contextTypes = {
 class Users extends React.Component {
 
   renderUsers () {
-    return <ul>
+    return <ul className='bigList'>
       {this.users.map((user) => <li key={user.id}><UserItem user={user} laundry={this.props.laundry}/></li>)}
       {this.invites.map(invite => <li key={invite.id}><InviteItem invite={invite}/></li>)}
     </ul>
@@ -188,7 +188,7 @@ class Users extends React.Component {
 
   render () {
     return <DocumentTitle title='Laundry users'>
-      <main className='naved'>
+      <main className='naved' id='Users'>
         <h1 className='alignLeft'>Laundry users</h1>
         <section id='UserList'>
           {this.renderUsers()}
