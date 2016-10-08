@@ -223,6 +223,7 @@ class TimetableWrapper extends React.Component {
   }
 
   render () {
+    if (!this.props.laundry) return null
     return <DocumentTitle title='Timetable'>
       {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
     </DocumentTitle>

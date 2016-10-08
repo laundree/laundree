@@ -10,11 +10,21 @@ class LeftNav extends React.Component {
   }
 
   get isOwner () {
-    return this.props.laundry.owners.indexOf(this.props.currentUser) >= 0
+    return this.laundry.owners.indexOf(this.props.currentUser) >= 0
+  }
+
+  componentWillReceiveProps ({currentUser, users, currentLaundry}) {
+    const user = users[currentUser]
+    if (!user || user.laundries.indexOf(currentLaundry) >= 0) return
+    window.location = `/`
+  }
+
+  get laundry () {
+    return this.props.laundries[this.props.currentLaundry]
   }
 
   render () {
-    if (!this.props.laundry) return null
+    if (!this.laundry) return null
     const owner = this.isOwner
     return <div>
       <div className={this.state.expanded ? 'expanded_left_nav' : ''}>
@@ -30,7 +40,7 @@ class LeftNav extends React.Component {
           <ul>
             <li>
               <Link
-                to={'/laundries/' + this.props.laundry.id + '/timetable'} activeClassName='active'
+                to={'/laundries/' + this.laundry.id + '/timetable'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
                   <use xlinkHref='#Time'/>
@@ -40,7 +50,7 @@ class LeftNav extends React.Component {
             </li>
             <li>
               <Link
-                to={'/laundries/' + this.props.laundry.id + '/bookings'} activeClassName='active'
+                to={'/laundries/' + this.laundry.id + '/bookings'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
                   <use xlinkHref='#List'/>
@@ -51,7 +61,7 @@ class LeftNav extends React.Component {
             {owner
               ? <li>
               <Link
-                to={'/laundries/' + this.props.laundry.id + '/machines'} activeClassName='active'
+                to={'/laundries/' + this.laundry.id + '/machines'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
                   <use xlinkHref='#SimpleMachine'/>
@@ -63,7 +73,7 @@ class LeftNav extends React.Component {
             {owner
               ? <li>
               <Link
-                to={'/laundries/' + this.props.laundry.id + '/users'} activeClassName='active'
+                to={'/laundries/' + this.laundry.id + '/users'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
                   <use xlinkHref='#Users'/>
@@ -77,7 +87,7 @@ class LeftNav extends React.Component {
           <ul>
             <li>
               <Link
-                to={'/laundries/' + this.props.laundry.id + '/settings'} activeClassName='active'
+                to={'/laundries/' + this.laundry.id + '/settings'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
                   <use xlinkHref='#Gears'/>
@@ -96,7 +106,8 @@ class LeftNav extends React.Component {
 LeftNav.propTypes = {
   children: React.PropTypes.any,
   currentUser: React.PropTypes.string.isRequired,
-  laundry: React.PropTypes.object
+  laundries: React.PropTypes.object,
+  currentLaundry: React.PropTypes.string
 }
 
 module.exports = LeftNav
