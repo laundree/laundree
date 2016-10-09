@@ -6,6 +6,7 @@ const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
+const sdk = require('../../client/sdk')
 
 class SignUp extends ValueUpdater {
 
@@ -14,8 +15,7 @@ class SignUp extends ValueUpdater {
     this.submitHandler = (evt) => {
       this.setState({loading: true})
       evt.preventDefault()
-      if (!this.context.actions.signUpUser) return
-      return this.context.actions.signUpUser(
+      return sdk.user.signUpUser(
         this.state.values.name,
         this.state.values.email,
         this.state.values.password
@@ -124,12 +124,6 @@ class SignUp extends ValueUpdater {
       </div>
     </DocumentTitle>
   }
-}
-
-SignUp.contextTypes = {
-  actions: React.PropTypes.shape({
-    userForgotPassword: React.PropTypes.func
-  })
 }
 
 module.exports = SignUp

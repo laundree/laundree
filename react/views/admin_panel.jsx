@@ -1,11 +1,12 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
+const sdk = require('../../client/sdk')
 
 class Stats extends React.Component {
 
   componentDidMount () {
-    this.context.actions.updateStats()
+    sdk.updateStats()
   }
 
   renderStats () {
@@ -55,19 +56,13 @@ class Stats extends React.Component {
   }
 }
 
-Stats.contextTypes = {
-  actions: React.PropTypes.shape({
-    updateStats: React.PropTypes.func
-  })
-}
-
 Stats.propTypes = {
   stats: React.PropTypes.object
 }
 
 class LaundryList extends React.Component {
   componentDidMount () {
-    this.context.actions.listLaundries()
+    sdk.listLaundries()
   }
 
   get laundries () {
@@ -95,19 +90,13 @@ class LaundryList extends React.Component {
   }
 }
 
-LaundryList.contextTypes = {
-  actions: React.PropTypes.shape({
-    listLaundries: React.PropTypes.func
-  })
-}
-
 LaundryList.propTypes = {
   laundries: React.PropTypes.object
 }
 
 class UserList extends React.Component {
   componentDidMount () {
-    this.context.actions.listUsers()
+    sdk.listUsers()
   }
 
   get users () {
@@ -128,12 +117,6 @@ class UserList extends React.Component {
       </ul>
     </section>
   }
-}
-
-UserList.contextTypes = {
-  actions: React.PropTypes.shape({
-    listLaundries: React.PropTypes.func
-  })
 }
 
 UserList.propTypes = {

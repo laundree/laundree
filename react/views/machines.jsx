@@ -4,6 +4,7 @@ const {ValidationElement, ValidationForm} = require('./validation')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
 const Modal = require('./modal.jsx')
 const {MachineClientSdk, LaundryClientSdk} = require('../../client/sdk')
+const sdk = require('../../client/sdk')
 
 class MachineDropdown extends React.Component {
 
@@ -196,7 +197,7 @@ class Machines extends React.Component {
   }
 
   componentDidMount () {
-    this.context.actions.listMachines(this.props.currentLaundry)
+    sdk.listMachines(this.props.currentLaundry)
   }
 
   render () {
@@ -232,12 +233,6 @@ class Machines extends React.Component {
       </main>
     </DocumentTitle>
   }
-}
-
-Machines.contextTypes = {
-  actions: React.PropTypes.shape({
-    listUsersAndInvites: React.PropTypes.func
-  })
 }
 
 Machines.propTypes = {

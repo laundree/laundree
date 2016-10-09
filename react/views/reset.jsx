@@ -6,6 +6,7 @@ const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
+const sdk = require('../../client/sdk')
 
 class Reset extends ValueUpdater {
 
@@ -15,8 +16,7 @@ class Reset extends ValueUpdater {
       const {location: {query: {user, token}}} = this.props
       this.setState({loading: true})
       evt.preventDefault()
-      return this.context.actions
-        .userResetPassword(user, token, this.state.values.password)
+      return sdk.user(user).resetPassword(token, this.state.values.password)
         .then(
           () => this.reset({
             loading: false,
@@ -74,12 +74,6 @@ class Reset extends ValueUpdater {
       </div>
     </DocumentTitle>
   }
-}
-
-Reset.contextTypes = {
-  actions: React.PropTypes.shape({
-    userResetPassword: React.PropTypes.func
-  })
 }
 
 Reset.propTypes = {

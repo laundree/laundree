@@ -14,106 +14,20 @@ const routeGenerator = require('../../react/routes')
 const io = require('socket.io-client')
 const {createStore} = require('redux')
 const reducer = require('../../redux/reducer')
-const {ActionProvider} = require('../../react/views/providers')
-const {UserClientSdk, LaundryClientSdk, MachineClientSdk, BookingClientSdk, InviteClientSdk} = require('../sdk')
+const sdk = require('../sdk')
 
-const nsp = io('/redux')
+const socket = io('/redux')
 
 function setupStore () {
   const state = window.__REDUX_STATE__
   debug('Setting up store with state', state)
   const store = createStore(reducer, state)
-  nsp.on('action', (action) => {
+  socket.on('action', (action) => {
     debug(action)
     store.dispatch(action)
   })
+  sdk.setupRedux(store, socket)
   return store
-}
-
-function signUpUser (name, email, password) {
-  return UserClientSdk
-    .createUser(name, email, password)
-    .then((user) => user.startEmailVerification(email))
-}
-
-function startEmailVerification (email) {
-  return UserClientSdk
-    .userFromEmail(email)
-    .then(user => {
-      if (!user) throw new Error('User not found')
-      return user.startEmailVerification(email)
-    })
-}
-
-function userForgotPassword (email) {
-  return UserClientSdk.userFromEmail(email).then((user) => {
-    if (!user) throw new Error('User not found')
-    return user.startPasswordReset()
-  })
-}
-
-function userResetPassword (userId, token, newPassword) {
-  return new UserClientSdk(userId).resetPassword(token, newPassword)
-}
-
-function createLaundry (name) {
-  return LaundryClientSdk.createLaundry(name)
-}
-
-function createBooking (id, from, to) {
-  return new MachineClientSdk(id).createBooking(from, to)
-}
-
-function listBookingsInTime (laundryId, from, to) {
-  return nsp.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
-}
-
-function listBookingsForUser (laundryId, userId, filter = {}) {
-  return nsp.emit('listBookingsForUser', laundryId, userId, filter)
-}
-
-function listUsersAndInvites (laundryId) {
-  return nsp.emit('listUsersAndInvites', laundryId)
-}
-
-function listUsers () {
-  return nsp.emit('listUsers')
-}
-
-function listMachines (laundryId) {
-  return nsp.emit('listMachines', laundryId)
-}
-
-function listLaundries () {
-  return nsp.emit('listLaundries')
-}
-
-function listMachinesAndUsers (laundryId) {
-  return nsp.emit('listMachinesAndUsers', laundryId)
-}
-
-function updateStats () {
-  return nsp.emit('updateStats')
-}
-
-function deleteBooking (id) {
-  return new BookingClientSdk(id).deleteBooking()
-}
-
-function inviteUserByEmail (laundryId, email) {
-  return new LaundryClientSdk(laundryId).inviteUserByEmail(email)
-}
-
-function deleteLaundry (laundryId) {
-  return new LaundryClientSdk(laundryId).deleteLaundry()
-}
-
-function deleteInvite (id) {
-  return new InviteClientSdk(id).deleteInvite()
-}
-
-function removeUserFromLaundry (laundryId, userId) {
-  return new LaundryClientSdk(laundryId).removeUserFromLaundry(userId)
 }
 
 class AppInitializer extends Initializer {
@@ -121,36 +35,13 @@ class AppInitializer extends Initializer {
     const rootElement = element.querySelector('#AppRoot')
     if (!rootElement) return
     const store = setupStore()
-    const actions = {
-      userForgotPassword,
-      signUpUser,
-      createLaundry,
-      userResetPassword,
-      createBooking,
-      deleteBooking,
-      listUsers,
-      listBookingsInTime,
-      listBookingsForUser,
-      inviteUserByEmail,
-      deleteLaundry,
-      startEmailVerification,
-      deleteInvite,
-      removeUserFromLaundry,
-      listUsersAndInvites,
-      listMachines,
-      listMachinesAndUsers,
-      listLaundries,
-      updateStats
-    }
     match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
       ReactDOM.render(
-        <ActionProvider actions={actions}>
-          <IntlProvider locale='en'>
-            <Provider store={store}>
-              {React.createElement(Router, Object.assign({}, renderProps))}
-            </Provider>
-          </IntlProvider>
-        </ActionProvider>, rootElement)
+        <IntlProvider locale='en'>
+          <Provider store={store}>
+            {React.createElement(Router, Object.assign({}, renderProps))}
+          </Provider>
+        </IntlProvider>, rootElement)
     })
   }
 }

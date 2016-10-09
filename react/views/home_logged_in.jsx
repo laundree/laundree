@@ -3,6 +3,7 @@ const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const AdminPanel = require('../containers/admin_panel')
+const sdk = require('../../client/sdk')
 
 class CreateLaundry extends ValueUpdater {
 
@@ -17,10 +18,9 @@ class CreateLaundry extends ValueUpdater {
     this.onSubmit = (event) => {
       event.preventDefault()
       this.setState({loading: true})
-      this.context.actions.createLaundry(this.state.values.name.trim()).then(
-        (data) => {
-        },
-        (err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
+      sdk.laundry
+        .createLaundry(this.state.values.name.trim())
+        .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
     }
   }
 
@@ -88,11 +88,6 @@ class CreateLaundry extends ValueUpdater {
       </main>
     </DocumentTitle>
   }
-}
-CreateLaundry.contextTypes = {
-  actions: React.PropTypes.shape({
-    createLaundry: React.PropTypes.func
-  })
 }
 
 CreateLaundry.propTypes = {

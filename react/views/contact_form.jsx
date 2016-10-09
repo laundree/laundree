@@ -1,7 +1,7 @@
 const React = require('react')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
-const {ContactClientSdk} = require('../../client/sdk')
+const sdk = require('../../client/sdk')
 
 const UserInput = ({user: {photo, displayName}}) => <div className='userInput'>
   <img className='avatar' src={photo}/>
@@ -28,7 +28,7 @@ class ContactForm extends ValueUpdater {
   submit () {
     this.setState({loading: true})
     const {email, name, subject, message} = this.state.values
-    ContactClientSdk
+    sdk
       .contact({name: name || undefined, email: email || undefined, message, subject})
       .then(() => this.reset({loading: false, sent: true}))
   }

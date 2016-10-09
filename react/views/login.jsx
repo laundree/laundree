@@ -104,10 +104,4 @@ LogIn.propTypes = {
   })).isRequired
 }
 
-LogIn.contextTypes = {
-  actions: React.PropTypes.shape({
-    startEmailVerification: React.PropTypes.func
-  })
-}
-
 module.exports = LogIn

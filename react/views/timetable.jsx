@@ -8,12 +8,13 @@ const TimetableHeaders = require('./timetable_headers.jsx')
 const {Link} = require('react-router')
 const {FormattedDate} = require('react-intl')
 const {range} = require('../../utils/array')
+const sdk = require('../../client/sdk')
 
 class BookingInfo extends React.Component {
 
   constructor (props) {
     super(props)
-    this.deleteHandler = () => this.context.actions.deleteBooking(this.props.booking.id)
+    this.deleteHandler = () => sdk.user(this.props.booking.id).deleteUser()
   }
 
   renderActions () {
@@ -67,12 +68,6 @@ class BookingInfo extends React.Component {
   }
 }
 
-BookingInfo.contextTypes = {
-  actions: React.PropTypes.shape({
-    deleteBooking: React.PropTypes.func
-  })
-}
-
 BookingInfo.propTypes = {
   currentUser: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
@@ -99,7 +94,7 @@ class Timetable extends React.Component {
   }
 
   componentDidMount () {
-    this.context.actions.listMachinesAndUsers(this.props.laundry.id)
+    sdk.listMachinesAndUsers(this.props.laundry.id)
     window.addEventListener('resize', this.handleResize)
     const numDays = this.numDays
     this.setState({numDays})
@@ -171,12 +166,6 @@ class Timetable extends React.Component {
       </div>
     </main>
   }
-}
-
-Timetable.contextTypes = {
-  actions: React.PropTypes.shape({
-    listMachinesAndUsers: React.PropTypes.func
-  })
 }
 
 Timetable.propTypes = {

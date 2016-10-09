@@ -3,6 +3,7 @@ const {FormattedDate} = require('react-intl')
 const {Link} = require('react-router')
 const DocumentTitle = require('react-document-title')
 const Modal = require('./modal.jsx')
+const sdk = require('../../client/sdk')
 
 class Booking extends React.Component {
 
@@ -10,7 +11,7 @@ class Booking extends React.Component {
     super(props)
     this.state = {showModal: false}
     this.onCloseModal = () => this.setState({showModal: false})
-    this.onDeleteModal = () => this.context.actions.deleteBooking(this.props.booking.id)
+    this.onDeleteModal = () => sdk.booking(this.props.booking.id).deleteBooking()
     this.onDeleteClick = () => this.setState({showModal: true})
   }
 
@@ -59,12 +60,6 @@ class Booking extends React.Component {
 
 }
 
-Booking.contextTypes = {
-  actions: React.PropTypes.shape({
-    deleteBooking: React.PropTypes.func
-  })
-}
-
 Booking.propTypes = {
   currentLaundry: React.PropTypes.string.isRequired,
   machines: React.PropTypes.object.isRequired,
@@ -84,13 +79,8 @@ class Bookings extends React.Component {
     this.onCloseModal = () => this.setState({showModal: false})
   }
 
-  deleteModalGenerator (booking) {
-    return () => this.context.actions.deleteBooking(booking.id).then(() => this.setState({showModal: false}))
-  }
-
   componentDidMount () {
-    this.context.actions
-      .listBookingsForUser(this.props.currentLaundry, this.props.user.id, {to: {$gte: new Date()}})
+    sdk.listBookingsForUser(this.props.currentLaundry, this.props.user.id, {to: {$gte: new Date()}})
   }
 
   renderBookings () {
@@ -113,13 +103,6 @@ class Bookings extends React.Component {
       </main>
     </DocumentTitle>
   }
-}
-
-Bookings.contextTypes = {
-  actions: React.PropTypes.shape({
-    listBookingsForUser: React.PropTypes.func,
-    deleteBooking: React.PropTypes.func
-  })
 }
 
 Bookings.propTypes = {

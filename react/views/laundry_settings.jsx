@@ -4,6 +4,7 @@ const Modal = require('./modal.jsx')
 const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {LaundryClientSdk} = require('../../client/sdk')
+const sdk = require('../../client/sdk')
 
 class LaundrySettingsForm extends ValueUpdater {
 
@@ -80,8 +81,7 @@ class LaundrySettings extends React.Component {
   }
 
   deleteLaundry () {
-    return this.context.actions
-      .deleteLaundry(this.props.currentLaundry)
+    return sdk.laundry(this.props.currentLaundry).deleteLaundry()
   }
 
   get isOwner () {
@@ -144,11 +144,6 @@ LaundrySettings.propTypes = {
   user: React.PropTypes.shape({
     id: React.PropTypes.string,
     photo: React.PropTypes.string
-  })
-}
-LaundrySettings.contextTypes = {
-  actions: React.PropTypes.shape({
-    deleteLaundry: React.PropTypes.func
   })
 }
 
