@@ -431,7 +431,8 @@ class UserHandler extends Handler {
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,
-      role: this.model.role
+      role: this.model.role,
+      demo: this.isDemo
     }
   }
 

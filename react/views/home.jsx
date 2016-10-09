@@ -3,7 +3,7 @@
  */
 const React = require('react')
 const DocumentTitle = require('react-document-title')
-const {LaundryClientSdk} = require('../../client/sdk')
+const sdk = require('../../client/sdk')
 
 class DemoButton extends React.Component {
 
@@ -12,7 +12,7 @@ class DemoButton extends React.Component {
     this.state = {loading: false, email: '', password: ''}
     this.clickHandler = () => {
       this.setState({loading: true})
-      LaundryClientSdk.createDemoLaundry().then(({email, password}) => this.setState({
+      sdk.laundry.createDemoLaundry().then(({email, password}) => this.setState({
         email,
         password
       }, () => this.ref.submit()))
