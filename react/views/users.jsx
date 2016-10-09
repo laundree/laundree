@@ -165,7 +165,7 @@ class Users extends React.Component {
   }
 
   componentDidMount () {
-    this.context.actions.listUsersAndInvites(this.props.laundry.id)
+    sdk.listUsersAndInvites(this.props.laundry.id)
   }
 
   get users () {
