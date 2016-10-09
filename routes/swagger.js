@@ -2,13 +2,15 @@
  * Created by budde on 05/05/16.
  */
 const Promise = require('promise')
-var path = require('path')
-var YAML = require('yamljs')
-var swaggerTools = require('swagger-tools')
-var passport = require('passport')
+const path = require('path')
+const YAML = require('yamljs')
+const swaggerTools = require('swagger-tools')
+const passport = require('passport')
 const {logError} = require('../utils/error')
 const {opbeat} = require('../lib/opbeat')
 const {TokenHandler, LaundryHandler, MachineHandler, BookingHandler, LaundryInvitationHandler, UserHandler, EventHandler} = require('../handlers')
+const express = require('express')
+const router = express.Router()
 
 function generateError (message, status) {
   const error = new Error(message)
@@ -113,19 +115,19 @@ function genericUserCheck (subjectName) {
   })
 }
 
-function setup (app) {
+function fetchRouter () {
   return new Promise((resolve) => {
     YAML.load(path.join(__dirname, '..', 'api', 'swagger', 'swagger.yaml'),
       (result) => swaggerTools.initializeMiddleware(result, (middleware) => {
-        app.use(middleware.swaggerMetadata())
-        app.use((req, res, next) => {
+        router.use(middleware.swaggerMetadata())
+        router.use((req, res, next) => {
           if (!opbeat) return next()
           if (!req.swagger || !req.swagger.apiPath) return next()
           opbeat.setTransactionName(`${req.method} /api${req.swagger.apiPath}`)
           next()
         })
 
-        app.use((req, res, next) => {
+        router.use((req, res, next) => {
           if (req.user) return next()
           passport.authenticate('basic', (err, user, info) => {
             if (err) return next(err)
@@ -134,8 +136,8 @@ function setup (app) {
             next()
           })(req, res, next)
         })
-        app.use(EventHandler.trackingMiddleware())
-        app.use(middleware.swaggerSecurity({
+        router.use(EventHandler.trackingMiddleware())
+        router.use(middleware.swaggerSecurity({
           subjectsExists: wrapSecurity(pullSubjects),
           userAccess: wrapSecurity(userAccess),
           self: wrapSecurity(self),
@@ -149,16 +151,16 @@ function setup (app) {
           bookingUser: wrapSecurity(genericUserCheck('booking')),
           bookingCreator: wrapSecurity(bookingCreator)
         }))
-        app.use(middleware.swaggerValidator({validateResponse: true}))
-        app.use(middleware.swaggerRouter({controllers: path.join(__dirname, '..', 'api', 'controllers')}))
-        app.use(middleware.swaggerUi())
-        app.use('/api', (err, req, res, next) => {
+        router.use(middleware.swaggerValidator({validateResponse: true}))
+        router.use(middleware.swaggerRouter({controllers: path.join(__dirname, '..', 'api', 'controllers')}))
+        router.use(middleware.swaggerUi())
+        router.use((err, req, res, next) => {
           res.statusCode = res.statusCode && res.statusCode < 300 ? err.status || 500 : res.statusCode
           if (res.statusCode === 500) logError(err)
           res.json({message: err.message})
         })
-        resolve(app)
+        resolve(router)
       }))
   })
 }
-module.exports = setup
+module.exports = {fetchRouter}

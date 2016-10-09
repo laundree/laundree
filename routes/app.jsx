@@ -12,11 +12,10 @@ const {match, RouterContext} = require('react-router')
 const {createInitialStore} = require('../redux')
 const utils = require('../utils')
 const DocumentTitle = require('react-document-title')
-const {ActionProvider} = require('../react/views/providers')
 const {opbeat} = require('../lib/opbeat')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'))
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), req.url)
     .then((store) => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)
@@ -31,15 +30,13 @@ router.use((req, res, next) => {
           opbeat.setTransactionName(`${req.method} ${pattern}`)
         }
         const html = renderToString(
-          <ActionProvider>
-            <IntlProvider locale='en'>
-              <Provider store={store}>
-                {React.createElement(RouterContext, Object.assign({}, renderProps))}
-              </Provider>
-            </IntlProvider>
-          </ActionProvider>)
+          <IntlProvider locale='en'>
+            <Provider store={store}>
+              {React.createElement(RouterContext, Object.assign({}, renderProps))}
+            </Provider>
+          </IntlProvider>)
         const title = DocumentTitle.rewind()
-        res.render('app', {html: html, title: title, flash: JSON.stringify(store.getState().flash)})
+        res.render('app', {html: html, title: title, state: JSON.stringify(store.getState())})
       })
     })
     .catch(utils.error.logError)

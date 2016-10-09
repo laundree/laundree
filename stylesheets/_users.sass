@@ -1,59 +1,61 @@
-#UserList
-  li
-    &:hover
+#Users
+  #UserList
+    li
+      &:hover
+        .name
+          .action.delete
+            opacity: 1
       .name
-        .action.delete
-          opacity: 1
-    .name
-      .action
-        float: right
-        height: 2em
-        padding: 0.5em 0.5em 0.5em 1em
-        &.delete
-          opacity: 0
-          overflow: hidden
-          +transition(opacity 0.1s)
-          svg
-            cursor: pointer
-            fill: #dc3f50
-        svg
+        left: 5em
+        .action
+          float: right
           height: 2em
-          width: 2em
-      .owner
-        font-size: 0.8em
-        font-weight: bold
-        text-transform: uppercase
-        padding: 0 1em
-        color: #c73544
-    .avatarContainer
-      float: left
-      position: relative
-      margin-right: 1em
-      height: 3em
-      width: 3em
-      .avatar
+          padding: 0.5em 0.5em 0.5em 1em
+          &.delete
+            opacity: 0
+            overflow: hidden
+            +transition(opacity 0.1s)
+            svg
+              cursor: pointer
+              fill: #dc3f50
+          svg
+            height: 2em
+            width: 2em
+        .owner
+          font-size: 0.8em
+          font-weight: bold
+          text-transform: uppercase
+          padding: 0 1em
+          color: #c73544
+      .avatarContainer
         float: left
+        position: relative
+        margin-right: 1em
         height: 3em
         width: 3em
-        background-color: #ffffff
-        +border-radius(0.2em)
-#InviteUserForm
-  padding-top: 2em
-  form
-    .demo
-      position: relative
-      &:before
-        +loading_before()
-      &:after
-        content: attr(data-demo-message)
-        position: absolute
-        z-index: 101
-        font-weight: bold
-        font-size: 0.9em
-        top: 0
-        bottom: 0
-        left: 0
-        right: 0
-        text-align: center
-        line-height: 10em
+        .avatar
+          float: left
+          height: 3em
+          width: 3em
+          background-color: #ffffff
+          +border-radius(0.2em)
+  #InviteUserForm
+    padding-top: 2em
+    form
+      .demo
+        position: relative
+        &:before
+          +loading_before()
+        &:after
+          content: attr(data-demo-message)
+          position: absolute
+          z-index: 101
+          font-weight: bold
+          font-size: 0.9em
+          top: 0
+          bottom: 0
+          left: 0
+          right: 0
+          text-align: center
+          line-height: 10em
 

@@ -5,6 +5,7 @@ const Promise = require('promise')
 const React = require('react')
 const {Link} = require('react-router')
 const {range} = require('../../utils/array')
+const sdk = require('../../client/sdk')
 
 function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
@@ -155,7 +156,7 @@ class TimetableTable extends React.Component {
     const {max, min} = TimetableTable._fixPos(from, to)
     const maxExclusive = {x: max.x + 1, y: max.y + 1}
     return Promise.all(range(min.x, maxExclusive.x)
-      .map((x) => this.context.actions.createBooking(this.props.laundry.machines[x], this.posToDate(min), this.posToDate(maxExclusive))))
+      .map((x) => sdk.machine(this.props.laundry.machines[x]).createBooking(this.posToDate(min), this.posToDate(maxExclusive))))
   }
 
   static _fixPos (pos1, pos2) {
@@ -233,12 +234,6 @@ TimetableTable.propTypes = {
   hoverRow: React.PropTypes.number.isRequired
 }
 
-TimetableTable.contextTypes = {
-  actions: React.PropTypes.shape({
-    createBooking: React.PropTypes.func
-  })
-}
-
 class TimetableTables extends React.Component {
 
   constructor (props) {
@@ -254,7 +249,7 @@ class TimetableTables extends React.Component {
     const lastDate = dates[dates.length - 1]
     const lastDateExclusive = new Date(lastDate.getTime())
     lastDateExclusive.setDate(lastDate.getDate() + 1)
-    this.context.actions.listBookingsInTime(id, firstDate, lastDateExclusive)
+    sdk.listBookingsInTime(id, firstDate, lastDateExclusive)
   }
 
   hoverColumnWrapper (i) {
@@ -327,12 +322,6 @@ class TimetableTables extends React.Component {
       </div>
     </section>
   }
-}
-
-TimetableTables.contextTypes = {
-  actions: React.PropTypes.shape({
-    listBookingsInTime: React.PropTypes.func
-  })
 }
 
 TimetableTables.propTypes = {

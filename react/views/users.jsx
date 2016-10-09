@@ -3,14 +3,15 @@ const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const Modal = require('./modal.jsx')
+const sdk = require('../../client/sdk')
 
 class InviteUserForm extends ValueUpdater {
   constructor (props) {
     super(props)
     this.submitHandler = (evt) => {
       evt.preventDefault()
-      return this.context.actions
-        .inviteUserByEmail(this.props.laundry.id, this.state.values.email)
+      return sdk.laundry(this.props.laundry.id)
+        .inviteUserByEmail(this.state.values.email)
         .then(() => this.reset())
     }
   }
@@ -44,12 +45,6 @@ class InviteUserForm extends ValueUpdater {
   }
 }
 
-InviteUserForm.contextTypes = {
-  actions: React.PropTypes.shape({
-    inviteUserByEmail: React.PropTypes.func
-  })
-}
-
 InviteUserForm.propTypes = {
   laundry: React.PropTypes.object.isRequired
 }
@@ -60,7 +55,7 @@ class UserItem extends React.Component {
     this.state = {showModal: false}
     this.onShowModal = () => this.setState({showModal: true})
     this.onCloseModal = () => this.setState({showModal: false})
-    this.handleDelete = () => this.context.actions.removeUserFromLaundry(this.props.laundry.id, this.props.user.id)
+    this.handleDelete = () => sdk.laundry(this.props.laundry.id).removeUserFromLaundry(this.props.user.id)
   }
 
   renderOwner () {
@@ -114,11 +109,6 @@ UserItem.propTypes = {
     owners: React.PropTypes.array
   }).isRequired
 }
-UserItem.contextTypes = {
-  actions: React.PropTypes.shape({
-    removeUserFromLaundry: React.PropTypes.func
-  })
-}
 
 class InviteItem extends React.Component {
   constructor (props) {
@@ -126,7 +116,7 @@ class InviteItem extends React.Component {
     this.state = {showModal: false}
     this.onShowModal = () => this.setState({showModal: true})
     this.onCloseModal = () => this.setState({showModal: false})
-    this.handleDelete = () => this.context.actions.deleteInvite(this.props.invite.id)
+    this.handleDelete = () => sdk.invite(this.props.invite.id).deleteInvite()
   }
 
   render () {
@@ -168,14 +158,14 @@ InviteItem.contextTypes = {
 class Users extends React.Component {
 
   renderUsers () {
-    return <ul>
+    return <ul className='bigList'>
       {this.users.map((user) => <li key={user.id}><UserItem user={user} laundry={this.props.laundry}/></li>)}
       {this.invites.map(invite => <li key={invite.id}><InviteItem invite={invite}/></li>)}
     </ul>
   }
 
   componentDidMount () {
-    this.context.actions.listUsersAndInvites(this.props.laundry.id)
+    sdk.listUsersAndInvites(this.props.laundry.id)
   }
 
   get users () {
@@ -188,7 +178,7 @@ class Users extends React.Component {
 
   render () {
     return <DocumentTitle title='Laundry users'>
-      <main className='naved'>
+      <main className='naved' id='Users'>
         <h1 className='alignLeft'>Laundry users</h1>
         <section id='UserList'>
           {this.renderUsers()}
@@ -200,12 +190,6 @@ class Users extends React.Component {
       </main>
     </DocumentTitle>
   }
-}
-
-Users.contextTypes = {
-  actions: React.PropTypes.shape({
-    listUsersAndInvites: React.PropTypes.func
-  })
 }
 
 Users.propTypes = {

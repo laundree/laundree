@@ -7,7 +7,6 @@ const Footer = require('./footer.jsx')
 const DocumentTitle = require('react-document-title')
 
 class App extends React.Component {
-
   render () {
     return <DocumentTitle title='Laundree.io'>
       <div className={this.props.user ? '' : 'footer'}>

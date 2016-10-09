@@ -56,13 +56,13 @@ class TopNav extends React.Component {
         </DropDownTitle>
         <DropDownContent className='right'>
           <ul className='dropDownList'>
-            <li>
+            {this.props.user.demo ? null : <li>
               <DropDownCloser>
                 <Link to='/settings' activeClassName='active'>
                   Manage your account
                 </Link>
               </DropDownCloser>
-            </li>
+            </li>}
             <li>
               <a href='/logout'>
                 Log out
@@ -111,6 +111,7 @@ TopNav.propTypes = {
   user: React.PropTypes.shape({
     id: React.PropTypes.string,
     photo: React.PropTypes.string,
+    demo: React.PropTypes.boolean,
     laundries: React.PropTypes.arrayOf(React.PropTypes.string)
   }),
   currentLaundry: React.PropTypes.string,

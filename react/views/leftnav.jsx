@@ -15,7 +15,7 @@ class LeftNav extends React.Component {
 
   componentWillReceiveProps ({currentUser, users, currentLaundry}) {
     const user = users[currentUser]
-    if (!user || user.laundries.indexOf(currentLaundry) >= 0) return
+    if (!user || user.role === 'admin' || user.laundries.indexOf(currentLaundry) >= 0) return
     window.location = `/`
   }
 

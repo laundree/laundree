@@ -6,6 +6,7 @@ const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
+const sdk = require('../../client/sdk')
 
 class Forgot extends ValueUpdater {
   constructor (props) {
@@ -13,8 +14,7 @@ class Forgot extends ValueUpdater {
     this.submitHandler = (evt) => {
       this.setState({loading: true})
       evt.preventDefault()
-      if (!this.context.actions.userForgotPassword) return
-      return this.context.actions.userForgotPassword(this.state.values.email)
+      return sdk.user.forgotPassword(this.state.values.email)
         .then(
           () =>
             this.reset({
@@ -77,12 +77,6 @@ class Forgot extends ValueUpdater {
       </div>
     </DocumentTitle>
   }
-}
-
-Forgot.contextTypes = {
-  actions: React.PropTypes.shape({
-    userForgotPassword: React.PropTypes.func
-  })
 }
 
 module.exports = Forgot

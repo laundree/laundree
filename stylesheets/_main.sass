@@ -398,6 +398,24 @@ div.expanded_left_nav
   margin-left: 15em
   +transition(0.2s margin)
 
+ul.bigList
+  list-style-type: none
+  li
+    &:first-of-type
+      border-top-style: solid
+    position: relative
+    overflow: hidden
+    border-width: 0.1em
+    border-color: #5eb9b9
+    border-bottom-style: solid
+    min-height: 3em
+    padding: 1em 1em
+    .name
+      line-height: 3em
+      top: 1em
+      left: 1em
+      position: absolute
+
 h1
   color: #ffffff
   font-weight: 300

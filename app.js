@@ -6,11 +6,12 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const flash = require('connect-flash')
-const routes = require('./routes')
+const {fetchRoutes} = require('./routes')
 const setups = require('./lib')
 const config = require('config')
 const app = express()
 const hbs = require('hbs')
+const {error} = require('./utils')
 
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'))
 // view engine setup
@@ -46,9 +47,8 @@ app.use(flash())
 // Swagger
 module.exports = {
   app,
-  promise: setups.swaggerSetup(app).then(() => {
+  promise: fetchRoutes().then((routes) => {
     app.use('/', routes)
-
     app.get('/err', (req, res, next) => {
       next(new Error('This is a test error'))
     })
@@ -79,6 +79,7 @@ module.exports = {
     app.use((err, req, res, next) => {
       const status = err.status || 500
       res.status(status)
+      error.logError(err)
       res.render('error-500', {
         message: err.message,
         styles: ['/stylesheets/error.css']
