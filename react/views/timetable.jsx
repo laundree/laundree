@@ -102,17 +102,16 @@ class Timetable extends React.Component {
     this.context.actions.listMachinesAndUsers(this.props.laundry.id)
     window.addEventListener('resize', this.handleResize)
     const numDays = this.numDays
-    this.setState({numDays: numDays, loading: false}, () => {
-      if (!this._mainRef) return
-      const now = this._mainRef.querySelector('#TimeTable .now')
-      if (!now) return
-      now.scrollIntoView()
-    })
+    this.setState({numDays})
   }
 
-  componentWillReceiveProps ({laundry: {machines}}) {
-    if (machines.length === this.props.laundry.machines.length) return
-    this.setState({numDays: this.calculateNumDays(machines.length)})
+  componentWillReceiveProps ({laundry: {machines: machineIds}, machines}) {
+    if (machineIds.length !== this.props.laundry.machines.length) this.setState({numDays: this.calculateNumDays(machines.length)})
+    if (!this._mainRef || machineIds.map(id => machines[id]).filter(m => m).length !== machineIds.length) return
+    this.setState({loading: false})
+    const now = this._mainRef.querySelector('#TimeTable .now')
+    if (!now) return
+    now.scrollIntoView()
   }
 
   componentWillUnmount () {

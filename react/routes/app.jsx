@@ -24,7 +24,7 @@ function checkLaundryGenerator (store) {
 }
 
 function checkExistingLaundryGenerator (store) {
-  return checkGenerator(store, (laundry) => laundry)
+  return checkGenerator(store, laundry => laundry)
 }
 
 function checkLaundryOwnerGenerator (store) {

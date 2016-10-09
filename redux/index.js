@@ -5,6 +5,7 @@ const {createStore} = require('redux')
 const reducer = require('./reducer')
 const actions = require('./actions')
 const Promise = require('promise')
+const {LaundryHandler} = require('../handlers')
 
 function mapFlash (flashArray, type) {
   return flashArray
@@ -12,32 +13,23 @@ function mapFlash (flashArray, type) {
     .map((flash) => actions.flash(flash))
 }
 
-/**
- * @param laundry
- * @returns {Promise.<{machines, users, invites}>}
- */
-function fetchLaundry (laundry) {
-  return Promise
-    .all([laundry.fetchMachines(), laundry.fetchUsers(), laundry.fetchInvites()])
-    .then(([machines, users, invites]) => ({machines, users, invites}))
+function fetchLaundries (currentUser, url) {
+  if (!currentUser.isAdmin) return currentUser.fetchLaundries()
+  const currentLaundryMatch = url.match(/\/laundries\/([^\/]+)/)
+  if (!currentLaundryMatch || !currentLaundryMatch[1]) return Promise.resolve([])
+  const currentLaundryId = currentLaundryMatch[1]
+  return LaundryHandler
+    .findFromId(currentLaundryId)
+    .then(l => [l])
 }
 
-function fetchLaundries (laundries) {
-  return Promise
-    .all(laundries.map(fetchLaundry))
-    .then((r) => r.reduce((obj, next) => {
-      return {
-        machines: obj.machines.concat(next.machines),
-        users: obj.users.concat(next.users),
-        invites: obj.invites.concat(next.invites)
-      }
-    }, {machines: [], users: [], invites: []}))
-    .then(({machines, users, invites}) => ({
-      machines,
-      users,
-      invites,
-      laundries
-    }))
+function createLaundryEvents (events) {
+  return laundries => {
+    laundries = laundries.filter(l => l)
+    if (!laundries.length) return events
+    events.push(actions.listLaundries(laundries))
+    return events
+  }
 }
 
 /**
@@ -45,32 +37,20 @@ function fetchLaundries (laundries) {
  * @param {UserHandler} currentUser
  * @param {Array=} successFlash
  * @param {Array=} errorFlash
+ * @param {string=} url
  * @return {Promise}
  */
-function createInitialEvents (currentUser, successFlash = [], errorFlash = []) {
+function createInitialEvents (currentUser, successFlash = [], errorFlash = [], url = '') {
   var events = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
   if (!currentUser) return Promise.resolve(events)
   events.push(actions.signInUser(currentUser))
-
-  return currentUser.fetchLaundries()
-    .then(fetchLaundries)
-    .then(({laundries, machines, users, invites}) => {
-      laundries = laundries.filter((l) => l)
-      if (!laundries.length) return events
-      machines = machines.filter((m) => m)
-      users = users.filter((u) => u)
-      invites = invites.filter((i) => i)
-      events.push(actions.listLaundries(laundries))
-      events.push(actions.listMachines(machines))
-      events.push(actions.listUsers(users))
-      events.push(actions.listInvites(invites))
-      return events
-    })
+  return fetchLaundries(currentUser, url)
+    .then(createLaundryEvents(events))
 }
 
-function createInitialStore (currentUser, successFlash = [], errorFlash = []) {
-  return createInitialEvents(currentUser, successFlash, errorFlash)
+function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '') {
+  return createInitialEvents(currentUser, successFlash, errorFlash, url)
     .then((events) => {
       const store = createStore(reducer)
       events.forEach((event) => store.dispatch(event))

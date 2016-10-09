@@ -1,5 +1,6 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
+const {Link} = require('react-router')
 
 class Stats extends React.Component {
 
@@ -75,7 +76,11 @@ class LaundryList extends React.Component {
 
   renderLaundryList () {
     return this.laundries.map(l => <li key={l.id}>
-      <span className='name'>{l.name}</span>
+      <div className='name'>
+        <Link to={`/laundries/${l.id}`}>
+          {l.name}
+        </Link>
+      </div>
     </li>)
   }
 

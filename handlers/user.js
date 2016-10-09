@@ -435,6 +435,10 @@ class UserHandler extends Handler {
     }
   }
 
+  get isAdmin () {
+    return this.model.role === 'admin'
+  }
+
   get eventData () {
     return {demo: this.isDemo}
   }

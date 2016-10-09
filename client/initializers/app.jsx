@@ -4,7 +4,6 @@
 
 const Initializer = require('./initializer')
 const debug = require('debug')('laundree.initializers.app')
-const Promise = require('promise')
 
 const React = require('react')
 const ReactDOM = require('react-dom')
@@ -14,30 +13,21 @@ const {Router, browserHistory, match} = require('react-router')
 const routeGenerator = require('../../react/routes')
 const io = require('socket.io-client')
 const {createStore} = require('redux')
-const {reducer} = require('../../redux')
-const reduxActions = require('../../redux/actions')
+const reducer = require('../../redux/reducer')
 const {ActionProvider} = require('../../react/views/providers')
 const {UserClientSdk, LaundryClientSdk, MachineClientSdk, BookingClientSdk, InviteClientSdk} = require('../sdk')
 
 const nsp = io('/redux')
 
-function fetchStore () {
-  return new Promise((resolve, reject) => {
-    var store
-    var actions = []
-    nsp.on('action', (action) => {
-      debug(action)
-      if (store) return store.dispatch(action)
-      actions.push(action)
-    })
-    nsp.on('init', (events) => {
-      debug(events)
-      if (!store) store = createStore(reducer)
-      events.forEach((event) => store.dispatch(event))
-      resolve(store)
-      actions.forEach((action) => store.dispatch(action))
-    })
+function setupStore () {
+  const state = window.__REDUX_STATE__
+  debug('Setting up store with state', state)
+  const store = createStore(reducer, state)
+  nsp.on('action', (action) => {
+    debug(action)
+    store.dispatch(action)
   })
+  return store
 }
 
 function signUpUser (name, email, password) {
@@ -130,39 +120,37 @@ class AppInitializer extends Initializer {
   setup (element) {
     const rootElement = element.querySelector('#AppRoot')
     if (!rootElement) return
-    fetchStore().then((store) => {
-      const actions = {
-        userForgotPassword,
-        signUpUser,
-        createLaundry,
-        userResetPassword,
-        createBooking,
-        deleteBooking,
-        listUsers,
-        listBookingsInTime,
-        listBookingsForUser,
-        inviteUserByEmail,
-        deleteLaundry,
-        startEmailVerification,
-        deleteInvite,
-        removeUserFromLaundry,
-        listUsersAndInvites,
-        listMachines,
-        listMachinesAndUsers,
-        listLaundries,
-        updateStats
-      }
-      if (window.__FLASH_MESSAGES__) window.__FLASH_MESSAGES__.forEach((message) => store.dispatch(reduxActions.flash(message)))
-      match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
-        ReactDOM.render(
-          <ActionProvider actions={actions}>
-            <IntlProvider locale='en'>
-              <Provider store={store}>
-                {React.createElement(Router, Object.assign({}, renderProps))}
-              </Provider>
-            </IntlProvider>
-          </ActionProvider>, rootElement)
-      })
+    const store = setupStore()
+    const actions = {
+      userForgotPassword,
+      signUpUser,
+      createLaundry,
+      userResetPassword,
+      createBooking,
+      deleteBooking,
+      listUsers,
+      listBookingsInTime,
+      listBookingsForUser,
+      inviteUserByEmail,
+      deleteLaundry,
+      startEmailVerification,
+      deleteInvite,
+      removeUserFromLaundry,
+      listUsersAndInvites,
+      listMachines,
+      listMachinesAndUsers,
+      listLaundries,
+      updateStats
+    }
+    match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
+      ReactDOM.render(
+        <ActionProvider actions={actions}>
+          <IntlProvider locale='en'>
+            <Provider store={store}>
+              {React.createElement(Router, Object.assign({}, renderProps))}
+            </Provider>
+          </IntlProvider>
+        </ActionProvider>, rootElement)
     })
   }
 }

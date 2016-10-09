@@ -16,7 +16,7 @@ const {ActionProvider} = require('../react/views/providers')
 const {opbeat} = require('../lib/opbeat')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'))
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), req.url)
     .then((store) => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)
@@ -39,7 +39,7 @@ router.use((req, res, next) => {
             </IntlProvider>
           </ActionProvider>)
         const title = DocumentTitle.rewind()
-        res.render('app', {html: html, title: title, flash: JSON.stringify(store.getState().flash)})
+        res.render('app', {html: html, title: title, state: JSON.stringify(store.getState())})
       })
     })
     .catch(utils.error.logError)
