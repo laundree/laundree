@@ -3,7 +3,6 @@ const DocumentTitle = require('react-document-title')
 const Modal = require('./modal.jsx')
 const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {LaundryClientSdk} = require('../../client/sdk')
 const sdk = require('../../client/sdk')
 
 class LaundrySettingsForm extends ValueUpdater {
@@ -13,7 +12,7 @@ class LaundrySettingsForm extends ValueUpdater {
     this.onSubmit = (evt) => {
       evt.preventDefault()
       this.setState({loading: true})
-      new LaundryClientSdk(this.props.laundry.id)
+      sdk.laundry(this.props.laundry.id)
         .updateName(this.state.values.name)
         .then(() => this.setState({loading: false, notion: null}))
         .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))

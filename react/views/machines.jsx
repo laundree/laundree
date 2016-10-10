@@ -3,7 +3,6 @@ const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
 const Modal = require('./modal.jsx')
-const {MachineClientSdk, LaundryClientSdk} = require('../../client/sdk')
 const sdk = require('../../client/sdk')
 
 class MachineDropdown extends React.Component {
@@ -181,7 +180,7 @@ class Machines extends React.Component {
   constructor (props) {
     super(props)
     this.state = {}
-    this.creator = (type, name) => new LaundryClientSdk(this.props.currentLaundry).createMachine(name, type)
+    this.creator = (type, name) => sdk.laundry(this.props.currentLaundry).createMachine(name, type)
   }
 
   get laundry () {
@@ -189,11 +188,11 @@ class Machines extends React.Component {
   }
 
   generateDeleter (id) {
-    return () => new MachineClientSdk(id).deleteMachine()
+    return () => sdk.machine(id).deleteMachine()
   }
 
   generateUpdater (id) {
-    return (params) => new MachineClientSdk(id).updateMachine(params)
+    return (params) => sdk.machine(id).updateMachine(params)
   }
 
   componentDidMount () {
