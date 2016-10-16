@@ -3,6 +3,33 @@
  */
 
 const request = require('superagent')
+const EventEmitter = require('events')
+
+function req (method, path, data = null) {
+  const req = request[method](path)
+  if (!data) return req.then()
+  return req
+    .send(data)
+    .then()
+}
+
+function post (path, data = null) {
+  return req('post', path, data)
+}
+
+function del (path) {
+  return req('delete', path)
+}
+
+function put (path, data = null) {
+  return req('put', path, data)
+}
+
+function get (path) {
+  return req('get', path)
+}
+
+var jobId = 1
 
 class Sdk {
 
@@ -36,47 +63,56 @@ class Sdk {
   }
 
   contact ({name, email, subject, message}) {
-    return request
-      .post(`/api/contact`)
-      .send({name, email, subject, message})
-      .then()
+    return post('/api/contact', {name, email, subject, message})
   }
 
   setupRedux (store, socket) {
-    this.store = store
     this.socket = socket
+    this.jobEventEmitter = new EventEmitter()
+    store.subscribe(() => this.jobEventEmitter.emit(store.getState().jobs))
+  }
+
+  emit (action) {
+    const jId = jobId++
+    const args = Array.prototype.slice.call(arguments, 1)
+    const opts = {jobId: jId}
+    const newArgs = [action, opts].concat(args)
+    return new Promise(resolve => {
+      this.jobEventEmitter.once(jId, resolve)
+      this.socket.emit.apply(this.socket, newArgs)
+    })
   }
 
   listBookingsInTime (laundryId, from, to) {
-    return this.socket.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
+    return this.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
   }
 
   listBookingsForUser (laundryId, userId, filter = {}) {
-    return this.socket.emit('listBookingsForUser', laundryId, userId, filter)
+    return this.emit('listBookingsForUser', laundryId, userId, filter)
   }
 
   listUsersAndInvites (laundryId) {
-    return this.socket.emit('listUsersAndInvites', laundryId)
+    return this.emit('listUsersAndInvites', laundryId)
   }
 
   listUsers () {
-    return this.socket.emit('listUsers')
+    return this.emit('listUsers')
   }
 
   listMachines (laundryId) {
-    return this.socket.emit('listMachines', laundryId)
+    return this.emit('listMachines', laundryId)
   }
 
   listLaundries () {
-    return this.socket.emit('listLaundries')
+    return this.emit('listLaundries')
   }
 
   listMachinesAndUsers (laundryId) {
-    return this.socket.emit('listMachinesAndUsers', laundryId)
+    return this.emit('listMachinesAndUsers', laundryId)
   }
 
   updateStats () {
-    return this.socket.emit('updateStats')
+    return this.emit('updateStats')
   }
 }
 
@@ -88,8 +124,7 @@ class ResourceSdk {
 
 class UserSdk extends ResourceSdk {
   static fromEmail (email) {
-    return request
-      .get(`/api/users?email=${encodeURIComponent(email)}`)
+    return get(`/api/users?email=${encodeURIComponent(email)}`)
       .then(({body}) => {
         if (!body) return null
         if (body.length !== 1) return null
@@ -98,9 +133,7 @@ class UserSdk extends ResourceSdk {
   }
 
   static createUser (displayName, email, password) {
-    return request
-      .post('/api/users')
-      .send({displayName, email, password})
+    return post('/api/users', {displayName, email, password})
       .then(({body}) => {
         if (!body) return null
         return body
@@ -135,46 +168,30 @@ class UserSdk extends ResourceSdk {
   }
 
   resetPassword (token, password) {
-    return request
-      .post(`/api/users/${this.id}/password-reset`)
-      .send({token, password})
-      .then()
+    return post(`/api/users/${this.id}/password-reset`, {token, password})
   }
 
   updateName (name) {
-    return request
-      .put(`/api/users/${this.id}`)
-      .send({name})
-      .then()
+    return put(`/api/users/${this.id}`, {name})
   }
 
   changePassword (currentPassword, newPassword) {
-    return request
-      .post(`/api/users/${this.id}/password-change`)
-      .send({currentPassword, newPassword})
-      .then()
+    return post(`/api/users/${this.id}/password-change`, {currentPassword, newPassword})
   }
 
   startPasswordReset () {
-    return request
-      .post(`/api/users/${this.id}/start-password-reset`)
-      .then()
+    return post(`/api/users/${this.id}/start-password-reset`)
   }
 
   startEmailVerification (email) {
-    return request
-      .post(`/api/users/${this.id}/start-email-verification`)
-      .send({email})
-      .then()
+    return post(`/api/users/${this.id}/start-email-verification`, {email})
   }
 }
 
 class MachineSdk extends ResourceSdk {
 
   deleteMachine () {
-    return request
-      .delete(`/api/machines/${this.id}`)
-      .then()
+    return del(`/api/machines/${this.id}`)
   }
 
   /**
@@ -182,10 +199,7 @@ class MachineSdk extends ResourceSdk {
    * @param {{name:string=, type: string=}} params
    */
   updateMachine (params) {
-    return request
-      .put(`/api/machines/${this.id}`)
-      .send(params)
-      .then()
+    return put(`/api/machines/${this.id}`, params)
   }
 
   /**
@@ -194,19 +208,14 @@ class MachineSdk extends ResourceSdk {
    * @param {Date} to
    */
   createBooking (from, to) {
-    return request
-      .post(`/api/machines/${this.id}/bookings`)
-      .send({from: from.toISOString(), to: to.toISOString()})
-      .then()
+    return post(`/api/machines/${this.id}/bookings`, {from: from.toISOString(), to: to.toISOString()})
   }
 }
 
 class LaundrySdk extends ResourceSdk {
 
   static createLaundry (name) {
-    return request
-      .post('/api/laundries')
-      .send({name})
+    return post('/api/laundries', {name})
       .then((response) => response.body || null)
   }
 
@@ -215,59 +224,41 @@ class LaundrySdk extends ResourceSdk {
    * @returns {Promise.<{email: string, password: string}>}
    */
   static createDemoLaundry () {
-    return request
-      .post('/api/laundries/demo')
+    return post('/api/laundries/demo')
       .then(({body}) => body)
   }
 
   updateName (name) {
-    return request
-      .put(`/api/laundries/${this.id}`)
-      .send({name})
-      .then()
+    return put(`/api/laundries/${this.id}`, {name})
   }
 
   createMachine (name, type) {
-    return request
-      .post(`/api/laundries/${this.id}/machines`)
-      .send({name, type})
-      .then()
+    return post(`/api/laundries/${this.id}/machines`, {name, type})
   }
 
   inviteUserByEmail (email) {
-    return request
-      .post(`/api/laundries/${this.id}/invite-by-email`)
-      .send({email})
-      .then()
+    return post(`/api/laundries/${this.id}/invite-by-email`, {email})
   }
 
   deleteLaundry () {
-    return request
-      .delete(`/api/laundries/${this.id}`)
-      .then()
+    return del(`/api/laundries/${this.id}`)
   }
 
   removeUserFromLaundry (userId) {
-    return request
-      .delete(`/api/laundries/${this.id}/users/${userId}`)
-      .then()
+    return del(`/api/laundries/${this.id}/users/${userId}`)
   }
 }
 
 class InviteSdk extends ResourceSdk {
   deleteInvite () {
-    return request
-      .delete(`/api/invites/${this.id}`)
-      .then()
+    return del(`/api/invites/${this.id}`)
   }
 }
 
 class BookingSdk extends ResourceSdk {
 
   deleteBooking () {
-    return request
-      .delete(`/api/bookings/${this.id}`)
-      .then()
+    return del(`/api/bookings/${this.id}`)
   }
 }
 
