@@ -78,7 +78,7 @@ class Sdk {
     const opts = {jobId: jId}
     const newArgs = [action, opts].concat(args)
     return new Promise(resolve => {
-      this.jobEventEmitter.once(jId, () => resolve)
+      this.jobEventEmitter.once(jId, resolve)
       this.socket.emit.apply(this.socket, newArgs)
     })
   }

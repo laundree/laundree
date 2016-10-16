@@ -61,12 +61,17 @@ Stats.propTypes = {
 }
 
 class LaundryList extends React.Component {
+  constructor (props) {
+    super(props)
+    this.state = {loaded: false}
+  }
+
   componentDidMount () {
-    sdk.listLaundries()
+    sdk.listLaundries().then(() => this.setState({loaded: true}))
   }
 
   get laundries () {
-    return Object.keys(this.props.laundries).map(key => this.props.laundries[key])
+    return this.state.loaded ? Object.keys(this.props.laundries).map(key => this.props.laundries[key]) : []
   }
 
   renderLaundryList () {
@@ -95,12 +100,18 @@ LaundryList.propTypes = {
 }
 
 class UserList extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {loaded: false}
+  }
+
   componentDidMount () {
-    sdk.listUsers()
+    sdk.listUsers().then(() => this.setState({loaded: true}))
   }
 
   get users () {
-    return Object.keys(this.props.users).map(key => this.props.users[key])
+    return this.state.loaded ? Object.keys(this.props.users).map(key => this.props.users[key]) : []
   }
 
   renderUserList () {
