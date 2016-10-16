@@ -1,8 +1,5 @@
-const {handleActions} = require('redux-actions')
 const actions = require('../actions')
 
-const actionMap = {}
+const {setupSingleton} = require('./singleton')
 
-actionMap[actions.types.UPDATE_STATS] = (state, {payload}) => payload
-
-module.exports = handleActions(actionMap, null)
+module.exports = setupSingleton(actions.types.UPDATE_STATS)
