@@ -22,10 +22,16 @@ function setupStore () {
   const state = window.__REDUX_STATE__
   debug('Setting up store with state', state)
   const store = createStore(reducer, state)
-  socket.on('action', (action) => {
-    debug(action)
+
+  const dispatchAction = action => {
+    debug(`Dispatching: ${action.type}`, action)
     store.dispatch(action)
-  })
+  }
+
+  socket.on('action', dispatchAction)
+
+  socket.on('actions', actions => actions.forEach(dispatchAction))
+
   sdk.setupRedux(store, socket)
   return store
 }

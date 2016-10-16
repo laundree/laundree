@@ -68,36 +68,44 @@ class Sdk {
     this.socket = socket
   }
 
+  emit (action) {
+    const args = Array.prototype.slice.call(arguments, 1)
+    const opts = {}
+    const newArgs = [action, opts].concat(args)
+    console.log(newArgs)
+    return this.socket.emit.apply(this.socket, newArgs)
+  }
+
   listBookingsInTime (laundryId, from, to) {
-    return this.socket.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
+    return this.emit('listBookingsInTime', laundryId, from.getTime(), to.getTime())
   }
 
   listBookingsForUser (laundryId, userId, filter = {}) {
-    return this.socket.emit('listBookingsForUser', laundryId, userId, filter)
+    return this.emit('listBookingsForUser', laundryId, userId, filter)
   }
 
   listUsersAndInvites (laundryId) {
-    return this.socket.emit('listUsersAndInvites', laundryId)
+    return this.emit('listUsersAndInvites', laundryId)
   }
 
   listUsers () {
-    return this.socket.emit('listUsers')
+    return this.emit('listUsers')
   }
 
   listMachines (laundryId) {
-    return this.socket.emit('listMachines', laundryId)
+    return this.emit('listMachines', laundryId)
   }
 
   listLaundries () {
-    return this.socket.emit('listLaundries')
+    return this.emit('listLaundries')
   }
 
   listMachinesAndUsers (laundryId) {
-    return this.socket.emit('listMachinesAndUsers', laundryId)
+    return this.emit('listMachinesAndUsers', laundryId)
   }
 
   updateStats () {
-    return this.socket.emit('updateStats')
+    return this.emit('updateStats')
   }
 }
 

@@ -25,6 +25,7 @@ const LIST_INVITATIONS = 'LIST_INVITATIONS'
 const DELETE_INVITATION = 'DELETE_INVITATION'
 const UPDATE_INVITATION = 'UPDATE_INVITATION'
 const UPDATE_STATS = 'UPDATE_STATS'
+const FINISH_JOB = 'FINISH_JOB'
 
 function mapper (handler) {
   return handler.model ? handler.reduxModel : handler
@@ -57,7 +58,8 @@ module.exports = {
     LIST_INVITATIONS,
     DELETE_INVITATION,
     UPDATE_INVITATION,
-    UPDATE_STATS
+    UPDATE_STATS,
+    FINISH_JOB
   },
   listLaundries: createAction(LIST_LAUNDRIES, arrayMapper),
   signInUser: createAction(SIGN_IN_USER, mapper),
@@ -70,5 +72,6 @@ module.exports = {
   listBookings: createAction(LIST_BOOKINGS, arrayMapper),
   listInvites: createAction(LIST_INVITATIONS, arrayMapper),
   updateStats: createAction(UPDATE_STATS),
-  flash: createAction(FLASH)
+  flash: createAction(FLASH),
+  finishJob: createAction(FINISH_JOB)
 }
