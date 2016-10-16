@@ -72,7 +72,6 @@ class Sdk {
     const args = Array.prototype.slice.call(arguments, 1)
     const opts = {}
     const newArgs = [action, opts].concat(args)
-    console.log(newArgs)
     return this.socket.emit.apply(this.socket, newArgs)
   }
 
