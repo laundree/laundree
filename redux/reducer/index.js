@@ -12,5 +12,6 @@ module.exports = combineReducers({
   bookings: require('./bookings'),
   userBookings: require('./user_bookings'),
   invites: require('./laundry_invitations'),
-  stats: require('./stats')
+  stats: require('./stats'),
+  jobs: require('./jobs')
 })

@@ -3,6 +3,7 @@
  */
 
 const request = require('superagent')
+const EventEmitter = require('events')
 
 function req (method, path, data = null) {
   const req = request[method](path)
@@ -27,6 +28,8 @@ function put (path, data = null) {
 function get (path) {
   return req('get', path)
 }
+
+var jobId = 1
 
 class Sdk {
 
@@ -64,15 +67,20 @@ class Sdk {
   }
 
   setupRedux (store, socket) {
-    this.store = store
     this.socket = socket
+    this.jobEventEmitter = new EventEmitter()
+    store.subscribe(() => this.jobEventEmitter.emit(store.getState().jobs))
   }
 
   emit (action) {
+    const jId = jobId++
     const args = Array.prototype.slice.call(arguments, 1)
-    const opts = {}
+    const opts = {jobId: jId}
     const newArgs = [action, opts].concat(args)
-    return this.socket.emit.apply(this.socket, newArgs)
+    return new Promise(resolve => {
+      this.jobEventEmitter.once(jId, () => resolve)
+      this.socket.emit.apply(this.socket, newArgs)
+    })
   }
 
   listBookingsInTime (laundryId, from, to) {
