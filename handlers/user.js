@@ -272,7 +272,7 @@ class UserHandler extends Handler {
       name: displayNameToName(displayName),
       provider: 'local',
       emails: [{value: email}],
-      photos: [{value: `/identicon/${email}/150.svg`}]
+      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
     }
     return Promise.all(
       [UserHandler.createUserFromProfile(profile),
@@ -297,7 +297,7 @@ class UserHandler extends Handler {
       name: displayNameToName(displayName),
       provider: 'local',
       emails: [{value: email}],
-      photos: [{value: `/identicon/${email}/150.svg`}]
+      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
     }
     return Promise
       .all([
