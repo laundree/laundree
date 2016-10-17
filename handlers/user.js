@@ -106,17 +106,20 @@ class UserHandler extends Handler {
    * @return {Promise.<TokenHandler>}
    */
   findAuthTokenFromSecret (secret) {
-    return UserModel
-      .populate(this.model, {path: 'authTokens', model: 'Token'})
-      .then((model) =>
-        model.authTokens
-          .map((token) => new TokenHandler(token))
-          .reduce((prev, token) =>
-              prev
-                .then((oldToken) => oldToken || token
-                  .verify(secret)
-                  .then((result) => result ? token : null)),
-            Promise.resolve(null)))
+    return this
+      .fetchAuthTokens()
+      .then(tokens => tokens
+        .reduce(
+          (prev, token) =>
+            prev
+              .then((oldToken) => oldToken || token
+                .verify(secret)
+                .then((result) => result ? token : null)),
+          Promise.resolve(null)))
+  }
+
+  fetchAuthTokens () {
+    return TokenHandler.find({_id: {$in: this.model.authTokens}})
   }
 
   /**
@@ -196,8 +199,7 @@ class UserHandler extends Handler {
 
   fetchLaundries () {
     const LaundryHandler = require('./laundry')
-    return UserModel.populate(this.model, {path: 'laundries'})
-      .then(({laundries}) => laundries.map((l) => new LaundryHandler(l)))
+    return LaundryHandler.find({_id: {$in: this.model.laundries}})
   }
 
   /**
@@ -371,12 +373,10 @@ class UserHandler extends Handler {
   }
 
   deleteUser () {
-    const LaundryHandler = require('./laundry')
-    return UserModel.populate(this.model, {path: 'authTokens laundries'})
-      .then((model) =>
-        Promise.all([
-          Promise.all(model.authTokens.map((t) => new TokenHandler(t).deleteToken())),
-          Promise.all(model.laundries.map((l) => new LaundryHandler(l).removeUser(this)))]))
+    return Promise.all([
+      this.fetchLaundries().then(ls => Promise.all(ls.map(l => l.removeUser(this)))),
+      this.fetchAuthTokens().then(ts => Promise.all(ts.map(t => t.deleteToken())))
+    ])
       .then(() => this.model.remove())
       .then(() => this)
   }
@@ -399,9 +399,8 @@ class UserHandler extends Handler {
   }
 
   toRest () {
-    return UserModel
-      .populate(this.model, {path: 'authTokens', model: 'Token'})
-      .then((model) => ({
+    return this.fetchAuthTokens()
+      .then(tokens => ({
         id: this.model.id,
         displayName: this.model.displayName,
         lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
@@ -410,7 +409,7 @@ class UserHandler extends Handler {
           givenName: this.model.name.givenName,
           middleName: this.model.name.middleName
         },
-        tokens: model.authTokens.map((t) => new TokenHandler(t).toRestSummary()),
+        tokens: tokens.map(t => t.toRestSummary()),
         photo: this.model.photo,
         href: this.restUrl
       }))
