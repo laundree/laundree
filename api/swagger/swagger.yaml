@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.1.0"
+  version: "0.2.0"
   title: Laundree App
 
 host: laundree.io
@@ -855,7 +855,7 @@ paths:
     delete:
       operationId: removeUserFromLaundry
       security:
-        - laundryOwner: []
+        - laundryUser: []
       tags:
         - Laundries
         - Users

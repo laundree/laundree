@@ -88,15 +88,12 @@ function inviteUserByEmail (req, res) {
 }
 
 function removeUserFromLaundry (req, res) {
-  const userId = req.swagger.params.userId.value
-  const laundry = req.subjects.laundry
-  UserHandler.findFromId(userId)
-    .then((user) => {
-      if (!user) return api.returnError(res, 404, 'User not found')
-      if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
-      if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')
-      return laundry.removeUser(user).then(() => api.returnSuccess(res))
-    })
+  const {user, currentUser, laundry} = req.subjects
+  if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
+  if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')
+  if (!laundry.isOwner(currentUser) && user.model.id !== currentUser.model.id) return api.returnError(res, 403, 'Not allowed')
+  laundry.removeUser(user)
+    .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
 

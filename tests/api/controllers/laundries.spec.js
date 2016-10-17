@@ -5,7 +5,7 @@ chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {LaundryHandler, LaundryInvitationHandler, UserHandler} = require('../../../handlers')
+const {LaundryHandler, LaundryInvitationHandler, UserHandler, BookingHandler} = require('../../../handlers')
 const dbUtils = require('../../db_utils')
 const Promise = require('promise')
 
@@ -736,6 +736,37 @@ describe('controllers', function () {
               .then(res => LaundryHandler
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isUser(user)).should.be.false))))
+
+      it('should succeed and remove bookings', () => Promise
+        .all([dbUtils.populateMachines(1), dbUtils.populateUsers(1)])
+        .then(([{laundry, user: owner, token, machine}, [user]]) =>
+          laundry.addUser(user)
+            .then(() => machine.createBooking(
+              user,
+              Date.now() + 60 * 60 * 1000,
+              Date.now() + 2 * 60 * 60 * 1000))
+            .then(booking => ({booking, laundry, owner, token, user})))
+        .then(({laundry, user, owner, token, booking}) => request(app)
+          .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+          .auth(owner.model.id, token.secret)
+          .expect(204)
+          .then(res => BookingHandler
+            .findFromId(booking.model._id)
+            .then(booking => {
+              assert(booking === undefined, 'Booking should be undefined')
+            }))))
+
+      it('should succeed when removing self', () => Promise
+        .all([dbUtils.populateLaundries(1), dbUtils.populateTokens(1)])
+        .then(([{laundry}, {user, token}]) => laundry
+          .addUser(user)
+          .then(() => ({laundry, user, token})))
+        .then(({laundry, user, token}) =>
+          request(app)
+            .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+            .auth(user.model.id, token.secret)
+            .expect(204)))
+
       it('should fail when only user', () =>
         Promise.all([dbUtils.populateLaundries(1), dbUtils.populateTokens(1), dbUtils.populateUsers(1)])
           .then(([{laundry}, {token, user}, [user2]]) => Promise

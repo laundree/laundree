@@ -65,7 +65,7 @@ LaundrySettingsForm.propTypes = {
   laundry: React.PropTypes.object.isRequired
 }
 
-class LaundrySettings extends React.Component {
+class DeleteLaundry extends React.Component {
 
   constructor (props) {
     super(props)
@@ -75,33 +75,15 @@ class LaundrySettings extends React.Component {
     this.handleOpenModal = () => this.setState({modalOpen: true})
   }
 
-  get laundry () {
-    return this.props.laundries[this.props.currentLaundry]
-  }
-
   deleteLaundry () {
-    return sdk.laundry(this.props.currentLaundry).deleteLaundry()
+    return sdk.laundry(this.props.laundry.id).deleteLaundry()
   }
 
-  get isOwner () {
-    return this.laundry.owners.indexOf(this.props.user.id) >= 0
-  }
-
-  renderSettings () {
-    if (!this.isOwner) return null
-    return <div>
-      <section>
-        <h2>Change name</h2>
-        <LaundrySettingsForm laundry={this.laundry}/>
-      </section>
-      {this.renderDelete()}
-    </div>
-  }
-
-  renderDelete () {
-    if (this.laundry.demo) return null
-    return <section>
-      <h2>Delete laundry</h2>
+  render () {
+    if (this.props.laundry.demo) return null
+    return <div className='text'>
+      Deleting the laundry will remove all data associated with it and remove all users from it.<br />
+      It can NOT be undone!
       <Modal
         show={this.state.modalOpen}
         onClose={this.handleCloseModal}
@@ -110,19 +92,85 @@ class LaundrySettings extends React.Component {
           {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
           {label: 'No', action: this.handleCloseModal}
         ]}/>
-      <div className='text'>
-        Deleting the laundry will remove all data associated with it and remove all users from it.<br />
-        It can NOT be undone!
-        <div className='buttonContainer'>
-          <button onClick={this.handleOpenModal} className='red'>Delete Laundry</button>
-        </div>
+      <div className='buttonContainer'>
+        <button onClick={this.handleOpenModal} className='red'>Delete Laundry</button>
       </div>
-    </section>
+    </div>
   }
 
-  renderApologeticMessage () {
+}
+
+DeleteLaundry.propTypes = {
+  laundry: React.PropTypes.object.isRequired
+}
+
+class LeaveLaundry extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {modalOpen: false}
+    this.handleDeleteClick = () => this.deleteLaundry()
+    this.handleCloseModal = () => this.setState({modalOpen: false})
+    this.handleOpenModal = () => this.setState({modalOpen: true})
+  }
+
+  deleteLaundry () {
+    return sdk.laundry(this.props.laundry.id).removeUserFromLaundry(this.props.user.id)
+  }
+
+  render () {
+    if (this.props.laundry.demo) return null
+    return <div className='text'>
+      If you leave the laundry, all your bookings will be lost.
+      <Modal
+        show={this.state.modalOpen}
+        onClose={this.handleCloseModal}
+        message='Are you absolutely sure that you want to leave this laundry?'
+        actions={[
+          {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
+          {label: 'No', action: this.handleCloseModal}
+        ]}/>
+      <div className='buttonContainer'>
+        <button onClick={this.handleOpenModal} className='red'>Leave Laundry</button>
+      </div>
+    </div>
+  }
+
+}
+
+LeaveLaundry.propTypes = {
+  laundry: React.PropTypes.object.isRequired,
+  user: React.PropTypes.object.isRequired
+}
+
+class LaundrySettings extends React.Component {
+
+  get isOwner () {
+    return this.laundry.owners.indexOf(this.props.user.id) >= 0
+  }
+
+  renderOwnerSettings () {
+    if (!this.isOwner) return null
+    return <div>
+      <section>
+        <h2>Change name</h2>
+        <LaundrySettingsForm laundry={this.laundry}/>
+      </section>
+      <section>
+        <h2>Delete laundry</h2>
+        <DeleteLaundry laundry={this.laundry}/>
+      </section>
+    </div>
+  }
+
+  get laundry () {
+    return this.props.laundries[this.props.currentLaundry]
+  }
+
+  renderUserSettings () {
     return <section>
-      There's nothing to see here yet!
+      <h2>Leave laundry</h2>
+      <LeaveLaundry laundry={this.laundry} user={this.props.user}/>
     </section>
   }
 
@@ -131,7 +179,7 @@ class LaundrySettings extends React.Component {
     return <DocumentTitle title='Laundry Settings'>
       <main className='naved' id='LaundrySettings'>
         <h1>Laundry settings</h1>
-        {this.isOwner ? this.renderSettings() : this.renderApologeticMessage()}
+        {this.isOwner ? this.renderOwnerSettings() : this.renderUserSettings()}
       </main>
     </DocumentTitle>
   }

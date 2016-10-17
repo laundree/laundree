@@ -31,7 +31,7 @@ class TopNav extends React.Component {
                 .map(({id, name}) =>
                   <li key={id} className={id === this.props.currentLaundry ? 'active' : ''}>
                     <DropDownCloser>
-                      <Link to={'/laundries/' + id}>{name}</Link>
+                      <a href={'/laundries/' + id}>{name}</a>
                     </DropDownCloser>
                   </li>)}
             </ul>

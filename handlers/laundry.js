@@ -227,8 +227,16 @@ class LaundryHandler extends Handler {
     this.model.owners.pull(user.model._id)
     return this
       .save()
+      .then(() => this._deleteBookings(user))
       .then(() => user._removeLaundry(this))
       .then(() => this)
+  }
+
+  _deleteBookings (user) {
+    return BookingHandler.deleteBookings({
+      owner: user.model._id,
+      laundry: this.model._id
+    })
   }
 
   updateName (name) {
