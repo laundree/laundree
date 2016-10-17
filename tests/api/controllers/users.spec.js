@@ -39,8 +39,8 @@ describe('controllers', function () {
           request(app)
             .get(`/api/users/${user.model.id}`)
             .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
             .expect(200)
+            .expect('Content-Type', /json/)
             .then(res =>
               user.toRest()
                 .then((u) => {
@@ -58,8 +58,8 @@ describe('controllers', function () {
             request(app)
               .get(`/api/users/${user.model.id}`)
               .set('Accept', 'application/json')
-              .expect('Content-Type', /json/)
               .expect(200)
+              .expect('Content-Type', /json/)
               .then(res =>
                 user.toRest()
                   .then((u) => {
