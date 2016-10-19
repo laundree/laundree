@@ -80,7 +80,12 @@ class DeleteLaundry extends React.Component {
   }
 
   render () {
-    if (this.props.laundry.demo) return null
+    if (this.props.laundry.demo && this.props.user.role !== 'admin') {
+      return <div className='text'>
+        You can not delete a demo laundry.
+      </div>
+    }
+
     return <div className='text'>
       Deleting the laundry will remove all data associated with it and remove all users from it.<br />
       It can NOT be undone!
@@ -101,7 +106,8 @@ class DeleteLaundry extends React.Component {
 }
 
 DeleteLaundry.propTypes = {
-  laundry: React.PropTypes.object.isRequired
+  laundry: React.PropTypes.object.isRequired,
+  user: React.PropTypes.object.isRequired
 }
 
 class LeaveLaundry extends React.Component {
@@ -109,17 +115,16 @@ class LeaveLaundry extends React.Component {
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
-    this.handleDeleteClick = () => this.deleteLaundry()
+    this.handleDeleteClick = () => this.removeUser()
     this.handleCloseModal = () => this.setState({modalOpen: false})
     this.handleOpenModal = () => this.setState({modalOpen: true})
   }
 
-  deleteLaundry () {
+  removeUser () {
     return sdk.laundry(this.props.laundry.id).removeUserFromLaundry(this.props.user.id)
   }
 
   render () {
-    if (this.props.laundry.demo) return null
     return <div className='text'>
       If you leave the laundry, all your bookings will be lost.
       <Modal
@@ -146,7 +151,7 @@ LeaveLaundry.propTypes = {
 class LaundrySettings extends React.Component {
 
   get isOwner () {
-    return this.laundry.owners.indexOf(this.props.user.id) >= 0
+    return this.props.user.role === 'admin' || this.laundry.owners.indexOf(this.props.user.id) >= 0
   }
 
   renderOwnerSettings () {
@@ -158,7 +163,7 @@ class LaundrySettings extends React.Component {
       </section>
       <section>
         <h2>Delete laundry</h2>
-        <DeleteLaundry laundry={this.laundry}/>
+        <DeleteLaundry laundry={this.laundry} user={this.props.user}/>
       </section>
     </div>
   }
@@ -190,6 +195,7 @@ LaundrySettings.propTypes = {
   laundries: React.PropTypes.object,
   user: React.PropTypes.shape({
     id: React.PropTypes.string,
+    role: React.PropTypes.string,
     photo: React.PropTypes.string
   })
 }

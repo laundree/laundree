@@ -10,9 +10,13 @@ const dbUtils = require('../../db_utils')
 const Promise = require('promise')
 
 describe('controllers', function () {
-  beforeEach(() => dbUtils.clearDb())
+  this.timeout(5000)
+  let admin, admintoken
+  beforeEach(() => dbUtils.clearDb().then(() => dbUtils.createAdministrator()).then(({user, token}) => {
+    admin = user
+    admintoken = token
+  }))
   describe('machines', function () {
-    this.timeout(5000)
     describe('GET /api/laundries/{id}/machines', () => {
       it('should fail on not authenticated', () =>
         request(app)
@@ -20,6 +24,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .expect(403)
           .expect('Content-Type', /json/))
+
       it('should limit output size', () =>
         dbUtils.populateMachines(50).then(({user, token, laundry, machines}) =>
           request(app)
@@ -65,6 +70,21 @@ describe('controllers', function () {
             request(app)
               .get(`/api/laundries/${laundry.model.id}/machines`)
               .auth(user.model.id, token.secret)
+              .set('Accept', 'application/json')
+              .expect(200)
+              .expect('Content-Type', /json/)
+              .expect('Link', /rel=.first./)
+              .then(res => {
+                var arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
+                res.body.should.deep.equal(arr)
+              })))
+
+      it('should only fetch from current user when admin', () =>
+        Promise.all([dbUtils.populateMachines(1), dbUtils.populateMachines(2)])
+          .then(([r1, {machines, laundry}]) =>
+            request(app)
+              .get(`/api/laundries/${laundry.model.id}/machines`)
+              .auth(admin.model.id, admintoken.secret)
               .set('Accept', 'application/json')
               .expect(200)
               .expect('Content-Type', /json/)
@@ -210,6 +230,24 @@ describe('controllers', function () {
                 return machine.toRest().then((result) => res.body.should.deep.equal(result))
               })
             })))
+
+      it('should succeed when admin', () =>
+        dbUtils.populateMachines(1).then(({laundry, machines}) =>
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/machines`)
+            .send({name: machines[0].model.name + ' 2', type: 'wash'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(admin.model.id, admintoken.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+              const id = res.body.id
+              return MachineHandler.findFromId(id).then((machine) => {
+                machine.should.not.be.undefined
+                return machine.toRest().then((result) => res.body.should.deep.equal(result))
+              })
+            })))
     })
     describe('PUT /api/machines/{id}', () => {
       it('should fail on not authenticated', () =>
@@ -320,6 +358,23 @@ describe('controllers', function () {
                 res.body.should.deep.equal(rest)
               })
             }))))
+      it('should succeed when admin', () =>
+        dbUtils.populateMachines(1).then(({machine}) =>
+          request(app)
+            .put(`/api/machines/${machine.model.id}`)
+            .send({name: machine.model.name + ' 2', type: 'dry'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(admin.model.id, admintoken.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => MachineHandler.findFromId(machine.model.id).then((m) => {
+              m.model.name.should.equal(machine.model.name + ' 2')
+              m.model.type.should.equal('dry')
+              return m.toRest().then((rest) => {
+                res.body.should.deep.equal(rest)
+              })
+            }))))
     })
 
     describe('GET /machines/{id}', () => {
@@ -372,6 +427,17 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => machines[0].toRest().then((result) => res.body.should.deep.equal(result)))))
+
+      it('should succeed when admin', () =>
+        dbUtils.populateMachines(1).then(({machines}) =>
+          request(app)
+            .get(`/api/machines/${machines[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(admin.model.id, admintoken.secret)
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => machines[0].toRest().then((result) => res.body.should.deep.equal(result)))))
@@ -441,6 +507,18 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
+            .expect(204)
+            .then(res => MachineHandler
+              .findFromId(machine.model.id)
+              .then((t) => assert(t === undefined)))))
+
+      it('should succeed when admin', () =>
+        dbUtils.populateMachines(1).then(({machine}) =>
+          request(app)
+            .delete(`/api/machines/${machine.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(admin.model.id, admintoken.secret)
             .expect(204)
             .then(res => MachineHandler
               .findFromId(machine.model.id)

@@ -17,29 +17,30 @@ class InviteUserForm extends ValueUpdater {
   }
 
   render () {
+    if (this.props.laundry.demo) {
+      return <div className='text'>
+        Sorry, but you can't add users to a demo laundry
+      </div>
+    }
     return <ValidationForm
       sesh={this.state.sesh}
       onSubmit={this.submitHandler}>
-      <div
-        data-demo-message="You can't add users to a demo laundry"
-        className={this.props.laundry.demo ? 'demo' : ''}>
-        <div>
-          <ValidationElement
-            sesh={this.state.sesh}
-            initial={this.state.values.email === undefined}
-            value={this.state.values.email || ''} email trim>
-            <label
-              data-validate-error='Please enter a valid email address'>
-              <input
-                placeholder='Email address'
-                type='text' onChange={this.generateValueUpdater('email')}
-                value={this.state.values.email || ''}/>
-            </label>
-          </ValidationElement>
-        </div>
-        <div className='buttons'>
-          <input type='submit' value='Invite'/>
-        </div>
+      <div>
+        <ValidationElement
+          sesh={this.state.sesh}
+          initial={this.state.values.email === undefined}
+          value={this.state.values.email || ''} email trim>
+          <label
+            data-validate-error='Please enter a valid email address'>
+            <input
+              placeholder='Email address'
+              type='text' onChange={this.generateValueUpdater('email')}
+              value={this.state.values.email || ''}/>
+          </label>
+        </ValidationElement>
+      </div>
+      <div className='buttons'>
+        <input type='submit' value='Invite'/>
       </div>
     </ValidationForm>
   }

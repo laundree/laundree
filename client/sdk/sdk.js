@@ -171,6 +171,10 @@ class UserSdk extends ResourceSdk {
     return post(`/api/users/${this.id}/password-reset`, {token, password})
   }
 
+  listEmails () {
+    return get(`/api/users/${this.id}/emails`).then(({body}) => body)
+  }
+
   updateName (name) {
     return put(`/api/users/${this.id}`, {name})
   }
@@ -185,6 +189,10 @@ class UserSdk extends ResourceSdk {
 
   startEmailVerification (email) {
     return post(`/api/users/${this.id}/start-email-verification`, {email})
+  }
+
+  deleteUser () {
+    return del(`/api/users/${this.id}`)
   }
 }
 

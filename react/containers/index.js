@@ -21,7 +21,7 @@ module.exports = {
   LogIn: require('./login'),
   Users: require('./users'),
   HomeLoggedIn: require('./home_logged_in'),
-  Settings: require('./settings'),
+  UserSettings: require('./user_settings'),
   Support: require('./support'),
   AdminPanel: require('./admin_panel'),
   Contact: require('../views').Contact

@@ -17,7 +17,6 @@ class TopNav extends React.Component {
     if (!currentLaundry) return null
     switch (laundries.length) {
       case 0:
-        return null
       case 1:
         return <div><span>{currentLaundry.name}</span></div>
       default:
@@ -58,7 +57,7 @@ class TopNav extends React.Component {
           <ul className='dropDownList'>
             {this.props.user.demo ? null : <li>
               <DropDownCloser>
-                <Link to='/settings' activeClassName='active'>
+                <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
                   Manage your account
                 </Link>
               </DropDownCloser>

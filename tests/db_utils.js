@@ -35,6 +35,14 @@ function populateUsers (no) {
   return Promise.all(range(no).map(generateProfile).map((profile) => UserHandler.createUserFromProfile(profile)))
 }
 
+function createAdministrator () {
+  return populateTokens(1)
+    .then(({user, token}) => {
+      user.model.role = 'admin'
+      return user.save().then(() => ({user, token}))
+    })
+}
+
 function populateTokens (no) {
   const userPromise = populateUsers(1)
   return userPromise
@@ -100,5 +108,6 @@ module.exports = {
   populateTokens,
   populateBookings,
   populateMachines,
-  populateInvites
+  populateInvites,
+  createAdministrator
 }

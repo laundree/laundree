@@ -64,6 +64,22 @@ describe('controllers', function () {
                 res.body.should.deep.equal(arr)
               })))
 
+      it('should fetch all for administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(2), dbUtils.createAdministrator()])
+          .then(([ {laundries: laundries1}, {laundries: laundries2}, {user, token} ]) =>
+            request(app)
+              .get('/api/laundries')
+              .auth(user.model.id, token.secret)
+              .set('Accept', 'application/json')
+              .expect('Content-Type', /json/)
+              .expect('Link', /rel=.first./)
+              .expect(200)
+              .then(res => {
+                const laundries = laundries1.concat(laundries2)
+                const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((laundry) => laundry.toRestSummary())
+                res.body.should.deep.equal(arr)
+              })))
+
       it('should allow since', () =>
         dbUtils.populateLaundries(50).then(({user, token, laundries}) => {
           laundries = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id))
@@ -110,6 +126,21 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(409)
             .then(res => res.body.should.deep.equal({message: 'Laundry already exists'}))))
+
+      it('should fail on demo user', () =>
+        dbUtils.populateTokens(1).then(({user, token}) => {
+          user.model.demo = true
+          return user.save().then(() => ({user, token}))
+        }).then(({user, token, laundries}) =>
+          request(app)
+            .post('/api/laundries')
+            .send({name: 'Some crazy laundry'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(403)))
+
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
@@ -247,6 +278,19 @@ describe('controllers', function () {
             .expect(200)
             .then(res => laundries[0].toRest().then((result) => res.body.should.deep.equal(result)))))
 
+      it('should succeed when administrator', () =>
+        Promise
+          .all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
+          .then(([{laundries}, {user, token}]) =>
+            request(app)
+              .get(`/api/laundries/${laundries[0].model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(200)
+              .then(res => laundries[0].toRest().then((result) => res.body.should.deep.equal(result)))))
+
       it('should succeed 2', () =>
         dbUtils.populateMachines(2).then(({user, token, laundry}) =>
           request(app)
@@ -351,6 +395,21 @@ describe('controllers', function () {
               .findFromId(laundries[0].model.id)
               .then(laundry => laundry.model.name.should.equal('L1')))))
 
+      it('should succeed when administrator', () =>
+        Promise
+          .all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
+          .then(([{laundries}, {user, token}]) =>
+            request(app)
+              .put(`/api/laundries/${laundries[0].model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .send({name: 'L1'})
+              .expect(204)
+              .then(() => LaundryHandler
+                .findFromId(laundries[0].model.id)
+                .then(laundry => laundry.model.name.should.equal('L1')))))
+
       it('should succeed same name', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
@@ -454,6 +513,17 @@ describe('controllers', function () {
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
             .expect(204)))
+
+      it('should succeed if administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
+          .then(([{laundry}, {user, token}]) =>
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .send({email: 'alice@example.com'})
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)))
 
       it('should fail if demo', () =>
         dbUtils.populateLaundries(1)
@@ -624,6 +694,19 @@ describe('controllers', function () {
               .findFromId(laundries[0].model.id)
               .then((t) => assert(t === undefined)))))
 
+      it('should succeed when administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
+          .then(([{laundries}, {user, token}]) =>
+            request(app)
+              .delete(`/api/laundries/${laundries[0].model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)
+              .then(res => LaundryHandler
+                .findFromId(laundries[0].model.id)
+                .then((t) => assert(t === undefined)))))
+
       it('should fail if demo', () =>
         dbUtils.populateLaundries(1)
           .then(({user, token, laundry}) => {
@@ -637,6 +720,35 @@ describe('controllers', function () {
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
               .expect(403)))
+
+      it('should succeed if demo and administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateTokens(1)])
+          .then(([{laundry}, {user, token}]) => {
+            laundry.model.demo = true
+            user.model.role = 'admin'
+            return Promise.all([laundry.save(), user.save()]).then(() => ({user, token, laundry}))
+          })
+          .then(({user, token, laundry}) =>
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)))
+
+      it('should succeed if administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateTokens(1)])
+          .then(([{laundry}, {user, token}]) => {
+            user.model.role = 'admin'
+            return user.save().then(() => ({user, token, laundry}))
+          })
+          .then(({user, token, laundry}) =>
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(204)))
 
       it('should fail when only user', () =>
         Promise
@@ -736,6 +848,41 @@ describe('controllers', function () {
               .then(res => LaundryHandler
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isUser(user)).should.be.false))))
+
+      it('should succeed when administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateUsers(1), dbUtils.createAdministrator()])
+          .then(([{laundry}, [user2], {user, token}]) => laundry.addUser(user2).then(() => ({
+            owner: user,
+            token,
+            laundry,
+            user: user2
+          })))
+          .then(({user, owner, token, laundry}) =>
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(owner.model.id, token.secret)
+              .expect(204)
+              .then(res => LaundryHandler
+                .findFromId(laundry.model.id)
+                .then((laundry) => Boolean(laundry.isUser(user)).should.be.false))))
+
+      it('should fail when administrator but user is owner', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
+          .then(([{laundry, user: owner}, {user, token}]) => ({
+            owner,
+            user,
+            token,
+            laundry
+          }))
+          .then(({user, owner, token, laundry}) =>
+            request(app)
+              .delete(`/api/laundries/${laundry.model.id}/users/${owner.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(403)))
 
       it('should succeed and remove bookings', () => Promise
         .all([dbUtils.populateMachines(1), dbUtils.populateUsers(1)])
