@@ -5,7 +5,11 @@ const {api, mail} = require('../../utils')
  */
 
 function listLaundries (req, res) {
-  const filter = {users: req.user.model._id}
+  const {currentUser} = req.subjects
+  const filter = {}
+  if (!currentUser.isAdmin) {
+    filter.users = currentUser.model._id
+  }
   const limit = req.swagger.params.page_size.value
   const since = req.swagger.params.since.value
   if (since) {
@@ -28,6 +32,8 @@ function listLaundries (req, res) {
 
 function createLaundry (req, res) {
   const name = req.swagger.params.body.value.name.trim()
+  const {currentUser} = req.subjects
+  if (currentUser.isDemo) return api.returnError(res, 403, 'Not allowed')
   LaundryHandler
     .find({name})
     .then(([laundry]) => {
@@ -66,8 +72,8 @@ function fetchLaundry (req, res) {
 }
 
 function deleteLaundry (req, res) {
-  const laundry = req.subjects.laundry
-  if (laundry.model.demo) return api.returnError(res, 403, 'Not allowed')
+  const {laundry, currentUser} = req.subjects
+  if (!currentUser.isAdmin && laundry.model.demo) return api.returnError(res, 403, 'Not allowed')
   laundry.deleteLaundry()
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
@@ -88,15 +94,14 @@ function inviteUserByEmail (req, res) {
 }
 
 function removeUserFromLaundry (req, res) {
-  const userId = req.swagger.params.userId.value
-  const laundry = req.subjects.laundry
-  UserHandler.findFromId(userId)
-    .then((user) => {
-      if (!user) return api.returnError(res, 404, 'User not found')
-      if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
-      if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')
-      return laundry.removeUser(user).then(() => api.returnSuccess(res))
-    })
+  const {user, currentUser, laundry} = req.subjects
+  if (!currentUser.isAdmin) {
+    if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
+    if (!laundry.isOwner(currentUser) && user.model.id !== currentUser.model.id) return api.returnError(res, 403, 'Not allowed')
+  }
+  if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')
+  laundry.removeUser(user)
+    .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
 

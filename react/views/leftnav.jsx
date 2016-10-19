@@ -10,12 +10,17 @@ class LeftNav extends React.Component {
   }
 
   get isOwner () {
-    return this.laundry.owners.indexOf(this.props.currentUser) >= 0
+    return this.props.user.role === 'admin' || this.laundry.owners.indexOf(this.props.user.id) >= 0
   }
 
-  componentWillReceiveProps ({currentUser, users, currentLaundry}) {
-    const user = users[currentUser]
-    if (!user || user.role === 'admin' || user.laundries.indexOf(currentLaundry) >= 0) return
+  componentWillReceiveProps ({user, currentLaundry, laundries}) {
+    if (!laundries[currentLaundry]) {
+      window.location = '/'
+      return
+    }
+    if (!user) return
+    if (user.role === 'admin') return
+    if (user.laundries.indexOf(currentLaundry) >= 0) return
     window.location = `/`
   }
 
@@ -105,7 +110,7 @@ class LeftNav extends React.Component {
 
 LeftNav.propTypes = {
   children: React.PropTypes.any,
-  currentUser: React.PropTypes.string.isRequired,
+  user: React.PropTypes.object.isRequired,
   laundries: React.PropTypes.object,
   currentLaundry: React.PropTypes.string
 }

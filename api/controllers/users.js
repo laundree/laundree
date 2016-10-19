@@ -123,6 +123,10 @@ function changeUserPassword (req, res) {
     .catch(utils.api.generateErrorHandler(res))
 }
 
+function fetchUserEmails (req, res) {
+  const {user} = req.subjects
+  return utils.api.returnSuccess(res, user.model.emails)
+}
 module.exports = {
   getUser,
   listUsers,
@@ -133,5 +137,6 @@ module.exports = {
   verifyEmail,
   deleteUser,
   updateUser,
-  changeUserPassword
+  changeUserPassword,
+  fetchUserEmails
 }

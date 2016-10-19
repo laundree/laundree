@@ -4,6 +4,7 @@ const {Link} = require('react-router')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
+const Modal = require('./modal.jsx')
 
 class UserNameForm extends ValueUpdater {
 
@@ -137,10 +138,138 @@ UserPasswordForm.propTypes = {
   user: React.PropTypes.object.isRequired
 }
 
-class Settings extends React.Component {
+class DeleteUser extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {modalOpen: false}
+    this.handleDeleteClick = () => this.deleteLaundry()
+    this.handleCloseModal = () => this.setState({modalOpen: false})
+    this.handleOpenModal = () => this.setState({modalOpen: true})
+  }
+
+  deleteLaundry () {
+    return sdk.user(this.props.user.id).deleteUser().then(() => {
+      window.location = '/'
+    })
+  }
 
   render () {
-    const user = this.props.users[this.props.currentUser]
+    return <div>
+      <Modal
+        show={this.state.modalOpen}
+        onClose={this.handleCloseModal}
+        message='Are you absolutely sure that you want to delete your account?'
+        actions={[
+          {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
+          {label: 'No', action: this.handleCloseModal}
+        ]}/>
+      <div className='buttonContainer'>
+        <button onClick={this.handleOpenModal} className='red'>Delete Account</button>
+      </div>
+    </div>
+  }
+
+}
+
+DeleteUser.propTypes = {
+  user: React.PropTypes.object.isRequired
+}
+class UserSettings extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {}
+    this.onLoadClick = () => {
+      if (this.state.loading) return
+      this.setState({loading: true})
+      sdk.user(this.props.user).listEmails().then(emails => this.setState({loading: false, emails}))
+    }
+  }
+
+  renderPassword () {
+    if (this.isAdmin && !this.isSelf) return null
+    return <section>
+      <h2>Change password</h2>
+      <UserPasswordForm user={this.user}/>
+    </section>
+  }
+
+  get isSelf () {
+    return this.props.user === this.props.currentUser
+  }
+
+  get user () {
+    return this.props.users[this.props.user]
+  }
+
+  get currentUser () {
+    return this.props.users[this.props.currentUser]
+  }
+
+  get isAdmin () {
+    return this.currentUser.role === 'admin'
+  }
+
+  get laundries () {
+    return this.user.laundries.map(l => this.props.laundries[l]).filter(l => l)
+  }
+
+  get isOwner () {
+    return this.laundries.find(l => l.owners.find(i => i === this.props.user))
+  }
+
+  renderDelete () {
+    if (this.isOwner) {
+      return <section>
+        <h2>Delete account</h2>
+        <div className='text'>
+          Since you are a owner of at least one laundry, you cannot delete your account.<br />
+          Please delete your laundries first!
+        </div>
+      </section>
+    }
+    return <section>
+      <h2>Delete account</h2>
+      <div className='text'>
+        Deleting your account is irreversible and your information will be removed.<br />
+        This including, but not limited to, bookings.
+        <DeleteUser user={this.user}/>
+      </div>
+    </section>
+  }
+
+  renderEmailList () {
+    if (!this.state.emails) {
+      return <div className='bigListMessage email'>
+        <button className={this.state.loading ? 'grey' : ''} onClick={this.onLoadClick}>
+          {this.state.loading ? 'Loading addresses...' : 'Load addresses'}
+        </button>
+      </div>
+    }
+    return <ul className='bigList'>
+      {this.state.emails.map(email => <li key={email}>
+        <div className='name'>
+          <a href={`mailto:${email}`}>
+            {email}
+          </a>
+        </div>
+      </li>)}
+    </ul>
+  }
+
+  renderEmails () {
+    if (!this.isAdmin && !this.isSelf) return
+    return <section>
+      <h2>Email addresses</h2>
+      <div className='text'>
+        {this.renderEmailList()}
+      </div>
+    </section>
+  }
+
+  render () {
+    const user = this.user
     return <DocumentTitle title='Profile settings'>
       <main className='topNaved' id='Settings'>
         <h1>Profile settings</h1>
@@ -148,21 +277,14 @@ class Settings extends React.Component {
           <h2>Basic user-info</h2>
           <UserNameForm user={user}/>
         </section>
-        <section>
-          <h2>Change password</h2>
-          <UserPasswordForm user={user}/>
-        </section>
-        <section>
-          <h2>Delete account</h2>
-          <p>
-            Deleting your account is currently a manual process.<br />
-            Please contact us at <a href='mailto:delete-my-account@laundre.io'>delete-my-account@laundre.io</a> if you
-            which to do so.
-          </p>
-        </section>
+        {this.renderEmails()}
+        {this.renderPassword()}
+        {this.renderDelete()}
         <section>
           <h2>Laundries</h2>
-          {this.renderLaundries(user)}
+          <div className='text'>
+            {this.renderLaundries(user)}
+          </div>
         </section>
       </main>
     </DocumentTitle>
@@ -170,24 +292,27 @@ class Settings extends React.Component {
 
   renderLaundries (user) {
     if (user.laundries.length === 0) {
-      return <div className='emptyLaundryList'>
-        No laundry found.
+      return <div className='bigListMessage'>
+        No laundries found.
       </div>
     }
-    return <ul className='laundryList'>
+    return <ul className='bigList'>
       {user.laundries.map(id => this.props.laundries[id]).map(laundry =>
         <li key={laundry.id}>
-          <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
+          <div className='name'>
+            <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
+          </div>
         </li>)}
     </ul>
   }
 
 }
 
-Settings.propTypes = {
+UserSettings.propTypes = {
   currentUser: React.PropTypes.string,
+  user: React.PropTypes.string,
   laundries: React.PropTypes.object,
   users: React.PropTypes.object
 }
 
-module.exports = Settings
+module.exports = UserSettings

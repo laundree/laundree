@@ -33,9 +33,15 @@ function pullSubjects (req) {
       pullSubject(req, 'laundryId', LaundryHandler),
       pullSubject(req, 'bookingId', BookingHandler)
     ])
-    .then(([user, machine, token, invite, laundry, booking]) => ({
-      user, machine, token, invite, laundry, booking
-    }))
+    .then(([user, machine, token, invite, laundry, booking]) => {
+      const subjects = {user, machine, token, invite, laundry, booking}
+      if (laundry) return subjects
+      const subject = machine || invite || booking
+      if (!subject) return subjects
+      return LaundryHandler
+        .findFromId(subject.model.laundry.toString())
+        .then(laundry => Object.assign(subjects, {laundry}))
+    })
     .then(subjects => Object.keys(subjects).reduce((subs, key) => {
       if (!subjects[key]) return subs
       subs[key] = subjects[key]
@@ -83,6 +89,10 @@ function self (req) {
   return securityCheck(req, userAccess, subjects => subjects.currentUser.model.id === subjects.user.model.id, generateError('Not allowed', 403))
 }
 
+function administrator (req) {
+  return securityCheck(req, userAccess, subjects => subjects.currentUser.isAdmin, generateError('Not allowed', 403))
+}
+
 function tokenOwner (req) {
   return securityCheck(req, userAccess, subjects => subjects.token.isOwner(subjects.currentUser), generateError('Not found', 404))
 }
@@ -97,22 +107,6 @@ function laundryOwner (req) {
 
 function bookingCreator (req) {
   return securityCheck(req, userAccess, subjects => subjects.booking.isOwner(subjects.currentUser), generateError('Not found', 404))
-}
-
-function genericOwnerCheck (subjectName) {
-  return (req) => securityCheck(req, genericUserCheck(subjectName), subjects => subjects.laundry.isOwner(subjects.currentUser), generateError('Not allowed', 403))
-}
-
-function genericUserCheck (subjectName) {
-  return (req) => userAccess(req).then(subjects => {
-    const subject = subjects[subjectName]
-    return LaundryHandler
-      .findFromId(subject.model.laundry.toString())
-      .then(laundry => {
-        if (!laundry.isUser(subjects.currentUser)) throw generateError('Not found', 404)
-        return Object.assign({laundry}, subjects)
-      })
-  })
 }
 
 function fetchRouter () {
@@ -141,14 +135,10 @@ function fetchRouter () {
           subjectsExists: wrapSecurity(pullSubjects),
           userAccess: wrapSecurity(userAccess),
           self: wrapSecurity(self),
+          administrator: wrapSecurity(administrator),
           tokenOwner: wrapSecurity(tokenOwner),
           laundryOwner: wrapSecurity(laundryOwner),
           laundryUser: wrapSecurity(laundryUser),
-          machineOwner: wrapSecurity(genericOwnerCheck('machine')),
-          machineUser: wrapSecurity(genericUserCheck('machine')),
-          inviteOwner: wrapSecurity(genericOwnerCheck('invite')),
-          bookingOwner: wrapSecurity(genericOwnerCheck('booking')),
-          bookingUser: wrapSecurity(genericUserCheck('booking')),
           bookingCreator: wrapSecurity(bookingCreator)
         }))
         router.use(middleware.swaggerValidator({validateResponse: true}))

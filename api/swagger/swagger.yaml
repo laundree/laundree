@@ -1,6 +1,6 @@
 swagger: "2.0"
 info:
-  version: "0.1.0"
+  version: "0.2.0"
   title: Laundree App
 
 host: laundree.io
@@ -34,24 +34,12 @@ securityDefinitions:
   laundryUser:
     type: basic
     description: Is the requested laundry used by current user
-  machineOwner:
-    type: basic
-    description: Is the requested machine owned by current user
-  machineUser:
-    type: basic
-    description: Is the requested machine used by current user
-  bookingOwner:
-    type: basic
-    description: Is the requested booking owned by current user
-  bookingUser:
-    type: basic
-    description: Is the requested booking used by current user
   bookingCreator:
     type: basic
     description: Is the requested booking created by current user
-  inviteOwner:
+  administrator:
     type: basic
-    description: Is the requested invite owned by current user
+    description: Is the current user an admin
 
 paths:
   /users:
@@ -167,6 +155,7 @@ paths:
       operationId: updateUser
       security:
         - self: []
+        - administrator: []
       parameters:
         - name: userId
           in: path
@@ -202,6 +191,7 @@ paths:
       operationId: deleteUser
       security: 
         - self: []
+        - administrator: []
       tags: 
         - Users
       parameters:
@@ -225,13 +215,45 @@ paths:
           description: Error
           schema: 
             $ref: "#/definitions/Error"
+  /users/{userId}/emails:
+    x-swagger-router-controller: users
+    get:
+      description: Get user emails
+      operationId: fetchUserEmails
+      security:
+        - administrator: []
+        - self: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The user to be queried
+          type: string
+      tags:
+        - Users
+      responses:
+        "200":
+          description: Success
+          schema:
+            type: array
+            items:
+              type: string
+              format: email
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /users/{userId}/start-password-reset:
     x-swagger-router-controller: users
     post:
       description: Start user password reset
       operationId: startPasswordReset
       security:
-        - subjectsExists: []      
+        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -664,6 +686,7 @@ paths:
         - Laundries
       security:
         - laundryOwner: []
+        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -702,6 +725,7 @@ paths:
         - Laundries
       security: 
         - laundryUser: []
+        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -730,6 +754,7 @@ paths:
         - Laundries
       security: 
         - laundryOwner: []
+        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -761,6 +786,7 @@ paths:
         - Laundries
       security:
         - laundryUser: []
+        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -807,6 +833,7 @@ paths:
       operationId: createMachine
       security:
         - laundryOwner: []
+        - administrator: []
       tags:
         - Machines
         - Laundries
@@ -855,7 +882,8 @@ paths:
     delete:
       operationId: removeUserFromLaundry
       security:
-        - laundryOwner: []
+        - laundryUser: []
+        - administrator: []
       tags:
         - Laundries
         - Users
@@ -892,6 +920,7 @@ paths:
       operationId: inviteUserByEmail
       security:
         - laundryOwner: []
+        - administrator: []
       tags:
         - Laundries
       parameters:
@@ -932,7 +961,8 @@ paths:
       tags:
         - Machines
       security:
-        - machineUser: []
+        - laundryUser: []
+        - administrator: []
       parameters:
         - name: machineId
           in: path
@@ -959,7 +989,8 @@ paths:
     put:
       operationId: updateMachine
       security:
-        - machineOwner: []
+        - laundryOwner: []
+        - administrator: []
       tags:
         - Machines
       parameters:
@@ -998,7 +1029,8 @@ paths:
     delete:
       operationId: deleteMachine
       security:
-        - machineOwner: []
+        - laundryOwner: []
+        - administrator: []
       tags:
         - Machines
       parameters:
@@ -1032,7 +1064,7 @@ paths:
         - Bookings
         - Machines
       security:
-        - machineUser: []
+        - laundryUser: []
       parameters:
         - name: machineId
           in: path
@@ -1095,7 +1127,7 @@ paths:
       tags:
         - Bookings
       security:
-        - machineUser: []
+        - laundryUser: []
       parameters:
         - name: machineId
           in: path
@@ -1147,7 +1179,7 @@ paths:
     x-swagger-router-controller: bookings
     get:
       security:
-        - bookingUser: []
+        - laundryUser: []
       operationId: fetchBooking
       tags:
         - Bookings
@@ -1172,7 +1204,7 @@ paths:
             $ref: "#/definitions/Error"
     delete:
       security:
-        - bookingOwner: []
+        - laundryOwner: []
         - bookingCreator: []
       operationId: deleteBooking
       tags:
@@ -1198,7 +1230,7 @@ paths:
     x-swagger-router-controller: invites
     get:
       security:
-        - inviteOwner: []
+        - laundryOwner: []
       operationId: fetchInvite
       tags:
         - Invites
@@ -1223,7 +1255,7 @@ paths:
             $ref: "#/definitions/Error"
     delete:
       security:
-        - inviteOwner: []
+        - laundryOwner: []
       operationId: deleteInvite
       tags:
         - Invites

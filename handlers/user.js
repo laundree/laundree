@@ -286,7 +286,7 @@ class UserHandler extends Handler {
 
   /**
    * Create a demo user
-   * @returns {Promise.<{email: string, password: string}>}
+   * @returns {Promise.<{email: string, user: UserHandler, password: string}>}
    */
   static createDemoUser () {
     const displayName = 'Demo user'

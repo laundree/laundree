@@ -85,6 +85,18 @@ class BookingHandler extends Handler {
   }
 
   /**
+   * Delete multiple bookings without emitting events
+   * @param query
+   * @returns {Promise}
+   */
+  static deleteBookings (query = {}) {
+    return BookingModel
+      .find(query)
+      .remove()
+      .then()
+  }
+
+  /**
    * Find adjacent bookings
    * @param {UserHandler} user
    * @param {MachineHandler} machine

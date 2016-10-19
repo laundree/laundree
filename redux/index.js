@@ -5,7 +5,7 @@ const {createStore} = require('redux')
 const reducer = require('./reducer')
 const actions = require('./actions')
 const Promise = require('promise')
-const {LaundryHandler} = require('../handlers')
+const {LaundryHandler, UserHandler} = require('../handlers')
 
 function mapFlash (flashArray, type) {
   return flashArray
@@ -14,22 +14,25 @@ function mapFlash (flashArray, type) {
 }
 
 function fetchLaundries (currentUser, url) {
-  if (!currentUser.isAdmin) return currentUser.fetchLaundries()
-  const currentLaundryMatch = url.match(/\/laundries\/([^\/]+)/)
-  if (!currentLaundryMatch || !currentLaundryMatch[1]) return Promise.resolve([])
-  const currentLaundryId = currentLaundryMatch[1]
-  return LaundryHandler
-    .findFromId(currentLaundryId)
-    .then(l => [l])
+  if (!currentUser.isAdmin) return currentUser.fetchLaundries().then(actions.listLaundries)
+  return fetchInstance(url, /\/laundries\/([^\/]+)/, LaundryHandler)
+    .then(laundry => laundry ? [actions.listLaundries([laundry])] : [])
 }
 
-function createLaundryEvents (events) {
-  return laundries => {
-    laundries = laundries.filter(l => l)
-    if (!laundries.length) return events
-    events.push(actions.listLaundries(laundries))
-    return events
-  }
+function fetchUsers (currentUser, url) {
+  if (!currentUser.isAdmin) return Promise.resolve([])
+  return fetchInstance(url, /\/users\/([^\/]+)/, UserHandler)
+    .then(user => {
+      if (!user) return []
+      return user.fetchLaundries().then(ls => [actions.listUsers([user]), actions.listLaundries(ls)])
+    })
+}
+
+function fetchInstance (url, pattern, _Handler) {
+  const currentMatch = url.match(pattern)
+  if (!currentMatch || !currentMatch[1]) return Promise.resolve()
+  const currentId = currentMatch[1]
+  return _Handler.findFromId(currentId).then(l => l)
 }
 
 /**
@@ -45,8 +48,12 @@ function createInitialEvents (currentUser, successFlash = [], errorFlash = [], u
   events = events.concat(mapFlash(errorFlash, 'error'))
   if (!currentUser) return Promise.resolve(events)
   events.push(actions.signInUser(currentUser))
-  return fetchLaundries(currentUser, url)
-    .then(createLaundryEvents(events))
+  return Promise
+    .all([
+      fetchLaundries(currentUser, url),
+      fetchUsers(currentUser, url)
+    ])
+    .then(evts => evts.reduce((e1, e2) => e1.concat(e2), events))
 }
 
 function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '') {

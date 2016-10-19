@@ -75,23 +75,31 @@ class LaundryList extends React.Component {
   }
 
   renderLaundryList () {
-    return this.laundries.map(l => <li key={l.id}>
+    if (!this.state.loaded) {
+      return <div className='bigListMessage'>
+        Loading laundries...
+      </div>
+    }
+    if (!Object.keys(this.props.laundries).length) {
+      return <div className='bigListMessage'>
+        No laundries found.
+      </div>
+    }
+    return <ul className='bigList'>{ this.laundries.map(l => <li key={l.id}>
       <div className='name'>
         <Link to={`/laundries/${l.id}`}>
           {l.name}
         </Link>
       </div>
-    </li>)
+    </li>)}
+    </ul>
   }
 
   render () {
     return <section id='LaundryList'>
       <h2>Laundries</h2>
-      <ul className='bigList'>
-        {this.renderLaundryList()}
-      </ul>
+      {this.renderLaundryList()}
     </section>
-    // TODO handle no laundries
   }
 }
 
@@ -115,17 +123,32 @@ class UserList extends React.Component {
   }
 
   renderUserList () {
-    return this.users.map(({id, displayName}) => <li key={id}>
-      <span className='name'>{displayName}</span>
-    </li>)
+    if (!this.state.loaded) {
+      return <div className='bigListMessage'>
+        Loading users...
+      </div>
+    }
+    if (!Object.keys(this.props.users).length) {
+      return <div className='bigListMessage'>
+        No users found.
+      </div>
+    }
+    return <ul className='bigList'>
+      {this.users.map(({id, displayName, photo}) => <li key={id}>
+        <div className='name'>
+          <Link to={`/users/${id}`}>
+            <img src={photo} className='avatar'/>
+            {displayName}
+          </Link>
+        </div>
+      </li>)}
+    </ul>
   }
 
   render () {
     return <section id='UserList'>
       <h2>Users</h2>
-      <ul className='bigList'>
-        {this.renderUserList()}
-      </ul>
+      {this.renderUserList()}
     </section>
   }
 }

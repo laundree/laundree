@@ -142,6 +142,21 @@ describe('controllers', function () {
                 .then(([user]) => {
                   user.model.displayName.should.equal('Kurt Frandsen')
                 }))))
+      it('should update user when admin', () =>
+        Promise
+          .all([dbUtils.populateTokens(1), dbUtils.createAdministrator()])
+          .then(([{user}, {user: admin, token}]) =>
+            request(app)
+              .put(`/api/users/${user.model.id}`)
+              .auth(admin.model.id, token.secret)
+              .send({name: 'Kurt Frandsen'})
+              .set('Accept', 'application/json')
+              .expect(204)
+              .then(res =>
+                UserHandler.find({_id: user.model._id})
+                  .then(([user]) => {
+                    user.model.displayName.should.equal('Kurt Frandsen')
+                  }))))
       it('should not update user', () =>
         Promise
           .all([
@@ -342,7 +357,40 @@ describe('controllers', function () {
           .expect('Content-Type', /json/)
           .expect(400))
     })
+    describe('GET /api/users/{id}/emails', () => {
+      it('should succeed on self', () => dbUtils
+        .populateTokens(1)
+        .then(({user, token}) => request(app)
+          .get(`/api/users/${user.model.id}/emails`)
+          .auth(user.model.id, token.secret)
+          .send()
+          .expect(200)
+          .then(({body}) => body.should.deep.equal(user.model.emails))))
 
+      it('should succeed on admin', () =>
+        Promise.all([dbUtils.populateTokens(1), dbUtils.createAdministrator()])
+          .then(([{user}, {user: admin, token}]) => request(app)
+            .get(`/api/users/${user.model.id}/emails`)
+            .auth(admin.model.id, token.secret)
+            .send()
+            .expect(200)
+            .then(({body}) => body.should.deep.equal(user.model.emails))))
+
+      it('should fail on other', () =>
+        Promise.all([dbUtils.populateTokens(1), dbUtils.populateTokens(1)])
+          .then(([{user}, {user: otherUser, token}]) => request(app)
+            .get(`/api/users/${user.model.id}/emails`)
+            .auth(otherUser.model.id, token.secret)
+            .send()
+            .expect(403)))
+
+      it('should fail without auth', () =>
+        Promise.all([dbUtils.populateTokens(1), dbUtils.populateTokens(1)])
+          .then(([{user}, {user: otherUser, token}]) => request(app)
+            .get(`/api/users/${user.model.id}/emails`)
+            .send()
+            .expect(403)))
+    })
     describe('POST /api/users/{id}/start-password-reset', () => {
       it('should fail on no user', () =>
         dbUtils.populateUsers(2).then(() =>
@@ -547,6 +595,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
       it('should return 403 on missing id', () =>
         dbUtils.populateTokens(1).then(({user, tokens}) =>
           request(app)
@@ -571,18 +620,29 @@ describe('controllers', function () {
               .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
 
       it('should succeed', () =>
-        dbUtils.populateTokens(1).then(({user, tokens}) =>
+        dbUtils.populateTokens(1).then(({user, token}) =>
           request(app)
             .delete(`/api/users/${user.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
-            .auth(user.model.id, tokens[0].secret)
+            .auth(user.model.id, token.secret)
             .expect(204)
             .then(res =>
-              Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(tokens[0].model.id)])
-                .then((result) => {
-                  result.should.be.deep.equal([undefined, undefined])
-                }))))
+              Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(token.model.id)])
+                .then((result) => result.should.be.deep.equal([undefined, undefined])))))
+
+      it('should succeed when admin', () =>
+        Promise.all([dbUtils.populateTokens(1), dbUtils.createAdministrator()])
+          .then(([{user}, {user: admin, token}]) =>
+            request(app)
+              .delete(`/api/users/${user.model.id}`)
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(admin.model.id, token.secret)
+              .expect(204)
+              .then(res =>
+                UserHandler.findFromId(user.model.id)
+                  .then((result) => chai.assert(!result)))))
 
       it('should fail on owner', () =>
         dbUtils.populateLaundries(1).then(({user, token}) =>
