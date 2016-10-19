@@ -3,7 +3,8 @@ chai.should()
 const {EventHandler} = require('../../handlers')
 const dbUtils = require('../db_utils')
 
-describe('handlers', () => {
+describe('handlers', function () {
+  this.timeout(10000)
   describe('EventHandler', () => {
     describe('createEvent', () => {
       it('should create event', () => dbUtils.populateUsers(1)

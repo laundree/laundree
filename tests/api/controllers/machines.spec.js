@@ -10,7 +10,7 @@ const dbUtils = require('../../db_utils')
 const Promise = require('promise')
 
 describe('controllers', function () {
-  this.timeout(5000)
+  this.timeout(10000)
   let admin, admintoken
   beforeEach(() => dbUtils.clearDb().then(() => dbUtils.createAdministrator()).then(({user, token}) => {
     admin = user
