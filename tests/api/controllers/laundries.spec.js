@@ -395,6 +395,38 @@ describe('controllers', function () {
               .findFromId(laundries[0].model.id)
               .then(laundry => laundry.model.name.should.equal('L1')))))
 
+      it('should succeed with name and timezone', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .put(`/api/laundries/${laundries[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: 'L1', timezone: 'Europe/Paris'})
+            .expect(204)
+            .then(() => LaundryHandler
+              .findFromId(laundries[0].model.id)
+              .then(laundry => {
+                laundry.model.name.should.equal('L1')
+                laundry.timezone.should.equal('Europe/Paris')
+              }))))
+
+      it('should succeed with timezone', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .put(`/api/laundries/${laundries[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({timezone: 'Europe/Paris'})
+            .expect(204)
+            .then(() => LaundryHandler
+              .findFromId(laundries[0].model.id)
+              .then(laundry => {
+                laundry.model.name.should.equal(laundries[0].model.name)
+                laundry.timezone.should.equal('Europe/Paris')
+              }))))
+
       it('should succeed when administrator', () =>
         Promise
           .all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
@@ -444,6 +476,27 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .send({name: laundry2.model.name})
             .expect(409)))
+
+      it('should succeed on no options', () =>
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
+          request(app)
+            .put(`/api/laundries/${laundry1.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({})
+            .expect(204)))
+
+      it('should fail invalid timezone', () =>
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
+          request(app)
+            .put(`/api/laundries/${laundry1.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({timezone: 'Not/A valid timezone'})
+            .expect(400)
+            .then(({body}) => body.should.deep.equal({message: 'Invalid timezone'}))))
 
       it('should fail when only user', () =>
         Promise

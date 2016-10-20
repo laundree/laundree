@@ -36,12 +36,16 @@ function listBookings (req, res) {
 }
 
 function createBooking (req, res) {
+  const {machine, laundry} = req.subjects
   const {from, to} = req.swagger.params.body.value
   const fromDate = new Date(from)
   const toDate = new Date(to)
   if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to')
   if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon')
-  const {machine} = req.subjects
+  // TODO use moment
+  const dateTimeFormat = new Intl.DateTimeFormat({}, {minute: 'numeric', timeZone: laundry.timezone})
+  if (parseInt(dateTimeFormat.format(fromDate)) % 30) return api.returnError(res, 400, 'Started at wrong minute')
+  if (parseInt(dateTimeFormat.format(toDate)) % 30) return api.returnError(res, 400, 'Ended at wrong minute')
   return machine.fetchBookings(fromDate, toDate)
     .then(([booking]) => {
       if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})

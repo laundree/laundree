@@ -10,6 +10,7 @@ const LaundryInvitationHandler = require('./laundry_invitation')
 const Promise = require('promise')
 const debug = require('debug')('laundree.handlers.laundry')
 const uuid = require('uuid')
+const config = require('config')
 const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
 
 class LaundryHandler extends Handler {
@@ -239,9 +240,10 @@ class LaundryHandler extends Handler {
     })
   }
 
-  updateName (name) {
+  updateLaundry ({name, timezone}) {
     debug('Updating name')
-    this.model.name = name
+    if (name) this.model.name = name
+    if (timezone) this.model.timezone = timezone
     return this.save()
   }
 
@@ -311,6 +313,10 @@ class LaundryHandler extends Handler {
     return {name: this.model.name, id: this.model.id, href: this.restUrl}
   }
 
+  get timezone () {
+    return this.model.timezone || config.get('timezone')
+  }
+
   get reduxModel () {
     return {
       id: this.model.id,
@@ -319,6 +325,7 @@ class LaundryHandler extends Handler {
       users: this.userIds,
       owners: this.ownerIds,
       invites: this.inviteIds,
+      timezone: this.timezone,
       demo: this.model.demo
     }
   }

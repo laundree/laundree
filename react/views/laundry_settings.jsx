@@ -13,7 +13,7 @@ class LaundrySettingsForm extends ValueUpdater {
       evt.preventDefault()
       this.setState({loading: true})
       sdk.laundry(this.props.laundry.id)
-        .updateName(this.state.values.name)
+        .updateLaundry({name: this.state.values.name, timezone: this.state.values.timezone})
         .then(() => this.setState({loading: false, notion: null}))
         .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
     }
@@ -22,7 +22,9 @@ class LaundrySettingsForm extends ValueUpdater {
   errorToMessage ({status, message}) {
     switch (status) {
       case 409:
-        return 'A laundry by that name already exists.'
+        return 'A laundry by that name already exists'
+      case 400:
+        return 'Invalid timezone'
       default:
         return message
     }
@@ -30,28 +32,47 @@ class LaundrySettingsForm extends ValueUpdater {
 
   get initialValues () {
     return {
-      name: this.props.laundry.name
+      name: this.props.laundry.name,
+      timezone: this.props.laundry.timezone
     }
   }
 
-  componentWillReceiveProps ({laundry}) {
-    if (laundry.name === this.props.laundry.name) return
-    this.reset({values: {name: laundry.name}})
+  componentWillReceiveProps ({laundry: {name, timezone}}) {
+    if (name === this.props.laundry.name && timezone === this.props.laundry.timezone) return
+    this.reset({values: {name, timezone}})
   }
 
-  generateErrorMessage () {
+  get nameErrorMessage () {
     return this.state.values.name.trim() ? 'Please enter a new name' : 'Please enter a name'
+  }
+
+  get timezoneErrorMessage () {
+    return this.state.values.timezone.trim() ? 'Please enter a new timezone' : 'Please enter a timezone'
+  }
+
+  get nameErrorValues () {
+    if (this.state.values.timezone !== this.props.laundry.timezone) return []
+    return ['', this.props.laundry.name]
+  }
+
+  get timezoneErrorValues () {
+    if (this.state.values.name !== this.props.laundry.name) return []
+    return ['', this.props.laundry.timezone]
   }
 
   render () {
     return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
       {this.state.notion ? <div
         className={'notion ' + (this.state.notion.success ? 'success' : 'error')}>{this.state.notion.message}</div> : null }
-      <ValidationElement
-        sesh={this.state.sesh} value={this.state.values.name} notOneOf={['', this.props.laundry.name]}
-        trim>
-        <label data-validate-error={this.generateErrorMessage()}>
+      <ValidationElement sesh={this.state.sesh} value={this.state.values.name} notOneOf={this.nameErrorValues} trim>
+        <label data-validate-error={this.nameErrorMessage}>
           <input type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}/>
+        </label>
+      </ValidationElement>
+      <ValidationElement
+        sesh={this.state.sesh} value={this.state.values.timezone} notOneOf={this.timezoneErrorValues} trim>
+        <label data-validate-error={this.timezoneErrorMessage}>
+          <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
         </label>
       </ValidationElement>
       <div className='buttons'>
@@ -62,6 +83,66 @@ class LaundrySettingsForm extends ValueUpdater {
 }
 
 LaundrySettingsForm.propTypes = {
+  laundry: React.PropTypes.object.isRequired
+}
+
+class LaundryBookingFormatForm extends ValueUpdater {
+
+  constructor (props) {
+    super(props)
+    this.onSubmit = (evt) => {
+      evt.preventDefault()
+      this.setState({loading: true})
+      sdk.laundry(this.props.laundry.id)
+        .updateLaundry({timezone: this.state.values.timezone})
+        .then(() => this.setState({loading: false, notion: null}))
+        .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
+    }
+  }
+
+  errorToMessage ({status, message}) {
+    switch (status) {
+      case 400:
+        return 'Invalid timezone'
+      default:
+        return message
+    }
+  }
+
+  get initialValues () {
+    return {
+      timezone: this.props.laundry.timezone
+    }
+  }
+
+  componentWillReceiveProps ({laundry}) {
+    if (laundry.name === this.props.laundry.timezone) return
+    this.reset({values: {timezone: laundry.timezone}})
+  }
+
+  generateErrorMessage () {
+    return this.state.values.timezone.trim() ? 'Please enter a new timezone' : 'Please enter a timezone'
+  }
+
+  render () {
+    return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
+      {this.state.notion ? <div
+        className={'notion ' + (this.state.notion.success ? 'success' : 'error')}>{this.state.notion.message}</div> : null }
+      <ValidationElement
+        sesh={this.state.sesh} value={this.state.values.timezone} nonEmpty
+        trim>
+        <label data-validate-error={this.generateErrorMessage()}>
+          <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
+        </label>
+      </ValidationElement>
+      <div className='buttons'>
+        <input type='submit' value='Update'/>
+      </div>
+    </ValidationForm>
+  }
+}
+
+LaundryBookingFormatForm.propTypes = {
   laundry: React.PropTypes.object.isRequired
 }
 
@@ -160,6 +241,10 @@ class LaundrySettings extends React.Component {
       <section>
         <h2>Change name</h2>
         <LaundrySettingsForm laundry={this.laundry}/>
+      </section>
+      <section>
+        <h2>Booking rules</h2>
+        <LaundryBookingFormatForm laundry={this.laundry}/>
       </section>
       <section>
         <h2>Delete laundry</h2>
