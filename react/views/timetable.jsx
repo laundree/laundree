@@ -14,7 +14,7 @@ class BookingInfo extends React.Component {
 
   constructor (props) {
     super(props)
-    this.deleteHandler = () => sdk.booking(this.props.booking.id).deleteBooking()
+    this.deleteHandler = () => sdk.booking(this.props.booking.id).del()
   }
 
   renderActions () {

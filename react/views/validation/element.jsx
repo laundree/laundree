@@ -30,21 +30,22 @@ class ValidationElement extends React.Component {
   }
 
   componentWillReceiveProps (props) {
-    const {value, sesh} = props
+    const {sesh} = props
     const initial = sesh !== this.props.sesh
     if (initial) {
       this.setState({initial})
-      return this.handle(this.validate(value, props), initial)
+      return this.handle(this.validate(props), initial)
     }
-    if (value === this.props.value) return
-    this.handle(this.validate(value, props), initial)
+    if (Boolean(this.validate(props)) === Boolean(this.validate(this.props))) return
+    this.handle(this.validate(props), initial)
   }
 
   get name () {
     return `id${this.id}`
   }
 
-  validate (value, props = this.props) {
+  validate (props = this.props) {
+    let {value} = props
     if (props.trim) value = value.trim()
     if (props.equal !== undefined) return props.equal === value
     if (props.not !== undefined) return props.not !== value
@@ -57,7 +58,7 @@ class ValidationElement extends React.Component {
   }
 
   render () {
-    const valid = this.validate(this.props.value)
+    const valid = this.validate()
     const child = React.Children.only(this.props.children)
     return React.cloneElement(child, {
       className: (child.props.className || '') + (valid ? '' : ' invalid') +

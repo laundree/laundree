@@ -12,6 +12,7 @@ class LaundrySettingsForm extends ValueUpdater {
     this.onSubmit = (evt) => {
       evt.preventDefault()
       this.setState({loading: true})
+      console.log(sdk.laundry(this.props.laundry.id))
       sdk.laundry(this.props.laundry.id)
         .updateName(this.state.values.name)
         .then(() => this.setState({loading: false, notion: null}))
@@ -76,7 +77,7 @@ class DeleteLaundry extends React.Component {
   }
 
   deleteLaundry () {
-    return sdk.laundry(this.props.laundry.id).deleteLaundry()
+    return sdk.laundry(this.props.laundry.id).del()
   }
 
   render () {
