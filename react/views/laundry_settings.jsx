@@ -76,7 +76,7 @@ class DeleteLaundry extends React.Component {
   }
 
   deleteLaundry () {
-    return sdk.laundry(this.props.laundry.id).deleteLaundry()
+    return sdk.laundry(this.props.laundry.id).del()
   }
 
   render () {

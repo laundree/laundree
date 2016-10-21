@@ -188,7 +188,7 @@ class Machines extends React.Component {
   }
 
   generateDeleter (id) {
-    return () => sdk.machine(id).deleteMachine()
+    return () => sdk.machine(id).del()
   }
 
   generateUpdater (id) {

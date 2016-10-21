@@ -117,7 +117,7 @@ class InviteItem extends React.Component {
     this.state = {showModal: false}
     this.onShowModal = () => this.setState({showModal: true})
     this.onCloseModal = () => this.setState({showModal: false})
-    this.handleDelete = () => sdk.invite(this.props.invite.id).deleteInvite()
+    this.handleDelete = () => sdk.invite(this.props.invite.id).del()
   }
 
   render () {

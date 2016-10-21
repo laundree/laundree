@@ -143,13 +143,13 @@ class DeleteUser extends React.Component {
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
-    this.handleDeleteClick = () => this.deleteLaundry()
+    this.handleDeleteClick = () => this.deleteUser()
     this.handleCloseModal = () => this.setState({modalOpen: false})
     this.handleOpenModal = () => this.setState({modalOpen: true})
   }
 
-  deleteLaundry () {
-    return sdk.user(this.props.user.id).deleteUser().then(() => {
+  deleteUser () {
+    return sdk.user(this.props.user.id).del().then(() => {
       window.location = '/'
     })
   }
