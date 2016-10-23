@@ -64,7 +64,7 @@ function updateLaundry (req, res) {
     return api.returnError(res, 400, 'Invalid timezone')
   }
   if (!name || laundry.model.name === name) {
-    return laundry.updateLaundry({timezone, name})
+    return laundry.updateLaundry({timezone})
       .then(() => api.returnSuccess(res))
       .catch(api.generateErrorHandler(res))
   }
