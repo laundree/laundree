@@ -36,7 +36,7 @@ class ValidationElement extends React.Component {
       this.setState({initial})
       return this.handle(this.validate(props), initial)
     }
-    if (Boolean(this.validate(props)) === Boolean(this.validate(this.props))) return
+    if (props.value === this.props.value && Boolean(this.validate(props)) === Boolean(this.validate(this.props))) return
     this.handle(this.validate(props), initial)
   }
 
