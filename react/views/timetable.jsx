@@ -17,7 +17,10 @@ class BookingInfo extends React.Component {
 
   constructor (props) {
     super(props)
-    this.deleteHandler = () => sdk.booking(this.props.booking.id).del()
+    this.deleteHandler = () => sdk
+      .booking(this.props.booking.id)
+      .del()
+      .then(() => this.close())
     this.closeHandler = () => this.close()
   }
 
@@ -61,7 +64,7 @@ class BookingInfo extends React.Component {
 
   close () {
     const query = this.props.offsetDate ? '?offsetDate=' + this.props.offsetDate : ''
-    browserHistory.push(`/${query}`)
+    browserHistory.replace(`${query}`)
   }
 
   render () {
