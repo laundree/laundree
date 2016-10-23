@@ -9,6 +9,7 @@ const {Link} = require('react-router')
 const {FormattedDate} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
+const moment = require('moment-timezone')
 
 class BookingInfo extends React.Component {
 
@@ -77,13 +78,6 @@ BookingInfo.propTypes = {
   users: React.PropTypes.object
 }
 
-const diffDates = (d1, d2) => {
-  var oneDay = 24 * 60 * 60 * 1000
-  var t1 = new Date(d1.getTime()).setHours(0, 0, 0, 0)
-  var t2 = new Date(d2.getTime()).setHours(0, 0, 0, 0)
-  return Math.round((t2 - t1) / (oneDay))
-}
-
 class Timetable extends React.Component {
 
   constructor (props) {
@@ -104,7 +98,9 @@ class Timetable extends React.Component {
     if (machineIds.length !== this.props.laundry.machines.length) this.setState({numDays: this.calculateNumDays(machines.length)})
     if (!this._mainRef || machineIds.map(id => machines[id]).filter(m => m).length !== machineIds.length) return
     this.setState({loading: false})
+    if (!this._mainRef.offsetHeight || this.state.scrolledToNav) return
     const now = this._mainRef.querySelector('#TimeTable .now')
+    this.setState({scrolledToNav: true})
     if (!now) return
     now.scrollIntoView()
   }
@@ -122,21 +118,12 @@ class Timetable extends React.Component {
     return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (Math.max(numMachines * 100, 200))), 1), 7)
   }
 
-  get offsetDays () {
-    const offsetTime = parseInt(this.props.offsetDate)
-    if (isNaN(offsetTime)) return 0
-    return Math.max(0, diffDates(new Date(), new Date(offsetTime)))
-  }
-
   get days () {
-    const startDay = new Date()
-    startDay.setHours(0, 0, 0, 0)
-    const offset = this.offsetDays
-    return range(offset, offset + this.state.numDays).map((i) => {
-      const d = new Date(startDay.getTime())
-      d.setDate(startDay.getDate() + i)
-      return d
-    })
+    const startDay = this.props.offsetDate
+      ? moment.tz(this.props.offsetDate, this.props.laundry.timezone)
+      : moment.tz(moment.tz(this.props.laundry.timezone).format('YYYY-MM-DD'), this.props.laundry.timezone)
+    const days = range(this.state.numDays).map(i => startDay.clone().add(i, 'd'))
+    return days
   }
 
   render () {
@@ -178,7 +165,8 @@ Timetable.propTypes = {
   laundry: React.PropTypes.shape({
     id: React.PropTypes.string,
     name: React.PropTypes.string,
-    machines: React.PropTypes.array
+    machines: React.PropTypes.array,
+    timezone: React.PropTypes.string
   })
 }
 

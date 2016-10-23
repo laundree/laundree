@@ -45,6 +45,13 @@ class BookingHandler extends Handler {
       .then(([machine]) => machine)
   }
 
+  fetchLaundry () {
+    const LaundryHandler = require('./laundry')
+    return LaundryHandler
+      .find({_id: this.model.laundry})
+      .then(([laundry]) => laundry)
+  }
+
   static _fetchBookings (from, to, machineIds) {
     return BookingHandler.find({
       $or: [
@@ -152,12 +159,14 @@ class BookingHandler extends Handler {
   }
 
   toRest () {
-    return Promise.resolve({
-      id: this.model.id,
-      href: this.restUrl,
-      from: this.model.from.toISOString(),
-      to: this.model.to.toISOString()
-    })
+    return this
+      .fetchLaundry()
+      .then(laundry => ({
+        id: this.model.id,
+        href: this.restUrl,
+        from: laundry.dateToObject(this.model.from),
+        to: laundry.dateToObject(this.model.to.toISOString())
+      }))
   }
 
   get reduxModel () {

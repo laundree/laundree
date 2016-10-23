@@ -6,6 +6,7 @@ const React = require('react')
 const {Link} = require('react-router')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
+const moment = require('moment-timezone')
 
 function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
@@ -17,14 +18,13 @@ class TimetableTable extends React.Component {
     super(props)
     this.state = Object.assign({bookings: {}, activeBooking: null}, this._calcPosition())
     this.firstBooking = false
+    this.tableMouseDownHandler = (event) => this.handleMouseDown(event)
+    this.tableMouseUpHandler = (event) => this.handleMouseUp(event)
+    this.tableMouseOverHandler = (event) => this.handleMouseOver(event)
+    this.tableMouseOutHandler = (event) => this.handleMouseOut(event)
   }
 
-  _row (key, now) {
-    var tooLate = false
-    if (now) {
-      now = new Date(now.getTime() + 10 * 60 * 1000)
-      tooLate = now ? now.getHours() + (now.getMinutes() / 60) >= key / 2 : false
-    }
+  _row (key, tooLate) {
     const machines = this.props.laundry.machines
       .map((id) => this.props.machines[id])
       .filter((m) => m)
@@ -70,15 +70,20 @@ class TimetableTable extends React.Component {
   }
 
   componentWillReceiveProps ({bookings}) {
-    const day = this.props.date.getDate()
+    const day = this.props.date.clone()
     this.setState({
       bookings: Object.keys(bookings)
         .map((key) => bookings[key])
-        .map(({from, to, machine, id}) => ({from: new Date(from), to: new Date(to), machine, id}))
-        .filter(({from, to}) => to.getDate() >= day && from.getDate() <= day)
+        .map(({from, to, machine, id}) => ({
+          from: moment(from).tz(this.props.laundry.timezone),
+          to: moment(to).tz(this.props.laundry.timezone),
+          machine,
+          id
+        }))
+        .filter(({from, to}) => to.isSameOrAfter(day, 'd') && from.isSameOrBefore(day, 'd'))
         .reduce((obj, {machine, from, to, id}) => {
-          const fromY = day === from.getDate() ? TimetableTable.dateToY(from) : 0
-          const toY = day === to.getDate() ? TimetableTable.dateToY(to) : 48
+          const fromY = day.isSame(from, 'd') ? TimetableTable.dateToY(from) : 0
+          const toY = day.isSame(to, 'd') ? TimetableTable.dateToY(to) : 48
           range(fromY, toY).forEach((y) => {
             obj[`${machine}:${y}`] = id
           })
@@ -108,9 +113,8 @@ class TimetableTable extends React.Component {
   }
 
   _calcPosition () {
-    // TODO Check daylight saving time
-    const now = new Date()
-    const diff = now.getTime() - this.props.date.getTime()
+    const now = moment().tz(this.props.laundry.timezone)
+    const diff = now.valueOf() - this.props.date.clone().valueOf()
     const percent = diff / (24 * 60 * 60 * 1000)
     const offLimitsPosition = percent + (10 / (60 * 24))
     return {nowPosition: percent * 100, offLimitsPosition: maxMin(offLimitsPosition, 1, 0) * 100}
@@ -142,14 +146,18 @@ class TimetableTable extends React.Component {
   }
 
   static dateToY (date) {
-    return Math.floor((date.getHours() * 60 + date.getMinutes()) / 30)
+    return Math.floor((date.hours() * 60 + date.minutes()) / 30)
   }
 
   posToDate ({y}) {
-    const d = new Date(this.props.date.getTime())
     const mins = y * 30
-    d.setHours(Math.floor(mins / 60), mins % 60, 0, 0)
-    return d
+    return {
+      year: this.props.date.year(),
+      month: this.props.date.month(),
+      day: this.props.date.date(),
+      hour: Math.floor(mins / 60),
+      minute: mins % 60
+    }
   }
 
   book (from, to) {
@@ -190,15 +198,14 @@ class TimetableTable extends React.Component {
   }
 
   render () {
-    const now = new Date()
-    const hours = now.getHours()
-    const minutes = now.getMinutes()
-    const time = hours.toString() + ':' + (minutes < 10 ? '0' + minutes.toString() : minutes.toString())
-    const today = new Date(now.getTime()).setHours(0, 0, 0, 0) === this.props.date.getTime()
-    const tableMouseDownHandler = (event) => this.handleMouseDown(event)
-    const tableMouseUpHandler = (event) => this.handleMouseUp(event)
-    const tableMouseOverHandler = (event) => this.handleMouseOver(event)
-    const tableMouseOutHandler = (event) => this.handleMouseOut(event)
+    const now = moment().tz(this.props.laundry.timezone)
+    const time = now.format('H:mm')
+    const today = now.isSame(this.props.date, 'd')
+    var tooLateKey
+    if (today) {
+      const tooLate = now.clone().add(10, 'm')
+      tooLateKey = tooLate.hours() * 2 + tooLate.minutes() / 30
+    }
     const refPuller = (ref) => {
       this.ref = ref
     }
@@ -209,12 +216,12 @@ class TimetableTable extends React.Component {
           ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
       </div>
       <table
-        onMouseOver={tableMouseOverHandler}
-        onMouseOut={tableMouseOutHandler}
-        onMouseDown={tableMouseDownHandler}
-        onMouseUp={tableMouseUpHandler}>
+        onMouseOver={this.tableMouseOverHandler}
+        onMouseOut={this.tableMouseOutHandler}
+        onMouseDown={this.tableMouseDownHandler}
+        onMouseUp={this.tableMouseUpHandler}>
         <tbody>
-        {range(48).map((key) => this._row(key, today ? now : undefined))}
+        {range(48).map((key) => this._row(key, today && tooLateKey >= key))}
         </tbody>
       </table>
     </div>
@@ -229,7 +236,7 @@ TimetableTable.propTypes = {
   bookings: React.PropTypes.object.isRequired,
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
-  date: React.PropTypes.instanceOf(Date).isRequired,
+  date: React.PropTypes.object.isRequired,
   onHoverRow: React.PropTypes.func.isRequired,
   hoverRow: React.PropTypes.number.isRequired
 }
@@ -244,12 +251,19 @@ class TimetableTables extends React.Component {
 
   componentWillReceiveProps ({dates, laundry: {id}}) {
     const oldDates = this.props.dates
-    if (dates.length === oldDates.length && oldDates.map((d) => d.getTime()).every((t, i) => t === dates[i].getTime())) return
+    if (dates.length === oldDates.length && oldDates.every((d, i) => d.isSame(dates[i], 'd'))) return
     const firstDate = dates[0]
     const lastDate = dates[dates.length - 1]
-    const lastDateExclusive = new Date(lastDate.getTime())
-    lastDateExclusive.setDate(lastDate.getDate() + 1)
-    sdk.listBookingsInTime(id, firstDate, lastDateExclusive)
+    const lastDateExclusive = lastDate.clone().add(1, 'd')
+    sdk.listBookingsInTime(id, {
+      year: firstDate.year(),
+      month: firstDate.month(),
+      day: firstDate.date()
+    }, {
+      year: lastDateExclusive.year(),
+      month: lastDateExclusive.month(),
+      day: lastDateExclusive.date()
+    })
   }
 
   hoverColumnWrapper (i) {
@@ -293,7 +307,7 @@ class TimetableTables extends React.Component {
           onHoverColumn={this.hoverColumnWrapper(i)}
           date={date} machines={this.props.machines} laundry={this.props.laundry}
           bookings={this.props.bookings}
-          key={date}/>)}
+          key={date.format('YYYY-MM-DD')}/>)}
         <ul className='times'>
           <li><span>1</span></li>
           <li><span>2</span></li>
@@ -329,7 +343,7 @@ TimetableTables.propTypes = {
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   onHoverColumn: React.PropTypes.func.isRequired,
-  dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
+  dates: React.PropTypes.array.isRequired,
   laundry: React.PropTypes.object.isRequired,
   machines: React.PropTypes.object.isRequired,
   bookings: React.PropTypes.object.isRequired

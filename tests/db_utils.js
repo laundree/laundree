@@ -74,20 +74,37 @@ function populateMachines (no) {
         })))
 }
 
-function populateBookings (no, {length = 3600, space = 20, offset = 0} = {}) {
+function populateBookings (no) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise
-        .all(range(no).map((i) => machine.createBooking(user, new Date(offset + (i * (length + space))), new Date(i * (length + space) + length + offset))))
-        .then((bookings) => ({
-          offset,
-          space,
-          length,
+        .all(range(no)
+          .map(i => ({
+            from: {year: 2000, day: i, month: 1, hour: 0, minute: 0},
+            to: {year: 2000, day: i, month: 1, hour: 1, minute: 30}
+          }))
+          .map(({
+            from, to
+          }) => laundry.createBooking(machine, user, from, to)))
+        .then(bookings => ({
           user,
           token,
           laundry,
           machine,
           bookings,
+          booking: bookings[0]
+        })))
+}
+
+function createBooking (from, to) {
+  return populateMachines(1)
+    .then(({user, token, laundry, machine}) =>
+      laundry.createBooking(machine, user, from, to)
+        .then(bookings => ({
+          user,
+          token,
+          laundry,
+          machine,
           booking: bookings[0]
         })))
 }
@@ -109,5 +126,6 @@ module.exports = {
   populateBookings,
   populateMachines,
   populateInvites,
+  createBooking,
   createAdministrator
 }

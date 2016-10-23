@@ -4,6 +4,7 @@ const Modal = require('./modal.jsx')
 const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
+const moment = require('moment-timezone')
 
 class LaundrySettingsForm extends ValueUpdater {
 
@@ -47,7 +48,10 @@ class LaundrySettingsForm extends ValueUpdater {
   }
 
   get timezoneErrorMessage () {
-    return this.state.values.timezone.trim() ? 'Please enter a new timezone' : 'Please enter a timezone'
+    const tz = this.state.values.timezone.trim()
+    if (!tz) return 'Please enter a timezone'
+    if (tz === this.props.laundry.timezone) return 'Please enter a new timezone'
+    return 'Please enter a valid timezone'
   }
 
   get nameErrorValues () {
@@ -70,7 +74,7 @@ class LaundrySettingsForm extends ValueUpdater {
         </label>
       </ValidationElement>
       <ValidationElement
-        sesh={this.state.sesh} value={this.state.values.timezone} notOneOf={this.timezoneErrorValues} trim>
+        sesh={this.state.sesh} value={this.state.values.timezone} oneOf={moment.tz.names()} trim>
         <label data-validate-error={this.timezoneErrorMessage}>
           <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
         </label>
@@ -239,12 +243,8 @@ class LaundrySettings extends React.Component {
     if (!this.isOwner) return null
     return <div>
       <section>
-        <h2>Change name</h2>
+        <h2>Change name or timezone</h2>
         <LaundrySettingsForm laundry={this.laundry}/>
-      </section>
-      <section>
-        <h2>Booking rules</h2>
-        <LaundryBookingFormatForm laundry={this.laundry}/>
       </section>
       <section>
         <h2>Delete laundry</h2>

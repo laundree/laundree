@@ -1,5 +1,6 @@
 const {LaundryHandler, UserHandler} = require('../../handlers')
 const {api, mail} = require('../../utils')
+const moment = require('moment-timezone')
 /**
  * Created by budde on 02/06/16.
  */
@@ -59,13 +60,8 @@ function updateLaundry (req, res) {
   name = name.trim()
   timezone = timezone.trim()
   if (timezone === laundry.model.timezone) timezone = ''
-  if (timezone) {
-    try {
-      // TODO use moment
-      new Intl.DateTimeFormat({}, {timeZone: timezone}).format(Date.now())
-    } catch (e) {
-      return api.returnError(res, 400, 'Invalid timezone')
-    }
+  if (timezone && moment.tz.names().indexOf(timezone) < 0) {
+    return api.returnError(res, 400, 'Invalid timezone')
   }
   if (!name || laundry.model.name === name) {
     return laundry.updateLaundry({timezone, name})

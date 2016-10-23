@@ -51,6 +51,7 @@ class ValidationElement extends React.Component {
     if (props.not !== undefined) return props.not !== value
     if (props.validator) return props.validator(value)
     if (props.notOneOf) return props.notOneOf.indexOf(value) < 0
+    if (props.oneOf) return props.oneOf.indexOf(value) >= 0
     if (props.nonEmpty) return value
     if (props.email) return regex.email.exec(value)
     if (props.password) return regex.password.exec(value)
@@ -75,6 +76,7 @@ ValidationElement.propTypes = {
   sesh: React.PropTypes.number,
   children: React.PropTypes.any,
   notOneOf: React.PropTypes.arrayOf(React.PropTypes.string),
+  oneOf: React.PropTypes.arrayOf(React.PropTypes.string),
   equal: React.PropTypes.string,
   not: React.PropTypes.string,
   trim: React.PropTypes.bool,

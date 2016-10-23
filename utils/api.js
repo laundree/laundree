@@ -33,7 +33,7 @@ function returnSuccess (res, result) {
   res.statusCode = result ? 200 : 204
   if (!result) return res.end()
   Promise.resolve(result)
-    .then((result) => res.json(result))
+    .then(result => res.json(result))
     .catch(error.logError)
 }
 

@@ -1143,11 +1143,9 @@ paths:
               - to
             properties:
               from:
-                type: string
-                format: date-time
+                $ref: "#/definitions/Date"
               to:
-                type: string
-                format: date-time
+                $ref: "#/definitions/Date"
       responses:
         "200":
           description: Success
@@ -1478,11 +1476,9 @@ definitions:
       href:
         type: string
       from:
-        type: string
-        format: date-time
+        $ref: "#/definitions/Date"
       to:
-        type: string
-        format: date-time
+        $ref: "#/definitions/Date"
       owner:
         type: string
 
@@ -1548,6 +1544,27 @@ definitions:
         type: string
       name: 
         type: string
+  Date:
+    required:
+      - year
+      - month
+      - day
+      - hour
+      - minute
+    properties:
+      year:
+        type: integer
+      month:
+        type: integer
+      day:
+        type: integer
+      hour:
+        type: integer
+      minute:
+        type: integer
+        enum:
+          - 0
+          - 30
   Error:
     required:
       - message

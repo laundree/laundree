@@ -12,6 +12,7 @@ const debug = require('debug')('laundree.handlers.laundry')
 const uuid = require('uuid')
 const config = require('config')
 const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
+const moment = require('moment-timezone')
 
 class LaundryHandler extends Handler {
 
@@ -102,6 +103,39 @@ class LaundryHandler extends Handler {
       this.model.machines.push(machine.model._id)
       return this.save().then(() => machine)
     })
+  }
+
+  /**
+   * Create a new booking relative to the timezone of the laundry
+   * @param {MachineHandler} machine
+   * @param {UserHandler} owner
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} from
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
+   */
+  createBooking (machine, owner, from, to) {
+    const fromDate = this.dateFromObject(from)
+    const toDate = this.dateFromObject(to)
+    return machine.createBooking(owner, fromDate, toDate)
+  }
+
+  /**
+   * Creates an date from a object (relative to the timezone of the laundry).
+   * @param {{year: int, month: int, day: int, hour: int=, minute: int=}} object
+   * @return {Date}
+   */
+  dateFromObject (object) {
+    const mom = moment.tz(object, this.timezone)
+    return mom.toDate()
+  }
+
+  /**
+   * Creates an object from given date (relative to the timezone of the laundry).
+   * @param {Date} d
+   * @returns {{year: int, month: int, day: int, hour: int, minute: int}}
+   */
+  dateToObject (d) {
+    const mom = moment(d).tz(this.timezone)
+    return {year: mom.year(), month: mom.month(), day: mom.date(), hour: mom.hours(), minute: mom.minutes()}
   }
 
   /**
@@ -250,12 +284,15 @@ class LaundryHandler extends Handler {
   /**
    * Fetch bookings for laundry.
    * Finds any booking with start before to and end after from
-   * @param {Date} from
-   * @param {Date} to
+   * @param {{year: int, month: int, day: int}} from
+   * @param {{year: int, month: int, day: int}} to
    * @return {BookingHandler[]}
    */
   fetchBookings (from, to) {
-    return BookingHandler._fetchBookings(from, to, this.model.machines)
+    return BookingHandler._fetchBookings(
+      this.dateFromObject(from),
+      this.dateFromObject(to),
+      this.model.machines)
   }
 
   /**
