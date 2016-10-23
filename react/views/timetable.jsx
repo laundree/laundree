@@ -10,18 +10,22 @@ const {FormattedDate} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
+const BaseModal = require('./base_modal.jsx')
+const {browserHistory} = require('react-router')
 
 class BookingInfo extends React.Component {
 
   constructor (props) {
     super(props)
     this.deleteHandler = () => sdk.booking(this.props.booking.id).del()
+    this.closeHandler = () => this.close()
   }
 
   renderActions () {
     if (!this.isOwner) return null
-    return <div className='actions'>
+    return <div className='buttonContainer'>
       <button className='red' onClick={this.deleteHandler}>Delete booking</button>
+      <button onClick={this.closeHandler}>Close</button>
     </div>
   }
 
@@ -31,17 +35,17 @@ class BookingInfo extends React.Component {
 
   renderBooking () {
     const booking = this.props.booking
+    if (!booking) return null
     const owner = this.props.users[booking.owner]
     const fromDate = new Date(booking.from)
     const toDate = new Date(booking.to)
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
-    return <div>
-      <h1>Booking info</h1>
+    return <div id='ActiveBooking'>
       <img src={owner.photo} className='avatar'/>
       <div className='text'>
         {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked{' '}
-        <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
+        <i>{this.props.machines[this.props.booking.machine].name}</i> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}
           month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
@@ -55,17 +59,17 @@ class BookingInfo extends React.Component {
     </div>
   }
 
-  render () {
+  close () {
     const query = this.props.offsetDate ? '?offsetDate=' + this.props.offsetDate : ''
-    return <div id='ActiveBooking' className={this.props.booking ? '' : 'no_booking'}>
-      <Link
-        to={`/laundries/${this.props.laundry.id}/timetable${query}`}>
-        <svg className='close'>
-          <use xlinkHref='#CloseX'/>
-        </svg>
-      </Link>
-      {this.props.booking ? this.renderBooking() : null}
-    </div>
+    browserHistory.push(`/${query}`)
+  }
+
+  render () {
+    return <BaseModal
+      onClose={this.closeHandler}
+      show={Boolean(this.props.booking)}>
+      {this.renderBooking()}
+    </BaseModal>
   }
 }
 
@@ -143,6 +147,7 @@ class Timetable extends React.Component {
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+
         <BookingInfo
           currentUser={this.props.currentUser}
           users={this.props.users}
