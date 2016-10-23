@@ -36,12 +36,12 @@ function listBookings (req, res) {
 }
 
 function createBooking (req, res) {
+  const {machine, laundry} = req.subjects
   const {from, to} = req.swagger.params.body.value
-  const fromDate = new Date(from)
-  const toDate = new Date(to)
+  const fromDate = laundry.dateFromObject(from)
+  const toDate = laundry.dateFromObject(to)
   if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to')
   if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon')
-  const {machine} = req.subjects
   return machine.fetchBookings(fromDate, toDate)
     .then(([booking]) => {
       if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
@@ -61,7 +61,7 @@ function createBooking (req, res) {
           }
           return Promise.all(promises)
             .then(() => machine.createBooking(req.user, from, to))
-            .then((machine) => api.returnSuccess(res, machine.toRest()))
+            .then(booking => api.returnSuccess(res, booking.toRest()))
         })
     })
     .catch(api.generateErrorHandler(res))

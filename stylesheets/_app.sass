@@ -286,55 +286,16 @@ main#TimeTableMain
                 width: 100%
                 height: calc(100% + 0.1em)
   #ActiveBooking
-    overflow: hidden
-    position: fixed
-    bottom: 0
-    height: 15em
-    right: 0
-    left: 15em
-    color: #000
-    background-color: #f9ffff
-    z-index: 15
     .avatar
       +border-radius(0.1em)
       float: left
       width: 3em
       height: 3em
-    span
-      font-style: italic
-    .actions
-      position: absolute
-      bottom: 2em
-    .close
-      width: 1.1em
-      height: 1.1em
-      position: absolute
-      right: 1em
-      top: 1em
-      cursor: pointer
-      fill: #d00101
-      opacity: 0.6
-      z-index: 16
-      +transition(0.1s opacity)
-      &:hover
-        opacity: 1
-    +transition(0.2s all)
-    > div
-      position: relative
-      padding: 1em
-      height: 13em
-      > div.text
-        padding: 0 1em 0 4em
-        max-width: 25em
-    h1
-      font-family: "Roboto Condensed", sans-serif
-      padding-bottom: 1em
-      color: #2b2b2b
-      text-align: left
-      font-size: 1.3em
-      padding-top: 0
-    &.no_booking
-      height: 0
+      margin-right: 1em
+    .text
+      min-height: 3em
+    .buttonContainer
+      text-align: center
 
 #TimeTable::-webkit-scrollbar-track
   background-color: #7DD8D5

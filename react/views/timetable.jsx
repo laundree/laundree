@@ -9,18 +9,23 @@ const {Link} = require('react-router')
 const {FormattedDate} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
+const moment = require('moment-timezone')
+const BaseModal = require('./base_modal.jsx')
+const {browserHistory} = require('react-router')
 
 class BookingInfo extends React.Component {
 
   constructor (props) {
     super(props)
     this.deleteHandler = () => sdk.booking(this.props.booking.id).del()
+    this.closeHandler = () => this.close()
   }
 
   renderActions () {
     if (!this.isOwner) return null
-    return <div className='actions'>
+    return <div className='buttonContainer'>
       <button className='red' onClick={this.deleteHandler}>Delete booking</button>
+      <button onClick={this.closeHandler}>Close</button>
     </div>
   }
 
@@ -30,17 +35,17 @@ class BookingInfo extends React.Component {
 
   renderBooking () {
     const booking = this.props.booking
+    if (!booking) return null
     const owner = this.props.users[booking.owner]
     const fromDate = new Date(booking.from)
     const toDate = new Date(booking.to)
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
-    return <div>
-      <h1>Booking info</h1>
+    return <div id='ActiveBooking'>
       <img src={owner.photo} className='avatar'/>
       <div className='text'>
         {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked{' '}
-        <span>{this.props.machines[this.props.booking.machine].name}</span> from{' '}
+        <i>{this.props.machines[this.props.booking.machine].name}</i> from{' '}
         <FormattedDate
           weekday={today ? undefined : 'long'}
           month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
@@ -54,17 +59,17 @@ class BookingInfo extends React.Component {
     </div>
   }
 
-  render () {
+  close () {
     const query = this.props.offsetDate ? '?offsetDate=' + this.props.offsetDate : ''
-    return <div id='ActiveBooking' className={this.props.booking ? '' : 'no_booking'}>
-      <Link
-        to={`/laundries/${this.props.laundry.id}/timetable${query}`}>
-        <svg className='close'>
-          <use xlinkHref='#CloseX'/>
-        </svg>
-      </Link>
-      {this.props.booking ? this.renderBooking() : null}
-    </div>
+    browserHistory.push(`/${query}`)
+  }
+
+  render () {
+    return <BaseModal
+      onClose={this.closeHandler}
+      show={Boolean(this.props.booking)}>
+      {this.renderBooking()}
+    </BaseModal>
   }
 }
 
@@ -75,13 +80,6 @@ BookingInfo.propTypes = {
   booking: React.PropTypes.object,
   machines: React.PropTypes.object,
   users: React.PropTypes.object
-}
-
-const diffDates = (d1, d2) => {
-  var oneDay = 24 * 60 * 60 * 1000
-  var t1 = new Date(d1.getTime()).setHours(0, 0, 0, 0)
-  var t2 = new Date(d2.getTime()).setHours(0, 0, 0, 0)
-  return Math.round((t2 - t1) / (oneDay))
 }
 
 class Timetable extends React.Component {
@@ -104,7 +102,9 @@ class Timetable extends React.Component {
     if (machineIds.length !== this.props.laundry.machines.length) this.setState({numDays: this.calculateNumDays(machines.length)})
     if (!this._mainRef || machineIds.map(id => machines[id]).filter(m => m).length !== machineIds.length) return
     this.setState({loading: false})
+    if (!this._mainRef.offsetHeight || this.state.scrolledToNav) return
     const now = this._mainRef.querySelector('#TimeTable .now')
+    this.setState({scrolledToNav: true})
     if (!now) return
     now.scrollIntoView()
   }
@@ -122,21 +122,12 @@ class Timetable extends React.Component {
     return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (Math.max(numMachines * 100, 200))), 1), 7)
   }
 
-  get offsetDays () {
-    const offsetTime = parseInt(this.props.offsetDate)
-    if (isNaN(offsetTime)) return 0
-    return Math.max(0, diffDates(new Date(), new Date(offsetTime)))
-  }
-
   get days () {
-    const startDay = new Date()
-    startDay.setHours(0, 0, 0, 0)
-    const offset = this.offsetDays
-    return range(offset, offset + this.state.numDays).map((i) => {
-      const d = new Date(startDay.getTime())
-      d.setDate(startDay.getDate() + i)
-      return d
-    })
+    const startDay = this.props.offsetDate
+      ? moment.tz(this.props.offsetDate, this.props.laundry.timezone)
+      : moment.tz(moment.tz(this.props.laundry.timezone).format('YYYY-MM-DD'), this.props.laundry.timezone)
+    const days = range(this.state.numDays).map(i => startDay.clone().add(i, 'd'))
+    return days
   }
 
   render () {
@@ -156,6 +147,7 @@ class Timetable extends React.Component {
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+
         <BookingInfo
           currentUser={this.props.currentUser}
           users={this.props.users}
@@ -178,7 +170,8 @@ Timetable.propTypes = {
   laundry: React.PropTypes.shape({
     id: React.PropTypes.string,
     name: React.PropTypes.string,
-    machines: React.PropTypes.array
+    machines: React.PropTypes.array,
+    timezone: React.PropTypes.string
   })
 }
 

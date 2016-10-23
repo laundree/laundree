@@ -6,6 +6,7 @@ const React = require('react')
 const reactIntl = require('react-intl')
 const string = require('../../utils/string')
 const {Link} = require('react-router')
+const moment = require('moment-timezone')
 
 const TimetableHeader = (props) => {
   const machines = props.laundry.machines
@@ -13,7 +14,9 @@ const TimetableHeader = (props) => {
     .filter((m) => m)
   return <div className='header_container'>
     <div className='date'>
-      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={props.date}/>
+      <reactIntl.FormattedDate
+        weekday='short' month='numeric' day='numeric'
+        value={new Date(props.date.format('YYYY-MM-DD'))}/>
     </div>
     <table className={machines.length > 5 ? 'compressed' : ''}>
       <tbody>
@@ -41,7 +44,7 @@ const TimetableHeader = (props) => {
 TimetableHeader.propTypes = {
   hoverColumn: React.PropTypes.number,
   laundry: React.PropTypes.object.isRequired,
-  date: React.PropTypes.instanceOf(Date).isRequired,
+  date: React.PropTypes.object.isRequired,
   machines: React.PropTypes.object.isRequired
 }
 
@@ -56,15 +59,11 @@ class TimeTableHeaderNav extends React.Component {
   }
 
   get yesterday () {
-    const d = new Date(this.props.dates[0].getTime())
-    d.setDate(d.getDate() - 1)
-    return d
+    return this.firstDate.clone().subtract(1, 'd')
   }
 
   get tomorrow () {
-    const d = new Date(this.props.dates[0].getTime())
-    d.setDate(d.getDate() + 1)
-    return d
+    return this.firstDate.clone().add(1, 'd')
   }
 
   render () {
@@ -76,10 +75,10 @@ class TimeTableHeaderNav extends React.Component {
     if (this.props.dates.length === 0) return null
     const navLeft = <Link
       className='left arrow'
-      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.getTime()}`}/>
+      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-M-D')}`}/>
     const navRight = <Link
       className='right arrow'
-      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.getTime()}`}/>
+      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-M-D')}`}/>
     if (this.props.dates.length === 1) {
       return <div className='nav'>
         {navLeft}
@@ -95,10 +94,14 @@ class TimeTableHeaderNav extends React.Component {
       {navLeft}
       {calendar}
       from{' '}
-      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={this.firstDate}/>
+      <reactIntl.FormattedDate
+        weekday='short' month='numeric' day='numeric'
+        value={new Date(this.firstDate.format('YYYY-MM-DD'))}/>
       {' '}
       to{' '}
-      <reactIntl.FormattedDate weekday='short' month='numeric' day='numeric' value={this.lastDate}/>
+      <reactIntl.FormattedDate
+        weekday='short' month='numeric' day='numeric'
+        value={new Date(this.lastDate.format('YYYY-MM-DD'))}/>
       {navRight}
     </div>
   }
@@ -106,12 +109,13 @@ class TimeTableHeaderNav extends React.Component {
 
 TimeTableHeaderNav.propTypes = {
   laundry: React.PropTypes.object,
-  dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired
+  dates: React.PropTypes.array.isRequired
 }
 
 const TimetableHeaders = (props) => {
+  const now = moment.tz(props.laundry.timezone)
   return <header
-    className={props.dates.length && props.dates[0].setHours(0, 0, 0, 0) === new Date().setHours(0, 0, 0, 0) ? 'today' : undefined}>
+    className={props.dates.length && props.dates[0].isSameOrBefore(now, 'd') ? 'today' : undefined}>
     <div className='date_nav'>
       <h1>
         Timetable
@@ -132,7 +136,7 @@ const TimetableHeaders = (props) => {
 TimetableHeaders.propTypes = {
   hoverColumn: React.PropTypes.number,
   laundry: React.PropTypes.object.isRequired,
-  dates: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Date)).isRequired,
+  dates: React.PropTypes.array.isRequired,
   machines: React.PropTypes.object.isRequired
 }
 

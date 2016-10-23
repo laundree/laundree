@@ -1,5 +1,6 @@
 const {LaundryHandler, UserHandler} = require('../../handlers')
 const {api, mail} = require('../../utils')
+const moment = require('moment-timezone')
 /**
  * Created by budde on 02/06/16.
  */
@@ -55,13 +56,24 @@ function createDemoLaundry (req, res) {
 
 function updateLaundry (req, res) {
   const {laundry} = req.subjects
-  const name = req.swagger.params.body.value.name.trim()
-  if (name === laundry.model.name) return api.returnSuccess(res)
-  LaundryHandler
-    .find({name})
+  let {name = '', timezone = ''} = req.swagger.params.body.value
+  name = name.trim()
+  timezone = timezone.trim()
+  if (timezone === laundry.model.timezone) timezone = ''
+  if (timezone && moment.tz.names().indexOf(timezone) < 0) {
+    return api.returnError(res, 400, 'Invalid timezone')
+  }
+  if (!name || laundry.model.name === name) {
+    return laundry.updateLaundry({timezone})
+      .then(() => api.returnSuccess(res))
+      .catch(api.generateErrorHandler(res))
+  }
+  return LaundryHandler
+    .find({name: name})
     .then(([l]) => {
       if (l) return api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
-      return laundry.updateName(name).then(() => api.returnSuccess(res))
+      return laundry.updateLaundry({timezone, name})
+        .then(() => api.returnSuccess(res))
     })
     .catch(api.generateErrorHandler(res))
 }

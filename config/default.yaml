@@ -1,6 +1,8 @@
 web:
   port: 3000
 
+timezone: Europe/Copenhagen
+
 redis:
   host: 'localhost'
   port: 6379
