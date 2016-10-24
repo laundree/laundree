@@ -3,7 +3,6 @@
  */
 const Promise = require('promise')
 const React = require('react')
-const {Link} = require('react-router')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
@@ -42,23 +41,21 @@ class TimetableTable extends React.Component {
     </tr>
   }
 
+  generateActiveChangeHandler (bookingId) {
+    return () => this.props.onActiveChange(bookingId)
+  }
+
   createBookingLink (bookingId) {
     const active = this.isActive(bookingId)
-    const link = this.bookingLink(bookingId)
     const mine = this.isMine(bookingId)
-    return <Link
-      to={link}
+    return <span
+      onClick={this.generateActiveChangeHandler(bookingId)}
       className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')}/>
   }
 
   isMine (bookingId) {
     const booking = this.props.bookings[bookingId]
     return this.props.currentUser === booking.owner
-  }
-
-  bookingLink (bookingId) {
-    const query = [bookingId ? `activeBooking=${bookingId}` : null, this.props.offsetDate ? `offsetDate=${this.props.offsetDate}` : null].filter((p) => p).join('&')
-    return `/laundries/${this.props.laundry.id}/timetable${query ? '?' + query : ''}`
   }
 
   componentDidMount () {
@@ -235,6 +232,7 @@ TimetableTable.propTypes = {
   laundry: React.PropTypes.object.isRequired,
   bookings: React.PropTypes.object.isRequired,
   activeBooking: React.PropTypes.string,
+  onActiveChange: React.PropTypes.func,
   offsetDate: React.PropTypes.string,
   date: React.PropTypes.object.isRequired,
   onHoverRow: React.PropTypes.func.isRequired,
@@ -301,6 +299,7 @@ class TimetableTables extends React.Component {
         {this.props.dates.map((date, i) => <TimetableTable
           currentUser={this.props.currentUser}
           offsetDate={this.props.offsetDate}
+          onActiveChange={this.props.onActiveChange}
           activeBooking={this.props.activeBooking}
           hoverRow={this.state.hoverRow}
           onHoverRow={this.hoverRowHandler}
@@ -339,6 +338,7 @@ class TimetableTables extends React.Component {
 }
 
 TimetableTables.propTypes = {
+  onActiveChange: React.PropTypes.func,
   currentUser: React.PropTypes.string.isRequired,
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,

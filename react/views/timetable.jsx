@@ -11,7 +11,6 @@ const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
 const BaseModal = require('./base_modal.jsx')
-const {browserHistory} = require('react-router')
 
 class BookingInfo extends React.Component {
 
@@ -25,9 +24,10 @@ class BookingInfo extends React.Component {
   }
 
   renderActions () {
-    if (!this.isOwner) return null
     return <div className='buttonContainer'>
-      <button className='red' onClick={this.deleteHandler}>Delete booking</button>
+      {this.isOwner
+        ? <button className='red' onClick={this.deleteHandler}>Delete booking</button>
+        : null }
       <button onClick={this.closeHandler}>Close</button>
     </div>
   }
@@ -63,8 +63,7 @@ class BookingInfo extends React.Component {
   }
 
   close () {
-    const query = this.props.offsetDate ? '?offsetDate=' + this.props.offsetDate : ''
-    browserHistory.replace(`${query}`)
+    this.props.onActiveChange(null)
   }
 
   render () {
@@ -77,6 +76,7 @@ class BookingInfo extends React.Component {
 }
 
 BookingInfo.propTypes = {
+  onActiveChange: React.PropTypes.func,
   currentUser: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   laundry: React.PropTypes.object,
@@ -92,6 +92,7 @@ class Timetable extends React.Component {
     this.state = {numDays: 0, loading: true, offset: 0, hoverColumn: -1, activeBooking: null}
     this.handleResize = () => this.setState({numDays: this.numDays})
     this.hoverColumn = (hoverColumn) => this.setState({hoverColumn})
+    this.onActiveChange = (bookingId) => this.setState({activeBooking: bookingId})
   }
 
   componentDidMount () {
@@ -144,19 +145,21 @@ class Timetable extends React.Component {
           hoverColumn={this.state.hoverColumn}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
         <TimetableTables
+          onActiveChange={this.onActiveChange}
           currentUser={this.props.currentUser}
-          activeBooking={this.props.activeBooking}
+          activeBooking={this.state.activeBooking}
           offsetDate={this.props.offsetDate}
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
 
         <BookingInfo
+          onActiveChange={this.onActiveChange}
           currentUser={this.props.currentUser}
           users={this.props.users}
           laundry={this.props.laundry}
           offsetDate={this.props.offsetDate}
-          booking={this.props.bookings[this.props.activeBooking]}
+          booking={this.props.bookings[this.state.activeBooking]}
           machines={this.props.machines}/>
       </div>
     </main>
@@ -165,7 +168,6 @@ class Timetable extends React.Component {
 
 Timetable.propTypes = {
   currentUser: React.PropTypes.string,
-  activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   users: React.PropTypes.object,
   machines: React.PropTypes.object,
