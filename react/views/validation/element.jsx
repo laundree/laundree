@@ -26,7 +26,7 @@ class ValidationElement extends React.Component {
 
   reset () {
     this.setState(this.initialState)
-    this.handle(false, true)
+    this.handle(this.validate(), true)
   }
 
   componentWillReceiveProps (props) {

@@ -232,6 +232,160 @@ LeaveLaundry.propTypes = {
   laundry: React.PropTypes.object.isRequired,
   user: React.PropTypes.object.isRequired
 }
+class Switch extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.onClick = () => this.props.onChange(!this.isOn)
+  }
+
+  get isOn () {
+    return Boolean(this.props.on)
+  }
+
+  render () {
+    return <div
+      onClick={this.onClick}
+      className={'switch ' + (this.isOn ? 'on' : 'off')}/>
+  }
+}
+
+Switch.propTypes = {
+  on: React.PropTypes.bool,
+  onChange: React.PropTypes.func.isRequired
+}
+
+function timeStringToMinutes (time) {
+  const timeMatch = time.match(/^(\d+):(\d+)$/)
+  if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return 0
+  return parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2])
+}
+
+const bookingRulesDefaultValues = {
+  timeLimitFrom: '0:00',
+  timeLimitTo: '24:00',
+  dailyLimit: 10,
+  limit: 100
+}
+
+class BookingRules extends ValueUpdater {
+
+  constructor (props) {
+    super(props)
+    this.timeMap = timeString => {
+      const time = timeString.match(/(\d+)(?::(\d\d))?\s*(p?)/)
+      if (!time) return '0:00'
+      const hours = Math.max(Math.min(parseInt(time[1]) + (time[3] ? 12 : 0), 24), 0)
+      const minutes = Math.max(Math.min(parseInt(time[2]) || 0, 60), 0)
+      const roundMinutes = minutes - minutes % 30
+      return `${hours}:${roundMinutes < 10 ? `0${roundMinutes}` : roundMinutes}`
+    }
+    this.numberMap = number => {
+      const int = parseInt(number)
+      return isNaN(int) ? 0 : Math.max(int, 0)
+    }
+    this.fromValidator = from => timeStringToMinutes(this.state.values.timeLimitTo) > timeStringToMinutes(from)
+    this.toValidator = to => timeStringToMinutes(this.state.values.timeLimitFrom) < timeStringToMinutes(to)
+  }
+
+  get initialValues () {
+    const {timeLimitFrom, timeLimitTo, dailyLimit, limit} = bookingRulesDefaultValues
+    return {
+      timeLimitEnable: false,
+      dailyLimitEnable: false,
+      limitEnable: false,
+      timeLimitFrom,
+      timeLimitTo,
+      dailyLimit,
+      limit
+    }
+  }
+
+  generateSwitchUpdater (name) {
+    const f = this.generateValueUpdater(name)
+    return value => {
+      if (value) return f(value)
+      switch (name) {
+        case 'limitEnable':
+          const {limit} = bookingRulesDefaultValues
+          this.updateValue({limit})
+          break
+        case 'timeLimitEnable':
+          const {timeLimitFrom, timeLimitTo} = bookingRulesDefaultValues
+          this.updateValue({timeLimitFrom, timeLimitTo})
+          break
+        case 'dailyLimitEnable':
+          const {dailyLimit} = bookingRulesDefaultValues
+          this.updateValue({dailyLimit})
+          break
+      }
+      return f(value)
+    }
+  }
+
+  render () {
+    // TODO validate if initial setting
+    return <ValidationForm id='BookingRules'>
+      <div className='rule'>
+        <ValidationElement value={this.state.values.timeLimitEnable ? 'on' : 'off'}>
+          <Switch
+            on={this.state.values.timeLimitEnable}
+            onChange={this.generateSwitchUpdater('timeLimitEnable')}/>
+        </ValidationElement>
+        <div className={'ruleText ' + (this.state.values.timeLimitEnable ? 'on' : 'off')}>
+          Bookings must be between{' '}
+          <ValidationElement
+            validator={this.fromValidator}
+            value={this.state.values.timeLimitFrom}>
+            <input
+              type='text'
+              value={this.state.values.timeLimitFrom}
+              onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
+              onChange={this.generateValueUpdater('timeLimitFrom')}/>
+          </ValidationElement>
+          {' '}and{' '}
+          <ValidationElement value={this.state.values.timeLimitTo} validator={this.toValidator}>
+            <input
+              onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
+              type='text' value={this.state.values.timeLimitTo}
+              onChange={this.generateValueUpdater('timeLimitTo')}/>
+          </ValidationElement>
+        </div>
+      </div>
+      <div className='rule'>
+        <ValidationElement value={this.state.values.dailyLimitEnable ? 'on' : 'off'}>
+          <Switch
+            on={this.state.values.dailyLimitEnable}
+            onChange={this.generateSwitchUpdater('dailyLimitEnable')}/>
+        </ValidationElement>
+        <div className={'ruleText ' + (this.state.values.dailyLimitEnable ? 'on' : 'off')}>
+          Maximum{' '}
+          <input
+            onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
+            type='text' value={this.state.values.dailyLimit}
+            onChange={this.generateValueUpdater('dailyLimit')}/> bookings per day
+        </div>
+      </div>
+      <div className='rule'>
+        <ValidationElement value={this.state.values.limitEnable ? 'on' : 'off'}>
+          <Switch
+            on={this.state.values.limitEnable}
+            onChange={this.generateSwitchUpdater('limitEnable')}/>
+        </ValidationElement>
+        <div className={'ruleText ' + (this.state.values.limitEnable ? 'on' : 'off')}>
+          Maximum{' '}
+          <input
+            onBlur={this.generateValueMapper('limit', this.numberMap)}
+            type='text' value={this.state.values.limit}
+            onChange={this.generateValueUpdater('limit')}/> bookings
+        </div>
+      </div>
+      <div className='buttonContainer'>
+        <button>Update</button>
+      </div>
+    </ValidationForm>
+  }
+}
 
 class LaundrySettings extends React.Component {
 
@@ -245,6 +399,10 @@ class LaundrySettings extends React.Component {
       <section>
         <h2>Change name or timezone</h2>
         <LaundrySettingsForm laundry={this.laundry}/>
+      </section>
+      <section>
+        <h2>Booking rules</h2>
+        <BookingRules/>
       </section>
       <section>
         <h2>Delete laundry</h2>

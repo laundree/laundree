@@ -19,12 +19,26 @@ class ValueUpdater extends React.Component {
     return {}
   }
 
-  generateValueUpdater (name) {
-    return (evt) => {
-      const value = evt.target.value
+  updateValue (values) {
+    this.setState(({values: vals}) => ({values: Object.assign({}, vals, values)}))
+  }
+
+  generateValueMapper (name, map) {
+    return () => {
       this.setState(({values}) => {
         const obj = {}
-        obj[name] = value
+        obj[name] = map(values[name])
+        return {values: Object.assign({}, values, obj)}
+      })
+    }
+  }
+
+  generateValueUpdater (name, map = v => v) {
+    return (evt) => {
+      const value = evt.target ? evt.target.value : evt
+      this.setState(({values}) => {
+        const obj = {}
+        obj[name] = map(value)
         return {values: Object.assign({}, values, obj)}
       })
     }

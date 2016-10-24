@@ -106,6 +106,30 @@ body
 $footer_height: 20em
 $max_page_width: 70em
 
+.switch
+  +user-select(none)
+  height: 1.6em
+  width: 3em
+  border-radius: 1em
+  background: #fff
+  position: relative
+  cursor: pointer
+  display: inline-block
+  &.on:after
+    right: 0.1em
+  &.off:after
+    right: calc(100% - 1.5em)
+    background: #cecece
+  &:after
+    +transition(0.1s, 0.1s right, background)
+    border-radius: 1em
+    content: ''
+    position: absolute
+    height: 1.4em
+    width: 1.4em
+    top: 0.1em
+    background: #77b3b3
+
 .contactForm
   &.sent
     text-align: center
