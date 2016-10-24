@@ -284,8 +284,25 @@ class BookingRules extends ValueUpdater {
       const int = parseInt(number)
       return isNaN(int) ? 0 : Math.max(int, 0)
     }
-    this.fromValidator = from => timeStringToMinutes(this.state.values.timeLimitTo) > timeStringToMinutes(from)
-    this.toValidator = to => timeStringToMinutes(this.state.values.timeLimitFrom) < timeStringToMinutes(to)
+    this.fromToValidator = ({from, to}) => timeStringToMinutes(to) > timeStringToMinutes(from)
+    this.validateValues = ({
+      timeLimitEnable,
+      dailyLimitEnable,
+      limitEnable,
+      timeLimitFrom,
+      timeLimitTo,
+      dailyLimit,
+      limit
+    }) => {
+      const values = this.initialValues
+      return timeLimitEnable !== values.timeLimitEnable ||
+        dailyLimitEnable !== values.dailyLimitEnable ||
+        limitEnable !== values.limitEnable ||
+        timeLimitFrom !== values.timeLimitFrom ||
+        timeLimitTo !== values.timeLimitTo ||
+        dailyLimit !== values.dailyLimit ||
+        limit !== values.limit
+    }
   }
 
   get initialValues () {
@@ -324,8 +341,10 @@ class BookingRules extends ValueUpdater {
   }
 
   render () {
-    // TODO validate if initial setting
     return <ValidationForm id='BookingRules'>
+      <ValidationElement
+        validator={this.validateValues}
+        value={this.state.values}/>
       <div className='rule'>
         <ValidationElement value={this.state.values.timeLimitEnable ? 'on' : 'off'}>
           <Switch
@@ -335,21 +354,18 @@ class BookingRules extends ValueUpdater {
         <div className={'ruleText ' + (this.state.values.timeLimitEnable ? 'on' : 'off')}>
           Bookings must be between{' '}
           <ValidationElement
-            validator={this.fromValidator}
-            value={this.state.values.timeLimitFrom}>
-            <input
-              type='text'
-              value={this.state.values.timeLimitFrom}
-              onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
-              onChange={this.generateValueUpdater('timeLimitFrom')}/>
-          </ValidationElement>
+            validator={this.fromToValidator}
+            value={{from: this.state.values.timeLimitFrom, to: this.state.values.timeLimitTo}}/>
+          <input
+            type='text'
+            value={this.state.values.timeLimitFrom}
+            onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
+            onChange={this.generateValueUpdater('timeLimitFrom')}/>
           {' '}and{' '}
-          <ValidationElement value={this.state.values.timeLimitTo} validator={this.toValidator}>
-            <input
-              onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
-              type='text' value={this.state.values.timeLimitTo}
-              onChange={this.generateValueUpdater('timeLimitTo')}/>
-          </ValidationElement>
+          <input
+            onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
+            type='text' value={this.state.values.timeLimitTo}
+            onChange={this.generateValueUpdater('timeLimitTo')}/>
         </div>
       </div>
       <div className='rule'>
