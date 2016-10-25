@@ -42,26 +42,35 @@ function createBooking (req, res) {
   const toDate = laundry.dateFromObject(to)
   if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to')
   if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon')
-  return machine.fetchBookings(fromDate, toDate)
-    .then(([booking]) => {
-      if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
-      return BookingHandler
-        .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate)
-        .then(({before, after}) => {
-          const promises = []
-          var from = fromDate
-          var to = toDate
-          if (before) {
-            promises.push(before.deleteBooking())
-            from = before.model.from
-          }
-          if (after) {
-            promises.push(after.deleteBooking())
-            to = after.model.to
-          }
-          return Promise.all(promises)
-            .then(() => machine.createBooking(req.user, from, to))
-            .then(booking => api.returnSuccess(res, booking.toRest()))
+  if (!laundry.checkTimeLimit(from, to)) return api.returnError(res, 400, 'Time limit violation')
+  laundry
+    .checkDailyLimit(req.user, from, to)
+    .then(result => {
+      if (!result) {
+        return api.returnError(res, 400, 'Daily limit violation')
+      }
+      return machine
+        .fetchBookings(fromDate, toDate)
+        .then(([booking]) => {
+          if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
+          return BookingHandler
+            .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate)
+            .then(({before, after}) => {
+              const promises = []
+              var from = fromDate
+              var to = toDate
+              if (before) {
+                promises.push(before.deleteBooking())
+                from = before.model.from
+              }
+              if (after) {
+                promises.push(after.deleteBooking())
+                to = after.model.to
+              }
+              return Promise.all(promises)
+                .then(() => machine.createBooking(req.user, from, to))
+                .then(booking => api.returnSuccess(res, booking.toRest()))
+            })
         })
     })
     .catch(api.generateErrorHandler(res))

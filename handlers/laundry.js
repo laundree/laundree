@@ -275,7 +275,7 @@ class LaundryHandler extends Handler {
   }
 
   updateLaundry ({name, timezone, rules}) {
-    debug('Updating name')
+    debug('Updating laundry')
     if (name) this.model.name = name
     if (timezone) this.model.timezone = timezone
     if (rules) this.model.rules = rules
@@ -364,6 +364,19 @@ class LaundryHandler extends Handler {
       delete obj.timeLimit
     }
     return obj
+  }
+
+  checkTimeLimit ({hour: fromHour, minute: fromMinute}, {hour: toHour, minute: toMinute}) {
+    const {
+      from: {hour: currentFromHour, minute: currentFromMinute},
+      to: {hour: currentToHour, minute: currentToMinute}
+    } = this.model.rules.timeLimit
+    if (currentFromHour === undefined || currentFromMinute === undefined || currentToHour === undefined || currentToMinute === undefined) return true
+    return fromHour * 60 + fromMinute >= currentFromHour * 60 + currentFromMinute && toHour * 60 + toMinute <= currentToHour * 60 + currentToMinute
+  }
+
+  checkDailyLimit (owner, {day: fromDay, month: fromMonth, year: fromYear}, {day: toDay, month: toMonth, year: toYear}) {
+    // TODO implement daily limit
   }
 
   get reduxModel () {

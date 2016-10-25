@@ -191,16 +191,83 @@ describe('controllers', function () {
 
       it('should fail from on to', () =>
         dbUtils.populateBookings(1).then(({user, token, machine, bookings}) => {
-          const date = new Date()
           return request(app)
             .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({to: date, from: date})
+            .send({to: createDateTomorrow(12), from: createDateTomorrow(12)})
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
             .then(res => res.body.should.deep.equal({message: 'From must be before to'}))
         }))
+
+      it('should fail if before limit', () =>
+        dbUtils
+          .populateBookings(1)
+          .then(({user, token, machine, bookings, laundry}) =>
+            laundry
+              .updateLaundry({
+                rules: {
+                  timeLimit: {
+                    from: {hour: 12, minute: 0},
+                    to: {hour: 24, minute: 0}
+                  }
+                }
+              })
+              .then(() => ({laundry, user, token, machine, bookings})))
+          .then(({user, token, machine, bookings}) => request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({to: createDateTomorrow(13), from: createDateTomorrow(0)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .then(res => res.body.should.deep.equal({message: 'Limit violation'}))))
+
+      it('should fail if after limit', () =>
+        dbUtils
+          .populateBookings(1)
+          .then(({user, token, machine, bookings, laundry}) =>
+            laundry
+              .updateLaundry({
+                rules: {
+                  timeLimit: {
+                    from: {hour: 0, minute: 0},
+                    to: {hour: 12, minute: 0}
+                  }
+                }
+              })
+              .then(() => ({laundry, user, token, machine, bookings})))
+          .then(({user, token, machine, bookings}) => request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({to: createDateTomorrow(13), from: createDateTomorrow(0)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .then(res => res.body.should.deep.equal({message: 'Time limit violation'}))))
+
+      it('should fail if daily limit', () =>
+        dbUtils
+          .populateMachines(1)
+          .then(({user, token, laundry, machine}) => Promise
+            .all([
+              laundry.updateLaundry({rules: {dailyLimit: 1}}),
+              laundry.createBooking(machine, user, createDateTomorrow(1), createDateTomorrow(2))
+            ]).then(() => ({
+              user,
+              token,
+              laundry,
+              machine
+            })))
+          .then(({machine, user, token}) => request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({from: createDateTomorrow(3), to: createDateTomorrow(4)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .then(res => res.body.should.deep.equal({message: 'Daily limit violation'}))))
 
       it('should fail on double booking', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
