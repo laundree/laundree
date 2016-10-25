@@ -44,7 +44,7 @@
     "react-dom": "^15.3.0",
     "react-intl": "^2.1.2",
     "react-redux": "^4.4.5",
-    "react-router": "^2.4.1",
+    "react-router": "^3.0.0",
     "reactify": "^1.1.1",
     "redis": "^2.6.2",
     "redux": "^3.5.2",
