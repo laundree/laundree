@@ -274,10 +274,11 @@ class LaundryHandler extends Handler {
     })
   }
 
-  updateLaundry ({name, timezone}) {
+  updateLaundry ({name, timezone, rules}) {
     debug('Updating name')
     if (name) this.model.name = name
     if (timezone) this.model.timezone = timezone
+    if (rules) this.model.rules = rules
     return this.save()
   }
 
@@ -354,6 +355,17 @@ class LaundryHandler extends Handler {
     return this.model.timezone || config.get('timezone')
   }
 
+  get rules () {
+    const obj = this.model.rules.toObject()
+    if (
+      Object.keys(obj.timeLimit.from).length === 0 ||
+      Object.keys(obj.timeLimit.to).length === 0
+    ) {
+      delete obj.timeLimit
+    }
+    return obj
+  }
+
   get reduxModel () {
     return {
       id: this.model.id,
@@ -363,7 +375,8 @@ class LaundryHandler extends Handler {
       owners: this.ownerIds,
       invites: this.inviteIds,
       timezone: this.timezone,
-      demo: this.model.demo
+      demo: this.model.demo,
+      rules: this.rules
     }
   }
 

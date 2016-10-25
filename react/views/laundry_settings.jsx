@@ -59,11 +59,6 @@ class LaundrySettingsForm extends ValueUpdater {
     return ['', this.props.laundry.name]
   }
 
-  get timezoneErrorValues () {
-    if (this.state.values.name !== this.props.laundry.name) return []
-    return ['', this.props.laundry.timezone]
-  }
-
   render () {
     return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
       {this.state.notion ? <div
@@ -87,66 +82,6 @@ class LaundrySettingsForm extends ValueUpdater {
 }
 
 LaundrySettingsForm.propTypes = {
-  laundry: React.PropTypes.object.isRequired
-}
-
-class LaundryBookingFormatForm extends ValueUpdater {
-
-  constructor (props) {
-    super(props)
-    this.onSubmit = (evt) => {
-      evt.preventDefault()
-      this.setState({loading: true})
-      sdk.laundry(this.props.laundry.id)
-        .updateLaundry({timezone: this.state.values.timezone})
-        .then(() => this.setState({loading: false, notion: null}))
-        .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
-    }
-  }
-
-  errorToMessage ({status, message}) {
-    switch (status) {
-      case 400:
-        return 'Invalid timezone'
-      default:
-        return message
-    }
-  }
-
-  get initialValues () {
-    return {
-      timezone: this.props.laundry.timezone
-    }
-  }
-
-  componentWillReceiveProps ({laundry}) {
-    if (laundry.name === this.props.laundry.timezone) return
-    this.reset({values: {timezone: laundry.timezone}})
-  }
-
-  generateErrorMessage () {
-    return this.state.values.timezone.trim() ? 'Please enter a new timezone' : 'Please enter a timezone'
-  }
-
-  render () {
-    return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
-      {this.state.notion ? <div
-        className={'notion ' + (this.state.notion.success ? 'success' : 'error')}>{this.state.notion.message}</div> : null }
-      <ValidationElement
-        sesh={this.state.sesh} value={this.state.values.timezone} nonEmpty
-        trim>
-        <label data-validate-error={this.generateErrorMessage()}>
-          <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
-        </label>
-      </ValidationElement>
-      <div className='buttons'>
-        <input type='submit' value='Update'/>
-      </div>
-    </ValidationForm>
-  }
-}
-
-LaundryBookingFormatForm.propTypes = {
   laundry: React.PropTypes.object.isRequired
 }
 
@@ -256,9 +191,19 @@ Switch.propTypes = {
 }
 
 function timeStringToMinutes (time) {
+  const obj = timeStringToObject(time)
+  if (!obj) return 0
+  return obj.hour * 60 + obj.minute
+}
+
+function timeStringToObject (time) {
   const timeMatch = time.match(/^(\d+):(\d+)$/)
-  if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return 0
-  return parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2])
+  if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return undefined
+  return {hour: parseInt(timeMatch[1]), minute: parseInt(timeMatch[2])}
+}
+
+function objectToTimeString ({hour, minute}) {
+  return `${hour}:${minute < 10 ? `0${minute}` : minute}`
 }
 
 const bookingRulesDefaultValues = {
@@ -266,6 +211,28 @@ const bookingRulesDefaultValues = {
   timeLimitTo: '24:00',
   dailyLimit: 10,
   limit: 100
+}
+
+function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
+  const laundryValues = {
+    timeLimitEnable: false,
+    dailyLimitEnable: false,
+    limitEnable: false
+  }
+  if (dailyLimit !== undefined) {
+    laundryValues.dailyLimitEnable = true
+    laundryValues.dayliLimit = dailyLimit
+  }
+  if (limit !== undefined) {
+    laundryValues.limitEnable = true
+    laundryValues.limit = limit
+  }
+  if (timeLimit) {
+    laundryValues.timeLimitEnable = true
+    laundryValues.timeLimitFrom = objectToTimeString(timeLimit.from)
+    laundryValues.timeLimitTo = objectToTimeString(timeLimit.to)
+  }
+  return Object.assign({}, bookingRulesDefaultValues, laundryValues)
 }
 
 class BookingRules extends ValueUpdater {
@@ -303,19 +270,53 @@ class BookingRules extends ValueUpdater {
         dailyLimit !== values.dailyLimit ||
         limit !== values.limit
     }
+    this.handleSubmit = evt => {
+      evt.preventDefault()
+      this.submit()
+    }
+  }
+
+  compareRules ({limit, dailyLimit, timeLimit}) {
+    const oldRules = this.props.laundry.rules
+    if (limit !== oldRules.limit) return false
+    if (dailyLimit !== oldRules.dailyLimit) return false
+    if (timeLimit === oldRules.timeLimit) return true
+    if (!timeLimit) return false
+    if (!oldRules.timeLimit) return false
+    if (timeLimit.from.hour !== oldRules.timeLimit.from.hour) return false
+    if (timeLimit.from.minute !== oldRules.timeLimit.from.minute) return false
+    if (timeLimit.to.hour !== oldRules.timeLimit.to.hour) return false
+    return timeLimit.to.minute === oldRules.to.minute
+  }
+
+  componentWillReceiveProps ({laundry: {rules}}) {
+    if (this.compareRules(rules)) return
+    this.reset({values: rulesToInitialValues(rules)})
+  }
+
+  submit () {
+    sdk.laundry(this.props.laundry.id).updateLaundry({rules: this.rules})
+  }
+
+  get rules () {
+    const ruleObject = {}
+    if (this.state.values.limitEnable) {
+      ruleObject.limit = this.state.values.limit
+    }
+    if (this.state.values.dailyLimitEnable) {
+      ruleObject.dailyLimit = this.state.values.dailyLimit
+    }
+    if (this.state.values.timeLimitEnable) {
+      ruleObject.timeLimit = {
+        from: timeStringToObject(this.state.values.timeLimitFrom),
+        to: timeStringToObject(this.state.values.timeLimitTo)
+      }
+    }
+    return ruleObject
   }
 
   get initialValues () {
-    const {timeLimitFrom, timeLimitTo, dailyLimit, limit} = bookingRulesDefaultValues
-    return {
-      timeLimitEnable: false,
-      dailyLimitEnable: false,
-      limitEnable: false,
-      timeLimitFrom,
-      timeLimitTo,
-      dailyLimit,
-      limit
-    }
+    return rulesToInitialValues(this.props.laundry.rules)
   }
 
   generateSwitchUpdater (name) {
@@ -341,7 +342,7 @@ class BookingRules extends ValueUpdater {
   }
 
   render () {
-    return <ValidationForm id='BookingRules'>
+    return <ValidationForm id='BookingRules' onSubmit={this.handleSubmit}>
       <ValidationElement
         validator={this.validateValues}
         value={this.state.values}/>
@@ -403,6 +404,10 @@ class BookingRules extends ValueUpdater {
   }
 }
 
+BookingRules.propTypes = {
+  laundry: React.PropTypes.object.isRequired
+}
+
 class LaundrySettings extends React.Component {
 
   get isOwner () {
@@ -418,7 +423,7 @@ class LaundrySettings extends React.Component {
       </section>
       <section>
         <h2>Booking rules</h2>
-        <BookingRules/>
+        <BookingRules laundry={this.laundry}/>
       </section>
       <section>
         <h2>Delete laundry</h2>
