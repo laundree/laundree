@@ -221,7 +221,7 @@ function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
   }
   if (dailyLimit !== undefined) {
     laundryValues.dailyLimitEnable = true
-    laundryValues.dayliLimit = dailyLimit
+    laundryValues.dailyLimit = dailyLimit
   }
   if (limit !== undefined) {
     laundryValues.limitEnable = true
@@ -380,7 +380,7 @@ class BookingRules extends ValueUpdater {
           <input
             onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
             type='text' value={this.state.values.dailyLimit}
-            onChange={this.generateValueUpdater('dailyLimit')}/> bookings per day
+            onChange={this.generateValueUpdater('dailyLimit')}/> hour of bookings per day
         </div>
       </div>
       <div className='rule'>
@@ -394,7 +394,7 @@ class BookingRules extends ValueUpdater {
           <input
             onBlur={this.generateValueMapper('limit', this.numberMap)}
             type='text' value={this.state.values.limit}
-            onChange={this.generateValueUpdater('limit')}/> bookings
+            onChange={this.generateValueUpdater('limit')}/> hour of bookings
         </div>
       </div>
       <div className='buttonContainer'>

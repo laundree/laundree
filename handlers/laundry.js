@@ -375,8 +375,31 @@ class LaundryHandler extends Handler {
     return fromHour * 60 + fromMinute >= currentFromHour * 60 + currentFromMinute && toHour * 60 + toMinute <= currentToHour * 60 + currentToMinute
   }
 
-  checkDailyLimit (owner, {day: fromDay, month: fromMonth, year: fromYear}, {day: toDay, month: toMonth, year: toYear}) {
-    // TODO implement daily limit
+  checkDailyLimit (owner, {day, month, year, hour: fromHour, minute: fromMinute}, {hour: toHour, minute: toMinute}) {
+    if (this.model.rules.dailyLimit === undefined) return Promise.resolve(true)
+    return BookingHandler
+      .find({
+        owner: owner.model._id,
+        from: {$lt: this.dateFromObject({day: day + 1, month, year})},
+        to: {$gt: this.dateFromObject({day, month, year})}
+      })
+      .then(bookings => bookings.map(({model: {from, to}}) => ({
+        from: this.dateToObject(from),
+        to: this.dateToObject(to)
+      })))
+      .then(bookings => bookings
+        .reduce(
+          (sum,
+            {
+              from: {hour: fHour, minute: fMinute},
+              to: {hour: tHour, minute: tMinute}
+            }) => sum + ((tHour * 60 + tMinute) - (fHour * 60 + fMinute)),
+          (toHour * 60 + toMinute) - (fromHour * 60 + fromMinute)))
+      .then(currentSum => currentSum <= this.model.rules.dailyLimit * 60)
+  }
+
+  isSameDay (d1, d2) {
+    return moment.tz(d1, this.timezone).format('YYYY-MM-DD') === moment.tz(d2, this.timezone).format('YYYY-MM-DD')
   }
 
   get reduxModel () {

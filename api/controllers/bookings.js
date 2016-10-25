@@ -43,6 +43,7 @@ function createBooking (req, res) {
   if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to')
   if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon')
   if (!laundry.checkTimeLimit(from, to)) return api.returnError(res, 400, 'Time limit violation')
+  if (to.hour < 24 && !laundry.isSameDay(from, to)) return api.returnError(res, 400, 'From and to must be same day')
   laundry
     .checkDailyLimit(req.user, from, to)
     .then(result => {
@@ -57,18 +58,18 @@ function createBooking (req, res) {
             .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate)
             .then(({before, after}) => {
               const promises = []
-              var from = fromDate
-              var to = toDate
-              if (before) {
+              var f = fromDate
+              var t = toDate
+              if (before && from.hour + from.minute > 0) {
                 promises.push(before.deleteBooking())
-                from = before.model.from
+                f = before.model.from
               }
-              if (after) {
+              if (after && to.hour < 24) {
                 promises.push(after.deleteBooking())
-                to = after.model.to
+                t = after.model.to
               }
               return Promise.all(promises)
-                .then(() => machine.createBooking(req.user, from, to))
+                .then(() => machine.createBooking(req.user, f, t))
                 .then(booking => api.returnSuccess(res, booking.toRest()))
             })
         })
