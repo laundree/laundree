@@ -11,7 +11,7 @@ class Booking extends React.Component {
     super(props)
     this.state = {showModal: false}
     this.onCloseModal = () => this.setState({showModal: false})
-    this.onDeleteModal = () => sdk.booking(this.props.booking.id).deleteBooking()
+    this.onDeleteModal = () => sdk.booking(this.props.booking.id).del()
     this.onDeleteClick = () => this.setState({showModal: true})
   }
 
