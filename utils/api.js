@@ -5,7 +5,7 @@
 const error = require('./error')
 
 function generateErrorHandler (res) {
-  return (err) => {
+  return err => {
     error.logError(err)
     res.statusCode = 500
     res.json({message: 'Internal server error'})
@@ -38,7 +38,7 @@ function returnSuccess (res, result) {
 }
 
 module.exports = {
-  generateErrorHandler: generateErrorHandler,
-  returnError: returnError,
-  returnSuccess: returnSuccess
+  generateErrorHandler,
+  returnError,
+  returnSuccess
 }

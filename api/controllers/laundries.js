@@ -129,8 +129,14 @@ function inviteUserByEmail (req, res) {
   return laundry
     .inviteUserByEmail(email)
     .then(({user, invite}) => {
-      if (user) return mail.sendEmail({email, laundry: laundry.model, user: user.model}, 'invite-user', email)
-      if (invite) return mail.sendEmail({email, laundry: laundry.model}, 'invite', email)
+      if (user) {
+        return mail.sendEmail({
+          email,
+          laundry: laundry.model.toObject(),
+          user: user.model.toObject()
+        }, 'invite-user', email)
+      }
+      if (invite) return mail.sendEmail({email, laundry: laundry.model.toObject()}, 'invite', email)
     })
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
