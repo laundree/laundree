@@ -111,9 +111,12 @@ class TimetableTable extends React.Component {
 
   _calcPosition () {
     const now = moment().tz(this.props.laundry.timezone)
-    const diff = now.valueOf() - this.props.date.clone().valueOf()
-    const percent = diff / (24 * 60 * 60 * 1000)
-    const offLimitsPosition = percent + (10 / (60 * 24))
+    const nowBox = now.hours() * 2 + now.minutes() / 30 + this.dayCoefficient(now) * 48
+    const startBox = this.props.times[0]
+    const lastBox = this.props.times[this.props.times.length - 1]
+    const boxLength = lastBox + 1 - startBox
+    const percent = (nowBox - startBox) / boxLength
+    const offLimitsPosition = percent + 1 / (3 * boxLength)
     return {nowPosition: percent * 100, offLimitsPosition: maxMin(offLimitsPosition, 1, 0) * 100}
   }
 
@@ -121,7 +124,7 @@ class TimetableTable extends React.Component {
     switch (event.target.tagName.toLowerCase()) {
       case 'td':
         const td = event.target
-        this._mouseDownStart = TimetableTable.tdToTablePos(td)
+        this._mouseDownStart = this.tdToTablePos(td)
         break
       default:
         this._mouseDownStart = undefined
@@ -133,13 +136,13 @@ class TimetableTable extends React.Component {
     switch (event.target.tagName.toLowerCase()) {
       case 'td':
         const td = event.target
-        const to = TimetableTable.tdToTablePos(td)
+        const to = this.tdToTablePos(td)
         this.book(this._mouseDownStart, to)
     }
   }
 
-  static tdToTablePos (td) {
-    return {x: td.cellIndex, y: td.parentNode.rowIndex}
+  tdToTablePos (td) {
+    return {x: td.cellIndex, y: td.parentNode.rowIndex + this.props.times[0]}
   }
 
   static dateToY (date) {
@@ -172,16 +175,16 @@ class TimetableTable extends React.Component {
   }
 
   handleMouseOut () {
-    this.hover(-1, -1)
+    this.hover({x: -1, y: -1})
   }
 
-  hover (x, y) {
+  hover ({x, y}) {
     this.props.onHoverRow(y)
     this.props.onHoverColumn(x)
   }
 
   hoverTd (td) {
-    this.hover(td.cellIndex, td.parentNode.rowIndex)
+    this.hover(this.tdToTablePos(td))
   }
 
   handleMouseOver (event) {
@@ -195,9 +198,13 @@ class TimetableTable extends React.Component {
   }
 
   calculateTooLateKey (tooLate) {
-    if (this.props.date.isAfter(tooLate, 'd')) return 0
-    if (this.props.date.isBefore(tooLate, 'd')) return 48
-    return tooLate.hours() * 2 + tooLate.minutes() / 30
+    return 48 * this.dayCoefficient(tooLate) + tooLate.hours() * 2 + tooLate.minutes() / 30
+  }
+
+  dayCoefficient (moment) {
+    if (this.props.date.isBefore(moment, 'd')) return 1
+    if (this.props.date.isAfter(moment, 'd')) return -1
+    return 0
   }
 
   render () {
@@ -220,7 +227,7 @@ class TimetableTable extends React.Component {
         onMouseDown={this.tableMouseDownHandler}
         onMouseUp={this.tableMouseUpHandler}>
         <tbody>
-        {range(48).map((key) => this._row(key, tooLateKey > key))}
+        {this.props.times.map((key) => this._row(key, tooLateKey >= key))}
         </tbody>
       </table>
     </div>
@@ -238,7 +245,8 @@ TimetableTable.propTypes = {
   offsetDate: React.PropTypes.string,
   date: React.PropTypes.object.isRequired,
   onHoverRow: React.PropTypes.func.isRequired,
-  hoverRow: React.PropTypes.number.isRequired
+  hoverRow: React.PropTypes.number.isRequired,
+  times: React.PropTypes.arrayOf(React.PropTypes.number).isRequired
 }
 
 class TimetableTables extends React.Component {
@@ -270,34 +278,25 @@ class TimetableTables extends React.Component {
     return (j) => this.props.onHoverColumn(j < 0 ? -1 : (i * this.props.laundry.machines.length + j))
   }
 
+  get times () {
+    if (!this.props.laundry.rules.timeLimit) return range(48)
+    const {hour: fromHour, minute: fromMinute} = this.props.laundry.rules.timeLimit.from
+    const {hour: toHour, minute: toMinute} = this.props.laundry.rules.timeLimit.to
+    const from = Math.floor(fromHour * 2 + fromMinute / 30)
+    const to = Math.floor(toHour * 2 + toMinute / 30)
+    return range(from, to)
+  }
+
   render () {
+    const times = this.times
+    const halfStart = times[0] % 2
+    const hours = (halfStart ? times : times.slice(2)).filter(i => (i + 1) % 2).map(i => i / 2)
+    const timeList = <ul className={'times' + (halfStart ? ' half' : '')}>
+      {hours.map(h => <li key={h}><span>{h}</span></li>)}
+    </ul>
     return <section id='TimeTable'>
       <div className='timetable_container'>
-        <ul className='times'>
-          <li><span>1</span></li>
-          <li><span>2</span></li>
-          <li><span>3</span></li>
-          <li><span>4</span></li>
-          <li><span>5</span></li>
-          <li><span>6</span></li>
-          <li><span>7</span></li>
-          <li><span>8</span></li>
-          <li><span>9</span></li>
-          <li><span>10</span></li>
-          <li><span>11</span></li>
-          <li><span>12</span></li>
-          <li><span>13</span></li>
-          <li><span>14</span></li>
-          <li><span>15</span></li>
-          <li><span>16</span></li>
-          <li><span>17</span></li>
-          <li><span>18</span></li>
-          <li><span>19</span></li>
-          <li><span>20</span></li>
-          <li><span>21</span></li>
-          <li><span>22</span></li>
-          <li><span>23</span></li>
-        </ul>
+        {timeList}
         {this.props.dates.map((date, i) => <TimetableTable
           currentUser={this.props.currentUser}
           offsetDate={this.props.offsetDate}
@@ -308,32 +307,9 @@ class TimetableTables extends React.Component {
           onHoverColumn={this.hoverColumnWrapper(i)}
           date={date} machines={this.props.machines} laundry={this.props.laundry}
           bookings={this.props.bookings}
+          times={times}
           key={date.format('YYYY-MM-DD')}/>)}
-        <ul className='times'>
-          <li><span>1</span></li>
-          <li><span>2</span></li>
-          <li><span>3</span></li>
-          <li><span>4</span></li>
-          <li><span>5</span></li>
-          <li><span>6</span></li>
-          <li><span>7</span></li>
-          <li><span>8</span></li>
-          <li><span>9</span></li>
-          <li><span>10</span></li>
-          <li><span>11</span></li>
-          <li><span>12</span></li>
-          <li><span>13</span></li>
-          <li><span>14</span></li>
-          <li><span>15</span></li>
-          <li><span>16</span></li>
-          <li><span>17</span></li>
-          <li><span>18</span></li>
-          <li><span>19</span></li>
-          <li><span>20</span></li>
-          <li><span>21</span></li>
-          <li><span>22</span></li>
-          <li><span>23</span></li>
-        </ul>
+        {timeList}
       </div>
     </section>
   }
