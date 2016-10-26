@@ -149,6 +149,8 @@ main#TimeTableMain
           right: 0
         list-style-type: none
         margin-top: 3em
+        &.half
+          margin-top: 0
         li
           $h: 6em
           border: 0.1em solid transparent
@@ -331,6 +333,7 @@ main#TimeTableMain
               display: none
       .date_nav
         .nav
+          +user-select(none)
           display: block
           line-height: 1.5em
 
