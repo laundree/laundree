@@ -75,10 +75,10 @@ class TimeTableHeaderNav extends React.Component {
     if (this.props.dates.length === 0) return null
     const navLeft = <Link
       className='left arrow'
-      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-M-D')}`}/>
+      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-MM-DD')}`}/>
     const navRight = <Link
       className='right arrow'
-      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-M-D')}`}/>
+      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-MM-DD')}`}/>
     if (this.props.dates.length === 1) {
       return <div className='nav'>
         {navLeft}

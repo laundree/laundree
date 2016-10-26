@@ -130,8 +130,7 @@ class Timetable extends React.Component {
     const startDay = this.props.offsetDate
       ? moment.tz(this.props.offsetDate, this.props.laundry.timezone)
       : moment.tz(moment.tz(this.props.laundry.timezone).format('YYYY-MM-DD'), this.props.laundry.timezone)
-    const days = range(this.state.numDays).map(i => startDay.clone().add(i, 'd'))
-    return days
+    return range(this.state.numDays).map(i => startDay.clone().add(i, 'd'))
   }
 
   render () {
