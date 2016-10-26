@@ -194,17 +194,17 @@ class TimetableTable extends React.Component {
     }
   }
 
+  calculateTooLateKey (tooLate) {
+    if (this.props.date.isAfter(tooLate, 'd')) return 0
+    if (this.props.date.isBefore(tooLate, 'd')) return 48
+    return tooLate.hours() * 2 + tooLate.minutes() / 30
+  }
+
   render () {
     const now = moment().tz(this.props.laundry.timezone)
     const time = now.format('H:mm')
-    const today = now.isSame(this.props.date, 'd')
-    var tooLateKey
-    if (today) {
-      const tooLate = now.clone().add(10, 'm')
-      tooLateKey = tooLate.hours() * 2 + tooLate.minutes() / 30
-    } else if (this.props.date.isBefore(now, 'd')) {
-      tooLateKey = 48
-    }
+    const tooLate = now.clone().add(10, 'm')
+    const tooLateKey = this.calculateTooLateKey(tooLate)
     const refPuller = (ref) => {
       this.ref = ref
     }
@@ -220,7 +220,7 @@ class TimetableTable extends React.Component {
         onMouseDown={this.tableMouseDownHandler}
         onMouseUp={this.tableMouseUpHandler}>
         <tbody>
-        {range(48).map((key) => this._row(key, tooLateKey >= key))}
+        {range(48).map((key) => this._row(key, tooLateKey > key))}
         </tbody>
       </table>
     </div>
