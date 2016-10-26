@@ -40,36 +40,43 @@ function createBooking (req, res) {
   const {from, to} = req.swagger.params.body.value
   const fromDate = laundry.dateFromObject(from)
   const toDate = laundry.dateFromObject(to)
-  if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to')
-  if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon')
-  if (!laundry.checkTimeLimit(from, to)) return api.returnError(res, 400, 'Time limit violation')
-  if (to.hour < 24 && !laundry.isSameDay(from, to)) return api.returnError(res, 400, 'From and to must be same day')
-  laundry
-    .checkDailyLimit(req.user, from, to)
-    .then(result => {
-      if (!result) {
+  if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to') // Test that from is before to
+  if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon') // Test that booking is after now
+  if (!laundry.checkTimeLimit(from, to)) return api.returnError(res, 400, 'Time limit violation') // Test that booking meets time limit
+  if (to.hour < 24 && !laundry.isSameDay(from, to)) return api.returnError(res, 400, 'From and to must be same day') // Test that booking isn't cross day
+  Promise
+    .all([
+      laundry.checkDailyLimit(req.user, from, to), // Test that daily limit isn't violated
+      laundry.checkLimit(req.user, from, to) // Test that limit isn't violated
+    ])
+    .then(([dailyResult, limitResult]) => {
+      if (!dailyResult) {
         return api.returnError(res, 400, 'Daily limit violation')
+      }
+      if (!limitResult) {
+        return api.returnError(res, 400, 'Limit violation')
       }
       return machine
         .fetchBookings(fromDate, toDate)
         .then(([booking]) => {
-          if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
+          if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl}) // Test for existing booking
           return BookingHandler
-            .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate)
+            .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate) // Find bookings that should be merged
             .then(({before, after}) => {
               const promises = []
               var f = fromDate
               var t = toDate
               if (before && from.hour + from.minute > 0) {
-                promises.push(before.deleteBooking())
+                promises.push(before.deleteBooking()) // Delete booking if should be merged
                 f = before.model.from
               }
               if (after && to.hour < 24) {
-                promises.push(after.deleteBooking())
+                promises.push(after.deleteBooking()) // Delete booking if should be merged
                 t = after.model.to
               }
-              return Promise.all(promises)
-                .then(() => machine.createBooking(req.user, f, t))
+              return Promise
+                .all(promises)
+                .then(() => machine.createBooking(req.user, f, t)) // Create booking
                 .then(booking => api.returnSuccess(res, booking.toRest()))
             })
         })

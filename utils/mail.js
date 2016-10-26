@@ -63,7 +63,7 @@ function sendEmail (data, template, to, from = config.get('emails.from'), transp
 }
 
 module.exports = {
-  render: render,
-  sendRenderedEmail: sendRenderedEmail,
-  sendEmail: sendEmail
+  render,
+  sendRenderedEmail,
+  sendEmail
 }

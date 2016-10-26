@@ -74,7 +74,7 @@ function timeToMinutes ({hour, minute}) {
   return hour * 60 + minute
 }
 
-function validateBody (res, body) {
+function validateBody (res, laundry, body) {
   const {timezone, rules, name} = body
   if (timezone && moment.tz.names().indexOf(timezone) < 0) {
     api.returnError(res, 400, 'Invalid timezone')
@@ -84,7 +84,7 @@ function validateBody (res, body) {
     api.returnError(res, 400, 'From must be before to')
     return undefined
   }
-  if (!name) return body
+  if (!name || name === laundry.model.name) return body
   LaundryHandler
     .find({name})
     .then(([l]) => {
@@ -101,7 +101,7 @@ function updateLaundry (req, res) {
   const {laundry} = req.subjects
   let body = req.swagger.params.body.value
   Promise
-    .resolve(validateBody(res, sanitizeBody(body)))
+    .resolve(validateBody(res, laundry, sanitizeBody(body)))
     .then(result => {
       if (!result) return
       return laundry.updateLaundry(result).then(() => api.returnSuccess(res))

@@ -274,6 +274,54 @@ describe('controllers', function () {
             .expect(400)
             .then(res => res.body.should.deep.equal({message: 'Daily limit violation'}))))
 
+      it('should succeed other bookings on other laundry', () => Promise
+        .all([dbUtils.populateMachines(1), dbUtils.populateMachines(1)])
+        .then(([{laundry: otherLaundry, machine: otherMachine}, {machine, laundry, user, token}]) =>
+          otherLaundry
+            .createBooking(otherMachine, user, createDateTomorrow(1), createDateTomorrow(2))
+            .then(() => laundry.updateLaundry({rules: {dailyLimit: 1}}))
+            .then(() => ({machine, laundry, user, token})))
+        .then(({machine, user, token}) => request(app)
+          .post(`/api/machines/${machine.model.id}/bookings`)
+          .send({from: createDateTomorrow(0), to: createDateTomorrow(1)})
+          .auth(user.model.id, token.secret)
+          .expect(200)))
+
+      it('should fail if limit', () =>
+        dbUtils
+          .populateMachines(1)
+          .then(({user, token, laundry, machine}) => Promise
+            .all([
+              laundry.updateLaundry({rules: {limit: 1}}),
+              laundry.createBooking(machine, user, createDateTomorrow(1), createDateTomorrow(2))
+            ]).then(() => ({
+              user,
+              token,
+              laundry,
+              machine
+            })))
+          .then(({machine, user, token}) => request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({from: createDateDayAfterTomorrow(3), to: createDateDayAfterTomorrow(4)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)
+            .then(res => res.body.should.deep.equal({message: 'Limit violation'}))))
+
+      it('should succeed other bookings on other laundry', () => Promise
+        .all([dbUtils.populateMachines(1), dbUtils.populateMachines(1)])
+        .then(([{laundry: otherLaundry, machine: otherMachine}, {machine, laundry, user, token}]) =>
+          otherLaundry
+            .createBooking(otherMachine, user, createDateTomorrow(1), createDateTomorrow(2))
+            .then(() => laundry.updateLaundry({rules: {limit: 1}}))
+            .then(() => ({machine, laundry, user, token})))
+        .then(({machine, user, token}) => request(app)
+          .post(`/api/machines/${machine.model.id}/bookings`)
+          .send({from: createDateTomorrow(0), to: createDateTomorrow(1)})
+          .auth(user.model.id, token.secret)
+          .expect(200)))
+
       it('should fail on double booking', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
           .then(({user, token, machine, booking, offset}) =>
@@ -321,7 +369,6 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect(409)
               .then(res => res.body.should.deep.equal({message: 'Machine not available'}))))
-
       it('should succeed on tight booking 1', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
           .then(({user, token, machine, bookings}) =>
@@ -350,6 +397,7 @@ describe('controllers', function () {
                 res.body.from.should.deep.equal(createDateTomorrow(0, 30))
                 res.body.to.should.deep.equal(createDateTomorrow(2))
               })))
+
       it('should fail on non % 30 minutes', () => dbUtils.populateMachines(1)
         .then(({machine, user, token}) => request(app)
           .post(`/api/machines/${machine.model.id}/bookings`)
@@ -364,14 +412,14 @@ describe('controllers', function () {
           .auth(user.model.id, token.secret)
           .expect(400)))
 
-      it('should succeed on non midnight booking', () => dbUtils.populateMachines(1)
+      it('should succeed on midnight booking', () => dbUtils.populateMachines(1)
         .then(({machine, user, token}) => request(app)
           .post(`/api/machines/${machine.model.id}/bookings`)
           .send({from: createDateTomorrow(23), to: createDateTomorrow(24)})
           .auth(user.model.id, token.secret)
           .expect(200)))
 
-      it('should succeed on non midnight booking', () => dbUtils.populateMachines(1)
+      it('should succeed on midnight booking', () => dbUtils.populateMachines(1)
         .then(({machine, user, token}) => request(app)
           .post(`/api/machines/${machine.model.id}/bookings`)
           .send({from: createDateTomorrow(0), to: createDateTomorrow(1)})
