@@ -51,7 +51,10 @@ function createUser (req, res) {
 function startPasswordReset (req, res) {
   const {user} = req.subjects
   user.generateResetToken()
-    .then((token) => utils.mail.sendEmail({user: user.model, token: token}, 'password-reset', user.model.emails[0]))
+    .then((token) => utils.mail.sendEmail({
+      user: user.model.toObject(),
+      token: token
+    }, 'password-reset', user.model.emails[0]))
     .then(() => utils.api.returnSuccess(res))
     .catch(utils.api.generateErrorHandler(res))
 }
@@ -75,7 +78,7 @@ function startEmailVerification (req, res) {
       email: email,
       emailEncoded: encodeURIComponent(email),
       token: token,
-      user: user.model
+      user: user.model.toObject()
     }, 'verify-email', email)
       .then(() => utils.api.returnSuccess(res)))
     .catch(utils.api.generateErrorHandler(res))

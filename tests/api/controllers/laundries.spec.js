@@ -409,6 +409,46 @@ describe('controllers', function () {
               .then(laundry => {
                 laundry.model.name.should.equal('L1')
                 laundry.timezone.should.equal('Europe/Paris')
+                laundry.model.rules.toObject().should.deep.equal({timeLimit: {from: {}, to: {}}})
+              }))))
+
+      it('should succeed with name and rule', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .put(`/api/laundries/${laundries[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({name: 'L1', rules: {limit: 1000}})
+            .expect(204)
+            .then(() => LaundryHandler
+              .findFromId(laundries[0].model.id)
+              .then(laundry => {
+                laundry.model.name.should.equal('L1')
+                laundry.model.rules.toObject().should.deep.equal({timeLimit: {from: {}, to: {}}, limit: 1000})
+              }))))
+
+      it('should succeed with name more rules', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .put(`/api/laundries/${laundries[0].model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({
+              name: 'L1',
+              rules: {limit: 1000, dailyLimit: 52, timeLimit: {from: {hour: 10, minute: 30}, to: {hour: 11, minute: 0}}}
+            })
+            .expect(204)
+            .then(() => LaundryHandler
+              .findFromId(laundries[0].model.id)
+              .then(laundry => {
+                laundry.model.name.should.equal('L1')
+                laundry.model.rules.toObject().should.deep.equal({
+                  timeLimit: {from: {hour: 10, minute: 30}, to: {hour: 11, minute: 0}},
+                  dailyLimit: 52,
+                  limit: 1000
+                })
               }))))
 
       it('should succeed with timezone', () =>
@@ -498,6 +538,17 @@ describe('controllers', function () {
             .expect(400)
             .then(({body}) => body.should.deep.equal({message: 'Invalid timezone'}))))
 
+      it('should fail invalid time-rule', () =>
+        dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
+          request(app)
+            .put(`/api/laundries/${laundry1.model.id}`)
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .send({rules: {timeLimit: {from: {hour: 23, minute: 0}, to: {hour: 4, minute: 30}}}})
+            .expect(400)
+            .then(({body}) => body.should.deep.equal({message: 'From must be before to'}))))
+
       it('should fail when only user', () =>
         Promise
           .all([dbUtils.populateTokens(1), dbUtils.populateLaundries(1)])
@@ -533,6 +584,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
       it('should return 404 on missing id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
@@ -544,6 +596,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(404)
             .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
       it('should return 404 on other id', () =>
         Promise
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
@@ -557,6 +610,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect(404)
               .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
@@ -638,6 +692,7 @@ describe('controllers', function () {
                 .then((invitations) => {
                   invitations.should.have.length(1)
                 })))))
+
       it('should add existing user instead of create invitation', () =>
         dbUtils.populateLaundries(1)
           .then(({user, token, laundry}) =>

@@ -59,11 +59,6 @@ class LaundrySettingsForm extends ValueUpdater {
     return ['', this.props.laundry.name]
   }
 
-  get timezoneErrorValues () {
-    if (this.state.values.name !== this.props.laundry.name) return []
-    return ['', this.props.laundry.timezone]
-  }
-
   render () {
     return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
       {this.state.notion ? <div
@@ -87,66 +82,6 @@ class LaundrySettingsForm extends ValueUpdater {
 }
 
 LaundrySettingsForm.propTypes = {
-  laundry: React.PropTypes.object.isRequired
-}
-
-class LaundryBookingFormatForm extends ValueUpdater {
-
-  constructor (props) {
-    super(props)
-    this.onSubmit = (evt) => {
-      evt.preventDefault()
-      this.setState({loading: true})
-      sdk.laundry(this.props.laundry.id)
-        .updateLaundry({timezone: this.state.values.timezone})
-        .then(() => this.setState({loading: false, notion: null}))
-        .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
-    }
-  }
-
-  errorToMessage ({status, message}) {
-    switch (status) {
-      case 400:
-        return 'Invalid timezone'
-      default:
-        return message
-    }
-  }
-
-  get initialValues () {
-    return {
-      timezone: this.props.laundry.timezone
-    }
-  }
-
-  componentWillReceiveProps ({laundry}) {
-    if (laundry.name === this.props.laundry.timezone) return
-    this.reset({values: {timezone: laundry.timezone}})
-  }
-
-  generateErrorMessage () {
-    return this.state.values.timezone.trim() ? 'Please enter a new timezone' : 'Please enter a timezone'
-  }
-
-  render () {
-    return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
-      {this.state.notion ? <div
-        className={'notion ' + (this.state.notion.success ? 'success' : 'error')}>{this.state.notion.message}</div> : null }
-      <ValidationElement
-        sesh={this.state.sesh} value={this.state.values.timezone} nonEmpty
-        trim>
-        <label data-validate-error={this.generateErrorMessage()}>
-          <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
-        </label>
-      </ValidationElement>
-      <div className='buttons'>
-        <input type='submit' value='Update'/>
-      </div>
-    </ValidationForm>
-  }
-}
-
-LaundryBookingFormatForm.propTypes = {
   laundry: React.PropTypes.object.isRequired
 }
 
@@ -232,6 +167,246 @@ LeaveLaundry.propTypes = {
   laundry: React.PropTypes.object.isRequired,
   user: React.PropTypes.object.isRequired
 }
+class Switch extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.onClick = () => this.props.onChange(!this.isOn)
+  }
+
+  get isOn () {
+    return Boolean(this.props.on)
+  }
+
+  render () {
+    return <div
+      onClick={this.onClick}
+      className={'switch ' + (this.isOn ? 'on' : 'off')}/>
+  }
+}
+
+Switch.propTypes = {
+  on: React.PropTypes.bool,
+  onChange: React.PropTypes.func.isRequired
+}
+
+function timeStringToMinutes (time) {
+  const obj = timeStringToObject(time)
+  if (!obj) return 0
+  return obj.hour * 60 + obj.minute
+}
+
+function timeStringToObject (time) {
+  const timeMatch = time.match(/^(\d+):(\d+)$/)
+  if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return undefined
+  return {hour: parseInt(timeMatch[1]), minute: parseInt(timeMatch[2])}
+}
+
+function objectToTimeString ({hour, minute}) {
+  return `${hour}:${minute < 10 ? `0${minute}` : minute}`
+}
+
+const bookingRulesDefaultValues = {
+  timeLimitFrom: '0:00',
+  timeLimitTo: '24:00',
+  dailyLimit: 10,
+  limit: 100
+}
+
+function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
+  const laundryValues = {
+    timeLimitEnable: false,
+    dailyLimitEnable: false,
+    limitEnable: false
+  }
+  if (dailyLimit !== undefined) {
+    laundryValues.dailyLimitEnable = true
+    laundryValues.dailyLimit = dailyLimit
+  }
+  if (limit !== undefined) {
+    laundryValues.limitEnable = true
+    laundryValues.limit = limit
+  }
+  if (timeLimit) {
+    laundryValues.timeLimitEnable = true
+    laundryValues.timeLimitFrom = objectToTimeString(timeLimit.from)
+    laundryValues.timeLimitTo = objectToTimeString(timeLimit.to)
+  }
+  return Object.assign({}, bookingRulesDefaultValues, laundryValues)
+}
+
+class BookingRules extends ValueUpdater {
+
+  constructor (props) {
+    super(props)
+    this.timeMap = timeString => {
+      const time = timeString.match(/(\d+)(?::(\d\d))?\s*(p?)/)
+      if (!time) return '0:00'
+      const hours = Math.max(Math.min(parseInt(time[1]) + (time[3] ? 12 : 0), 24), 0)
+      const minutes = Math.max(Math.min(parseInt(time[2]) || 0, 60), 0)
+      const roundMinutes = minutes - minutes % 30
+      return `${hours}:${roundMinutes < 10 ? `0${roundMinutes}` : roundMinutes}`
+    }
+    this.numberMap = number => {
+      const int = parseInt(number)
+      return isNaN(int) ? 0 : Math.max(int, 0)
+    }
+    this.fromToValidator = ({from, to}) => timeStringToMinutes(to) > timeStringToMinutes(from)
+    this.validateValues = ({
+      timeLimitEnable,
+      dailyLimitEnable,
+      limitEnable,
+      timeLimitFrom,
+      timeLimitTo,
+      dailyLimit,
+      limit
+    }) => {
+      const values = this.initialValues
+      return timeLimitEnable !== values.timeLimitEnable ||
+        dailyLimitEnable !== values.dailyLimitEnable ||
+        limitEnable !== values.limitEnable ||
+        timeLimitFrom !== values.timeLimitFrom ||
+        timeLimitTo !== values.timeLimitTo ||
+        dailyLimit !== values.dailyLimit ||
+        limit !== values.limit
+    }
+    this.handleSubmit = evt => {
+      evt.preventDefault()
+      this.submit()
+    }
+  }
+
+  compareRules ({limit, dailyLimit, timeLimit}) {
+    const oldRules = this.props.laundry.rules
+    if (limit !== oldRules.limit) return false
+    if (dailyLimit !== oldRules.dailyLimit) return false
+    if (timeLimit === oldRules.timeLimit) return true
+    if (!timeLimit) return false
+    if (!oldRules.timeLimit) return false
+    if (timeLimit.from.hour !== oldRules.timeLimit.from.hour) return false
+    if (timeLimit.from.minute !== oldRules.timeLimit.from.minute) return false
+    if (timeLimit.to.hour !== oldRules.timeLimit.to.hour) return false
+    return timeLimit.to.minute === oldRules.to.minute
+  }
+
+  componentWillReceiveProps ({laundry: {rules}}) {
+    if (this.compareRules(rules)) return
+    this.reset({values: rulesToInitialValues(rules)})
+  }
+
+  submit () {
+    sdk.laundry(this.props.laundry.id).updateLaundry({rules: this.rules})
+  }
+
+  get rules () {
+    const ruleObject = {}
+    if (this.state.values.limitEnable) {
+      ruleObject.limit = this.state.values.limit
+    }
+    if (this.state.values.dailyLimitEnable) {
+      ruleObject.dailyLimit = this.state.values.dailyLimit
+    }
+    if (this.state.values.timeLimitEnable) {
+      ruleObject.timeLimit = {
+        from: timeStringToObject(this.state.values.timeLimitFrom),
+        to: timeStringToObject(this.state.values.timeLimitTo)
+      }
+    }
+    return ruleObject
+  }
+
+  get initialValues () {
+    return rulesToInitialValues(this.props.laundry.rules)
+  }
+
+  generateSwitchUpdater (name) {
+    const f = this.generateValueUpdater(name)
+    return value => {
+      if (value) return f(value)
+      switch (name) {
+        case 'limitEnable':
+          const {limit} = bookingRulesDefaultValues
+          this.updateValue({limit})
+          break
+        case 'timeLimitEnable':
+          const {timeLimitFrom, timeLimitTo} = bookingRulesDefaultValues
+          this.updateValue({timeLimitFrom, timeLimitTo})
+          break
+        case 'dailyLimitEnable':
+          const {dailyLimit} = bookingRulesDefaultValues
+          this.updateValue({dailyLimit})
+          break
+      }
+      return f(value)
+    }
+  }
+
+  render () {
+    return <ValidationForm id='BookingRules' onSubmit={this.handleSubmit}>
+      <ValidationElement
+        validator={this.validateValues}
+        value={this.state.values}/>
+      <div className='rule'>
+        <ValidationElement value={this.state.values.timeLimitEnable ? 'on' : 'off'}>
+          <Switch
+            on={this.state.values.timeLimitEnable}
+            onChange={this.generateSwitchUpdater('timeLimitEnable')}/>
+        </ValidationElement>
+        <div className={'ruleText ' + (this.state.values.timeLimitEnable ? 'on' : 'off')}>
+          Bookings must be between{' '}
+          <ValidationElement
+            validator={this.fromToValidator}
+            value={{from: this.state.values.timeLimitFrom, to: this.state.values.timeLimitTo}}/>
+          <input
+            type='text'
+            value={this.state.values.timeLimitFrom}
+            onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
+            onChange={this.generateValueUpdater('timeLimitFrom')}/>
+          {' '}and{' '}
+          <input
+            onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
+            type='text' value={this.state.values.timeLimitTo}
+            onChange={this.generateValueUpdater('timeLimitTo')}/>
+        </div>
+      </div>
+      <div className='rule'>
+        <ValidationElement value={this.state.values.dailyLimitEnable ? 'on' : 'off'}>
+          <Switch
+            on={this.state.values.dailyLimitEnable}
+            onChange={this.generateSwitchUpdater('dailyLimitEnable')}/>
+        </ValidationElement>
+        <div className={'ruleText ' + (this.state.values.dailyLimitEnable ? 'on' : 'off')}>
+          Maximum{' '}
+          <input
+            onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
+            type='text' value={this.state.values.dailyLimit}
+            onChange={this.generateValueUpdater('dailyLimit')}/> hour of bookings per day
+        </div>
+      </div>
+      <div className='rule'>
+        <ValidationElement value={this.state.values.limitEnable ? 'on' : 'off'}>
+          <Switch
+            on={this.state.values.limitEnable}
+            onChange={this.generateSwitchUpdater('limitEnable')}/>
+        </ValidationElement>
+        <div className={'ruleText ' + (this.state.values.limitEnable ? 'on' : 'off')}>
+          Maximum{' '}
+          <input
+            onBlur={this.generateValueMapper('limit', this.numberMap)}
+            type='text' value={this.state.values.limit}
+            onChange={this.generateValueUpdater('limit')}/> hour of bookings
+        </div>
+      </div>
+      <div className='buttonContainer'>
+        <button>Update</button>
+      </div>
+    </ValidationForm>
+  }
+}
+
+BookingRules.propTypes = {
+  laundry: React.PropTypes.object.isRequired
+}
 
 class LaundrySettings extends React.Component {
 
@@ -245,6 +420,10 @@ class LaundrySettings extends React.Component {
       <section>
         <h2>Change name or timezone</h2>
         <LaundrySettingsForm laundry={this.laundry}/>
+      </section>
+      <section>
+        <h2>Booking rules</h2>
+        <BookingRules laundry={this.laundry}/>
       </section>
       <section>
         <h2>Delete laundry</h2>

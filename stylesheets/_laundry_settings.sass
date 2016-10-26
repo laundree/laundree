@@ -7,3 +7,40 @@
       width: 21em
   section
     padding: 1em 0
+
+  #BookingRules
+    padding-top: 1em
+    .rule
+      padding: 1em 0
+      height: 2em
+      line-height: 2em
+      .ruleText
+        position: relative
+        input
+          display: inline-block
+          padding: 0
+          width: 4em
+          text-align: center
+          background: transparent
+          border-bottom: 0.1em solid #438f90
+          border-radius: 0
+          font-size: 1em
+          &:focus
+            +box-shadow(0 0 0 0)
+        &.off
+          +user-select(none)
+          &:after
+            z-index: 1
+            position: absolute
+            top: 0
+            left: 0
+            right: 0
+            bottom: 0
+            background: rgba(102, 211, 211, 0.7)
+            content: ''
+      .switch
+        position: relative
+        z-index: 2
+        display: block
+        margin: 0.2em 1em 0.2em 0
+        float: left

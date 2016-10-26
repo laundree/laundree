@@ -699,6 +699,27 @@ paths:
             properties:
               name:
                 type: string
+              timezone:
+                type: string
+              rules:
+                properties:
+                  limit:
+                    type: number
+                    format: int32
+                    minimum: 0
+                  dailyLimit:
+                    type: number
+                    format: int32
+                    minimum: 0
+                  timeLimit:
+                    required:
+                      - from
+                      - to
+                    properties:
+                      from:
+                        $ref: "#/definitions/Time"
+                      to:
+                        $ref: "#/definitions/Time"
       responses:
         "204":
           description: Success
@@ -1558,6 +1579,18 @@ definitions:
         type: integer
       day:
         type: integer
+      hour:
+        type: integer
+      minute:
+        type: integer
+        enum:
+          - 0
+          - 30
+  Time:
+    required:
+      - hour
+      - minute
+    properties:
       hour:
         type: integer
       minute:

@@ -14,6 +14,10 @@ const config = require('config')
 const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
 const moment = require('moment-timezone')
 
+function objToMintues ({hour, minute}) {
+  return hour * 60 + minute
+}
+
 class LaundryHandler extends Handler {
 
   /**
@@ -274,10 +278,11 @@ class LaundryHandler extends Handler {
     })
   }
 
-  updateLaundry ({name, timezone}) {
-    debug('Updating name')
+  updateLaundry ({name, timezone, rules}) {
+    debug('Updating laundry')
     if (name) this.model.name = name
     if (timezone) this.model.timezone = timezone
+    if (rules) this.model.rules = rules
     return this.save()
   }
 
@@ -354,6 +359,91 @@ class LaundryHandler extends Handler {
     return this.model.timezone || config.get('timezone')
   }
 
+  get rules () {
+    const obj = this.model.rules.toObject()
+    if (
+      Object.keys(obj.timeLimit.from).length === 0 ||
+      Object.keys(obj.timeLimit.to).length === 0
+    ) {
+      delete obj.timeLimit
+    }
+    return obj
+  }
+
+  /**
+   * Check given times against time-limit
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} from
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
+   * @returns {boolean}
+   */
+  checkTimeLimit (from, to) {
+    const {
+      from: currentFrom,
+      to: currentTo
+    } = this.model.rules.timeLimit
+    if (currentFrom.hour === undefined || currentFrom.minute === undefined || currentTo.hour === undefined || currentTo.minute === undefined) return true
+    return objToMintues(from) >= objToMintues(currentFrom) && objToMintues(to) <= objToMintues(currentTo)
+  }
+
+  /**
+   * Check given times against daily limit
+   * @param {UserHandler} owner
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} from
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
+   * @returns {boolean}
+   */
+  checkDailyLimit (owner, from, to) {
+    if (this.model.rules.dailyLimit === undefined) return Promise.resolve(true)
+    const {day, month, year} = from
+    return BookingHandler
+      .find({
+        laundry: this.model._id,
+        owner: owner.model._id,
+        from: {$lt: this.dateFromObject({day: day + 1, month, year})},
+        to: {$gt: this.dateFromObject({day, month, year})}
+      })
+      .then(bookings => this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from)))
+      .then(sum => sum <= this.model.rules.dailyLimit * 60)
+  }
+
+  /**
+   * Check given times against limit
+   * @param {UserHandler} owner
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} from
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
+   * @returns {boolean}
+   */
+  checkLimit (owner, from, to) {
+    if (this.model.rules.limit === undefined) return Promise.resolve(true)
+    return BookingHandler
+      .find({
+        laundry: this.model._id,
+        owner: owner.model._id,
+        from: {$gt: new Date()}
+      })
+      .then(bookings => this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from)))
+      .then(sum => sum <= this.model.rules.limit * 60)
+  }
+
+  _countBookingTimes (bookings, offset = 0) {
+    return bookings
+      .map(({model: {from, to}}) => ({
+        from: this.dateToObject(from),
+        to: this.dateToObject(to)
+      }))
+      .reduce((sum, {from, to}) => sum + objToMintues(to) - objToMintues(from), offset)
+  }
+
+  /**
+   * Check if given times are the same day wrt. the timezone of the laundry
+   * @param d1
+   * @param d2
+   * @returns {boolean}
+   */
+  isSameDay (d1, d2) {
+    return moment.tz(d1, this.timezone).format('YYYY-MM-DD') === moment.tz(d2, this.timezone).format('YYYY-MM-DD')
+  }
+
   get reduxModel () {
     return {
       id: this.model.id,
@@ -363,7 +453,8 @@ class LaundryHandler extends Handler {
       owners: this.ownerIds,
       invites: this.inviteIds,
       timezone: this.timezone,
-      demo: this.model.demo
+      demo: this.model.demo,
+      rules: this.rules
     }
   }
 

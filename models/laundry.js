@@ -11,6 +11,14 @@ const laundrySchema = new Schema({
   users: [{type: Schema.Types.ObjectId, ref: 'User'}],
   invites: [{type: Schema.Types.ObjectId, ref: 'LaundryInvitation'}],
   demo: {type: Boolean, default: false},
+  rules: {
+    limit: Number,
+    dailyLimit: Number,
+    timeLimit: {
+      from: {hour: Number, minute: Number},
+      to: {hour: Number, minute: Number}
+    }
+  },
   timezone: {type: String}
 }, {timestamps: true})
 

@@ -1,6 +1,8 @@
 const {LaundryHandler, UserHandler} = require('../../handlers')
 const {api, mail} = require('../../utils')
 const moment = require('moment-timezone')
+const Promise = require('promise')
+
 /**
  * Created by budde on 02/06/16.
  */
@@ -54,26 +56,55 @@ function createDemoLaundry (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function sanitizeBody ({timezone, name, rules}) {
+  const updateObject = {}
+  if (timezone && timezone.trim()) {
+    updateObject.timezone = timezone.trim()
+  }
+  if (name && name.trim()) {
+    updateObject.name = name.trim()
+  }
+  if (rules) {
+    updateObject.rules = rules
+  }
+  return updateObject
+}
+
+function timeToMinutes ({hour, minute}) {
+  return hour * 60 + minute
+}
+
+function validateBody (res, laundry, body) {
+  const {timezone, rules, name} = body
+  if (timezone && moment.tz.names().indexOf(timezone) < 0) {
+    api.returnError(res, 400, 'Invalid timezone')
+    return undefined
+  }
+  if (rules && rules.timeLimit && timeToMinutes(rules.timeLimit.from) >= timeToMinutes(rules.timeLimit.to)) {
+    api.returnError(res, 400, 'From must be before to')
+    return undefined
+  }
+  if (!name || name === laundry.model.name) return body
+  LaundryHandler
+    .find({name})
+    .then(([l]) => {
+      if (l) {
+        api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
+        return undefined
+      }
+      return body
+    })
+  return body
+}
+
 function updateLaundry (req, res) {
   const {laundry} = req.subjects
-  let {name = '', timezone = ''} = req.swagger.params.body.value
-  name = name.trim()
-  timezone = timezone.trim()
-  if (timezone === laundry.model.timezone) timezone = ''
-  if (timezone && moment.tz.names().indexOf(timezone) < 0) {
-    return api.returnError(res, 400, 'Invalid timezone')
-  }
-  if (!name || laundry.model.name === name) {
-    return laundry.updateLaundry({timezone})
-      .then(() => api.returnSuccess(res))
-      .catch(api.generateErrorHandler(res))
-  }
-  return LaundryHandler
-    .find({name: name})
-    .then(([l]) => {
-      if (l) return api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
-      return laundry.updateLaundry({timezone, name})
-        .then(() => api.returnSuccess(res))
+  let body = req.swagger.params.body.value
+  Promise
+    .resolve(validateBody(res, laundry, sanitizeBody(body)))
+    .then(result => {
+      if (!result) return
+      return laundry.updateLaundry(result).then(() => api.returnSuccess(res))
     })
     .catch(api.generateErrorHandler(res))
 }
@@ -98,8 +129,14 @@ function inviteUserByEmail (req, res) {
   return laundry
     .inviteUserByEmail(email)
     .then(({user, invite}) => {
-      if (user) return mail.sendEmail({email, laundry: laundry.model, user: user.model}, 'invite-user', email)
-      if (invite) return mail.sendEmail({email, laundry: laundry.model}, 'invite', email)
+      if (user) {
+        return mail.sendEmail({
+          email,
+          laundry: laundry.model.toObject(),
+          user: user.model.toObject()
+        }, 'invite-user', email)
+      }
+      if (invite) return mail.sendEmail({email, laundry: laundry.model.toObject()}, 'invite', email)
     })
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))

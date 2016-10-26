@@ -14,6 +14,7 @@ const debug = require('debug')('laundree.utils.mail')
  * @return {Promise.<{html:string, text: string, subject:string}>}
  */
 function render (data, template) {
+  debug('Rendering email')
   var t = new EmailTemplate(path.join(__dirname, '..', 'email-templates', template))
   return t.render(data)
 }
@@ -59,11 +60,12 @@ function sendRenderedEmail (to, content, from, transporter) {
  * @returns {Promise}
  */
 function sendEmail (data, template, to, from = config.get('emails.from'), transporter = standardTransporter) {
+  debug(`Sending email to ${to}`)
   return render(data, template).then((rendered) => sendRenderedEmail(to, rendered, from, transporter))
 }
 
 module.exports = {
-  render: render,
-  sendRenderedEmail: sendRenderedEmail,
-  sendEmail: sendEmail
+  render,
+  sendRenderedEmail,
+  sendEmail
 }

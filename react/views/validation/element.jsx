@@ -26,7 +26,7 @@ class ValidationElement extends React.Component {
 
   reset () {
     this.setState(this.initialState)
-    this.handle(false, true)
+    this.handle(this.validate(), true)
   }
 
   componentWillReceiveProps (props) {
@@ -60,6 +60,7 @@ class ValidationElement extends React.Component {
 
   render () {
     const valid = this.validate()
+    if (!this.props.children) return null
     const child = React.Children.only(this.props.children)
     return React.cloneElement(child, {
       className: (child.props.className || '') + (valid ? '' : ' invalid') +
@@ -83,7 +84,7 @@ ValidationElement.propTypes = {
   nonEmpty: React.PropTypes.bool,
   password: React.PropTypes.bool,
   email: React.PropTypes.bool,
-  value: React.PropTypes.string.isRequired,
+  value: React.PropTypes.any.isRequired,
   validator: React.PropTypes.func
 }
 
