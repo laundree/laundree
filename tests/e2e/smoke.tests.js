@@ -7,51 +7,51 @@ module.exports = {
   'Can load front page': client =>
     client
       .url(client.launch_url)
-      .waitForElementVisible('#QuickStart', timeout)
+      .waitForElementPresent('#QuickStart', timeout)
       .end(),
   'Can load about page': client =>
     client
       .url(client.launch_url)
       .click('#TopNav a.about')
-      .waitForElementVisible('#About', timeout)
+      .waitForElementPresent('#About', timeout)
       .end(),
   'Can load contact page': client =>
     client
       .url(client.launch_url)
       .click('#TopNav a.contact')
-      .waitForElementVisible('#Contact', timeout)
+      .waitForElementPresent('#Contact', timeout)
       .end(),
   'Can load auth page': client =>
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementVisible('#Auth', timeout)
+      .waitForElementPresent('#Auth', timeout)
       .waitForElementNotPresent('#TopNav', timeout)
       .end(),
   'Can load forgot page': client =>
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementVisible('#Auth', timeout)
+      .waitForElementPresent('#Auth', timeout)
       .click('#Auth a.forgot')
-      .waitForElementVisible('#ForgotPassword', timeout)
+      .waitForElementPresent('#ForgotPassword', timeout)
       .end(),
   'Can load sign-up page': client =>
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementVisible('#Auth', timeout)
+      .waitForElementPresent('#Auth', timeout)
       .click('#Auth div.forgot div:last-of-type a')
-      .waitForElementVisible('#Auth input[name=email]', timeout)
-      .waitForElementVisible('#Auth input[name=name]', timeout)
-      .waitForElementVisible('#Auth input[name=password]', timeout)
+      .waitForElementPresent('#Auth input[name=email]', timeout)
+      .waitForElementPresent('#Auth input[name=name]', timeout)
+      .waitForElementPresent('#Auth input[name=password]', timeout)
       .end(),
   'Can load front page from auth': client =>
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementVisible('#Auth', timeout)
+      .waitForElementPresent('#Auth', timeout)
       .click('a#Logo')
-      .waitForElementVisible('#TopNav', timeout)
+      .waitForElementPresent('#TopNav', timeout)
       .end()
 }
