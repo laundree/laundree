@@ -1,12 +1,12 @@
 const request = require('supertest')
-const app = require('../../../app').app
+const app = require('../../../../app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {LaundryHandler, LaundryInvitationHandler, UserHandler, BookingHandler} = require('../../../handlers')
-const dbUtils = require('../../db_utils')
+const {LaundryHandler, LaundryInvitationHandler, UserHandler, BookingHandler} = require('../../../../handlers')
+const dbUtils = require('../../../db_utils')
 const Promise = require('promise')
 
 describe('controllers', function () {

@@ -6,7 +6,7 @@ var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
-var dbUtils = require('../db_utils')
+var dbUtils = require('../../db_utils')
 var clearDb = dbUtils.clearDb
 
 describe('handlers', () => {

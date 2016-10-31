@@ -1,7 +1,7 @@
 const chai = require('chai')
 chai.should()
-const {EventHandler} = require('../../handlers')
-const dbUtils = require('../db_utils')
+const {EventHandler} = require('../../../handlers')
+const dbUtils = require('../../db_utils')
 
 describe('handlers', function () {
   this.timeout(10000)

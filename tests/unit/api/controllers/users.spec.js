@@ -1,12 +1,12 @@
 var request = require('supertest-as-promised')
-var app = require('../../../app').app
+var app = require('../../../../app').app
 var chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 
-var dbUtils = require('../../db_utils')
-const {UserHandler, TokenHandler} = require('../../../handlers')
+var dbUtils = require('../../../db_utils')
+const {UserHandler, TokenHandler} = require('../../../../handlers')
 const Promise = require('promise')
 
 describe('controllers', function () {
@@ -71,7 +71,7 @@ describe('controllers', function () {
                   }))))
 
       it('should find user 3', () => {
-        const UserModel = require('../../../models/user')
+        const UserModel = require('../../../../models/user')
         return new UserModel({
           updatedAt: new Date('2016-09-23T06:39:16.495Z'),
           createdAt: new Date('2016-09-23T06:37:49.206Z'),

@@ -9,7 +9,7 @@ const Promise = require('promise')
 
 function clearDb () {
   return new Promise((resolve, reject) => {
-    mongoose.connection.db.dropDatabase((err) => {
+    mongoose.connection.dropDatabase(err => {
       if (err) return reject(err)
       resolve()
     })
