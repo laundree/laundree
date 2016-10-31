@@ -6,8 +6,8 @@ var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
-var clearDb = require('../db_utils').clearDb
-var UserModel = require('../../models').UserModel
+var clearDb = require('../../db_utils').clearDb
+var UserModel = require('../../../models').UserModel
 
 describe('models', () => {
   describe('UserModel', function () {

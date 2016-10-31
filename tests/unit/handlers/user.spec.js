@@ -6,9 +6,9 @@ var chai = require('chai')
 var chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
-var dbUtils = require('../db_utils')
+var dbUtils = require('../../db_utils')
 var clearDb = dbUtils.clearDb
-var {UserHandler, LaundryInvitationHandler, LaundryHandler} = require('../../handlers')
+var {UserHandler, LaundryInvitationHandler, LaundryHandler} = require('../../../handlers')
 var assert = chai.assert
 
 describe('handlers', () => {

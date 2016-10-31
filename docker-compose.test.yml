@@ -5,6 +5,8 @@ services:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URL=mongodb://mongo/test
+      - SAUCE_LABS_USERNAME
+      - SAUCE_LABS_ACCESS_KEY
     build: .
     links:
       - redis

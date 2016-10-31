@@ -1,11 +1,11 @@
 const request = require('supertest-as-promised')
-const app = require('../../../app').app
+const app = require('../../../../app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 
-const dbUtils = require('../../db_utils')
+const dbUtils = require('../../../db_utils')
 
 describe('controllers', function () {
   this.timeout(10000)

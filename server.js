@@ -26,6 +26,7 @@ module.exports = app.promise.then((app) => {
     server.on('error', onError)
     server.on('listening', () => onListening(server))
     socketIoSetup(server)
+    return server
   }
 })
 

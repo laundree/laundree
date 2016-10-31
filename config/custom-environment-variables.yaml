@@ -29,6 +29,10 @@ session:
 codeClimate:
   repoToken: 'CODECLIMATE_REPO_TOKEN'
 
+sauceLabs:
+  username: 'SAUCE_LABS_USERNAME'
+  accessKey: 'SAUCE_LABS_ACCESS_KEY'
+
 mailer:
   smtp:
     transport: 'MAILER_SMTP_TRANSPORT'

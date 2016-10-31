@@ -2,7 +2,7 @@
  * Created by budde on 15/05/16.
  */
 
-const mail = require('../../utils').mail
+const mail = require('../../../utils').mail
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()
