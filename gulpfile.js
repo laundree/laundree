@@ -18,7 +18,7 @@ const sauceConnectLauncher = require('sauce-connect-launcher')
 const nightwatch = require('nightwatch')
 
 gulp.task('lint', function () {
-  return gulp.src(['{api,bin,client,email-templates,handlers,models,public,react,redux,routes,tests,utils,views}/**/*.{js,jsx}', '*.js'])
+  return gulp.src(['{api,bin,client,email-templates,handlers,models,public,routes,tests,utils,views}/**/*.{js,jsx}', '*.js'])
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
