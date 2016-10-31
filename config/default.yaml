@@ -37,6 +37,7 @@ opbeat:
 sauceLabs:
   username: 'sauceUsername'
   accessKey: 'sauceKey'
+  timeout: 60000
 
 facebook:
   appId: '0000000000000000'
