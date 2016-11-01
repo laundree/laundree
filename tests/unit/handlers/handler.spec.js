@@ -4,7 +4,7 @@
 const Promise = require('promise')
 const chai = require('chai')
 chai.should()
-const Handler = require('../../handlers/handler')
+const Handler = require('../../../handlers/handler')
 
 describe('handlers', () => {
   describe('Handler', () => {

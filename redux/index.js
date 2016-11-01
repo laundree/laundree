@@ -15,13 +15,13 @@ function mapFlash (flashArray, type) {
 
 function fetchLaundries (currentUser, url) {
   if (!currentUser.isAdmin) return currentUser.fetchLaundries().then(actions.listLaundries)
-  return fetchInstance(url, /\/laundries\/([^\/]+)/, LaundryHandler)
+  return fetchInstance(url, /\/laundries\/([^/]+)/, LaundryHandler)
     .then(laundry => laundry ? [actions.listLaundries([laundry])] : [])
 }
 
 function fetchUsers (currentUser, url) {
   if (!currentUser.isAdmin) return Promise.resolve([])
-  return fetchInstance(url, /\/users\/([^\/]+)/, UserHandler)
+  return fetchInstance(url, /\/users\/([^/]+)/, UserHandler)
     .then(user => {
       if (!user) return []
       return user.fetchLaundries().then(ls => [actions.listUsers([user]), actions.listLaundries(ls)])
