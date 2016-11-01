@@ -48,7 +48,7 @@
     "reactify": "^1.1.1",
     "redis": "^2.6.2",
     "redux": "^3.5.2",
-    "redux-actions": "^0.12.0",
+    "redux-actions": "^0.13.0",
     "socket.io": "^1.4.5",
     "socket.io-client": "^1.4.5",
     "superagent": "^2.1.0",
