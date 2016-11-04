@@ -1,4 +1,4 @@
-FROM node:6
+FROM laundree/laundree_base:latest
 MAINTAINER Christian Budde Christensen <budde377@gmail.com>
 ENV PORT 3000
 ENV REDIS_HOST 'redis'
@@ -13,14 +13,11 @@ ENV GOOGLE_CALLBACK_URL ''
 ENV SESSION_SECRET ''
 ENV CODECLIMATE_REPO_TOKEN ''
 EXPOSE 3000
-RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | bash && \
-    apt-get install git-lfs && \
-    git lfs install
-RUN adduser --disabled-password --gecos "" laundree
-COPY . /opt/laundree
-WORKDIR /opt/laundree
-RUN chown -R laundree:laundree /opt/laundree
+ADD package.json package.json
+RUN npm install
+ADD . .
+RUN chown -R laundree:laundree .
 USER laundree
-RUN git remote set-url origin https://github.com/laundree/laundree && git lfs pull && npm install
+RUN git remote set-url origin https://github.com/laundree/laundree && git lfs pull
 CMD ["start"]
 ENTRYPOINT ["npm"]

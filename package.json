@@ -95,8 +95,7 @@
   },
   "scripts": {
     "test": "./node_modules/.bin/gulp test",
-    "start": "./bin/www",
-    "install": "./node_modules/.bin/gulp build"
+    "start": "./bin/www"
   },
   "repository": {
     "type": "git",
