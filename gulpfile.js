@@ -189,6 +189,13 @@ gulp.task('test:e2e-local', done => {
     done)
 })
 
+gulp.task('test:e2e-docker', done => {
+  runSequence(
+    'db:clean',
+    'nightwatch:run-local',
+    done)
+})
+
 gulp.task('test:e2e-local-coverage', done => {
   runSequence(
     'coverage:instrument',
@@ -203,16 +210,16 @@ gulp.task('test:e2e-local-coverage', done => {
     done)
 })
 
-gulp.task('test', (done) => {
-  runSequence('lint', 'coverage:instrument', 'test:unit', 'test:e2e', 'coverage:report', 'coverage:send', 'exit', done)
-})
+gulp.task('test', (done) => runSequence('lint', 'coverage:instrument', 'test:unit', 'test:e2e', 'coverage:report', 'coverage:send', exit(done)))
 
-gulp.task('exit', (done) => {
-  setTimeout(() => {
-    done()
+gulp.task('test:docker', (done) => runSequence('lint', 'coverage:instrument', 'test:unit', 'test:e2e-docker', 'coverage:report', 'coverage:send', exit(done)))
+
+function exit (cb) {
+  return err => setTimeout(() => {
+    cb(err)
     process.exit(0)
   }, 1000)
-})
+}
 
 gulp.task('build', function () {
   process.env.NODE_ENV = 'production'
