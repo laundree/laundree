@@ -1,18 +1,25 @@
 version: '2'
 services:
-  sut:
+  base:
+    build: ./images/base
+    image: laundree/laundree_base
+  web:
     environment:
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URL=mongodb://mongo/test
-      - SAUCE_LABS_USERNAME
-      - SAUCE_LABS_ACCESS_KEY
+      - SELENIUM_HOST=selenium
+      - NIGHTWATCH_LAUNCH_URL=http://web:3000/
     build: .
     links:
       - redis
       - mongo
-    command: 'test'
+      - selenium
+    entrypoint: './node_modules/.bin/gulp'
+    command: 'server:start'
   redis:
     image: redis
   mongo:
     image: mongo
+  selenium:
+    image: selenium/standalone-chrome

@@ -1,5 +1,8 @@
 version: '2'
 services:
+  base:
+    build: ./images/base
+    image: laundree/laundree_base
   web:
     environment:
       - REDIS_HOST=redis
