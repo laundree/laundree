@@ -470,17 +470,19 @@ describe('controllers', function () {
       it('should succeed when administrator', () =>
         Promise
           .all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
-          .then(([{laundries}, {user, token}]) =>
-            request(app)
-              .put(`/api/laundries/${laundries[0].model.id}`)
+          .then(([{laundry}, {user, token}]) => {
+            const name = `${laundry.model.name} 2`
+            return request(app)
+              .put(`/api/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
-              .send({name: 'L1'})
+              .send({name})
               .expect(204)
               .then(() => LaundryHandler
-                .findFromId(laundries[0].model.id)
-                .then(laundry => laundry.model.name.should.equal('L1')))))
+                .findFromId(laundry.model.id)
+                .then(laundry => laundry.model.name.should.equal(name)))
+          }))
 
       it('should succeed same name', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
