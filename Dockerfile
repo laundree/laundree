@@ -1,4 +1,4 @@
-FROM laundree/laundree_base:latest
+FROM laundree/base:latest
 MAINTAINER Christian Budde Christensen <budde377@gmail.com>
 ENV PORT 3000
 ENV REDIS_HOST 'redis'
