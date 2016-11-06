@@ -14,7 +14,7 @@ class Forgot extends ValueUpdater {
     this.submitHandler = (evt) => {
       this.setState({loading: true})
       evt.preventDefault()
-      return sdk.user.forgotPassword(this.state.values.email)
+      return sdk.user.forgotPassword(this.state.values.email.toLowerCase())
         .then(
           () =>
             this.reset({

@@ -228,9 +228,9 @@ class UserHandler extends Handler {
    */
   verifyEmail (email, token) {
     email = email.toLowerCase()
-    const storedToken = this.model.explicitVerificationEmailTokens.find((element) => element.email === email)
+    const storedToken = this.model.explicitVerificationEmailTokens.find(element => element.email === email)
     if (!storedToken) return Promise.resolve(false)
-    return utils.password.comparePassword(token, storedToken.hash).then((result) => {
+    return utils.password.comparePassword(token, storedToken.hash).then(result => {
       if (!result) return false
       this.model.explicitVerificationEmailTokens = this.model.explicitVerificationEmailTokens
         .filter((element) => element.email !== email)
