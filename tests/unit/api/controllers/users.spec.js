@@ -321,6 +321,17 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => res.body.should.be.deep.equal([users[5].toRestSummary()]))))
+
+      it('should allow email filter case insensitive', () =>
+        dbUtils.populateUsers(10).then((users) =>
+          request(app)
+            .get('/api/users')
+            .query({email: users[5].model.emails[0].toUpperCase()})
+            .set('Accept', 'application/json')
+            .expect('Content-Type', /json/)
+            .expect('Link', /rel=.first./)
+            .expect(200)
+            .then(res => res.body.should.be.deep.equal([users[5].toRestSummary()]))))
     })
 
     describe('POST /api/users', () => {

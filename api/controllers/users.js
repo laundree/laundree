@@ -16,7 +16,7 @@ function listUsers (req, res) {
   var email = req.swagger.params.email.value
   var limit = req.swagger.params.page_size.value
   if (email) {
-    filter['profiles.emails.value'] = email
+    filter['profiles.emails.value'] = email.toLowerCase()
   }
   var since = req.swagger.params.since.value
   if (since) {

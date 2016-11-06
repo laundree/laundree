@@ -71,5 +71,29 @@ module.exports = {
       .submitForm('#ForgotPassword')
       .waitForElementVisible('#ForgotPassword .notion.error', timeout)
       .end()
+  },
+  'Can sign-up': client => {
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    const name = faker.name.findName()
+    console.log(name, email, password)
+    client
+      .url(client.launch_url)
+      .click('#TopNav a.log-in')
+      .waitForElementPresent('#SignIn', timeout)
+      .click('#SignIn div.forgot div:last-of-type a')
+      .waitForElementPresent('#Auth form', timeout)
+      .setValue('#Auth form label:nth-of-type(1) input', name)
+      .setValue('#Auth form label:nth-of-type(2) input', email)
+      .setValue('#Auth form label:nth-of-type(3) input', password)
+      .submitForm('#Auth form')
+      .waitForElementVisible('#Auth form .notion.success', timeout)
+      .setValue('#Auth form label:nth-of-type(1) input', name)
+      .setValue('#Auth form label:nth-of-type(2) input', email)
+      .setValue('#Auth form label:nth-of-type(3) input', password)
+      .submitForm('#Auth form')
+      .waitForElementVisible('#Auth form .notion.error', timeout)
+    client.expect.element('#Auth form .error.notion').text.to.contain('Conflict')
+    client.end()
   }
 }
