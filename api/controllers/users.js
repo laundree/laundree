@@ -52,7 +52,7 @@ function startPasswordReset (req, res) {
   const {user} = req.subjects
   user.generateResetToken()
     .then((token) => utils.mail.sendEmail({
-      user: user.model.toObject(),
+      user: {id: user.model.id},
       token: token
     }, 'password-reset', user.model.emails[0]))
     .then(() => utils.api.returnSuccess(res))
@@ -78,7 +78,7 @@ function startEmailVerification (req, res) {
       email: email,
       emailEncoded: encodeURIComponent(email),
       token: token,
-      user: user.model.toObject()
+      user: {id: user.model.id}
     }, 'verify-email', email)
       .then(() => utils.api.returnSuccess(res)))
     .catch(utils.api.generateErrorHandler(res))
