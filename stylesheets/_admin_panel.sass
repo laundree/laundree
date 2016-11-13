@@ -48,15 +48,45 @@
   #LaundryList
     padding-right: 1em
   #LaundryList, #UserList
+    .filter
+      label
+        max-width: none
+        padding: 0.5em 0 1em
+        input
+          color: #03414C
+          background: #7fecec
+          width: calc(100% - 1em)
+          padding: 0.5em
+
+    .nav
+      text-align: center
+      font-family: "Roboto Condensed", sans-serif
+      padding: 2em 0 0
+      overflow: hidden
+      .link
+        &:not(.inactive)
+          cursor: pointer
+        display: block
+        $inactiveColor: #59b9b9
+        &.next
+          +arrow(#e55564, 0.5em, right)
+          float: right
+          &.inactive
+            border-left-color: $inactiveColor
+        &.prev
+          float: left
+          +arrow(#e55564, 0.5em, left)
+          &.inactive
+            border-right-color: $inactiveColor
     width: calc(50% - 0.5em)
     float: left
     .bigListMessage
       padding-top: 3.1em
-    ul
-      padding-top: 2em
+
     img.avatar
       float: left
       margin-right: 1em
+
 @media only screen and (max-width: 40em)
   #AdminPanel
     #Stats
