@@ -120,7 +120,7 @@ class QueryList extends React.Component {
   }
 
   get totalPages () {
-    return Math.max(0, Math.floor((this.props.total - 1 ) / this.limit))
+    return Math.max(0, Math.floor((this.props.total - 1) / this.limit))
   }
 
   renderList () {
