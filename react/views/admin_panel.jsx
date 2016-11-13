@@ -78,13 +78,13 @@ class QueryList extends React.Component {
   }
 
   prev () {
-    if (this.state.page === 0) return
-    this.setState({page: this.state.page - 1}, () => this._load())
+    if (this.currentPage === 0) return
+    this.setState({page: this.currentPage - 1}, () => this._load())
   }
 
   next () {
-    if (this.state.page === this.totalPages - 1) return
-    this.setState({page: this.state.page + 1}, () => this._load())
+    if (this.currentPage === this.totalPages) return
+    this.setState({page: this.currentPage + 1}, () => this._load())
   }
 
   load (options) {
@@ -95,8 +95,8 @@ class QueryList extends React.Component {
     return this.load({
       q: this.state.q,
       limit: this.limit,
-      skip: this.limit * this.state.page
-    }).then(() => this.setState({loaded: true}))
+      skip: this.limit * this.currentPage
+    }).then(() => this.setState({loaded: true, page: this.currentPage}))
   }
 
   get elements () {
@@ -116,11 +116,11 @@ class QueryList extends React.Component {
   }
 
   get currentPage () {
-    return this.state.page + 1
+    return Math.max(0, Math.min(this.state.page, this.totalPages))
   }
 
   get totalPages () {
-    return Math.floor(this.props.total / this.limit) + 1
+    return Math.floor(this.props.total / this.limit)
   }
 
   renderList () {
@@ -131,8 +131,8 @@ class QueryList extends React.Component {
     }
     return <div>
       <div className='nav'>
-        <span className={'prev link' + (this.currentPage === 1 ? ' inactive' : '')} onClick={this.onPrevClick}/>
-        Page {this.currentPage} of {this.totalPages}
+        <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={this.onPrevClick}/>
+        Page {this.currentPage + 1} of {this.totalPages + 1}
         <span
           className={'next link' + (this.currentPage === this.totalPages ? ' inactive' : '')}
           onClick={this.onNextClick}/>
