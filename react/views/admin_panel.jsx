@@ -59,111 +59,190 @@ class Stats extends React.Component {
 Stats.propTypes = {
   stats: React.PropTypes.object
 }
-
-class LaundryList extends React.Component {
+class QueryList extends React.Component {
   constructor (props) {
     super(props)
-    this.state = {loaded: false}
+    this.state = {loaded: false, page: 0}
+    this.limit = 10
+    this.onPrevClick = () => this.prev()
+    this.onNextClick = () => this.next()
+    this.onFilterUpdate = ({target: {value}}) => this.updateFilter(value)
+  }
+
+  updateFilter (q) {
+    this.setState({q}, () => this._load())
   }
 
   componentDidMount () {
-    sdk.listLaundries().then(() => this.setState({loaded: true}))
+    this._load()
   }
 
-  get laundries () {
-    return this.state.loaded ? Object.keys(this.props.laundries).map(key => this.props.laundries[key]) : []
+  prev () {
+    if (this.currentPage === 0) return
+    this.setState({page: this.currentPage - 1}, () => this._load())
   }
 
-  renderLaundryList () {
+  next () {
+    if (this.currentPage === this.totalPages) return
+    this.setState({page: this.currentPage + 1}, () => this._load())
+  }
+
+  load (options) {
+    throw new Error('Not implemented')
+  }
+
+  _load () {
+    return this.load({
+      q: this.state.q,
+      limit: this.limit,
+      skip: this.limit * this.currentPage
+    }).then(() => this.setState({loaded: true, page: this.currentPage}))
+  }
+
+  get elements () {
+    throw new Error('Not implemented')
+  }
+
+  renderLoading () {
+    throw new Error('Not implemented')
+  }
+
+  renderEmpty () {
+    throw new Error('Not implemented')
+  }
+
+  renderElement () {
+    throw new Error('Not implemented')
+  }
+
+  get currentPage () {
+    return Math.max(0, Math.min(this.state.page, this.totalPages))
+  }
+
+  get totalPages () {
+    return Math.max(0, Math.floor((this.props.total - 1) / this.limit))
+  }
+
+  renderList () {
     if (!this.state.loaded) {
       return <div className='bigListMessage'>
-        Loading laundries...
+        {this.renderLoading()}
       </div>
     }
-    if (!Object.keys(this.props.laundries).length) {
-      return <div className='bigListMessage'>
-        No laundries found.
+    return <div>
+      <div className='nav'>
+        <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={this.onPrevClick}/>
+        Page {this.currentPage + 1} of {this.totalPages + 1}
+        <span
+          className={'next link' + (this.currentPage === this.totalPages ? ' inactive' : '')}
+          onClick={this.onNextClick}/>
       </div>
-    }
-    return <ul className='bigList'>{ this.laundries.map(l => <li key={l.id}>
-      <div className='name'>
-        <Link to={`/laundries/${l.id}`}>
-          {l.name}
-        </Link>
+      <div className='filter'>
+        <label>
+          <input
+            type='text' placeholder='Filter' value={this.state.q || ''}
+            onChange={this.onFilterUpdate}/>
+        </label>
       </div>
-    </li>)}
-    </ul>
+      {this.elements.length
+        ? <ul className='bigList'>
+        { this.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
+      </ul>
+        : <div className='bigListMessage'>
+        {this.renderEmpty()}
+      </div>}
+    </div>
+  }
+}
+
+QueryList.propTypes = {
+  total: React.PropTypes.number
+}
+
+class LaundryList extends QueryList {
+
+  renderLoading () {
+    return <span>Loading laundries...</span>
+  }
+
+  renderEmpty () {
+    return <span>No laundries found.</span>
+  }
+
+  get elements () {
+    return this.props.laundries
+  }
+
+  renderElement (l) {
+    return <div className='name'>
+      <Link to={`/laundries/${l.id}`}>
+        {l.name}
+      </Link>
+    </div>
+  }
+
+  load (options) {
+    return sdk.listLaundries(options)
   }
 
   render () {
     return <section id='LaundryList'>
       <h2>Laundries</h2>
-      {this.renderLaundryList()}
+      {this.renderList()}
     </section>
   }
 }
 
 LaundryList.propTypes = {
-  laundries: React.PropTypes.object
+  laundries: React.PropTypes.array
 }
 
-class UserList extends React.Component {
+class UserList extends QueryList {
 
-  constructor (props) {
-    super(props)
-    this.state = {loaded: false}
+  renderLoading () {
+    return <span>Loading users...</span>
   }
 
-  componentDidMount () {
-    sdk.listUsers().then(() => this.setState({loaded: true}))
+  load (options) {
+    return sdk.listUsers(options)
   }
 
-  get users () {
-    return this.state.loaded ? Object.keys(this.props.users).map(key => this.props.users[key]) : []
+  renderEmpty () {
+    return <span>No users found.</span>
   }
 
-  renderUserList () {
-    if (!this.state.loaded) {
-      return <div className='bigListMessage'>
-        Loading users...
-      </div>
-    }
-    if (!Object.keys(this.props.users).length) {
-      return <div className='bigListMessage'>
-        No users found.
-      </div>
-    }
-    return <ul className='bigList'>
-      {this.users.map(({id, displayName, photo}) => <li key={id}>
-        <div className='name'>
-          <Link to={`/users/${id}`}>
-            <img src={photo} className='avatar'/>
-            {displayName}
-          </Link>
-        </div>
-      </li>)}
-    </ul>
+  get elements () {
+    return this.props.users
+  }
+
+  renderElement ({id, photo, displayName}) {
+    return <div className='name'>
+      <Link to={`/users/${id}`}>
+        <img src={photo} className='avatar'/>
+        {displayName}
+      </Link>
+    </div>
   }
 
   render () {
     return <section id='UserList'>
       <h2>Users</h2>
-      {this.renderUserList()}
+      {this.renderList()}
     </section>
   }
 }
 
 UserList.propTypes = {
-  users: React.PropTypes.object
+  users: React.PropTypes.array
 }
 
-const AdminPanel = ({stats, laundries, users}) => {
+const AdminPanel = ({stats, laundries, users, userList, laundryList, laundryListSize, userListSize}) => {
   return <DocumentTitle title='Administrator panel'>
     <main id='AdminPanel' className='topNaved'>
       <h1>Administrator Panel</h1>
       <Stats stats={stats}/>
-      <LaundryList laundries={laundries}/>
-      <UserList users={users}/>
+      <LaundryList laundries={laundryList.map(id => laundries[id])} total={laundryListSize}/>
+      <UserList users={userList.map(id => users[id])} total={userListSize}/>
     </main>
   </DocumentTitle>
 }
@@ -171,7 +250,11 @@ const AdminPanel = ({stats, laundries, users}) => {
 AdminPanel.propTypes = {
   stats: React.PropTypes.object,
   laundries: React.PropTypes.object,
-  users: React.PropTypes.object
+  laundryList: React.PropTypes.array,
+  userList: React.PropTypes.array,
+  users: React.PropTypes.object,
+  userListSize: React.PropTypes.number,
+  laundryListSize: React.PropTypes.number
 }
 
 module.exports = AdminPanel

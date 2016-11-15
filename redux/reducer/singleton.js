@@ -1,9 +1,9 @@
 const {handleActions} = require('redux-actions')
 
-function setupSingleton (type) {
+function setupSingleton (type, defaultValue = null) {
   const actionMap = {}
   actionMap[type] = (state, {payload}) => payload
-  return handleActions(actionMap, null)
+  return handleActions(actionMap, defaultValue)
 }
 
 module.exports = {setupSingleton}
