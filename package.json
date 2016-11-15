@@ -29,7 +29,7 @@
     "moment-timezone": "^0.5.7",
     "mongoose": "^4.6.4",
     "morgan": "~1.7.0",
-    "node-sass-middleware": "^0.9.8",
+    "node-sass-middleware": "^0.10.0",
     "nodemailer": "^2.3.2",
     "nodemailer-stub-transport": "^1.0.0",
     "opbeat": "^3.17.1",
