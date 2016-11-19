@@ -14,7 +14,7 @@ function listTokens (req, res) {
   TokenHandler.find(filter, {limit, sort: {_id: 1}})
     .then((tokens) => tokens.map((token) => token.toRestSummary()))
     .then((tokens) => {
-      var links = {
+      const links = {
         first: `/api/tokens?page_size=${limit}`
       }
       if (tokens.length === limit) {

@@ -21,7 +21,7 @@ function listLaundries (req, res) {
   LaundryHandler.find(filter, {limit, sort: {_id: 1}})
     .then((laundries) => laundries.map((laundry) => laundry.toRestSummary()))
     .then((laundries) => {
-      var links = {
+      const links = {
         first: `/api/laundries?page_size=${limit}`
       }
       if (laundries.length === limit) {
@@ -154,6 +154,15 @@ function removeUserFromLaundry (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function createInviteCode (req, res) {
+  const {laundry} = req.subjects
+  if (laundry.model.demo) return api.returnError(res, 403, 'Not allowed')
+  laundry
+    .createInviteCode()
+    .then(key => api.returnSuccess(res, {key, pdfHref: `/pdf/invite/${laundry.shortId}/${key}`}))
+    .catch(api.generateErrorHandler(res))
+}
+
 module.exports = {
   createDemoLaundry,
   inviteUserByEmail,
@@ -162,5 +171,6 @@ module.exports = {
   fetchLaundry,
   deleteLaundry,
   createLaundry,
-  removeUserFromLaundry
+  removeUserFromLaundry,
+  createInviteCode
 }

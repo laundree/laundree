@@ -8,6 +8,7 @@ const assert = chai.assert
 const {LaundryHandler, LaundryInvitationHandler, UserHandler, BookingHandler} = require('../../../../handlers')
 const dbUtils = require('../../../db_utils')
 const Promise = require('promise')
+const base64UrlSafe = require('urlsafe-base64')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
@@ -740,6 +741,124 @@ describe('controllers', function () {
               request(app)
                 .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
                 .send({email: 'alice@example.com'})
+                .set('Accept', 'application/json')
+                .set('Content-Type', 'application/json')
+                .auth(user.model.id, token.secret)
+                .expect('Content-Type', /json/)
+                .expect(403)
+                .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
+    })
+
+    describe('POST /api/laundries/{id}/invite-code', () => {
+      it('should fail on not authenticated', () =>
+        request(app)
+          .post('/api/laundries/id/invite-code')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403))
+
+      it('should return 404 on invalid id', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .post('/api/laundries/id/invite-code')
+            .send()
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should return 404 on missing id', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .post('/api/laundries/id/invite-code')
+            .send()
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(404)
+            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should return 404 on other id', () =>
+        Promise
+          .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
+          .then(([{laundry}, {user, token}]) =>
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-code`)
+              .send()
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect('Content-Type', /json/)
+              .expect(404)
+              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+
+      it('should succeed', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-code`)
+            .send()
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(200)))
+
+      it('should succeed if administrator', () =>
+        Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
+          .then(([{laundry}, {user, token}]) =>
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-code`)
+              .send()
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(200)))
+
+      it('should fail if demo', () =>
+        dbUtils.populateLaundries(1)
+          .then(({user, token, laundry}) => {
+            laundry.model.demo = true
+            return laundry.model.save().then(() => ({user, token, laundry}))
+          })
+          .then(({user, token, laundry}) =>
+            request(app)
+              .post(`/api/laundries/${laundry.model.id}/invite-code`)
+              .send()
+              .set('Accept', 'application/json')
+              .set('Content-Type', 'application/json')
+              .auth(user.model.id, token.secret)
+              .expect(403)))
+
+      it('should create code', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-code`)
+            .send()
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(200)
+            .then(res => LaundryHandler
+              .findFromId(laundry.model._id)
+              .then(laundry => {
+                const {key, pdfHref} = res.body
+                base64UrlSafe.validate(key).should.be.true
+                pdfHref.should.equal(`/pdf/invite/${laundry.shortId}/${key}`)
+                return laundry.verifyInviteCode(key).should.eventually.be.true
+              }))))
+
+      it('should fail when only user', () =>
+        Promise
+          .all([dbUtils.populateLaundries(1), dbUtils.populateTokens(1)])
+          .then(([{laundry}, {user, token}]) => laundry
+            .addUser(user)
+            .then(() =>
+              request(app)
+                .post(`/api/laundries/${laundry.model.id}/invite-code`)
+                .send()
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
                 .auth(user.model.id, token.secret)

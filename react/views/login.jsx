@@ -21,6 +21,10 @@ class LogIn extends ValueUpdater {
     </div>
   }
 
+  get query () {
+    return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
+  }
+
   render () {
     return <DocumentTitle title='Login'>
       <div>
@@ -33,13 +37,13 @@ class LogIn extends ValueUpdater {
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href='/auth/facebook' className='facebook'>
+          <a href={'/auth/facebook' + this.query} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook'/>
             </svg>
             Log in with Facebook
           </a>
-          <a href='/auth/google' className='google'>
+          <a href={'/auth/google' + this.query} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus'/>
             </svg>
@@ -49,7 +53,7 @@ class LogIn extends ValueUpdater {
         <div className='or'>
           <span>OR</span>
         </div>
-        <ValidationForm id='SignIn' method='post' action='/auth/local'>
+        <ValidationForm id='SignIn' method='post' action={'/auth/local' + this.query}>
           {this.handleNotion()}
           <ValidationElement email trim value={this.state.values.email || ''}>
             <label
@@ -83,7 +87,7 @@ class LogIn extends ValueUpdater {
             </div>
             <div>
               Do you not have an account?{' '}
-              <Link to='/auth/sign-up'>Sign-up here.</Link>
+              <Link to={'/auth/sign-up' + this.query}>Sign-up here.</Link>
             </div>
           </div>
         </ValidationForm>
@@ -98,6 +102,7 @@ class LogIn extends ValueUpdater {
 }
 
 LogIn.propTypes = {
+  to: React.PropTypes.string,
   flash: React.PropTypes.arrayOf(React.PropTypes.shape({
     type: React.PropTypes.string.isRequired,
     message: React.PropTypes.string.isRequired

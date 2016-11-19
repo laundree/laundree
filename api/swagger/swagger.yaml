@@ -70,8 +70,8 @@ paths:
         - Users
       responses:
         "200":
-          headers: 
-            Link: 
+          headers:
+            Link:
               description: Link header
               type: string
           description: A list of users
@@ -90,7 +90,7 @@ paths:
         - name: body
           in: body
           required: true
-          schema: 
+          schema:
             required:
               - displayName
               - email
@@ -189,10 +189,10 @@ paths:
     delete:
       description: Delete a given user
       operationId: deleteUser
-      security: 
+      security:
         - self: []
         - administrator: []
-      tags: 
+      tags:
         - Users
       parameters:
         - name: userId
@@ -213,7 +213,7 @@ paths:
             $ref: "#/definitions/Error"
         default:
           description: Error
-          schema: 
+          schema:
             $ref: "#/definitions/Error"
   /users/{userId}/emails:
     x-swagger-router-controller: users
@@ -279,7 +279,7 @@ paths:
       description: Reset user password
       operationId: passwordReset
       security:
-        - subjectsExists: []      
+        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -289,7 +289,7 @@ paths:
         - name: body
           in: body
           required: true
-          schema: 
+          schema:
             required:
               - password
               - token
@@ -363,7 +363,7 @@ paths:
       description: Start email verification
       operationId: startEmailVerification
       security:
-        - subjectsExists: []      
+        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -372,7 +372,7 @@ paths:
         - name: body
           in: body
           required: true
-          schema: 
+          schema:
             required:
               - email
             properties:
@@ -402,7 +402,7 @@ paths:
       description: Verify a user email
       operationId: verifyEmail
       security:
-        - subjectsExists: []      
+        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -411,7 +411,7 @@ paths:
         - name: body
           in: body
           required: true
-          schema: 
+          schema:
             required:
               - email
               - token
@@ -442,7 +442,7 @@ paths:
     x-swagger-router-controller: tokens
     get:
       description: List available tokens
-      security: 
+      security:
         - userAccess: []
       operationId: listTokens
       tags:
@@ -465,7 +465,7 @@ paths:
         "200":
           description: Success
           headers:
-            Link: 
+            Link:
               description: Link header
               type: string
           schema:
@@ -485,7 +485,7 @@ paths:
     post:
       description: Create a new token
       operationId: createToken
-      security: 
+      security:
         - userAccess: []
       tags:
         - Tokens
@@ -499,7 +499,7 @@ paths:
       responses:
         "200":
           description: Success
-          schema: 
+          schema:
             $ref: "#/definitions/TokenWithSecret"
         "403":
           description: Unauthorized
@@ -519,7 +519,7 @@ paths:
       operationId: fetchToken
       tags:
         - Tokens
-      security: 
+      security:
         - tokenOwner: []
       parameters:
         - name: tokenId
@@ -547,7 +547,7 @@ paths:
       operationId: deleteToken
       tags:
         - Tokens
-      security: 
+      security:
         - tokenOwner: []
       parameters:
         - name: tokenId
@@ -572,7 +572,7 @@ paths:
   /laundries:
     x-swagger-router-controller: laundries
     get:
-      security: 
+      security:
         - userAccess: []
       description: Lists the current laundries
       operationId: listLaundries
@@ -596,7 +596,7 @@ paths:
         "200":
           description: Success
           headers:
-            Link: 
+            Link:
               description: Link header
               type: string
           schema:
@@ -618,7 +618,7 @@ paths:
     post:
       tags:
         - Laundries
-      security: 
+      security:
         - userAccess: []
       description: Create a laundry
       operationId: createLaundry
@@ -626,10 +626,10 @@ paths:
         - name: body
           in: body
           schema:
-            required: 
+            required:
               - name
             properties:
-              name: 
+              name:
                 $ref: "#/definitions/name"
       responses:
         "200":
@@ -744,7 +744,7 @@ paths:
       operationId: fetchLaundry
       tags:
         - Laundries
-      security: 
+      security:
         - laundryUser: []
         - administrator: []
       parameters:
@@ -773,7 +773,7 @@ paths:
       operationId: deleteLaundry
       tags:
         - Laundries
-      security: 
+      security:
         - laundryOwner: []
         - administrator: []
       parameters:
@@ -796,7 +796,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-      
+
   /laundries/{laundryId}/machines:
     x-swagger-router-controller: machines
     get:
@@ -831,7 +831,7 @@ paths:
         "200":
           description: Success
           headers:
-            Link: 
+            Link:
               description: Link header
               type: string
           schema:
@@ -975,6 +975,46 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+
+  /laundries/{laundryId}/invite-code:
+    x-swagger-router-controller: laundries
+    post:
+      operationId: createInviteCode
+      security:
+        - laundryOwner: []
+        - administrator: []
+      tags:
+        - Laundries
+      parameters:
+        - name: laundryId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+      responses:
+        "200":
+          description: Success
+          schema:
+            properties:
+              key:
+                type: string
+              pdfHref:
+                type: string
+            required:
+              - key
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /machines/{machineId}:
     x-swagger-router-controller: machines
     get:
@@ -1046,7 +1086,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-      
+
     delete:
       operationId: deleteMachine
       security:
@@ -1075,7 +1115,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-      
+
   /machines/{machineId}/bookings:
     x-swagger-router-controller: bookings
     get:
@@ -1120,7 +1160,7 @@ paths:
         "200":
           description: Success
           headers:
-            Link: 
+            Link:
               description: Link header
               type: string
           schema:
@@ -1192,7 +1232,7 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
-      
+
 
   /bookings/{bookingId}:
     x-swagger-router-controller: bookings
@@ -1357,18 +1397,18 @@ definitions:
         format: date-time
       name:
         properties:
-          familyName: 
+          familyName:
             type: string
-          givenName: 
+          givenName:
             type: string
-          middleName: 
+          middleName:
             type: string
       href:
         type: string
         format: url
       laundries:
         type: array
-        items: 
+        items:
           $ref: "#/definitions/LaundrySummary"
       tokens:
         type: array
@@ -1399,17 +1439,17 @@ definitions:
     properties:
       id:
         type: string
-      name: 
+      name:
         type: string
-      href: 
+      href:
         type: string
       owners:
         type: array
-        items: 
+        items:
           $ref: "#/definitions/UserSummary"
       users:
         type: array
-        items: 
+        items:
           $ref: "#/definitions/UserSummary"
       machines:
         type: array
@@ -1431,7 +1471,7 @@ definitions:
         type: string
       href:
         type: string
-        format: url 
+        format: url
 
   Token:
     required:
@@ -1442,9 +1482,9 @@ definitions:
     properties:
       id:
         type: string
-      name: 
+      name:
         type: string
-      href: 
+      href:
         type: string
       lastSeen:
         type: string
@@ -1463,9 +1503,9 @@ definitions:
         type: string
       secret:
         type: string
-      name: 
+      name:
         type: string
-      href: 
+      href:
         type: string
       lastSeen:
         type: string
@@ -1483,7 +1523,7 @@ definitions:
         type: string
       name:
         type: string
-      href: 
+      href:
         type: string
   Booking:
     required:
@@ -1522,7 +1562,7 @@ definitions:
         type: string
       href:
         type: string
-      name: 
+      name:
         type: string
   Invite:
     required:
@@ -1563,7 +1603,7 @@ definitions:
         type: string
       href:
         type: string
-      name: 
+      name:
         type: string
   Date:
     required:
@@ -1619,5 +1659,3 @@ definitions:
   nonEmpty:
     type: string
     pattern: ([^\s]+)
-
-

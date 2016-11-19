@@ -8,7 +8,7 @@ module.exports = {
   LeftNav: require('./leftnav'),
   Auth: require('../views').Auth,
   Forgot: require('../views').Forgot,
-  SignUp: require('../views').SignUp,
+  SignUp: require('./sign_up'),
   Reset: require('../views').Reset,
   Home: require('../views').Home,
   Verification: require('../views').Verification,

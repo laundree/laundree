@@ -1,12 +1,12 @@
-var express = require('express')
-var router = express.Router()
-var passport = require('passport')
-var UserHandler = require('../handlers').UserHandler
-
+const express = require('express')
+const router = express.Router()
+const passport = require('passport')
+const UserHandler = require('../handlers').UserHandler
+const debug = require('debug')('laundree.routes.auth')
 router.get('/verify', (req, res) => {
-  var user = req.query.user
-  var token = req.query.token
-  var email = req.query.email
+  const user = req.query.user
+  const token = req.query.token
+  const email = req.query.email
   if (!user || !token || !email) {
     req.flash('error', 'Invalid verification link')
     return res.redirect(req.baseUrl + '/')
@@ -26,31 +26,46 @@ router.get('/verify', (req, res) => {
     })
   })
 })
+function findRedirect (req) {
+  return req.query.to ? decodeURIComponent(req.query.to) : '/'
+}
 
-router.get('/facebook', function (req) {
-  var params = {scope: ['public_profile', 'email']}
+function saveTo (f) {
+  return function (req) {
+    const to = findRedirect(req)
+    debug('Saving to: ', to)
+    req.session.to = to
+    return f.apply(null, arguments)
+  }
+}
+
+function setupCallback (router, strategy) {
+  router.get(`/${strategy}/callback`,
+    function (req) {
+      passport.authenticate(strategy, {failureRedirect: `${req.baseUrl}?${strategy}_auth_failure=1`}).apply(null, arguments)
+    },
+    (req, res) => res.redirect(req.session.to))
+}
+
+router.get('/facebook', saveTo(function (req) {
+  const params = {scope: ['public_profile', 'email']}
   if (req.query.rerequest) params.authType = 'rerequest'
   passport.authenticate('facebook', params).apply(null, arguments)
-})
+}))
 
-router.get('/facebook/callback',
-  function (req) {
-    passport.authenticate('facebook', {failureRedirect: req.baseUrl + '?fb_auth_failure=1'}).apply(null, arguments)
-  },
-  (req, res) => res.redirect('/'))
+setupCallback(router, 'facebook')
 
-router.get('/google', passport.authenticate('google', {accessType: 'online', scope: ['openid', 'profile', 'email']}))
+router.get('/google', saveTo(passport.authenticate('google', {
+  accessType: 'online',
+  scope: ['openid', 'profile', 'email']
+})))
 
-router.get('/google/callback',
-  function (req) {
-    passport.authenticate('google', {failureRedirect: req.baseUrl + '?google_auth_failure=1'}).apply(null, arguments)
-  },
-  (req, res) => res.redirect('/'))
+setupCallback(router, 'google')
 
 router.post('/local', function (req) {
   passport.authenticate('local', {
     failureRedirect: `${req.baseUrl}`,
-    successRedirect: '/',
+    successRedirect: findRedirect(req),
     failureFlash: true
   }).apply(null, arguments)
 })
