@@ -50,6 +50,31 @@ InviteUserForm.propTypes = {
   laundry: React.PropTypes.object.isRequired
 }
 
+class QrInvite extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.onClick = () => this.createPdf()
+  }
+
+  createPdf () {
+    sdk.laundry(this.props.laundry.id).createInviteCode()
+      .then(({pdfHref}) => window.open(pdfHref))
+  }
+
+  render () {
+    return <div id='QrSignUp'>
+      You can invite your tenant by generating a PDF document, printing this, and hanging it in your laundry.<br />
+      This will enable everyone with physical access to your machines, to register on your laundry.<br />
+      Generate your PDF <span onClick={this.onClick}>here</span>.
+    </div>
+  }
+}
+
+QrInvite.propTypes = {
+  laundry: React.PropTypes.object.isRequired
+}
+
 class UserItem extends React.Component {
   constructor (props) {
     super(props)
@@ -185,8 +210,12 @@ class Users extends React.Component {
           {this.renderUsers()}
         </section>
         <section id='InviteUserForm'>
-          <h2>Invite user</h2>
+          <h2>Invite user from email</h2>
           <InviteUserForm laundry={this.props.laundry}/>
+        </section>
+        <section>
+          <h2>Invite user from QR</h2>
+          <QrInvite laundry={this.props.laundry}/>
         </section>
       </main>
     </DocumentTitle>

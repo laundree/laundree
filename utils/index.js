@@ -11,5 +11,6 @@ module.exports = {
   error: require('./error'),
   object: require('./object'),
   string: require('./string'),
-  flash: require('./flash')
+  flash: require('./flash'),
+  pdf: require('./pdf')
 }

@@ -32,6 +32,10 @@ class SignUp extends ValueUpdater {
     }
   }
 
+  get query () {
+    return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
+  }
+
   render () {
     return <DocumentTitle title='Sign up'>
       <div>
@@ -44,13 +48,13 @@ class SignUp extends ValueUpdater {
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href='/auth/facebook' className='facebook'>
+          <a href={'/auth/facebook' + this.query} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook'/>
             </svg>
             Sign up with Facebook
           </a>
-          <a href='/auth/google' className='google'>
+          <a href={'/auth/google' + this.query} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus'/>
             </svg>
@@ -114,7 +118,7 @@ class SignUp extends ValueUpdater {
             <input type='submit' value='Create your account' className='create'/>
           </div>
           <div className='forgot'>
-            <div>Already have an account? <Link to='/auth'>Log in here.</Link></div>
+            <div>Already have an account? <Link to={'/auth' + this.query}>Log in here.</Link></div>
             <div>
               Forgot your password?
               <Link to='/auth/forgot' className='forgot'>Let us send you a new one.</Link>
