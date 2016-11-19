@@ -1,10 +1,11 @@
 /**
  * Created by budde on 06/05/16.
  */
-var bcrypt = require('bcrypt')
-var crypto = require('crypto')
-var config = require('config')
+const bcrypt = require('bcrypt')
+const crypto = require('crypto')
+const config = require('config')
 const Promise = require('promise')
+const base64UrlSafe = require('urlsafe-base64')
 
 /**
  * Hash a given password
@@ -46,6 +47,18 @@ function generateToken () {
 }
 
 /**
+ * Create new code
+ * @param {int=6} entropy
+ * @returns {Promise.<string>}
+ */
+function generateBase64UrlSafeCode (entropy = 6) {
+  return new Promise((resolve, reject) => crypto.randomBytes(entropy, (err, buffer) => {
+    if (err) return reject(err)
+    return resolve(base64UrlSafe.encode(buffer))
+  }))
+}
+
+/**
  * Generate a token and hash
  * @returns {Promise.<{token: string, hash: string}>}
  */
@@ -57,5 +70,6 @@ module.exports = {
   hashPassword,
   comparePassword,
   generateToken,
-  generateTokenAndHash
+  generateTokenAndHash,
+  generateBase64UrlSafeCode
 }

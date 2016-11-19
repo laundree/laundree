@@ -7,6 +7,7 @@ const {linkEmitter} = require('../lib/redis')
 const debug = require('debug')('laundree.handlers.handler')
 const Promise = require('promise')
 const {createAction} = require('redux-actions')
+const base64UrlSafe = require('urlsafe-base64')
 
 function findLaundries (handler) {
   const {_id, laundry, laundries} = handler.model || {}
@@ -58,6 +59,10 @@ class Handler {
       .then((m) => m ? new Handler(m).updateDocument() : undefined)
   }
 
+  static _findFromShortId (_Model, _Handler, shortId) {
+    return Handler._findFromId(_Model, _Handler, base64UrlSafe.decode(shortId).toString('hex'))
+  }
+
   /**
    * @param _Handler
    * @param _Model
@@ -96,7 +101,8 @@ class Handler {
       return _Model.count(criteria)
     }
     _Handler.find = (filter, options) => Handler._find(_Model, _Handler, filter, options)
-    _Handler.findFromId = (id) => Handler._findFromId(_Model, _Handler, id)
+    _Handler.findFromId = id => Handler._findFromId(_Model, _Handler, id)
+    _Handler.findFromShortId = id => Handler._findFromShortId(_Model, _Handler, id)
     _Handler.redux = buildReduxEventEmitter(_Handler)
     _Handler.fetchEvents = (filter = {}) => {
       const EventHandler = require('./event')
@@ -129,6 +135,10 @@ class Handler {
    */
   get docVersion () {
     return this.model.docVersion || 0
+  }
+
+  get shortId () {
+    return base64UrlSafe.encode(Buffer.from(this.model.id, 'hex'))
   }
 
   /**

@@ -19,7 +19,8 @@ const laundrySchema = new Schema({
       to: {hour: Number, minute: Number}
     }
   },
-  timezone: {type: String}
+  timezone: {type: String},
+  signUpCodes: [String]
 }, {timestamps: true})
 
 laundrySchema.index({'name': 1})

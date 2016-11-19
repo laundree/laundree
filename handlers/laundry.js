@@ -13,6 +13,7 @@ const uuid = require('uuid')
 const config = require('config')
 const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
 const moment = require('moment-timezone')
+const {generateBase64UrlSafeCode, hashPassword, comparePassword} = require('../utils/password')
 
 function objToMintues ({hour, minute}) {
   return hour * 60 + minute
@@ -442,6 +443,27 @@ class LaundryHandler extends Handler {
    */
   isSameDay (d1, d2) {
     return moment.tz(d1, this.timezone).format('YYYY-MM-DD') === moment.tz(d2, this.timezone).format('YYYY-MM-DD')
+  }
+
+  /**
+   * Create new sign-up code in base64 url-safe format
+   * @returns {Promise.<string>}
+   */
+  createInviteCode () {
+    return generateBase64UrlSafeCode(6)
+      .then(code => hashPassword(code)
+        .then(hash => {
+          this.model.signUpCodes.push(hash)
+          return this.save().then(() => code)
+        }))
+  }
+
+  /**
+   * @param {string} code
+   * @returns {Promise.<bool>}
+   */
+  verifyInviteCode (code) {
+    return Promise.all(this.model.signUpCodes.map(hash => comparePassword(code, hash))).then(results => Boolean(results.find(v => v)))
   }
 
   get reduxModel () {

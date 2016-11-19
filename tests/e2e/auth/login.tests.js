@@ -76,7 +76,6 @@ module.exports = {
     const email = faker.internet.email()
     const password = faker.internet.password()
     const name = faker.name.findName()
-    console.log(name, email, password)
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
