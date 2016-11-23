@@ -41,7 +41,7 @@
     "pdfkit": "^0.8.0",
     "promise": "^7.1.1",
     "qr-image": "^3.1.0",
-    "react": "^15.1.0",
+    "react": "^15.4.1",
     "react-document-title": "^2.0.1",
     "react-dom": "^15.3.0",
     "react-intl": "^2.1.2",
