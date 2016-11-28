@@ -20,7 +20,6 @@ function objToMintues ({hour, minute}) {
 }
 
 class LaundryHandler extends Handler {
-
   /**
    * Create a new laundry.
    * @param {UserHandler} owner
@@ -131,6 +130,19 @@ class LaundryHandler extends Handler {
   dateFromObject (object) {
     const mom = moment.tz(object, this.timezone)
     return mom.toDate()
+  }
+
+  /**
+   * @param {{year: int, month: int, day: int, hour: int, minute: int}} object
+   * @returns {boolean}
+   */
+  validateDateObject (object) {
+    const mom = moment.tz(object, this.timezone)
+    return mom.isValid()
+  }
+
+  _objectToMoment (object) {
+    return moment.tz(object, this.timezone)
   }
 
   /**
@@ -400,7 +412,7 @@ class LaundryHandler extends Handler {
       .find({
         laundry: this.model._id,
         owner: owner.model._id,
-        from: {$lt: this.dateFromObject({day: day + 1, month, year})},
+        from: {$lt: this._objectToMoment({day, month, year}).add(1, 'day').toDate()},
         to: {$gt: this.dateFromObject({day, month, year})}
       })
       .then(bookings => this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from)))
