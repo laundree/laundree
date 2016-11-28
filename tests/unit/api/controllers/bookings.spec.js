@@ -12,13 +12,13 @@ const Promise = require('promise')
 const moment = require('moment-timezone')
 
 function createDateTomorrow (hour = 0, minute = 0, tz = config.timezone) {
-  const now = moment.tz(tz).add(1, 'd')
-  return {year: now.year(), month: now.month(), day: now.date() + 1, hour, minute}
+  const now = moment.tz(tz).add(2, 'd')
+  return {year: now.year(), month: now.month(), day: now.date(), hour, minute}
 }
 
 function createDateDayAfterTomorrow (hour = 0, minute = 0, tz = config.timezone) {
-  const now = moment.tz(tz).add(1, 'd')
-  return {year: now.year(), month: now.month(), day: now.date() + 2, hour, minute}
+  const now = moment.tz(tz).add(3, 'd')
+  return {year: now.year(), month: now.month(), day: now.date(), hour, minute}
 }
 
 function createDateYesterday (hour = 0, minute = 0) {
@@ -164,6 +164,16 @@ describe('controllers', function () {
           .expect(403))
 
       it('should fail on invalid from', () =>
+        dbUtils.populateBookings(1).then(({user, token, machine}) =>
+          request(app)
+            .post(`/api/machines/${machine.model.id}/bookings`)
+            .send({from: createDateTomorrow(12), to: createDateTomorrow(26)})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)))
+
+      it('should fail on invalid date', () =>
         dbUtils.populateBookings(1).then(({user, token, machine}) =>
           request(app)
             .post(`/api/machines/${machine.model.id}/bookings`)

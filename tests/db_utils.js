@@ -17,7 +17,7 @@ function clearDb () {
 }
 
 function generateProfile () {
-  var name = {
+  const name = {
     familyName: faker.name.lastName(),
     middleName: faker.name.firstName(),
     givenName: faker.name.firstName()
@@ -74,15 +74,27 @@ function populateMachines (no) {
         })))
 }
 
+function fixOverflow ({year, day, month, hour, minute}) {
+  const date = new Date(year, month - 1, day - 1, hour, minute)
+  return {
+    year: date.getFullYear(),
+    month: date.getMonth(),
+    day: date.getDate(),
+    hour: date.getHours(),
+    minute: date.getMinutes()
+  }
+}
+
 function populateBookings (no) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise
         .all(range(no)
-          .map(i => ({
-            from: {year: 2000, day: i, month: 1, hour: 0, minute: 0},
-            to: {year: 2000, day: i, month: 1, hour: 1, minute: 30}
-          }))
+          .map(i => {
+            const from = fixOverflow({year: 2000, day: i + 1, month: 1, hour: 0, minute: 0})
+            const to = fixOverflow({year: 2000, day: i + 1, month: 1, hour: 1, minute: 30})
+            return ({from, to})
+          })
           .map(({
             from, to
           }) => laundry.createBooking(machine, user, from, to)))
