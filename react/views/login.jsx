@@ -2,7 +2,7 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {USER_NOT_VERIFIED} = require('../../utils/flash')
@@ -29,7 +29,7 @@ class LogIn extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title='Login'>
+    return <DocumentTitle title='document-title.login'>
       <div>
         <FormattedMessage tagName='h1' id='auth.login.title'/>
         <Link to='/' id='Logo'>

@@ -2,7 +2,7 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 class DemoButton extends React.Component {
@@ -37,7 +37,7 @@ class DemoButton extends React.Component {
   }
 }
 
-const Home = () => <DocumentTitle title='Home'>
+const Home = () => <DocumentTitle id='document-title.home'>
   <div id='Home'>
     <header>
       <div>

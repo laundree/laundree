@@ -2,11 +2,12 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
+const {injectIntl, FormattedMessage} = require('react-intl')
 
 class SignUp extends ValueUpdater {
 
@@ -23,11 +24,16 @@ class SignUp extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: 'A verification link has been sent', type: 'success'}
+            message: {message: 'auth.signup.success', type: 'success'}
           }),
-          (err) => this.setState({
+          err => this.setState({
             loading: false,
-            message: {message: err.message, type: 'error'}
+            message: {
+              message: err.status === 409
+                ? 'auth.signup.error.already-exists'
+                : 'auth.signup.error',
+              type: 'error'
+            }
           }))
     }
   }
@@ -36,12 +42,17 @@ class SignUp extends ValueUpdater {
     return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
   }
 
+  renderMessage () {
+    if (!this.state.message) return null
+    return <div className={'notion ' + (this.state.message.type || '')}>
+      <FormattedMessage id={this.state.message.message}/>
+    </div>
+  }
+
   render () {
-    return <DocumentTitle title='Sign up'>
+    return <DocumentTitle id='document-title.signup'>
       <div>
-        <h1>
-          Sign-up for an account
-        </h1>
+        <FormattedMessage id='auth.signup.title' tagName='h1'/>
         <Link to='/' id='Logo'>
           <svg>
             <use xlinkHref='#Logo'/>
@@ -52,33 +63,31 @@ class SignUp extends ValueUpdater {
             <svg>
               <use xlinkHref='#Facebook'/>
             </svg>
-            Sign up with Facebook
+            <FormattedMessage id='auth.signup.method.facebook'/>
           </a>
           <a href={'/auth/google' + this.query} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus'/>
             </svg>
-            Sign up with Google
+            <FormattedMessage id='auth.signup.method.google'/>
           </a>
         </div>
         <div className='or'>
-          <span>OR</span>
+          <FormattedMessage id='general.or'/>
         </div>
         <ValidationForm
           sesh={this.state.sesh}
           className={this.state.loading ? 'blur' : ''}
           onSubmit={this.submitHandler}>
-          {this.state.message
-            ? <div className={'notion ' + (this.state.message.type || '')}>{this.state.message.message}</div>
-            : null}
+          {this.renderMessage()}
           <ValidationElement
             nonEmpty
             trim sesh={this.state.sesh}
             initial={this.state.values.name === undefined}
             value={this.state.values.name || ''}>
-            <label data-validate-error='Please enter your full name'>
+            <label data-validate-error={this.props.intl.formatMessage({id: 'auth.error.no-full-name'})}>
               <input
-                type='text' name='name' placeholder='Full name'
+                type='text' name='name' placeholder={this.props.intl.formatMessage({id: 'general.full-name'})}
                 value={this.state.values.name || ''}
                 onChange={this.generateValueUpdater('name')}
               />
@@ -90,11 +99,11 @@ class SignUp extends ValueUpdater {
             initial={this.state.values.email === undefined}
             value={this.state.values.email || ''}>
             <label
-              data-validate-error='Please enter a valid e-mail address'>
+              data-validate-error={this.props.intl.formatMessage({id: 'auth.error.invalid-email'})}>
               <input
                 value={this.state.values.email || ''}
                 onChange={this.generateValueUpdater('email')}
-                type='text' name='email' placeholder='E-mail address'/>
+                type='text' name='email' placeholder={this.props.intl.formatMessage({id: 'general.email-address'})}/>
             </label>
           </ValidationElement>
           <ValidationElement
@@ -102,26 +111,44 @@ class SignUp extends ValueUpdater {
             password
             trim sesh={this.state.sesh}
             value={this.state.values.password || ''}>
-            <label data-validate-error='Min. 6 characters containing at least one letter'>
+            <label data-validate-error={this.props.intl.formatMessage({id: 'auth.error.invalid-password'})}>
               <input
                 value={this.state.values.password || ''}
                 onChange={this.generateValueUpdater('password')}
-                type='password' name='password' placeholder='Password'/>
+                type='password' name='password' placeholder={this.props.intl.formatMessage({id: 'general.password'})}/>
             </label>
           </ValidationElement>
           <div className='accept'>
-            By signing up you agree with our {' '}
-            <a href='/terms-and-conditions' target='_blank'>Terms and Conditions</a>{' '}and{' '}
-            <a href='/privacy' target='_blank'>Privacy Policy</a>.
+            <FormattedMessage id='auth.signup.notice' values={{
+              toc: <a
+                href='/terms-and-conditions'
+                target='_blank'>{this.props.intl.formatMessage({id: 'general.toc'})}</a>,
+              pp: <a href='/privacy' target='_blank'>{this.props.intl.formatMessage({id: 'general.privacy-policy'})}</a>
+            }}/>
           </div>
           <div className='buttons'>
-            <input type='submit' value='Create your account' className='create'/>
+            <input
+              type='submit' value={this.props.intl.formatMessage({id: 'general.create-account'})}
+              className='create'/>
           </div>
           <div className='forgot'>
-            <div>Already have an account? <Link to={'/auth' + this.query}>Log in here.</Link></div>
             <div>
-              Forgot your password?
-              <Link to='/auth/forgot' className='forgot'>Let us send you a new one.</Link>
+              <FormattedMessage
+                id='auth.links.login'
+                values={{
+                  link: <Link to={'/auth' + this.query}>
+                    {this.props.intl.formatMessage({id: 'auth.links.login.link'})}
+                  </Link>
+                }}/>
+            </div>
+            <div>
+              <FormattedMessage
+                id='auth.links.forgot'
+                values={{
+                  link: <Link
+                    to='/auth/forgot'
+                    className='forgot'>{this.props.intl.formatMessage({id: 'auth.links.forgot.link'})}</Link>
+                }}/>
             </div>
           </div>
         </ValidationForm>
@@ -130,4 +157,10 @@ class SignUp extends ValueUpdater {
   }
 }
 
-module.exports = SignUp
+SignUp.propTypes = {
+  intl: React.PropTypes.shape({
+    formatMessage: React.PropTypes.func.isRequired
+  })
+}
+
+module.exports = injectIntl(SignUp)
