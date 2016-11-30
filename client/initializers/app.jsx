@@ -43,7 +43,7 @@ class AppInitializer extends Initializer {
     const store = setupStore()
     match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
       ReactDOM.render(
-        <IntlProvider locale='en'>
+        <IntlProvider locale='en' messages={require('../../locales/en.json')}>
           <Provider store={store}>
             {React.createElement(Router, Object.assign({}, renderProps))}
           </Provider>
