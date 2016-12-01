@@ -10,7 +10,11 @@ class App extends React.Component {
   render () {
     return <DocumentTitle title='Laundree.io'>
       <div className={this.props.user ? '' : 'footer'}>
-        <TopNav user={this.props.user} currentLaundry={this.props.currentLaundry} laundries={this.props.laundries}/>
+        <TopNav
+          locale={this.props.locale}
+          user={this.props.user}
+          currentLaundry={this.props.currentLaundry}
+          laundries={this.props.laundries}/>
         {this.props.children}
         {this.props.user ? null : <Footer />}
       </div>
@@ -19,6 +23,7 @@ class App extends React.Component {
 }
 
 App.propTypes = {
+  locale: React.PropTypes.string,
   children: React.PropTypes.any,
   currentLaundry: React.PropTypes.string,
   laundries: React.PropTypes.object,

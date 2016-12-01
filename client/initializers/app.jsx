@@ -15,6 +15,7 @@ const io = require('socket.io-client')
 const {createStore} = require('redux')
 const reducer = require('../../redux/reducer')
 const sdk = require('../sdk')
+const locales = require('./../../locales')
 
 const socket = io('/redux')
 
@@ -42,8 +43,9 @@ class AppInitializer extends Initializer {
     if (!rootElement) return
     const store = setupStore()
     match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
+      const locale = store.getState().locale
       ReactDOM.render(
-        <IntlProvider locale='en' messages={require('../../locales/en.json')}>
+        <IntlProvider locale={locale} messages={locales[locale].messages}>
           <Provider store={store}>
             {React.createElement(Router, Object.assign({}, renderProps))}
           </Provider>

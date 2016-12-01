@@ -41,11 +41,13 @@ function fetchInstance (url, pattern, _Handler) {
  * @param {Array=} successFlash
  * @param {Array=} errorFlash
  * @param {string=} url
+ * @param {string=} locale
  * @return {Promise}
  */
-function createInitialEvents (currentUser, successFlash = [], errorFlash = [], url = '') {
-  var events = mapFlash(successFlash, 'success')
+function createInitialEvents (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en') {
+  let events = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
+  events.push(actions.setLocale(locale))
   if (!currentUser) return Promise.resolve(events)
   events.push(actions.signInUser(currentUser))
   return Promise
@@ -56,8 +58,8 @@ function createInitialEvents (currentUser, successFlash = [], errorFlash = [], u
     .then(evts => evts.reduce((e1, e2) => e1.concat(e2), events))
 }
 
-function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '') {
-  return createInitialEvents(currentUser, successFlash, errorFlash, url)
+function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en') {
+  return createInitialEvents(currentUser, successFlash, errorFlash, url, locale)
     .then((events) => {
       const store = createStore(reducer)
       events.forEach((event) => store.dispatch(event))

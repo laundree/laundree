@@ -56,7 +56,7 @@
       height: $height * 1em
       fill: #ffffff
 
-  > a, > span
+  > a, > span, .rightNav > a, .rightNav > span
     line-height: 4em
     color: #ffffff
     display: block
@@ -81,35 +81,20 @@
       color: $color
       svg
         fill: $color
-
+  div.rightNav
+    position: absolute
+    right: 0
   div.language
-    float: right
-    font-size: 0.8em
-    > span
-      background: transparent url("/images/arrow-down.svg") no-repeat left center
-    a, span
-      padding-left: 1.5em
-      background-size: 1em
-      font-size: 1em
-    ul
-      overflow: hidden
-      opacity: 0
-      height: 0
-      list-style-type: none
-      position: absolute
-      z-index: 11
-      top: 2.5em
-      background-color: #E55564
-      +border-radius(0 0 0.4em 0.4em)
-      +transition(0.3s opacity)
-
-    &:hover
-      > span
-        opacity: 0.4
-      ul
-        opacity: 1
-        height: auto
-
+    float: left
+    .dropDownTitle
+      svg
+        fill: #fff
+        display: block
+        margin: 1.25em
+        width: 1.5em
+        height: 1.5em
+    .dropDownContent
+      width: 6em
   div.user.dropDown
     background-color: #e55564
     float: right
@@ -127,8 +112,6 @@
       right: 1em
 
   a.log-in
-    position: absolute
-    right: 0
     text-transform: uppercase
     background: #E5954C
     height: 3em
@@ -159,7 +142,12 @@
 @media only screen and (max-width: 30em)
   #TopNav
     .laundries
-      max-width: 10em
+      max-width: 9em
     a.log-in
       margin: 0.5em
       padding: 0 1em
+    div.language
+      .dropDownTitle svg
+        margin: 1.25em 0
+      .dropDownContent.right
+        right: -0.75em

@@ -4,12 +4,17 @@
 const React = require('react')
 const {Link} = require('react-router')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const LocaleSelect = require('./locale_select.jsx')
 const {FormattedMessage} = require('react-intl')
 
 class TopNav extends React.Component {
 
   get laundries () {
     return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
+  }
+
+  renderGlobe () {
+    return <LocaleSelect locale={this.props.locale}/>
   }
 
   renderLaundries () {
@@ -50,33 +55,36 @@ class TopNav extends React.Component {
       <div className='laundries'>
         {this.renderLaundries()}
       </div>
-      <DropDown className='user'>
-        <DropDownTitle>
-          <img src={this.props.user.photo} className='avatar'/>
-        </DropDownTitle>
-        <DropDownContent className='right'>
-          <ul className='dropDownList'>
-            {this.props.user.demo ? null : <li>
-              <DropDownCloser>
-                <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
-                  <FormattedMessage id='topnav.manage'/>
-                </Link>
-              </DropDownCloser>
-            </li>}
-            <li>
-              <a href='/logout'>
-                <FormattedMessage id='topnav.logout'/>
-              </a>
-            </li>
-          </ul>
-        </DropDownContent>
-      </DropDown>
       <Link to='/support' className='icon help' activeClassName='active'>
         <svg>
           <use xlinkHref='#LifeBuoy'/>
         </svg>
         <FormattedMessage id='topnav.support'/>
       </Link>
+      <div className='rightNav'>
+        {this.renderGlobe()}
+        <DropDown className='user'>
+          <DropDownTitle>
+            <img src={this.props.user.photo} className='avatar'/>
+          </DropDownTitle>
+          <DropDownContent className='right'>
+            <ul className='dropDownList'>
+              {this.props.user.demo ? null : <li>
+                <DropDownCloser>
+                  <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
+                    <FormattedMessage id='topnav.manage'/>
+                  </Link>
+                </DropDownCloser>
+              </li>}
+              <li>
+                <a href='/logout'>
+                  <FormattedMessage id='topnav.logout'/>
+                </a>
+              </li>
+            </ul>
+          </DropDownContent>
+        </DropDown>
+      </div>
     </nav>
   }
 
@@ -99,9 +107,12 @@ class TopNav extends React.Component {
         </svg>
         <FormattedMessage id='topnav.contact'/>
       </Link>
-      <Link to='/auth' className='log-in'>
-        <FormattedMessage id='topnav.login'/>
-      </Link>
+      <div className='rightNav'>
+        {this.renderGlobe()}
+        <Link to='/auth' className='log-in'>
+          <FormattedMessage id='topnav.login'/>
+        </Link>
+      </div>
     </nav>
   }
 
@@ -117,6 +128,7 @@ TopNav.propTypes = {
     laundries: React.PropTypes.arrayOf(React.PropTypes.string)
   }),
   currentLaundry: React.PropTypes.string,
+  locale: React.PropTypes.string,
   laundries: React.PropTypes.object
 }
 
