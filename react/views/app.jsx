@@ -13,6 +13,7 @@ class App extends React.Component {
         <TopNav
           locale={this.props.locale}
           user={this.props.user}
+          location={this.props.location}
           currentLaundry={this.props.currentLaundry}
           laundries={this.props.laundries}/>
         {this.props.children}
@@ -23,6 +24,7 @@ class App extends React.Component {
 }
 
 App.propTypes = {
+  location: React.PropTypes.object,
   locale: React.PropTypes.string,
   children: React.PropTypes.any,
   currentLaundry: React.PropTypes.string,
