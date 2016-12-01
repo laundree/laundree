@@ -1,18 +1,16 @@
 const React = require('react')
 const ContactForm = require('./contact_form.jsx')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
+const {FormattedMessage} = require('react-intl')
 
 class Support extends React.Component {
 
   render () {
     const user = this.props.users[this.props.currentUser]
-    return <DocumentTitle title='Support'>
+    return <DocumentTitle id='document-title.signup'>
       <main id='Support' className='topNaved'>
-        <h1>Support</h1>
-        <section>
-          Experiencing any problems using this amazing system? Do you have any feedback that you want to share? Please
-          contact us with the form below, and we'll get right back at you!
-        </section>
+        <FormattedMessage tagName='h1' id='support.title'/>
+        <FormattedMessage tagName='section' id='support.message'/>
         <ContactForm user={user.demo ? null : user}/>
       </main>
     </DocumentTitle>

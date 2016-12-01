@@ -92,7 +92,7 @@ module.exports = {
       .setValue('#Auth form label:nth-of-type(3) input', password)
       .submitForm('#Auth form')
       .waitForElementVisible('#Auth form .notion.error', timeout)
-    client.expect.element('#Auth form .error.notion').text.to.contain('Conflict')
+    client.expect.element('#Auth form .error.notion').text.to.contain('A user with this email already exists')
     client.end()
   }
 }

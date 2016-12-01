@@ -4,6 +4,7 @@
 const React = require('react')
 const {Link} = require('react-router')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const {FormattedMessage} = require('react-intl')
 
 class TopNav extends React.Component {
 
@@ -58,13 +59,13 @@ class TopNav extends React.Component {
             {this.props.user.demo ? null : <li>
               <DropDownCloser>
                 <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
-                  Manage your account
+                  <FormattedMessage id='topnav.manage'/>
                 </Link>
               </DropDownCloser>
             </li>}
             <li>
               <a href='/logout'>
-                Log out
+                <FormattedMessage id='topnav.logout'/>
               </a>
             </li>
           </ul>
@@ -74,7 +75,7 @@ class TopNav extends React.Component {
         <svg>
           <use xlinkHref='#LifeBuoy'/>
         </svg>
-        Support
+        <FormattedMessage id='topnav.support'/>
       </Link>
     </nav>
   }
@@ -90,15 +91,17 @@ class TopNav extends React.Component {
         <svg>
           <use xlinkHref='#Info'/>
         </svg>
-        About us
+        <FormattedMessage id='topnav.about'/>
       </Link>
       <Link to='/contact' className='icon contact' activeClassName='active'>
         <svg>
           <use xlinkHref='#EMail4'/>
         </svg>
-        Contact
+        <FormattedMessage id='topnav.contact'/>
       </Link>
-      <Link to='/auth' className='log-in'>Log in</Link>
+      <Link to='/auth' className='log-in'>
+        <FormattedMessage id='topnav.login'/>
+      </Link>
     </nav>
   }
 

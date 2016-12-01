@@ -29,8 +29,9 @@ router.use((req, res, next) => {
           const pattern = renderProps.routes.map(r => r.path).join('/').replace('//', '/')
           opbeat.setTransactionName(`${req.method} ${pattern}`)
         }
+        const locale = 'en'
         const html = renderToString(
-          <IntlProvider locale='en'>
+          <IntlProvider locale={locale} messages={require(`../locales/${locale}.json`)}>
             <Provider store={store}>
               {React.createElement(RouterContext, Object.assign({}, renderProps))}
             </Provider>

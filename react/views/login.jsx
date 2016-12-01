@@ -2,11 +2,12 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {USER_NOT_VERIFIED} = require('../../utils/flash')
 const {ValueUpdater} = require('./helpers')
+const {injectIntl, FormattedMessage} = require('react-intl')
 
 class LogIn extends ValueUpdater {
 
@@ -15,9 +16,11 @@ class LogIn extends ValueUpdater {
     const {type, message} = this.props.flash[0]
     if (message !== USER_NOT_VERIFIED) return <div className={'notion ' + type}>{message}</div>
     return <div className={`notion ${type}`}>
-      The email provided isn't verified. <br />
-      Please check your inbox or <br />
-      <Link to='/auth/verification'>send a new verification email</Link>.
+      <FormattedMessage
+        id='auth.error.not-verified'
+        values={{
+          link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link'/></Link>
+        }}/>
     </div>
   }
 
@@ -26,11 +29,9 @@ class LogIn extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title='Login'>
+    return <DocumentTitle id='document-title.login'>
       <div>
-        <h1>
-          Log in to
-        </h1>
+        <FormattedMessage tagName='h1' id='auth.login.title'/>
         <Link to='/' id='Logo'>
           <svg>
             <use xlinkHref='#Logo'/>
@@ -41,27 +42,27 @@ class LogIn extends ValueUpdater {
             <svg>
               <use xlinkHref='#Facebook'/>
             </svg>
-            Log in with Facebook
+            <FormattedMessage id='auth.login.method.facebook'/>
           </a>
           <a href={'/auth/google' + this.query} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus'/>
             </svg>
-            Log in with Google
+            <FormattedMessage id='auth.login.method.google'/>
           </a>
         </div>
         <div className='or'>
-          <span>OR</span>
+          <FormattedMessage id='general.or'/>
         </div>
         <ValidationForm id='SignIn' method='post' action={'/auth/local' + this.query}>
           {this.handleNotion()}
           <ValidationElement email trim value={this.state.values.email || ''}>
             <label
-              data-validate-error='Please enter a valid e-mail address'>
+              data-validate-error={this.props.intl.formatMessage({id: 'auth.error.invalid-email'})}>
               <input
                 type='text'
                 name='username'
-                placeholder='E-mail address'
+                placeholder={this.props.intl.formatMessage({id: 'general.email-address'})}
                 value={this.state.values.email || ''}
                 onChange={this.generateValueUpdater('email')}/>
             </label>
@@ -70,9 +71,9 @@ class LogIn extends ValueUpdater {
             value={this.state.values.password || ''}
             nonEmpty trim>
             <label
-              data-validate-error='Please enter a password'>
+              data-validate-error={this.props.intl.formatMessage({id: 'auth.error.no-password'})}>
               <input
-                type='password' name='password' placeholder='Password'
+                type='password' name='password' placeholder={this.props.intl.formatMessage({id: 'general.password'})}
                 value={this.state.values.password || ''}
                 onChange={this.generateValueUpdater('password')}/>
             </label>
@@ -82,19 +83,32 @@ class LogIn extends ValueUpdater {
           </div>
           <div className='forgot'>
             <div>
-              Forgot your password?{' '}
-              <Link to='/auth/forgot' className='forgot'>Let us send you a new one.</Link>
+              <FormattedMessage
+                id='auth.links.forgot'
+                values={{
+                  link: <Link
+                    to='/auth/forgot'
+                    className='forgot'>{this.props.intl.formatMessage({id: 'auth.links.forgot.link'})}</Link>
+                }}/>
             </div>
             <div>
-              Do you not have an account?{' '}
-              <Link to={'/auth/sign-up' + this.query}>Sign-up here.</Link>
+              <FormattedMessage
+                id='auth.links.signup'
+                values={{
+                  link: <Link
+                    to='/auth/sign-up'
+                    className='forgot'>{this.props.intl.formatMessage({id: 'auth.links.signup.link'})}</Link>
+                }}/>
             </div>
           </div>
         </ValidationForm>
         <div className='notice'>
-          Notice: By logging in without an account, we will register you and you will be accepting our{' '}
-          <a href='/terms-and-conditions' target='_blank'>Terms and Conditions</a>{' '} and{' '}
-          <a href='/privacy' target='_blank'>Privacy Policy</a>.
+          <FormattedMessage id='auth.login.notice' values={{
+            toc: <a
+              href='/terms-and-conditions'
+              target='_blank'>{this.props.intl.formatMessage({id: 'general.toc'})}</a>,
+            pp: <a href='/privacy' target='_blank'>{this.props.intl.formatMessage({id: 'general.privacy-policy'})}</a>
+          }}/>
         </div>
       </div>
     </DocumentTitle>
@@ -102,6 +116,9 @@ class LogIn extends ValueUpdater {
 }
 
 LogIn.propTypes = {
+  intl: React.PropTypes.shape({
+    formatMessage: React.PropTypes.func.isRequired
+  }),
   to: React.PropTypes.string,
   flash: React.PropTypes.arrayOf(React.PropTypes.shape({
     type: React.PropTypes.string.isRequired,
@@ -109,4 +126,4 @@ LogIn.propTypes = {
   })).isRequired
 }
 
-module.exports = LogIn
+module.exports = injectIntl(LogIn)

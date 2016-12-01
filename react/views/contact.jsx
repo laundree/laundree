@@ -1,15 +1,16 @@
 const React = require('react')
 const ContactForm = require('./contact_form.jsx')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
+const {FormattedMessage, FormattedHTMLMessage} = require('react-intl')
 
 class Contact extends React.Component {
 
   render () {
-    return <DocumentTitle title='Support'>
+    return <DocumentTitle id='document-title.contact'>
       <main id='Contact' className='topNaved'>
-        <h1>Contact</h1>
+        <h1><FormattedMessage id='contact.title'/></h1>
         <section>
-          Having any concerns or questions? Please don't hesitate to contact us via. the form below.
+          <FormattedHTMLMessage id='contact.message'/>
         </section>
         <ContactForm/>
       </main>

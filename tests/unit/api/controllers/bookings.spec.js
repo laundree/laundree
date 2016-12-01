@@ -21,9 +21,9 @@ function createDateDayAfterTomorrow (hour = 0, minute = 0, tz = config.timezone)
   return {year: now.year(), month: now.month(), day: now.date(), hour, minute}
 }
 
-function createDateYesterday (hour = 0, minute = 0) {
-  const now = new Date()
-  return {year: now.getFullYear(), month: now.getMonth(), day: now.getDate() - 1, hour, minute}
+function createDateYesterday (hour = 0, minute = 0, tz = config.timezone) {
+  const now = moment.tz(tz).subtract(1, 'd')
+  return {year: now.year(), month: now.month(), day: now.date(), hour, minute}
 }
 
 describe('controllers', function () {
