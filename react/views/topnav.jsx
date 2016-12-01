@@ -14,7 +14,7 @@ class TopNav extends React.Component {
   }
 
   renderGlobe () {
-    return <LocaleSelect locale={this.props.locale}/>
+    return <LocaleSelect locale={this.props.locale} location={this.props.location}/>
   }
 
   renderLaundries () {
@@ -127,6 +127,7 @@ TopNav.propTypes = {
     demo: React.PropTypes.boolean,
     laundries: React.PropTypes.arrayOf(React.PropTypes.string)
   }),
+  location: React.PropTypes.object,
   currentLaundry: React.PropTypes.string,
   locale: React.PropTypes.string,
   laundries: React.PropTypes.object
