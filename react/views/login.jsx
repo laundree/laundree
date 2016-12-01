@@ -29,7 +29,7 @@ class LogIn extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title='document-title.login'>
+    return <DocumentTitle id='document-title.login'>
       <div>
         <FormattedMessage tagName='h1' id='auth.login.title'/>
         <Link to='/' id='Logo'>

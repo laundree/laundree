@@ -2,11 +2,11 @@
  * Created by budde on 28/05/16.
  */
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const DocumentTitle = require('./document-title-intl.jsx')
 const TimetableTables = require('./timetable_tables.jsx')
 const TimetableHeaders = require('./timetable_headers.jsx')
 const {Link} = require('react-router')
-const {FormattedDate} = require('react-intl')
+const {FormattedDate, FormattedMessage} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
@@ -182,11 +182,19 @@ Timetable.propTypes = {
 class TimetableWrapper extends React.Component {
   renderEmpty () {
     return <main className='naved'>
-      <h1 className='alignLeft'>There are no machines registered</h1>
+      <h1 className='alignLeft'>
+        <FormattedMessage id='timetable.no-machines.title'/>
+      </h1>
       {this.isOwner ? <section>
-        Please register your machines <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>here</Link>.
+        <FormattedMessage
+          id='timetable.no-machines.action.register'
+          values={{
+            link: <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>
+              <FormattedMessage id='timetable.no-machines.action.register.link'/>
+            </Link>
+          }}/>
       </section> : <section>
-        Please tell your landlord to register some machines.
+        <FormattedMessage id='timetable.no-machines.action.wait'/>
       </section>}
     </main>
   }
@@ -209,7 +217,7 @@ class TimetableWrapper extends React.Component {
 
   render () {
     if (!this.props.laundry) return null
-    return <DocumentTitle title='Timetable'>
+    return <DocumentTitle id='document-title.timetable'>
       {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
     </DocumentTitle>
   }

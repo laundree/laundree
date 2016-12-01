@@ -21,6 +21,7 @@
   "document-title.contact": "Contact",
   "document-title.login": "Login",
   "document-title.signup": "Sign up",
+  "document-title.timetable": "Timetable",
   "home.teaser": "An free and easy booking system for your laundry",
   "home.clip.credit": "Clip by {link}",
   "home.clip.credit.link": "Beachfront",
@@ -78,5 +79,12 @@
   "auth.links.login": "Already have an account? {link}",
   "auth.links.login.link": "Log in here.",
   "auth.links.login2": "Did you find your verification e-mail? {link}",
-  "auth.links.login2.link": "Log in."
+  "auth.links.login2.link": "Log in.",
+  "support.title": "Support",
+  "support.message": "Experiencing any problems using this amazing system? Do you have any feedback that you want to share? Pleasecontact us with the form below, and we'll get right back at you!",
+  "timetable.title": "Timetable",
+  "timetable.no-machines.title": "There are no machines registered",
+  "timetable.no-machines.action.register": "Please register your machines {link}.",
+  "timetable.no-machines.action.register.link": "here",
+  "timetable.no-machines.action.wait": "Please tell your landlord to register some machines."
 }
