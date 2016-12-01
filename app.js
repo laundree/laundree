@@ -12,6 +12,8 @@ const config = require('config')
 const app = express()
 const hbs = require('hbs')
 const {error} = require('./utils')
+const locale = require('locale')
+const locales = require('./locales')
 
 hbs.registerPartials(path.join(__dirname, 'views', 'partials'))
 // view engine setup
@@ -43,7 +45,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(flash())
-
+app.use(locale(Object.keys(locales)))
 // Swagger
 module.exports = {
   app,

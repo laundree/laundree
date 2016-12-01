@@ -13,10 +13,11 @@ const {createInitialStore} = require('../redux')
 const utils = require('../utils')
 const DocumentTitle = require('react-document-title')
 const {opbeat} = require('../lib/opbeat')
+const locales = require('../locales')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'), req.url)
-    .then((store) => {
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', req.session.locale || req.locale)
+    .then(store => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)
         if (redirectLocation) return res.redirect(302, redirectLocation.pathname + redirectLocation.search)
@@ -29,9 +30,9 @@ router.use((req, res, next) => {
           const pattern = renderProps.routes.map(r => r.path).join('/').replace('//', '/')
           opbeat.setTransactionName(`${req.method} ${pattern}`)
         }
-        const locale = 'en'
+        const locale = store.getState().locale
         const html = renderToString(
-          <IntlProvider locale={locale} messages={require(`../locales/${locale}.json`)}>
+          <IntlProvider locale={locale} messages={locales[locale].messages}>
             <Provider store={store}>
               {React.createElement(RouterContext, Object.assign({}, renderProps))}
             </Provider>

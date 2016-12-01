@@ -13,6 +13,7 @@ function fetchRoutes () {
   router.use('/pdf', require('./pdf'))
   router.use('/s', require('./invite-code'))
   router.use('/', require('./app.jsx'))
+  router.use('/lang', require('./lang'))
   return require('./swagger').fetchRouter().then(route => {
     router.use('/api', route)
     return router

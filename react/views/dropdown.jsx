@@ -48,13 +48,13 @@ class DropDown extends React.Component {
     super(props)
     this.state = {open: false}
     this.onToggle = () => this.toggle()
-    var ref
+    let ref
 
     this.refPuller = (r) => {
       ref = r
     }
     this.clickListener = (event) => {
-      var target = event.target
+      let target = event.target
       while (target && target.classList) {
         if (target === ref) return
         target = target.parentNode

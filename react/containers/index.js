@@ -6,7 +6,7 @@ module.exports = {
   Timetable: require('./timetable'),
   App: require('./app'),
   LeftNav: require('./leftnav'),
-  Auth: require('../views').Auth,
+  Auth: require('./auth'),
   Forgot: require('../views').Forgot,
   SignUp: require('./sign_up'),
   Reset: require('../views').Reset,
