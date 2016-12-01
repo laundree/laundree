@@ -9,7 +9,7 @@ const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
 const {injectIntl, FormattedMessage} = require('react-intl')
 
-class Forgot extends ValueUpdater {
+class Verification extends ValueUpdater {
   constructor (props) {
     super(props)
     this.submitHandler = (evt) => {
@@ -19,11 +19,11 @@ class Forgot extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: 'auth.forgot.success', type: 'success'}
+            message: {message: 'auth.verification.success', type: 'success'}
           }),
           () => this.setState({
             loading: false,
-            message: {message: 'auth.forgot.error', type: 'error'}
+            message: {message: 'auth.verification.error', type: 'error'}
           }))
     }
   }
@@ -36,9 +36,9 @@ class Forgot extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitleIntl id='document-title.reset-password'>
+    return <DocumentTitleIntl id='document-title.resend-verification'>
       <div>
-        <FormattedMessage id='auth.forgot.title' tagName='h1'/>
+        <FormattedMessage id='auth.verification.title' tagName='h1'/>
         <Link to='/' id='Logo'>
           <svg>
             <use xlinkHref='#Logo'/>
@@ -94,10 +94,10 @@ class Forgot extends ValueUpdater {
   }
 }
 
-Forgot.propTypes = {
+Verification.propTypes = {
   intl: React.PropTypes.shape({
     formatMessage: React.PropTypes.func.isRequired
   })
 }
 
-module.exports = injectIntl(Forgot)
+module.exports = injectIntl(Verification)

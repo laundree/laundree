@@ -23,6 +23,7 @@ module.exports = {
   },
   'test_settings': {
     'local': {
+      filter: 'tests/e2e/locale/*',
       'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000',
       'selenium_port': process.env.SELENIUM_PORT || 4444,
       'selenium_host': process.env.SELENIUM_HOST || 'localhost',
