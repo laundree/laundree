@@ -7,6 +7,8 @@ const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
+const {Input, Submit, Label} = require('./intl')
+const {FormattedMessage} = require('react-intl')
 
 class Reset extends ValueUpdater {
 
@@ -20,13 +22,20 @@ class Reset extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: 'Your password has been reset', type: 'success'}
+            message: {message: 'auth.reset.success', type: 'success'}
           }),
           () => this.setState({
             loading: false,
-            message: {message: 'Something went wrong', type: 'error'}
+            message: {message: 'auth.reset.error', type: 'error'}
           }))
     }
+  }
+
+  renderMessage () {
+    if (!this.state.message) return null
+    return <div className={'notion ' + (this.state.message.type || '')}>
+      <FormattedMessage id={this.state.message.message}/>
+    </div>
   }
 
   render () {
@@ -44,30 +53,40 @@ class Reset extends ValueUpdater {
           sesh={this.state.sesh}
           onSubmit={this.submitHandler}
           id='ResetPassword'>
-          {this.state.message
-            ? <div className={'notion ' + (this.state.message.type || '')}>{this.state.message.message}</div>
-            : null}
+          {this.renderMessage()}
           <ValidationElement
             sesh={this.state.sesh}
             password trim value={this.state.values.password || ''}>
-            <label data-validate-error='Please enter at least 6 characters'>
-              <input
+            <Label data-validate-error='auth.error.invalid-password'>
+              <Input
                 onChange={this.generateValueUpdater('password')}
                 value={this.state.values.password || ''}
-                type='password' name='password' placeholder='New password'/>
-            </label>
+                type='password' name='password' placeholder='general.new-password'/>
+            </Label>
           </ValidationElement>
           <div className='buttons'>
-            <input type='submit' value='Reset'/>
+            <Submit value='general.reset'/>
           </div>
           <div className='forgot'>
             <div>
-              Did you remember your password?{' '}
-              <Link to='/auth' className='forgot'>Log in.</Link>
+              <FormattedMessage
+                id='auth.links.login3'
+                values={{
+                  link: <Link to='/auth'>
+                    <FormattedMessage id='auth.links.login3.link'/>
+                  </Link>
+                }}/>
             </div>
             <div>
-              Do you not have an account?{' '}
-              <Link to='/auth/sign-up'>Sign-up here.</Link>
+              <FormattedMessage
+                id='auth.links.signup'
+                values={{
+                  link: <Link
+                    to='/auth/sign-up'
+                    className='forgot'>
+                    <FormattedMessage id='auth.links.signup.link'/>
+                  </Link>
+                }}/>
             </div>
           </div>
         </ValidationForm>

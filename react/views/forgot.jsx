@@ -2,12 +2,13 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('./document-title-intl.jsx')
+const {DocumentTitle} = require('./intl')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {FormattedMessage, injectIntl} = require('react-intl')
+const {FormattedMessage} = require('react-intl')
+const {Input, Label, Submit} = require('./intl')
 
 class Forgot extends ValueUpdater {
   constructor (props) {
@@ -37,7 +38,7 @@ class Forgot extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle id='document-title.resend-verification'>
+    return <DocumentTitle title='document-title.resend-verification'>
       <div>
         <FormattedMessage tagName='h1' id='auth.forgot.title'/>
         <Link to='/' id='Logo'>
@@ -56,16 +57,16 @@ class Forgot extends ValueUpdater {
             trim
             sesh={this.state.sesh}
             value={this.state.values.email || ''}>
-            <label data-validate-error={this.props.intl.formatMessage({id: 'auth.error.no-email'})}>
-              <input
+            <Label data-validate-error='auth.error.no-email'>
+              <Input
                 onChange={this.generateValueUpdater('email')}
                 value={this.state.values.email || ''}
                 type='text' name='email'
-                placeholder={this.props.intl.formatMessage({id: 'general.email-address'})}/>
-            </label>
+                placeholder='general.email-address'/>
+            </Label>
           </ValidationElement>
           <div className='buttons'>
-            <input type='submit' value='Reset'/>
+            <Submit value='general.reset'/>
           </div>
           <div className='forgot'>
             <div>
@@ -73,7 +74,7 @@ class Forgot extends ValueUpdater {
                 id='auth.links.login3'
                 values={{
                   link: <Link to='/auth'>
-                    {this.props.intl.formatMessage({id: 'auth.links.login3.link'})}
+                    <FormattedMessage id='auth.links.login3.link'/>
                   </Link>
                 }}/>
             </div>
@@ -83,7 +84,9 @@ class Forgot extends ValueUpdater {
                 values={{
                   link: <Link
                     to='/auth/sign-up'
-                    className='forgot'>{this.props.intl.formatMessage({id: 'auth.links.signup.link'})}</Link>
+                    className='forgot'>
+                    <FormattedMessage id='auth.links.signup.link'/>
+                  </Link>
                 }}/>
             </div>
           </div>
@@ -93,10 +96,4 @@ class Forgot extends ValueUpdater {
   }
 }
 
-Forgot.propTypes = {
-  intl: React.PropTypes.shape({
-    formatMessage: React.PropTypes.func.isRequired
-  })
-}
-
-module.exports = injectIntl(Forgot)
+module.exports = Forgot

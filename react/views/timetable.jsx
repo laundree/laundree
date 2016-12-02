@@ -2,7 +2,7 @@
  * Created by budde on 28/05/16.
  */
 const React = require('react')
-const DocumentTitle = require('./document-title-intl.jsx')
+const {DocumentTitle} = require('./intl')
 const TimetableTables = require('./timetable_tables.jsx')
 const TimetableHeaders = require('./timetable_headers.jsx')
 const {Link} = require('react-router')
@@ -217,7 +217,7 @@ class TimetableWrapper extends React.Component {
 
   render () {
     if (!this.props.laundry) return null
-    return <DocumentTitle id='document-title.timetable'>
+    return <DocumentTitle title='document-title.timetable'>
       {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
     </DocumentTitle>
   }

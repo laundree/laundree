@@ -4,6 +4,8 @@ const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const AdminPanel = require('../containers/admin_panel')
 const sdk = require('../../client/sdk')
+const {FormattedMessage} = require('react-intl')
+const {Input, Label, Submit} = require('./intl')
 
 class CreateLaundry extends ValueUpdater {
 
@@ -30,60 +32,61 @@ class CreateLaundry extends ValueUpdater {
   }
 
   calculateClassName () {
-    var className = 'create'
+    let className = 'create'
     if (this.state.createExpanded) className += ' expanded'
     if (this.state.notion) className += ' has_notion'
     return className
   }
 
   static errorToNotion (err) {
-    var message
+    let message
     switch (err.status) {
       case 409:
-        message = 'A laundry by that name already exists'
+        message = 'home.logged-in.error.duplicate'
         break
       case 500:
-        message = 'Internal server error'
+        message = 'home.logged-in.error.duplicate'
         break
       default:
-        message = 'Unknown error occurred'
+        message = 'home.logged-in.error.unknown'
     }
     return {type: 'error', message}
+  }
+
+  renderNotion () {
+    if (!this.state.notion) return null
+    return <div className={this.state.notion.type + ' notion'}>
+      <FormattedMessage id={this.state.notion.message}/>
+    </div>
   }
 
   render () {
     return <DocumentTitle title='Create Laundry'>
       <main id='CreateLaundry'>
-        <h1>Couldn't find any laundry...</h1>
+        <FormattedMessage id='home.logged-in.title' tagName='h1'/>
         <section>
-          <div>
-            It doesn't seem like you have any laundry attached to your account.
-            If you want to share your machines with your tenants, please create a new laundry.
-          </div>
+          <FormattedMessage tagName='div' id='home.logged-in.message'/>
           <div className={this.calculateClassName()}>
             <ValidationForm className={this.state.loading ? 'blur' : ''} onSubmit={this.onSubmit}>
-              {this.state.notion
-                ? <div className={this.state.notion.type + ' notion'}>{this.state.notion.message}</div>
-                : null}
+              {this.renderNotion()}
               <ValidationElement name='name' nonEmpty value={this.state.values.name || ''}>
-                <label data-validate-error='Please enter a name for your laundry.'>
-                  <input
+                <Label data-validate-error='home.logged-in.error.invalid-laundry-name'>
+                  <Input
                     type='text' value={this.state.values.name || ''} onChange={this.generateValueUpdater('name')}
-                    placeholder='Laundry name'/>
-                </label>
+                    placeholder='general.laundry-name'/>
+                </Label>
               </ValidationElement>
               <div className='buttons'>
-                <input type='submit' value='Create'/>
+                <Submit value='general.create'/>
               </div>
             </ValidationForm>
             <div className='expand_button'>
-              <button onClick={this.expander}>Create a laundry</button>
+              <button onClick={this.expander}>
+                <FormattedMessage id='home.logged-in.button.create'/>
+              </button>
             </div>
           </div>
-          <div>
-            Are you a tenant who wants to use laundree for your laundry? Please tell your
-            landlord to use Laundree or invite you if he already is.
-          </div>
+          <FormattedMessage tagName='div' id='home.logged-in.message.tenant'/>
         </section>
       </main>
     </DocumentTitle>

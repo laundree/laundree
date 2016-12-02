@@ -2,7 +2,8 @@ const React = require('react')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {injectIntl, FormattedMessage} = require('react-intl')
+const {FormattedMessage} = require('react-intl')
+const {Input, Label, TextArea, Submit} = require('./intl')
 
 const UserInput = ({user: {photo, displayName}}) => <div className='userInput'>
   <img className='avatar' src={photo}/>
@@ -46,25 +47,25 @@ class ContactForm extends ValueUpdater {
   renderUser () {
     if (this.props.user) return <UserInput user={this.props.user}/>
     return <ValidationElement sesh={this.state.sesh} value={this.state.values.name} nonEmpty trim>
-      <label data-validate-error={this.props.intl.formatMessage({id: 'contact-form.error.no-name'})}>
-        <input
+      <Label data-validate-error='contact-form.error.no-name'>
+        <Input
           readOnly={Boolean(this.props.user)}
-          placeholder={this.props.intl.formatMessage({id: 'general.name'})}
+          placeholder='general.name'
           type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}/>
-      </label>
+      </Label>
     </ValidationElement>
   }
 
   renderEmail () {
     if (this.props.user) return null
     return <ValidationElement sesh={this.state.sesh} value={this.state.values.email} email trim>
-      <label data-validate-error={this.props.intl.formatMessage({id: 'contact-form.error.invalid-email'})}>
-        <input
+      <Label data-validate-error='contact-form.error.invalid-email'>
+        <Input
           readOnly={Boolean(this.props.user)}
-          placeholder={this.props.intl.formatMessage({id: 'general.email-address'})}
+          placeholder='general.email-address'
           type='text' value={this.state.values.email}
           onChange={this.generateValueUpdater('email')}/>
-      </label>
+      </Label>
     </ValidationElement>
   }
 
@@ -82,31 +83,28 @@ class ContactForm extends ValueUpdater {
       {this.renderUser()}
       {this.renderEmail()}
       <ValidationElement sesh={this.state.sesh} value={this.state.values.subject} nonEmpty trim>
-        <label data-validate-error={this.props.intl.formatMessage({id: 'contact-form.error.no-subject'})}>
-          <input
-            placeholder={this.props.intl.formatMessage({id: 'general.subject'})}
+        <Label data-validate-error='contact-form.error.no-subject'>
+          <Input
+            placeholder='general.subject'
             type='text' value={this.state.values.subject} onChange={this.generateValueUpdater('subject')}/>
-        </label>
+        </Label>
       </ValidationElement>
       <ValidationElement sesh={this.state.sesh} value={this.state.values.message} nonEmpty trim>
-        <label data-validate-error={this.props.intl.formatMessage({id: 'contact-form.error.no-message'})}>
-          <textarea
-            placeholder={this.props.intl.formatMessage({id: 'general.message'})}
+        <Label data-validate-error='contact-form.error.no-message'>
+          <TextArea
+            placeholder='general.message'
             value={this.state.values.message} onChange={this.generateValueUpdater('message')}/>
-        </label>
+        </Label>
       </ValidationElement>
       <div className='buttons'>
-        <input type='submit' value={this.props.intl.formatMessage({id: 'general.send'})}/>
+        <Submit value='general.send'/>
       </div>
     </ValidationForm>
   }
 }
 
 ContactForm.propTypes = {
-  intl: React.PropTypes.shape({
-    formatMessage: React.PropTypes.func.isRequired
-  }),
   user: React.PropTypes.object
 }
 
-module.exports = injectIntl(ContactForm)
+module.exports = ContactForm

@@ -2,12 +2,13 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('./document-title-intl.jsx')
+const {DocumentTitle} = require('./intl')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {injectIntl, FormattedMessage} = require('react-intl')
+const {FormattedMessage} = require('react-intl')
+const {Input, Submit, Label} = require('./intl')
 
 class SignUp extends ValueUpdater {
 
@@ -50,7 +51,7 @@ class SignUp extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle id='document-title.signup'>
+    return <DocumentTitle title='document-title.signup'>
       <div>
         <FormattedMessage id='auth.signup.title' tagName='h1'/>
         <Link to='/' id='Logo'>
@@ -85,50 +86,56 @@ class SignUp extends ValueUpdater {
             trim sesh={this.state.sesh}
             initial={this.state.values.name === undefined}
             value={this.state.values.name || ''}>
-            <label data-validate-error={this.props.intl.formatMessage({id: 'auth.error.no-full-name'})}>
-              <input
-                type='text' name='name' placeholder={this.props.intl.formatMessage({id: 'general.full-name'})}
+            <Label data-validate-error='auth.error.no-full-name'>
+              <Input
+                type='text'
+                name='name'
+                placeholder='general.full-name'
                 value={this.state.values.name || ''}
                 onChange={this.generateValueUpdater('name')}
               />
-            </label>
+            </Label>
           </ValidationElement>
           <ValidationElement
             email
             trim sesh={this.state.sesh}
             initial={this.state.values.email === undefined}
             value={this.state.values.email || ''}>
-            <label
-              data-validate-error={this.props.intl.formatMessage({id: 'auth.error.invalid-email'})}>
-              <input
+            <Label
+              data-validate-error='auth.error.invalid-email'>
+              <Input
                 value={this.state.values.email || ''}
                 onChange={this.generateValueUpdater('email')}
-                type='text' name='email' placeholder={this.props.intl.formatMessage({id: 'general.email-address'})}/>
-            </label>
+                type='text' name='email' placeholder='general.email-address'/>
+            </Label>
           </ValidationElement>
           <ValidationElement
             initial={this.state.values.password === undefined}
             password
             trim sesh={this.state.sesh}
             value={this.state.values.password || ''}>
-            <label data-validate-error={this.props.intl.formatMessage({id: 'auth.error.invalid-password'})}>
-              <input
+            <Label data-validate-error='auth.error.invalid-password'>
+              <Input
                 value={this.state.values.password || ''}
                 onChange={this.generateValueUpdater('password')}
-                type='password' name='password' placeholder={this.props.intl.formatMessage({id: 'general.password'})}/>
-            </label>
+                type='password' name='password' placeholder='general.password'/>
+            </Label>
           </ValidationElement>
           <div className='accept'>
             <FormattedMessage id='auth.signup.notice' values={{
               toc: <a
                 href='/terms-and-conditions'
-                target='_blank'>{this.props.intl.formatMessage({id: 'general.toc'})}</a>,
-              pp: <a href='/privacy' target='_blank'>{this.props.intl.formatMessage({id: 'general.privacy-policy'})}</a>
+                target='_blank'>
+                <FormattedMessage id='general.toc'/>
+              </a>,
+              pp: <a href='/privacy' target='_blank'>
+                <FormattedMessage id='general.privacy-policy'/>
+              </a>
             }}/>
           </div>
           <div className='buttons'>
-            <input
-              type='submit' value={this.props.intl.formatMessage({id: 'general.create-account'})}
+            <Submit
+              value='general.create-account'
               className='create'/>
           </div>
           <div className='forgot'>
@@ -137,7 +144,7 @@ class SignUp extends ValueUpdater {
                 id='auth.links.login'
                 values={{
                   link: <Link to={'/auth' + this.query}>
-                    {this.props.intl.formatMessage({id: 'auth.links.login.link'})}
+                    <FormattedMessage id='auth.links.login.link'/>
                   </Link>
                 }}/>
             </div>
@@ -147,7 +154,9 @@ class SignUp extends ValueUpdater {
                 values={{
                   link: <Link
                     to='/auth/forgot'
-                    className='forgot'>{this.props.intl.formatMessage({id: 'auth.links.forgot.link'})}</Link>
+                    className='forgot'>
+                    <FormattedMessage id='auth.links.forgot.link'/>
+                  </Link>
                 }}/>
             </div>
           </div>
@@ -157,10 +166,4 @@ class SignUp extends ValueUpdater {
   }
 }
 
-SignUp.propTypes = {
-  intl: React.PropTypes.shape({
-    formatMessage: React.PropTypes.func.isRequired
-  })
-}
-
-module.exports = injectIntl(SignUp)
+module.exports = SignUp
