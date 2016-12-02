@@ -213,7 +213,7 @@ class Users extends React.Component {
           <h2>Invite user from email</h2>
           <InviteUserForm laundry={this.props.laundry}/>
         </section>
-        <section>
+        <section id='QrInviteSection'>
           <h2>Invite user from QR</h2>
           <QrInvite laundry={this.props.laundry}/>
         </section>

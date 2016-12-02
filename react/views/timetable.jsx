@@ -24,12 +24,10 @@ class BookingInfo extends React.Component {
   }
 
   renderActions () {
-    return <div className='buttonContainer'>
-      {this.isOwner
-        ? <button className='red' onClick={this.deleteHandler}>Delete booking</button>
-        : null }
-      <button onClick={this.closeHandler}>Close</button>
-    </div>
+    if (!this.isOwner) return null
+    return <button className='red' onClick={this.deleteHandler}>
+      <FormattedMessage id='general.delete-booking'/>
+    </button>
   }
 
   get isOwner () {
@@ -47,18 +45,36 @@ class BookingInfo extends React.Component {
     return <div id='ActiveBooking'>
       <img src={owner.photo} className='avatar'/>
       <div className='text'>
-        {owner.id === this.props.currentUser ? 'You have' : `${owner.displayName} has`} booked{' '}
-        <i>{this.props.machines[this.props.booking.machine].name}</i> from{' '}
-        <FormattedDate
-          weekday={today ? undefined : 'long'}
-          month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
-          value={this.props.booking.from}/> {' '}
-        to{' '}
-        <FormattedDate
-          weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
-          day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric' value={this.props.booking.to}/> {' '}
+        <FormattedMessage
+          id={owner.id === this.props.currentUser
+            ? 'timetable.modal.message.you-have'
+            : 'timetable.modal.message.user-has'}
+          values={{
+            machine: <i>{this.props.machines[this.props.booking.machine].name}</i>,
+            fromTime: <FormattedDate
+              weekday={today ? undefined : 'long'}
+              month={today ? undefined : 'numeric'}
+              day={today ? undefined : 'numeric'}
+              hour='numeric'
+              minute='numeric'
+              value={this.props.booking.from}/>,
+            toTime: <FormattedDate
+              weekday={sameDay ? undefined : 'long'}
+              month={sameDay ? undefined : 'numeric'}
+              day={sameDay ? undefined : 'numeric'}
+              hour='numeric'
+              minute='numeric'
+              value={this.props.booking.to}/>,
+            user: owner.displayName
+          }}
+        />
       </div>
-      {this.renderActions()}
+      <div className='buttonContainer'>
+        {this.renderActions()}
+        <button onClick={this.closeHandler}>
+          <FormattedMessage id='general.close'/>
+        </button>
+      </div>
     </div>
   }
 
