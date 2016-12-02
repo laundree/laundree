@@ -3,7 +3,7 @@
  */
 
 const React = require('react')
-const reactIntl = require('react-intl')
+const {FormattedDate, FormattedMessage} = require('react-intl')
 const string = require('../../utils/string')
 const {Link} = require('react-router')
 const moment = require('moment-timezone')
@@ -14,7 +14,7 @@ const TimetableHeader = (props) => {
     .filter((m) => m)
   return <div className='header_container'>
     <div className='date'>
-      <reactIntl.FormattedDate
+      <FormattedDate
         weekday='short' month='numeric' day='numeric'
         value={new Date(props.date.format('YYYY-MM-DD'))}/>
     </div>
@@ -83,7 +83,7 @@ class TimeTableHeaderNav extends React.Component {
       return <div className='nav'>
         {navLeft}
         {calendar}
-        <reactIntl.FormattedDate
+        <FormattedDate
           weekday='short' month='numeric' day='numeric'
           value={this.firstDate}/>
         {navRight}
@@ -93,15 +93,17 @@ class TimeTableHeaderNav extends React.Component {
     return <div className='nav'>
       {navLeft}
       {calendar}
-      from{' '}
-      <reactIntl.FormattedDate
-        weekday='short' month='numeric' day='numeric'
-        value={new Date(this.firstDate.format('YYYY-MM-DD'))}/>
-      {' '}
-      to{' '}
-      <reactIntl.FormattedDate
-        weekday='short' month='numeric' day='numeric'
-        value={new Date(this.lastDate.format('YYYY-MM-DD'))}/>
+      <FormattedMessage
+        id='timetable.nav'
+        values={{
+          fromDate: <FormattedDate
+            weekday='short' month='numeric' day='numeric'
+            value={new Date(this.firstDate.format('YYYY-MM-DD'))}/>,
+          toDate: <FormattedDate
+            weekday='short' month='numeric' day='numeric'
+            value={new Date(this.lastDate.format('YYYY-MM-DD'))}/>
+        }}
+      />
       {navRight}
     </div>
   }
@@ -117,9 +119,7 @@ const TimetableHeaders = (props) => {
   return <header
     className={props.dates.length && props.dates[0].isSameOrBefore(now, 'd') ? 'today' : undefined}>
     <div className='date_nav'>
-      <h1>
-        Timetable
-      </h1>
+      <FormattedMessage tagName='h1' id='timetable.title'/>
       <TimeTableHeaderNav
         laundry={props.laundry}
         dates={props.dates}/>

@@ -107,6 +107,7 @@
   "support.title": "Support",
   "support.message": "Experiencing any problems using this amazing system? Do you have any feedback that you want to share? Pleasecontact us with the form below, and we'll get right back at you!",
   "timetable.title": "Timetable",
+  "timetable.nav": "from {fromDate} to {toDate}",
   "timetable.no-machines.title": "There are no machines registered",
   "timetable.no-machines.action.register": "Please register your machines {link}.",
   "timetable.no-machines.action.register.link": "here",
