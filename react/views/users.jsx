@@ -2,7 +2,7 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
-const Modal = require('./modal.jsx')
+const {Modal} = require('./intl')
 const sdk = require('../../client/sdk')
 
 class InviteUserForm extends ValueUpdater {
@@ -107,10 +107,10 @@ class UserItem extends React.Component {
       <Modal
         show={this.state.showModal}
         onClose={this.onCloseModal}
-        message='Are you absolutely sure that you want to delete this user?'
+        message='users.modal.delete-user'
         actions={[
-          {label: 'Yes', className: 'delete red', action: this.handleDelete},
-          {label: 'No', action: this.onCloseModal}
+          {label: 'general.yes', className: 'delete red', action: this.handleDelete},
+          {label: 'general.no', action: this.onCloseModal}
         ]}/>
       <div className='avatarContainer'>
         <img className='avatar' src={this.props.user.photo}/>
@@ -150,10 +150,10 @@ class InviteItem extends React.Component {
       <Modal
         show={this.state.showModal}
         onClose={this.onCloseModal}
-        message='Are you absolutely sure that you want to delete this invitation?'
+        message='users.modal.delete-invite'
         actions={[
-          {label: 'Yes', className: 'delete red', action: this.handleDelete},
-          {label: 'No', action: this.onCloseModal}
+          {label: 'general.yes', className: 'delete red', action: this.handleDelete},
+          {label: 'general.no', action: this.onCloseModal}
         ]}/>
       <div className='avatarContainer'/>
       <div className='name'>

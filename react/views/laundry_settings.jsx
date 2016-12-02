@@ -1,6 +1,6 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
-const Modal = require('./modal.jsx')
+const {Modal} = require('./modal')
 const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')

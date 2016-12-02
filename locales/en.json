@@ -18,6 +18,10 @@
   "general.create-account": "Create your account",
   "general.send-again": "Resend",
   "general.reset": "Reset",
+  "general.delete": "Delete",
+  "general.yes": "Yes",
+  "general.no": "No",
+  "general.cancel": "Cancel",
   "document-title.reset-password": "Reset password",
   "document-title.resend-verification": "Resend verification e-mail",
   "document-title.home": "Home",
@@ -111,5 +115,10 @@
   "timetable.no-machines.title": "There are no machines registered",
   "timetable.no-machines.action.register": "Please register your machines {link}.",
   "timetable.no-machines.action.register.link": "here",
-  "timetable.no-machines.action.wait": "Please tell your landlord to register some machines."
+  "timetable.no-machines.action.wait": "Please tell your landlord to register some machines.",
+  "bookings.title": "Your bookings",
+  "bookings.no-bookings": "You have no bookings.",
+  "bookings.modal.delete-booking": "Are you sure that you want to delete this booking?",
+  "users.modal.delete-user": "Are you absolutely sure that you want to delete this user?",
+  "users.modal.delete-invite": "Are you absolutely sure that you want to delete this invitation?"
 }

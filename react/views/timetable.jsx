@@ -10,7 +10,7 @@ const {FormattedDate, FormattedMessage} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
-const BaseModal = require('./base_modal.jsx')
+const {BaseModal} = require('./modal')
 
 class BookingInfo extends React.Component {
 

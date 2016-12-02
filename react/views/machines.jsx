@@ -2,7 +2,7 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
-const Modal = require('./modal.jsx')
+const {Modal} = require('./modal')
 const sdk = require('../../client/sdk')
 
 class MachineDropdown extends React.Component {
