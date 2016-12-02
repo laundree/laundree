@@ -1,13 +1,13 @@
 const React = require('react')
 const ContactForm = require('./contact_form.jsx')
-const DocumentTitle = require('./document-title-intl.jsx')
+const {DocumentTitle} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class Support extends React.Component {
 
   render () {
     const user = this.props.users[this.props.currentUser]
-    return <DocumentTitle id='document-title.signup'>
+    return <DocumentTitle title='document-title.signup'>
       <main id='Support' className='topNaved'>
         <FormattedMessage tagName='h1' id='support.title'/>
         <FormattedMessage tagName='section' id='support.message'/>

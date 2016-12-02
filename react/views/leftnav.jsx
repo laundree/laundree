@@ -1,5 +1,7 @@
 const React = require('react')
 const {Link} = require('react-router')
+const {FormattedMessage} = require('react-intl')
+
 class LeftNav extends React.Component {
 
   constructor (props) {
@@ -50,7 +52,7 @@ class LeftNav extends React.Component {
                 <svg>
                   <use xlinkHref='#Time'/>
                 </svg>
-                <span>Timetable</span>
+                <FormattedMessage id='leftnav.timetable'/>
               </Link>
             </li>
             <li>
@@ -60,7 +62,7 @@ class LeftNav extends React.Component {
                 <svg>
                   <use xlinkHref='#List'/>
                 </svg>
-                <span>Your bookings</span>
+                <FormattedMessage id='leftnav.own-bookings'/>
               </Link>
             </li>
             {owner
@@ -71,7 +73,7 @@ class LeftNav extends React.Component {
                 <svg>
                   <use xlinkHref='#SimpleMachine'/>
                 </svg>
-                <span>Machines</span>
+                <FormattedMessage id='leftnav.machines'/>
               </Link>
             </li>
               : null}
@@ -83,7 +85,7 @@ class LeftNav extends React.Component {
                 <svg>
                   <use xlinkHref='#Users'/>
                 </svg>
-                <span>Users</span>
+                <FormattedMessage id='leftnav.users'/>
               </Link>
             </li>
               : null}
@@ -97,7 +99,7 @@ class LeftNav extends React.Component {
                 <svg>
                   <use xlinkHref='#Gears'/>
                 </svg>
-                <span>Settings</span>
+                <FormattedMessage id='leftnav.settings'/>
               </Link>
             </li>
           </ul>

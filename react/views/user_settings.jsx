@@ -4,7 +4,7 @@ const {Link} = require('react-router')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const Modal = require('./modal.jsx')
+const {Modal} = require('./modal')
 
 class UserNameForm extends ValueUpdater {
 

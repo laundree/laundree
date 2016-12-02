@@ -2,8 +2,9 @@ const React = require('react')
 const {FormattedDate} = require('react-intl')
 const {Link} = require('react-router')
 const DocumentTitle = require('react-document-title')
-const Modal = require('./modal.jsx')
+const {Modal} = require('./intl')
 const sdk = require('../../client/sdk')
+const {FormattedMessage} = require('react-intl')
 
 class Booking extends React.Component {
 
@@ -25,16 +26,16 @@ class Booking extends React.Component {
     return <div>
       <Modal
         show={this.state.showModal}
-        message='Are you sure that you want to delete this booking?'
+        message='bookings.modal.delete-booking'
         onClose={this.onCloseModal}
         actions={[
-          {label: 'Delete', className: 'delete red', action: this.onDeleteModal},
-          {label: 'Cancel', className: 'cancel', action: this.onCloseModal}]}
+          {label: 'general.delete', className: 'delete red', action: this.onDeleteModal},
+          {label: 'general.cancel', className: 'cancel', action: this.onCloseModal}]}
       />
       <div className='machineName'>
         <Link
           to={`/laundries/${this.props.currentLaundry}/timetable?offsetDate=${fromDate.getTime()}&activeBooking=${booking.id}`}>
-          {machine.name}
+          {machine ? machine.name : null}
         </Link>
       </div>
       <div className='time_action_wrapper'>
@@ -75,17 +76,22 @@ class Bookings extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {showModal: false}
+    this.state = {showModal: false, loading: true}
     this.onCloseModal = () => this.setState({showModal: false})
   }
 
   componentDidMount () {
     sdk.listBookingsForUser(this.props.currentLaundry, this.props.user.id, {to: {$gte: new Date()}})
+    sdk.listMachines(this.props.currentLaundry)
   }
 
   renderBookings () {
     if (!this.props.userBookings) return <div className='loading blur'/>
-    if (!this.props.userBookings.length) return <div className='empty_list'><span>You have no bookings.</span></div>
+    if (!this.props.userBookings.length) {
+      return <div className='empty_list'>
+        <FormattedMessage id='bookings.no-bookings'/>
+      </div>
+    }
     return <ul>{this.props.userBookings
       .map((id) => this.props.bookings[id])
       .map((booking) => <li key={booking.id}><Booking
@@ -96,7 +102,9 @@ class Bookings extends React.Component {
   render () {
     return <DocumentTitle title='Bookings'>
       <main className='naved'>
-        <h1 className='alignLeft'>Your bookings</h1>
+        <h1 className='alignLeft'>
+          <FormattedMessage id='bookings.title'/>
+        </h1>
         <section id='BookingList'>
           {this.renderBookings()}
         </section>

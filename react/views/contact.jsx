@@ -1,12 +1,12 @@
 const React = require('react')
 const ContactForm = require('./contact_form.jsx')
-const DocumentTitle = require('./document-title-intl.jsx')
+const {DocumentTitle} = require('./intl')
 const {FormattedMessage, FormattedHTMLMessage} = require('react-intl')
 
 class Contact extends React.Component {
 
   render () {
-    return <DocumentTitle id='document-title.contact'>
+    return <DocumentTitle title='document-title.contact'>
       <main id='Contact' className='topNaved'>
         <h1><FormattedMessage id='contact.title'/></h1>
         <section>
