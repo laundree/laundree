@@ -7,7 +7,7 @@ const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {Label, Input} = require('./intl')
+const {Label, Input, Submit} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class Verification extends ValueUpdater {
@@ -67,7 +67,7 @@ class Verification extends ValueUpdater {
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Input type='submit' value='general.send-again'/>
+            <Submit value='general.send-again'/>
           </div>
           <div className='forgot'>
             <div>
