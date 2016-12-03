@@ -124,5 +124,17 @@
   "bookings.no-bookings": "You have no bookings.",
   "bookings.modal.delete-booking": "Are you sure that you want to delete this booking?",
   "users.modal.delete-user": "Are you absolutely sure that you want to delete this user?",
-  "users.modal.delete-invite": "Are you absolutely sure that you want to delete this invitation?"
+  "users.modal.delete-invite": "Are you absolutely sure that you want to delete this invitation?",
+  "admin-panel.users": "Users",
+  "admin-panel.demo-users": "Demo users",
+  "admin-panel.laundries": "Laundries",
+  "admin-panel.demo-laundries": "Demo laundries",
+  "admin-panel.machines": "Machines",
+  "admin-panel.bookings": "Bookings",
+  "admin-panel.stats-title": "Current statistics",
+  "admin-panel.page-of": "Page {page} of {numPages}",
+  "admin-panel.loading": "Loading...",
+  "admin-panel.no-users": "No users found.",
+  "admin-panel.no-laundries": "No laundries found.",
+  "admin-panel.title": "Administrator panel"
 }
