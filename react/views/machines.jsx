@@ -2,8 +2,9 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
-const {Modal} = require('./modal')
+const {Modal, Label, Input, Submit} = require('./intl')
 const sdk = require('../../client/sdk')
+const {FormattedMessage} = require('react-intl')
 
 class MachineDropdown extends React.Component {
 
@@ -29,7 +30,7 @@ class MachineDropdown extends React.Component {
                 <svg>
                   <use xlinkHref='#Drop'/>
                 </svg>
-                Washing machine
+                <FormattedMessage id='machines.washing-machine'/>
               </span>
             </li>
           </DropDownCloser>
@@ -39,7 +40,7 @@ class MachineDropdown extends React.Component {
                 <svg>
                   <use xlinkHref='#Waves'/>
                 </svg>
-                Dryer
+                <FormattedMessage id='machines.dryer'/>
               </span>
             </li>
           </DropDownCloser>
@@ -119,7 +120,7 @@ class MachineListItem extends React.Component {
   }
 
   get blacklist () {
-    var blacklist = this.props.blacklist
+    let blacklist = this.props.blacklist
     if (this.props.machine) blacklist = blacklist.filter((name) => name !== this.props.machine.name)
     return blacklist.concat([''])
   }
@@ -128,11 +129,11 @@ class MachineListItem extends React.Component {
     return <div>
       <Modal
         show={this.state.showModal}
-        message='Are you sure that you want to delete this machine?'
+        message='machines.modal.message'
         onClose={this.onCloseModal}
         actions={[
-          {label: 'Delete', className: 'delete red', action: this.onDeleteModal},
-          {label: 'Cancel', className: 'cancel', action: this.onCloseModal}]}
+          {label: 'general.delete', className: 'delete red', action: this.onDeleteModal},
+          {label: 'general.cancel', className: 'cancel', action: this.onCloseModal}]}
       />
       <ValidationForm
         sesh={this.state.sesh}
@@ -145,13 +146,13 @@ class MachineListItem extends React.Component {
           trim
           notOneOf={this.blacklist}
           value={this.value} initial={this.state.initial}>
-          <label data-validate-error='Please enter a unique machine name'>
-            <input
+          <Label data-validate-error='machines.error.machine-name'>
+            <Input
               onBlur={this.onUpdateName}
               type='text'
-              placeholder={this.selected === 'wash' ? 'Washing machine name' : 'Dryer name'}
+              placeholder={this.selected === 'wash' ? 'machines.washing-machine-name' : 'machines.dryer-name'}
               value={this.value} onChange={this.onChange}/>
-          </label>
+          </Label>
         </ValidationElement>
         {this.props.onDelete
           ? <div className='delete action'>
@@ -162,7 +163,8 @@ class MachineListItem extends React.Component {
           : null
         }
         {this.props.children}
-      </ValidationForm></div>
+      </ValidationForm>
+    </div>
   }
 }
 
@@ -199,33 +201,43 @@ class Machines extends React.Component {
     sdk.listMachines(this.props.currentLaundry)
   }
 
-  render () {
-    const laundry = this.props.laundries[this.props.currentLaundry]
-    const blacklist = laundry.machines
+  get blacklist () {
+    return this.laundry.machines
       .map((id) => this.props.machines[id])
       .filter((m) => m)
       .map((m) => m.name)
+  }
+
+  renderMachineList () {
+    const laundry = this.laundry
+    if (!laundry.machines.length) {
+      return <div className='empty_list'>
+        <FormattedMessage id='machines.no-machines'/>
+      </div>
+    }
+    return <ul className='machine_list'>
+      {laundry.machines.map((machineId) => <li key={machineId}>
+        <MachineListItem
+          blacklist={this.blacklist}
+          machine={this.props.machines[machineId]}
+          onUpdate={this.generateUpdater(machineId)}
+          onDelete={this.generateDeleter(machineId)}/>
+      </li>)}
+    </ul>
+  }
+
+  render () {
     return <DocumentTitle title='Machines'>
       <main className='naved' id='LaundryMain'>
-        <h1>Machines</h1>
-        {laundry.machines.length
-          ? <ul className='machine_list'>
-          {laundry.machines.map((machineId) => <li key={machineId}>
-            <MachineListItem
-              blacklist={blacklist}
-              machine={this.props.machines[machineId]}
-              onUpdate={this.generateUpdater(machineId)}
-              onDelete={this.generateDeleter(machineId)}/>
-          </li>)}
-        </ul>
-          : <div className='empty_list'><span>There are no machines registered to this laundry</span></div>}
+        <FormattedMessage id='machines.title' tagName='h1'/>
+        {this.renderMachineList()}
         <div className='create_machine'>
-          <h2>Create machine</h2>
+          <FormattedMessage id='machines.create-machine.title' tagName='h2'/>
           <MachineListItem
-            blacklist={blacklist}
+            blacklist={this.blacklist}
             onSubmit={this.creator}>
             <div className='buttons'>
-              <input type='submit' value='Create'/>
+              <Submit value='general.create'/>
             </div>
           </MachineListItem>
         </div>

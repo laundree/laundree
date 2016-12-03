@@ -136,5 +136,14 @@
   "admin-panel.loading": "Loading...",
   "admin-panel.no-users": "No users found.",
   "admin-panel.no-laundries": "No laundries found.",
-  "admin-panel.title": "Administrator panel"
+  "admin-panel.title": "Administrator panel",
+  "machines.modal.message": "Are you sure that you want to delete this machine?",
+  "machines.error.machine-name": "Please enter a unique machine name",
+  "machines.washing-machine-name": "Washing machine name",
+  "machines.dryer-name": "Dyer name",
+  "machines.title": "Machines",
+  "machines.no-machines": "There are no machines registered to this laundry",
+  "machines.washing-machine": "Washing machine",
+  "machines.dryer": "Dryer",
+  "machines.create-machine.title": "Create machine"
 }
