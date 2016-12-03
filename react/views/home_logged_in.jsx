@@ -42,22 +42,15 @@ class CreateLaundry extends ValueUpdater {
     let message
     switch (err.status) {
       case 409:
-        message = 'home.logged-in.error.duplicate'
+        message = <FormattedMessage id='home.logged-in.error.duplicate'/>
         break
       case 500:
-        message = 'home.logged-in.error.duplicate'
+        message = <FormattedMessage id='home.logged-in.error.duplicate'/>
         break
       default:
-        message = 'home.logged-in.error.unknown'
+        message = <FormattedMessage id='home.logged-in.error.unknown'/>
     }
-    return {type: 'error', message}
-  }
-
-  renderNotion () {
-    if (!this.state.notion) return null
-    return <div className={this.state.notion.type + ' notion'}>
-      <FormattedMessage id={this.state.notion.message}/>
-    </div>
+    return {success: false, message}
   }
 
   render () {

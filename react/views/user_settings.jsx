@@ -67,10 +67,10 @@ class UserPasswordForm extends ValueUpdater {
           this.state.values.currentPassword,
           this.state.values.newPassword)
         .then(
-          () => this.reset({loading: false, notion: {message: 'Password updated', type: 'success'}}),
+          () => this.reset({loading: false, notion: {message: 'Password updated', success: true}}),
           (err) => this.setState({
             loading: false,
-            notion: {message: err.status === 403 ? 'Invalid password' : 'Error', type: 'error'}
+            notion: {message: err.status === 403 ? 'Invalid password' : 'Error'}
           }))
     }
   }
@@ -81,11 +81,6 @@ class UserPasswordForm extends ValueUpdater {
       newPassword: '',
       newPasswordRepeat: ''
     }
-  }
-
-  renderNotion () {
-    if (!this.state.notion) return null
-    return <div className={`notion ${this.state.notion.type}`}>{this.state.notion.message}</div>
   }
 
   render () {

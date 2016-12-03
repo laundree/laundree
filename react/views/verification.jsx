@@ -20,20 +20,13 @@ class Verification extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: 'auth.verification.success', type: 'success'}
+            message: {message: <FormattedMessage id='auth.verification.success'/>, success: true}
           }),
           () => this.setState({
             loading: false,
-            message: {message: 'auth.verification.error', type: 'error'}
+            message: {message: <FormattedMessage id='auth.verification.error'/>}
           }))
     }
-  }
-
-  renderNotion () {
-    if (!this.state.message) return null
-    return <div className={'notion ' + (this.state.message.type || '')}>
-      <FormattedMessage id={this.state.message.message}/>
-    </div>
   }
 
   render () {
