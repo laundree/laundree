@@ -1,9 +1,10 @@
 const React = require('react')
 const DocumentTitle = require('react-document-title')
-const {Modal} = require('./modal')
+const {Modal, Label, Submit} = require('./intl')
 const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
+const {FormattedMessage} = require('react-intl')
 const moment = require('moment-timezone')
 
 class LaundrySettingsForm extends ValueUpdater {
@@ -23,9 +24,9 @@ class LaundrySettingsForm extends ValueUpdater {
   errorToMessage ({status, message}) {
     switch (status) {
       case 409:
-        return 'A laundry by that name already exists'
+        return <FormattedMessage id='laundry-settings.name-or-timezone.error.duplicate'/>
       case 400:
-        return 'Invalid timezone'
+        return <FormattedMessage id='laundry-settings.name-or-timezone.error.invalid-timezone'/>
       default:
         return message
     }
@@ -44,14 +45,16 @@ class LaundrySettingsForm extends ValueUpdater {
   }
 
   get nameErrorMessage () {
-    return this.state.values.name.trim() ? 'Please enter a new name' : 'Please enter a name'
+    return this.state.values.name.trim()
+      ? 'laundry-settings.name-or-timezone.error.new-name'
+      : 'laundry-settings.name-or-timezone.error.no-name'
   }
 
   get timezoneErrorMessage () {
     const tz = this.state.values.timezone.trim()
-    if (!tz) return 'Please enter a timezone'
-    if (tz === this.props.laundry.timezone) return 'Please enter a new timezone'
-    return 'Please enter a valid timezone'
+    if (!tz) return 'laundry-settings.name-or-timezone.error.no-timezone'
+    if (tz === this.props.laundry.timezone) return 'laundry-settings.name-or-timezone.error.new-timezone'
+    return 'laundry-settings.name-or-timezone.error.valid-timezone'
   }
 
   get nameErrorValues () {
@@ -61,8 +64,7 @@ class LaundrySettingsForm extends ValueUpdater {
 
   render () {
     return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
-      {this.state.notion ? <div
-        className={'notion ' + (this.state.notion.success ? 'success' : 'error')}>{this.state.notion.message}</div> : null }
+      {this.renderNotion()}
       <ValidationElement sesh={this.state.sesh} value={this.state.values.name} notOneOf={this.nameErrorValues} trim>
         <label data-validate-error={this.nameErrorMessage}>
           <input type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}/>
@@ -70,12 +72,12 @@ class LaundrySettingsForm extends ValueUpdater {
       </ValidationElement>
       <ValidationElement
         sesh={this.state.sesh} value={this.state.values.timezone} oneOf={moment.tz.names()} trim>
-        <label data-validate-error={this.timezoneErrorMessage}>
+        <Label data-validate-error={this.timezoneErrorMessage}>
           <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
-        </label>
+        </Label>
       </ValidationElement>
       <div className='buttons'>
-        <input type='submit' value='Update'/>
+        <Submit value='general.update'/>
       </div>
     </ValidationForm>
   }
@@ -102,23 +104,28 @@ class DeleteLaundry extends React.Component {
   render () {
     if (this.props.laundry.demo && this.props.user.role !== 'admin') {
       return <div className='text'>
-        You can not delete a demo laundry.
+        <FormattedMessage id='laundry-settings.delete-laundry.demo'/>
       </div>
     }
 
     return <div className='text'>
-      Deleting the laundry will remove all data associated with it and remove all users from it.<br />
-      It can NOT be undone!
+      <FormattedMessage
+        id='laundry-settings.delete-laundry.text'
+        values={{
+          nl: <br />
+        }}/>
       <Modal
         show={this.state.modalOpen}
         onClose={this.handleCloseModal}
-        message='Are you absolutely sure that you want to delete this laundry?'
+        message='laundry-settings.delete-laundry.modal.message'
         actions={[
-          {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
-          {label: 'No', action: this.handleCloseModal}
+          {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
+          {label: 'general.no', action: this.handleCloseModal}
         ]}/>
       <div className='buttonContainer'>
-        <button onClick={this.handleOpenModal} className='red'>Delete Laundry</button>
+        <button onClick={this.handleOpenModal} className='red'>
+          <FormattedMessage id='general.delete-laundry'/>
+        </button>
       </div>
     </div>
   }
@@ -146,17 +153,19 @@ class LeaveLaundry extends React.Component {
 
   render () {
     return <div className='text'>
-      If you leave the laundry, all your bookings will be lost.
+      <FormattedMessage id='laundry-settings.leave-laundry.text'/>
       <Modal
         show={this.state.modalOpen}
         onClose={this.handleCloseModal}
-        message='Are you absolutely sure that you want to leave this laundry?'
+        message='laundry-settings.leave-laundry.modal.message'
         actions={[
-          {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
-          {label: 'No', action: this.handleCloseModal}
+          {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
+          {label: 'general.no', action: this.handleCloseModal}
         ]}/>
       <div className='buttonContainer'>
-        <button onClick={this.handleOpenModal} className='red'>Leave Laundry</button>
+        <button onClick={this.handleOpenModal} className='red'>
+          <FormattedMessage id='general.leave-laundry'/>
+        </button>
       </div>
     </div>
   }
@@ -353,20 +362,24 @@ class BookingRules extends ValueUpdater {
             onChange={this.generateSwitchUpdater('timeLimitEnable')}/>
         </ValidationElement>
         <div className={'ruleText ' + (this.state.values.timeLimitEnable ? 'on' : 'off')}>
-          Bookings must be between{' '}
+          <FormattedMessage
+            tagName='div'
+            id='laundry-settings.booking-rules.time-limit'
+            values={{
+              fromInput: <input
+                type='text'
+                value={this.state.values.timeLimitFrom}
+                onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
+                onChange={this.generateValueUpdater('timeLimitFrom')}/>,
+              toInput: <input
+                onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
+                type='text' value={this.state.values.timeLimitTo}
+                onChange={this.generateValueUpdater('timeLimitTo')}/>
+            }}
+          />
           <ValidationElement
             validator={this.fromToValidator}
             value={{from: this.state.values.timeLimitFrom, to: this.state.values.timeLimitTo}}/>
-          <input
-            type='text'
-            value={this.state.values.timeLimitFrom}
-            onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
-            onChange={this.generateValueUpdater('timeLimitFrom')}/>
-          {' '}and{' '}
-          <input
-            onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
-            type='text' value={this.state.values.timeLimitTo}
-            onChange={this.generateValueUpdater('timeLimitTo')}/>
         </div>
       </div>
       <div className='rule'>
@@ -376,11 +389,16 @@ class BookingRules extends ValueUpdater {
             onChange={this.generateSwitchUpdater('dailyLimitEnable')}/>
         </ValidationElement>
         <div className={'ruleText ' + (this.state.values.dailyLimitEnable ? 'on' : 'off')}>
-          Maximum{' '}
-          <input
-            onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
-            type='text' value={this.state.values.dailyLimit}
-            onChange={this.generateValueUpdater('dailyLimit')}/> hour of bookings per day
+          <FormattedMessage
+            tagName='div'
+            id='laundry-settings.booking-rules.daily-max-hours'
+            values={{
+              hourInput: <input
+                onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
+                type='text' value={this.state.values.dailyLimit}
+                onChange={this.generateValueUpdater('dailyLimit')}/>,
+              hour: this.state.values.dailyLimit
+            }}/>
         </div>
       </div>
       <div className='rule'>
@@ -390,15 +408,20 @@ class BookingRules extends ValueUpdater {
             onChange={this.generateSwitchUpdater('limitEnable')}/>
         </ValidationElement>
         <div className={'ruleText ' + (this.state.values.limitEnable ? 'on' : 'off')}>
-          Maximum{' '}
-          <input
-            onBlur={this.generateValueMapper('limit', this.numberMap)}
-            type='text' value={this.state.values.limit}
-            onChange={this.generateValueUpdater('limit')}/> hour of bookings
+          <FormattedMessage
+            tagName='div'
+            id='laundry-settings.booking-rules.max-hours'
+            values={{
+              hourInput: <input
+                onBlur={this.generateValueMapper('limit', this.numberMap)}
+                type='text' value={this.state.values.limit}
+                onChange={this.generateValueUpdater('limit')}/>,
+              hour: this.state.values.limit
+            }}/>
         </div>
       </div>
       <div className='buttonContainer'>
-        <button>Update</button>
+        <FormattedMessage tagName='button' id='general.update'/>
       </div>
     </ValidationForm>
   }
@@ -418,15 +441,15 @@ class LaundrySettings extends React.Component {
     if (!this.isOwner) return null
     return <div>
       <section>
-        <h2>Change name or timezone</h2>
+        <FormattedMessage tagName='h2' id='laundry-settings.name-or-timezone.title'/>
         <LaundrySettingsForm laundry={this.laundry}/>
       </section>
       <section>
-        <h2>Booking rules</h2>
+        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title'/>
         <BookingRules laundry={this.laundry}/>
       </section>
       <section>
-        <h2>Delete laundry</h2>
+        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title'/>
         <DeleteLaundry laundry={this.laundry} user={this.props.user}/>
       </section>
     </div>
@@ -438,7 +461,7 @@ class LaundrySettings extends React.Component {
 
   renderUserSettings () {
     return <section>
-      <h2>Leave laundry</h2>
+      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2'/>
       <LeaveLaundry laundry={this.laundry} user={this.props.user}/>
     </section>
   }
@@ -447,7 +470,7 @@ class LaundrySettings extends React.Component {
     if (!this.laundry) return null
     return <DocumentTitle title='Laundry Settings'>
       <main className='naved' id='LaundrySettings'>
-        <h1>Laundry settings</h1>
+        <FormattedMessage id='laundry-settings.title' tagName='h1'/>
         {this.isOwner ? this.renderOwnerSettings() : this.renderUserSettings()}
       </main>
     </DocumentTitle>

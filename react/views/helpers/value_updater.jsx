@@ -43,6 +43,13 @@ class ValueUpdater extends React.Component {
       })
     }
   }
+
+  renderNotion () {
+    if (!this.state.notion) return null
+    return <div className={'notion ' + (this.state.notion.success ? 'success' : 'error')}>
+      {this.state.notion.message}
+    </div>
+  }
 }
 
 module.exports = ValueUpdater
