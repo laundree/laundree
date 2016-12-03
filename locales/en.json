@@ -201,5 +201,10 @@
   "user-settings.change-password.error.invalid": "Invalid password",
   "user-settings.change-password.error": "Error",
   "user-settings.change-password.invalid-password": "Please enter a valid password",
-  "user-settings.change-password.password-match": "Passwords must match"
+  "user-settings.change-password.password-match": "Passwords must match",
+  "error-404.title": "Sorry...",
+  "error-404.message.l1": "We couldn't find the page you were looking for. How about backtracking a bit and try again?",
+  "error-404.message.l2": "If you keep seeing this page, please don't hesitate to write us!",
+  "error-500.title": "Darn...",
+  "error-500.message": "Something went wrong on our end. Don’t worry, we have logged it and will try to make sure it doesn’t happends again...."
 }

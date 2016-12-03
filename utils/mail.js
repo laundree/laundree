@@ -15,11 +15,11 @@ const debug = require('debug')('laundree.utils.mail')
  */
 function render (data, template) {
   debug('Rendering email')
-  var t = new EmailTemplate(path.join(__dirname, '..', 'email-templates', template))
+  const t = new EmailTemplate(path.join(__dirname, '..', 'templates', 'email', template))
   return t.render(data)
 }
 
-var standardTransporter = config.get('mailer.stubTransporter')
+const standardTransporter = config.get('mailer.stubTransporter')
   ? createTransport(require('nodemailer-stub-transport')())
   : createTransport(config.get('mailer.smtp.transport'))
 
@@ -32,7 +32,7 @@ var standardTransporter = config.get('mailer.stubTransporter')
  * @return {Promise}
  */
 function sendRenderedEmail (to, content, from, transporter) {
-  var options = {
+  const options = {
     from,
     to,
     subject: content.subject,
