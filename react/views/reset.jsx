@@ -22,20 +22,13 @@ class Reset extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: 'auth.reset.success', type: 'success'}
+            message: {message: <FormattedMessage id='auth.reset.success'/>, success: true}
           }),
           () => this.setState({
             loading: false,
-            message: {message: 'auth.reset.error', type: 'error'}
+            message: {message: <FormattedMessage id='auth.reset.error'/>, success: false}
           }))
     }
-  }
-
-  renderMessage () {
-    if (!this.state.message) return null
-    return <div className={'notion ' + (this.state.message.type || '')}>
-      <FormattedMessage id={this.state.message.message}/>
-    </div>
   }
 
   render () {
@@ -53,7 +46,7 @@ class Reset extends ValueUpdater {
           sesh={this.state.sesh}
           onSubmit={this.submitHandler}
           id='ResetPassword'>
-          {this.renderMessage()}
+          {this.renderNotion()}
           <ValidationElement
             sesh={this.state.sesh}
             password trim value={this.state.values.password || ''}>

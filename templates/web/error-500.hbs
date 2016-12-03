@@ -1,11 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {{> head.hbs}}
+</head>
+<body>
+{{> media.hbs}}
 <main>
     <section id="InternalError">
 
         <div class="message">
-            <h1>Darn...</h1>
+            <h1>{{ formatMessage (getIntlMessage 'error-500.title') }}</h1>
             <p>
-                Something went wrong on our end. Don’t worry, we have logged it and will try to make sure it doesn’t
-                happends again....
+                {{ formatMessage (getIntlMessage 'error-500.message')}}<br/>
             </p>
         </div>
 
@@ -80,3 +86,5 @@
 
     </section>
 </main>
+</body>
+</html>

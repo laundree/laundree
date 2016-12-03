@@ -16,7 +16,7 @@ const {opbeat} = require('../lib/opbeat')
 const locales = require('../locales')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', req.session.locale || req.locale)
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', locales.localeFromRequest(req))
     .then(store => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)
@@ -38,7 +38,7 @@ router.use((req, res, next) => {
             </Provider>
           </IntlProvider>)
         const title = DocumentTitle.rewind()
-        res.render('app', {html: html, title: title, state: JSON.stringify(store.getState())})
+        res.renderHb('app.hbs', {html: html, title: title, state: JSON.stringify(store.getState())})
       })
     })
     .catch(utils.error.logError)

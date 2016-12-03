@@ -1,7 +1,7 @@
 ---
 exclude_paths:
 - "tests"
-- 'email-templates'
+- 'templates'
 - 'gulpfile.js'
 - '**.jsx'
 - '**/index.js'

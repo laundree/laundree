@@ -4,7 +4,8 @@ const {Link} = require('react-router')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {Modal} = require('./modal')
+const {Modal, Submit, Input, Label} = require('./intl')
+const {FormattedMessage} = require('react-intl')
 
 class UserNameForm extends ValueUpdater {
 
@@ -45,7 +46,7 @@ class UserNameForm extends ValueUpdater {
         </label>
       </ValidationElement>
       <div className='buttons'>
-        <input type='submit' value='Update name'/>
+        <Submit value='general.update'/>
       </div>
     </ValidationForm>
   }
@@ -67,10 +68,20 @@ class UserPasswordForm extends ValueUpdater {
           this.state.values.currentPassword,
           this.state.values.newPassword)
         .then(
-          () => this.reset({loading: false, notion: {message: 'Password updated', type: 'success'}}),
+          () => this.reset({
+            loading: false,
+            notion: {
+              message: <FormattedMessage id='user-settings.change-password.success'/>,
+              success: true
+            }
+          }),
           (err) => this.setState({
             loading: false,
-            notion: {message: err.status === 403 ? 'Invalid password' : 'Error', type: 'error'}
+            notion: {
+              message: <FormattedMessage id={err.status === 403
+                ? 'user-settings.change-password.error.invalid'
+                : 'user-settings.change-password.error'}/>
+            }
           }))
     }
   }
@@ -83,11 +94,6 @@ class UserPasswordForm extends ValueUpdater {
     }
   }
 
-  renderNotion () {
-    if (!this.state.notion) return null
-    return <div className={`notion ${this.state.notion.type}`}>{this.state.notion.message}</div>
-  }
-
   render () {
     return <ValidationForm
       onSubmit={this.onSubmit}
@@ -98,37 +104,37 @@ class UserPasswordForm extends ValueUpdater {
         password
         value={this.state.values.currentPassword}
         sesh={this.state.sesh}>
-        <label data-validate-error='Please enter a valid password'>
-          <input
+        <Label data-validate-error='user-settings.change-password.invalid-password'>
+          <Input
             value={this.state.values.currentPassword}
             onChange={this.generateValueUpdater('currentPassword')}
-            type='password' placeholder='Current password'/>
-        </label>
+            type='password' placeholder='general.current-password'/>
+        </Label>
       </ValidationElement>
       <ValidationElement
         password
         sesh={this.state.sesh}
         value={this.state.values.newPassword}>
-        <label data-validate-error='Please enter a valid password'>
-          <input
+        <Label data-validate-error='user-settings.change-password.invalid-password'>
+          <Input
             value={this.state.values.newPassword}
             onChange={this.generateValueUpdater('newPassword')}
-            type='password' placeholder='New password'/>
-        </label>
+            type='password' placeholder='general.new-password'/>
+        </Label>
       </ValidationElement>
       <ValidationElement
         equal={this.state.values.newPassword}
         sesh={this.state.sesh}
         value={this.state.values.newPasswordRepeat}>
-        <label data-validate-error='Passwords must match'>
-          <input
+        <Label data-validate-error='user-settings.change-password.password-match'>
+          <Input
             value={this.state.values.newPasswordRepeat}
             onChange={this.generateValueUpdater('newPasswordRepeat')}
-            type='password' placeholder='Repeat password'/>
-        </label>
+            type='password' placeholder='general.repeat-password'/>
+        </Label>
       </ValidationElement>
       <div className='buttons'>
-        <input type='submit' value='Change password'/>
+        <Submit value='general.change-password'/>
       </div>
     </ValidationForm>
   }
@@ -159,13 +165,15 @@ class DeleteUser extends React.Component {
       <Modal
         show={this.state.modalOpen}
         onClose={this.handleCloseModal}
-        message='Are you absolutely sure that you want to delete your account?'
+        message='user-settings.delete-account.modal.message'
         actions={[
-          {label: 'Yes', className: 'delete red', action: this.handleDeleteClick},
-          {label: 'No', action: this.handleCloseModal}
+          {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
+          {label: 'general.no', action: this.handleCloseModal}
         ]}/>
       <div className='buttonContainer'>
-        <button onClick={this.handleOpenModal} className='red'>Delete Account</button>
+        <button onClick={this.handleOpenModal} className='red'>
+          <FormattedMessage id='general.delete-account'/>
+        </button>
       </div>
     </div>
   }
@@ -190,7 +198,7 @@ class UserSettings extends React.Component {
   renderPassword () {
     if (this.isAdmin && !this.isSelf) return null
     return <section>
-      <h2>Change password</h2>
+      <FormattedMessage id='user-settings.change-password.title' tagName='h2'/>
       <UserPasswordForm user={this.user}/>
     </section>
   }
@@ -220,23 +228,26 @@ class UserSettings extends React.Component {
   }
 
   renderDelete () {
-    if (this.isOwner) {
-      return <section>
-        <h2>Delete account</h2>
-        <div className='text'>
-          Since you are a owner of at least one laundry, you cannot delete your account.<br />
-          Please delete your laundries first!
-        </div>
-      </section>
-    }
     return <section>
-      <h2>Delete account</h2>
-      <div className='text'>
-        Deleting your account is irreversible and your information will be removed.<br />
-        This including, but not limited to, bookings.
-        <DeleteUser user={this.user}/>
-      </div>
+      <FormattedMessage id='user-settings.delete-account.title' tagName='h2'/>
+      {this.renderDeleteText()}
     </section>
+  }
+
+  renderDeleteText () {
+    if (this.isOwner) {
+      return <div className='text'>
+        <FormattedMessage
+          values={{nl: <br />}}
+          id='user-settings.delete-account.message.owner'/>
+      </div>
+    }
+    return <div className='text'>
+      <FormattedMessage
+        values={{nl: <br />}}
+        id='user-settings.delete-account.message.user'/>
+      <DeleteUser user={this.user}/>
+    </div>
   }
 
   renderEmailList () {
@@ -261,7 +272,7 @@ class UserSettings extends React.Component {
   renderEmails () {
     if (!this.isAdmin && !this.isSelf) return
     return <section>
-      <h2>Email addresses</h2>
+      <FormattedMessage id='user-settings.email-addresses.title' tagName='h2'/>
       <div className='text'>
         {this.renderEmailList()}
       </div>
@@ -272,16 +283,16 @@ class UserSettings extends React.Component {
     const user = this.user
     return <DocumentTitle title='Profile settings'>
       <main className='topNaved' id='Settings'>
-        <h1>Profile settings</h1>
+        <FormattedMessage tagName='h1' id='user-settings.title'/>
         <section>
-          <h2>Basic user-info</h2>
+          <FormattedMessage tagName='h2' id='user-settings.basic-info.title'/>
           <UserNameForm user={user}/>
         </section>
         {this.renderEmails()}
         {this.renderPassword()}
         {this.renderDelete()}
         <section>
-          <h2>Laundries</h2>
+          <FormattedMessage tagName='h2' id='user-settings.laundries.title'/>
           <div className='text'>
             {this.renderLaundries(user)}
           </div>
@@ -293,7 +304,7 @@ class UserSettings extends React.Component {
   renderLaundries (user) {
     if (user.laundries.length === 0) {
       return <div className='bigListMessage'>
-        No laundries found.
+        <FormattedMessage id='user-settings.laundries.no-laundries'/>
       </div>
     }
     return <ul className='bigList'>

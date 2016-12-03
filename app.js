@@ -10,20 +10,17 @@ const {fetchRoutes} = require('./routes')
 const setups = require('./lib')
 const config = require('config')
 const app = express()
-const hbs = require('hbs')
 const {error} = require('./utils')
 const locale = require('locale')
 const locales = require('./locales')
-
-hbs.registerPartials(path.join(__dirname, 'views', 'partials'))
-// view engine setup
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'hbs')
+const debug = require('debug')('laundree.app')
 
 // Session
 app.use(setups.sessionSetup)
+app.use(locale(locales.supported))
 
 // Passport
+setups.handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 setups.passportSetup(app)
 setups.morganSetup(app)
 setups.defaultUserSetup()
@@ -45,7 +42,6 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(flash())
-app.use(locale(Object.keys(locales)))
 // Swagger
 module.exports = {
   app,
@@ -65,11 +61,9 @@ module.exports = {
       switch (status) {
         case 404:
           res.status(404)
-          res.render('error-404',
-            {
-              title: ['Page not found'],
-              styles: ['/stylesheets/error.css']
-            })
+          res.renderHb('error-404.hbs', {
+            title: 'Page not found', styles: ['/stylesheets/error.css']
+          })
           break
         default:
           next(err)
@@ -82,7 +76,7 @@ module.exports = {
       const status = err.status || 500
       res.status(status)
       error.logError(err)
-      res.render('error-500', {
+      res.renderHb('error-500.hbs', {
         message: err.message,
         styles: ['/stylesheets/error.css']
       })

@@ -10,7 +10,7 @@ const LocaleSelect = props => <DropDown className='language'>
   </DropDownTitle>
   <DropDownContent className='right'>
     <ul className='dropDownList'>
-      {Object.keys(locales).map(l => <li key={l} className={props.locale === l ? 'active' : ''}>
+      {locales.supported.map(l => <li key={l} className={props.locale === l ? 'active' : ''}>
         <DropDownCloser>
           <a
             href={`/lang/${l}?r=${encodeURIComponent(props.location.pathname)}`}

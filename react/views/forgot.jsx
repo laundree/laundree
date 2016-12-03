@@ -21,20 +21,19 @@ class Forgot extends ValueUpdater {
           () =>
             this.reset({
               loading: false,
-              message: {message: 'auth.forgot.success', type: 'success'}
+              notion: {
+                message: <FormattedMessage id='auth.forgot.success'/>,
+                success: true
+              }
             }),
           () => this.setState({
             loading: false,
-            message: {message: 'auth.forgot.error', type: 'error'}
+            notion: {
+              message: <FormattedMessage id='auth.forgot.error'/>,
+              success: false
+            }
           }))
     }
-  }
-
-  renderMessage () {
-    if (!this.state.message) return
-    return <div className={'notion ' + (this.state.message.type || '')}>
-      <FormattedMessage id={this.state.message.message}/>
-    </div>
   }
 
   render () {
@@ -51,7 +50,7 @@ class Forgot extends ValueUpdater {
           className={this.state.loading ? 'blur' : ''}
           onSubmit={this.submitHandler}
           id='ForgotPassword'>
-          {this.renderMessage()}
+          {this.renderNotion()}
           <ValidationElement
             email
             trim

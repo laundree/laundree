@@ -2,6 +2,7 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const sdk = require('../../client/sdk')
+const {FormattedMessage} = require('react-intl')
 
 class Stats extends React.Component {
 
@@ -14,27 +15,39 @@ class Stats extends React.Component {
     return <ul className={this.props.stats ? '' : 'loading'}>
       <li>
         <span className='value'>{realUserCount}</span>
-        <span className='label'>Users</span>
+        <span className='label'>
+          <FormattedMessage id='admin-panel.users'/>
+        </span>
       </li>
       <li>
         <span className='value'>{demoUserCount}</span>
-        <span className='label'>Demo users</span>
+        <span className='label'>
+          <FormattedMessage id='admin-panel.demo-users'/>
+        </span>
       </li>
       <li>
         <span className='value'>{realLaundryCount}</span>
-        <span className='label'>Laundries</span>
+        <span className='label'>
+          <FormattedMessage id='admin-panel.laundries'/>
+        </span>
       </li>
       <li>
         <span className='value'>{demoLaundryCount}</span>
-        <span className='label'>Demo laundries</span>
+        <span className='label'>
+          <FormattedMessage id='admin-panel.demo-laundries'/>
+        </span>
       </li>
       <li>
         <span className='value'>{machineCount}</span>
-        <span className='label'>Machines</span>
+        <span className='label'>
+          <FormattedMessage id='admin-panel.machines'/>
+        </span>
       </li>
       <li>
         <span className='value'>{bookingCount}</span>
-        <span className='label'>Bookings</span>
+        <span className='label'>
+          <FormattedMessage id='admin-panel.bookings'/>
+        </span>
       </li>
     </ul>
   }
@@ -50,7 +63,7 @@ class Stats extends React.Component {
 
   render () {
     return <section id='Stats'>
-      <h2>Current statistics</h2>
+      <FormattedMessage id='admin-panel.stats-title' tagName='h2'/>
       {this.renderStats()}
     </section>
   }
@@ -132,7 +145,13 @@ class QueryList extends React.Component {
     return <div>
       <div className='nav'>
         <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={this.onPrevClick}/>
-        Page {this.currentPage + 1} of {this.totalPages + 1}
+        <FormattedMessage
+          id='admin-panel.page-of'
+          values={{
+            page: this.currentPage + 1,
+            numPages: this.totalPages + 1
+          }}
+        />
         <span
           className={'next link' + (this.currentPage === this.totalPages ? ' inactive' : '')}
           onClick={this.onNextClick}/>
@@ -162,11 +181,11 @@ QueryList.propTypes = {
 class LaundryList extends QueryList {
 
   renderLoading () {
-    return <span>Loading laundries...</span>
+    return <FormattedMessage id='admin-panel.loading'/>
   }
 
   renderEmpty () {
-    return <span>No laundries found.</span>
+    return <FormattedMessage id='admin-panel.no-laundries'/>
   }
 
   get elements () {
@@ -187,7 +206,7 @@ class LaundryList extends QueryList {
 
   render () {
     return <section id='LaundryList'>
-      <h2>Laundries</h2>
+      <FormattedMessage id='admin-panel.laundries' tagName='h2'/>
       {this.renderList()}
     </section>
   }
@@ -199,16 +218,16 @@ LaundryList.propTypes = {
 
 class UserList extends QueryList {
 
-  renderLoading () {
-    return <span>Loading users...</span>
-  }
-
   load (options) {
     return sdk.listUsers(options)
   }
 
+  renderLoading () {
+    return <FormattedMessage id='admin-panel.loading'/>
+  }
+
   renderEmpty () {
-    return <span>No users found.</span>
+    return <FormattedMessage id='admin-panel.no-users'/>
   }
 
   get elements () {
@@ -226,7 +245,7 @@ class UserList extends QueryList {
 
   render () {
     return <section id='UserList'>
-      <h2>Users</h2>
+      <FormattedMessage id='admin-panel.users' tagName='h2'/>
       {this.renderList()}
     </section>
   }
@@ -239,7 +258,7 @@ UserList.propTypes = {
 const AdminPanel = ({stats, laundries, users, userList, laundryList, laundryListSize, userListSize}) => {
   return <DocumentTitle title='Administrator panel'>
     <main id='AdminPanel' className='topNaved'>
-      <h1>Administrator Panel</h1>
+      <FormattedMessage id='admin-panel.title' tagName='h1'/>
       <Stats stats={stats}/>
       <LaundryList laundries={laundryList.map(id => laundries[id])} total={laundryListSize}/>
       <UserList users={userList.map(id => users[id])} total={userListSize}/>

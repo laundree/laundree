@@ -25,15 +25,14 @@ class SignUp extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: 'auth.signup.success', type: 'success'}
+            message: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
           }),
           err => this.setState({
             loading: false,
             message: {
-              message: err.status === 409
+              message: <FormattedMessage id={err.status === 409
                 ? 'auth.signup.error.already-exists'
-                : 'auth.signup.error',
-              type: 'error'
+                : 'auth.signup.error'}/>
             }
           }))
     }
@@ -41,13 +40,6 @@ class SignUp extends ValueUpdater {
 
   get query () {
     return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
-  }
-
-  renderMessage () {
-    if (!this.state.message) return null
-    return <div className={'notion ' + (this.state.message.type || '')}>
-      <FormattedMessage id={this.state.message.message}/>
-    </div>
   }
 
   render () {
@@ -80,7 +72,7 @@ class SignUp extends ValueUpdater {
           sesh={this.state.sesh}
           className={this.state.loading ? 'blur' : ''}
           onSubmit={this.submitHandler}>
-          {this.renderMessage()}
+          {this.renderNotion()}
           <ValidationElement
             nonEmpty
             trim sesh={this.state.sesh}
