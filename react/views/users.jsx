@@ -2,7 +2,8 @@ const React = require('react')
 const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
-const {Modal} = require('./intl')
+const {Modal, Label, Input, Submit} = require('./intl')
+const {FormattedMessage} = require('react-intl')
 const sdk = require('../../client/sdk')
 
 class InviteUserForm extends ValueUpdater {
@@ -19,7 +20,7 @@ class InviteUserForm extends ValueUpdater {
   render () {
     if (this.props.laundry.demo) {
       return <div className='text'>
-        Sorry, but you can't add users to a demo laundry
+        <FormattedMessage id='users.invite.demo'/>
       </div>
     }
     return <ValidationForm
@@ -30,17 +31,17 @@ class InviteUserForm extends ValueUpdater {
           sesh={this.state.sesh}
           initial={this.state.values.email === undefined}
           value={this.state.values.email || ''} email trim>
-          <label
-            data-validate-error='Please enter a valid email address'>
-            <input
-              placeholder='Email address'
+          <Label
+            data-validate-error='users.error.invalid-email'>
+            <Input
+              placeholder='general.email-address'
               type='text' onChange={this.generateValueUpdater('email')}
               value={this.state.values.email || ''}/>
-          </label>
+          </Label>
         </ValidationElement>
       </div>
       <div className='buttons'>
-        <input type='submit' value='Invite'/>
+        <Submit value='general.invite'/>
       </div>
     </ValidationForm>
   }
@@ -64,9 +65,13 @@ class QrInvite extends React.Component {
 
   render () {
     return <div id='QrSignUp'>
-      You can invite your tenant by generating a PDF document, printing this, and hanging it in your laundry.<br />
-      This will enable everyone with physical access to your machines, to register on your laundry.<br />
-      Generate your PDF <span onClick={this.onClick}>here</span>.
+      <FormattedMessage
+        id='users.qr-signup.message'
+        values={{
+          nl: <br />,
+          link: <span className='pdfLink' onClick={this.onClick}><FormattedMessage
+            id='users.qr-signup.message.link'/></span>
+        }}/>
     </div>
   }
 }
@@ -86,7 +91,9 @@ class UserItem extends React.Component {
 
   renderOwner () {
     if (!this.isOwner) return null
-    return <span className='owner'>Owner</span>
+    return <span className='owner'>
+      <FormattedMessage id='users.owner'/>
+    </span>
   }
 
   renderDelete () {
@@ -205,16 +212,18 @@ class Users extends React.Component {
   render () {
     return <DocumentTitle title='Laundry users'>
       <main className='naved' id='Users'>
-        <h1 className='alignLeft'>Laundry users</h1>
+        <h1 className='alignLeft'>
+          <FormattedMessage id='users.title'/>
+        </h1>
         <section id='UserList'>
           {this.renderUsers()}
         </section>
         <section id='InviteUserForm'>
-          <h2>Invite user from email</h2>
+          <FormattedMessage id='users.invite-from-email' tagName='h2'/>
           <InviteUserForm laundry={this.props.laundry}/>
         </section>
         <section id='QrInviteSection'>
-          <h2>Invite user from QR</h2>
+          <FormattedMessage id='users.invite-from-qr' tagName='h2'/>
           <QrInvite laundry={this.props.laundry}/>
         </section>
       </main>
