@@ -206,5 +206,8 @@
   "error-404.message.l1": "We couldn't find the page you were looking for. How about backtracking a bit and try again?",
   "error-404.message.l2": "If you keep seeing this page, please don't hesitate to write us!",
   "error-500.title": "Darn...",
-  "error-500.message": "Something went wrong on our end. Don’t worry, we have logged it and will try to make sure it doesn’t happends again...."
+  "error-500.message": "Something went wrong on our end. Don’t worry, we have logged it and will try to make sure it doesn’t happends again....",
+  "about.title": "About Laundree",
+  "about.mission.title": "Our mission",
+  "about.mission.text": "Our mission is two-fold; we want the daily lives of our landlords and tenants to  become easier and much more enjoyable by building a platform supporting laundry facilities  and also the communication between landlords and tenants.  {nl}\n  {nl}\n  We also want to improve the environment by encoring more people to share their laundry  facilities while nudging people to wash at times during the day that are more environmentally  friendly by analysing anonymized data collected from our users."
 }
