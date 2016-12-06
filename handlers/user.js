@@ -111,7 +111,7 @@ class UserHandler extends Handler {
 
   /**
    * Lists bookings as events
-   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string, timezone}[]>}
+   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string}[]>}
    */
   generateEvents () {
     return this
