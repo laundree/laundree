@@ -1,10 +1,9 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {Modal, Submit, Input, Label} = require('./intl')
+const {DocumentTitle, Modal, Submit, Input, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class UserNameForm extends ValueUpdater {
@@ -254,7 +253,8 @@ class UserSettings extends React.Component {
     if (!this.state.emails) {
       return <div className='bigListMessage email'>
         <button className={this.state.loading ? 'grey' : ''} onClick={this.onLoadClick}>
-          {this.state.loading ? 'Loading addresses...' : 'Load addresses'}
+          <FormattedMessage
+            id={this.state.loading ? 'user-settings.email-addresses.loading' : 'user-settings.email-addresses.load'}/>
         </button>
       </div>
     }
@@ -279,15 +279,28 @@ class UserSettings extends React.Component {
     </section>
   }
 
+  renderCalendar () {
+    return <section>
+      <FormattedMessage tagName='h2' id='user-settings.calendar.title'/>
+      <div className='text'>
+        <FormattedMessage tagName='div' id='user-settings.calendar.text' values={{
+          nl: <br />,
+          link: <a href='/calendar' target='_blank'><FormattedMessage id='user-settings.calendar.text.link'/></a>
+        }}/>
+      </div>
+    </section>
+  }
+
   render () {
     const user = this.user
-    return <DocumentTitle title='Profile settings'>
+    return <DocumentTitle title='document-title.profile-settings'>
       <main className='topNaved' id='Settings'>
         <FormattedMessage tagName='h1' id='user-settings.title'/>
         <section>
           <FormattedMessage tagName='h2' id='user-settings.basic-info.title'/>
           <UserNameForm user={user}/>
         </section>
+        {this.renderCalendar()}
         {this.renderEmails()}
         {this.renderPassword()}
         {this.renderDelete()}

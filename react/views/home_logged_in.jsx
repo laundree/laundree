@@ -1,11 +1,10 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const AdminPanel = require('../containers/admin_panel')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
-const {Input, Label, Submit} = require('./intl')
+const {Input, Label, Submit, DocumentTitle} = require('./intl')
 
 class CreateLaundry extends ValueUpdater {
 
@@ -54,7 +53,7 @@ class CreateLaundry extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title='Create Laundry'>
+    return <DocumentTitle title='document-title.create-laundry'>
       <main id='CreateLaundry'>
         <FormattedMessage id='home.logged-in.title' tagName='h1'/>
         <section>

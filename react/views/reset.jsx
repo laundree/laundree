@@ -2,12 +2,11 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {Input, Submit, Label} = require('./intl')
+const {DocumentTitle, Input, Submit, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class Reset extends ValueUpdater {
@@ -32,7 +31,7 @@ class Reset extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title='Reset password'>
+    return <DocumentTitle title='document-title.reset-password'>
       <div>
         <h1>
           Reset your password

@@ -1,8 +1,7 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
-const {Modal, Label, Input, Submit} = require('./intl')
+const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 
@@ -227,7 +226,7 @@ class Machines extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title='Machines'>
+    return <DocumentTitle title='document-title.machines'>
       <main className='naved' id='LaundryMain'>
         <FormattedMessage id='machines.title' tagName='h1'/>
         {this.renderMachineList()}

@@ -1,11 +1,11 @@
 /**
  * Created by budde on 27/04/16.
  */
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
 const {union} = require('../utils/array')
 
-var userSchema = new Schema({
+const userSchema = new Schema({
   role: {type: String, default: 'user', enum: ['user', 'admin']},
   demo: Boolean,
   oneTimePassword: {type: String},
@@ -16,6 +16,7 @@ var userSchema = new Schema({
   lastSeen: Date,
   overrideDisplayName: String,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
+  calendarTokens: [String],
   laundries: [{type: Schema.Types.ObjectId, ref: 'Laundry'}],
   explicitVerifiedEmails: [{type: String}],
   explicitVerificationEmailTokens: [{
@@ -57,7 +58,7 @@ userSchema
 userSchema
   .virtual('name')
   .get(function () {
-    var profile = this.latestProfile
+    const profile = this.latestProfile
     if (!profile) return null
     return profile.name
   })
@@ -65,7 +66,7 @@ userSchema
 userSchema
   .virtual('emails')
   .get(function () {
-    var emailMap = this.profiles.reduce((obj, profile) => profile.emails.reduce((obj, email) => {
+    const emailMap = this.profiles.reduce((obj, profile) => profile.emails.reduce((obj, email) => {
       obj[email.value] = true
       return obj
     }, obj), {})
@@ -75,7 +76,7 @@ userSchema
 userSchema
   .virtual('implicitVerifiedEmails')
   .get(function () {
-    var emailMap = this.profiles.reduce((obj, profile) => {
+    const emailMap = this.profiles.reduce((obj, profile) => {
       if (['google', 'facebook'].indexOf(profile.provider) < 0) return obj
       return profile.emails.reduce((obj, email) => {
         obj[email.value] = true
@@ -94,13 +95,13 @@ userSchema
 userSchema
   .virtual('photo')
   .get(function () {
-    var profile = this.latestProfile
+    const profile = this.latestProfile
     if (!profile) return ''
     if (!profile.photos) return ''
     if (!profile.photos.length) return ''
     return profile.photos[0].value
   })
 
-var UserModel = mongoose.model('User', userSchema)
+const UserModel = mongoose.model('User', userSchema)
 
 module.exports = UserModel

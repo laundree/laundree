@@ -85,6 +85,42 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Create a new calendar token
+   * @returns {Promise.<string>|*}
+   */
+  generateCalendarToken () {
+    return utils.password.generateToken().then(token => {
+      return utils.password.hashPassword(token).then(hash => {
+        this.model.calendarTokens.push(hash)
+        return this.model.save().then(() => token)
+      })
+    })
+  }
+
+  /**
+   * Verifies a calendar token
+   * @param token
+   * @returns {Promise.<boolean>|*}
+   */
+  verifyCalendarToken (token) {
+    return Promise
+      .all(this.model.calendarTokens.map(hash => utils.password.comparePassword(token, hash)))
+      .then(result => result.find(r => r))
+      .then(Boolean)
+  }
+
+  /**
+   * Lists bookings as events
+   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string, timezone}[]>}
+   */
+  generateEvents () {
+    return this
+      .fetchLaundries()
+      .then(laundries => Promise.all(laundries.map(l => l.generateEvents())))
+      .then(events => events.reduce((l1, l2) => l1.concat(l2), []))
+  }
+
+  /**
    * @returns {boolean}
    */
   get isDemo () {

@@ -1,5 +1,14 @@
 web:
+  host: laundree.io
   port: 3000
+  protocol: https
+
+calendar:
+  domain: 'laundree.io'
+  prodId:
+    company: 'laundree.io'
+    product: 'booking-calendar'
+  name: 'Booking'
 
 timezone: Europe/Copenhagen
 

@@ -1,5 +1,5 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const {DocumentTitle} = require('./intl')
 const {Link} = require('react-router')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
@@ -256,7 +256,7 @@ UserList.propTypes = {
 }
 
 const AdminPanel = ({stats, laundries, users, userList, laundryList, laundryListSize, userListSize}) => {
-  return <DocumentTitle title='Administrator panel'>
+  return <DocumentTitle title='document-title.administrator-panel'>
     <main id='AdminPanel' className='topNaved'>
       <FormattedMessage id='admin-panel.title' tagName='h1'/>
       <Stats stats={stats}/>
