@@ -1,8 +1,7 @@
 const React = require('react')
 const {FormattedDate} = require('react-intl')
 const {Link} = require('react-router')
-const DocumentTitle = require('react-document-title')
-const {Modal} = require('./intl')
+const {Modal, DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 
@@ -100,7 +99,7 @@ class Bookings extends React.Component {
   }
 
   render () {
-    return <DocumentTitle title='Bookings'>
+    return <DocumentTitle title='document-title.bookings'>
       <main className='naved'>
         <h1 className='alignLeft'>
           <FormattedMessage id='bookings.title'/>

@@ -1,8 +1,8 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
+const {DocumentTitle} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
-const About = () => <DocumentTitle title='About us'>
+const About = () => <DocumentTitle title='document-title.about'>
   <main id='About' className='topNaved'>
     <FormattedMessage tagName='h1' id='about.title'/>
     <section id='Mission'>

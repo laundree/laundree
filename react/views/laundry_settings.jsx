@@ -1,6 +1,5 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
-const {Modal, Label, Submit} = require('./intl')
+const {Modal, Label, Submit, DocumentTitle} = require('./intl')
 const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
@@ -468,7 +467,7 @@ class LaundrySettings extends React.Component {
 
   render () {
     if (!this.laundry) return null
-    return <DocumentTitle title='Laundry Settings'>
+    return <DocumentTitle title='document-title.laundry-settings'>
       <main className='naved' id='LaundrySettings'>
         <FormattedMessage id='laundry-settings.title' tagName='h1'/>
         {this.isOwner ? this.renderOwnerSettings() : this.renderUserSettings()}

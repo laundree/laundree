@@ -4,11 +4,11 @@
 const React = require('react')
 const TopNav = require('./topnav.jsx')
 const Footer = require('./footer.jsx')
-const DocumentTitle = require('react-document-title')
+const {DocumentTitle} = require('./intl')
 
 class App extends React.Component {
   render () {
-    return <DocumentTitle title='Laundree.io'>
+    return <DocumentTitle title='document-title.base'>
       <div className={this.props.user ? '' : 'footer'}>
         <TopNav
           locale={this.props.locale}

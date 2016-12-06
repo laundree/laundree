@@ -1,10 +1,9 @@
 const React = require('react')
-const DocumentTitle = require('react-document-title')
 const {Link} = require('react-router')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
-const {Modal, Submit, Input, Label} = require('./intl')
+const {DocumentTitle, Modal, Submit, Input, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class UserNameForm extends ValueUpdater {
@@ -281,7 +280,7 @@ class UserSettings extends React.Component {
 
   render () {
     const user = this.user
-    return <DocumentTitle title='Profile settings'>
+    return <DocumentTitle title='document-title.profile-settings'>
       <main className='topNaved' id='Settings'>
         <FormattedMessage tagName='h1' id='user-settings.title'/>
         <section>
