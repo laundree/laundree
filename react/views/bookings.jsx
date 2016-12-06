@@ -4,6 +4,7 @@ const {Link} = require('react-router')
 const {Modal, DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
+const moment = require('moment')
 
 class Booking extends React.Component {
 
@@ -33,7 +34,7 @@ class Booking extends React.Component {
       />
       <div className='machineName'>
         <Link
-          to={`/laundries/${this.props.currentLaundry}/timetable?offsetDate=${fromDate.getTime()}&activeBooking=${booking.id}`}>
+          to={`/laundries/${this.props.currentLaundry}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
           {machine ? machine.name : null}
         </Link>
       </div>
