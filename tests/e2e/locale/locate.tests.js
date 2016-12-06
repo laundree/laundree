@@ -12,7 +12,7 @@ module.exports = {
       .waitForElementVisible('#TopNav .language .dropDownContent', timeout)
       .click('#TopNav .language .dropDownContent li:nth-of-type(2) a')
       .waitForElementVisible('#Home header h2', timeout)
-      .expect.element('#Home header h2').text.to.contain('Et nemt og gratis booking system til dit vasketøj')
+      .expect.element('#Home header h2').text.to.contain('nemt og gratis')
     client.end()
   },
   'Can change locale on auth': client => {
