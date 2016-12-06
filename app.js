@@ -62,7 +62,7 @@ module.exports = {
         case 404:
           res.status(404)
           res.renderHb('error-404.hbs', {
-            title: 'Page not found', styles: ['/stylesheets/error.css']
+            intlTitle: 'document-title.not-found', styles: ['/stylesheets/error.css']
           })
           break
         default:
@@ -78,6 +78,7 @@ module.exports = {
       error.logError(err)
       res.renderHb('error-500.hbs', {
         message: err.message,
+        intlTitle: 'document-title.internal-error',
         styles: ['/stylesheets/error.css']
       })
     })

@@ -158,6 +158,19 @@ class BookingHandler extends Handler {
     ]
   }
 
+  /**
+   * Create an event from the booking
+   * @returns {{start: Date, end: Date, uid, timestamp}}
+   */
+  get event () {
+    return {
+      start: this.model.from,
+      end: this.model.to,
+      uid: this.model.id,
+      timestamp: this.model.createdAt
+    }
+  }
+
   toRest () {
     return this
       .fetchLaundry()

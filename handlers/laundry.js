@@ -478,6 +478,26 @@ class LaundryHandler extends Handler {
     return Promise.all(this.model.signUpCodes.map(hash => comparePassword(code, hash))).then(results => Boolean(results.find(v => v)))
   }
 
+  /**
+   * Lists bookings as events
+   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string, timezone}[]>}
+   */
+  generateEvents () {
+    return this
+      .fetchMachines()
+      .then(machines => Promise.all(machines.map(m => m.generateEvents())))
+      .then(events => events.reduce((m1, m2) => m1.concat(m2), []))
+      .then(events => events.map(({start, end, uid, timestamp, summary}) => ({
+        start,
+        end,
+        uid,
+        timestamp,
+        summary,
+        timezone: this.timezone,
+        url: `${config.get('web.protocol')}://${config.get('web.host')}/laundries/${this.model.id}/timetable?offsetDate=${moment.tz(start, this.timezone).format('YYYY-MM-DD')}`
+      })))
+  }
+
   get reduxModel () {
     return {
       id: this.model.id,

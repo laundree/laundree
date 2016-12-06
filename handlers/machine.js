@@ -75,6 +75,22 @@ class MachineHandler extends Handler {
       })
   }
 
+  /**
+   * Lists bookings as events
+   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, summary: string}[]>}
+   */
+  generateEvents () {
+    return BookingHandler.find({machine: this.model._id})
+      .then(bookings => bookings.map(booking => booking.event))
+      .then(bookings => bookings.map(({start, end, uid, timestamp}) => ({
+        start,
+        end,
+        uid,
+        timestamp,
+        summary: this.model.name
+      })))
+  }
+
   get restUrl () {
     return `/machines/${this.model.id}`
   }

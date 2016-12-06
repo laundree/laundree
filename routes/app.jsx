@@ -38,7 +38,12 @@ router.use((req, res, next) => {
             </Provider>
           </IntlProvider>)
         const title = DocumentTitle.rewind()
-        res.renderHb('app.hbs', {html: html, title: title, state: JSON.stringify(store.getState())})
+        res.renderHb('app.hbs', {
+          html: html,
+          title: title,
+          intlTitle: 'general.empty',
+          state: JSON.stringify(store.getState())
+        })
       })
     })
     .catch(utils.error.logError)

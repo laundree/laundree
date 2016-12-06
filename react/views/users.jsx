@@ -52,24 +52,14 @@ InviteUserForm.propTypes = {
 
 class QrInvite extends React.Component {
 
-  constructor (props) {
-    super(props)
-    this.onClick = () => this.createPdf()
-  }
-
-  createPdf () {
-    sdk.laundry(this.props.laundry.id).createInviteCode()
-      .then(({pdfHref}) => window.open(pdfHref))
-  }
-
   render () {
     return <div id='QrSignUp'>
       <FormattedMessage
         id='users.qr-signup.message'
         values={{
           nl: <br />,
-          link: <span className='pdfLink' onClick={this.onClick}><FormattedMessage
-            id='users.qr-signup.message.link'/></span>
+          link: <a href={`/pdf/invite/${this.props.laundry.id}`} target='_blank' className='pdfLink'><FormattedMessage
+            id='users.qr-signup.message.link'/></a>
         }}/>
     </div>
   }
