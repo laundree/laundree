@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const debug = require('debug')('laundree.routes.pdf')
+const debug = require('debug')('laundree.routes.calendar')
 const ical = require('ical-generator')
 const config = require('config')
 const {UserHandler} = require('../handlers')
@@ -40,7 +40,6 @@ router.get('/:userId/:calendarToken/calendar.ics', (req, res, next) => {
           return user
             .generateEvents()
             .then(events => {
-              console.log(events)
               const cal = ical(config.get('calendar'))
               cal.events(events)
               cal.serve(res)

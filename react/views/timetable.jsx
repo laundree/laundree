@@ -142,9 +142,15 @@ class Timetable extends React.Component {
     return Math.min(Math.max(Math.floor(this._mainRef.offsetWidth / (Math.max(numMachines * 100, 200))), 1), 7)
   }
 
+  get offsetDate () {
+    return this.props.offsetDate && this.props.offsetDate.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/) && moment.tz(this.props.offsetDate, this.props.laundry.timezone).isValid()
+      ? this.props.offsetDate
+      : undefined
+  }
+
   get days () {
-    const startDay = this.props.offsetDate
-      ? moment.tz(this.props.offsetDate, this.props.laundry.timezone)
+    const startDay = this.offsetDate
+      ? moment.tz(this.offsetDate, this.props.laundry.timezone)
       : moment.tz(moment.tz(this.props.laundry.timezone).format('YYYY-MM-DD'), this.props.laundry.timezone)
     return range(this.state.numDays).map(i => startDay.clone().add(i, 'd'))
   }
@@ -163,7 +169,7 @@ class Timetable extends React.Component {
           onActiveChange={this.onActiveChange}
           currentUser={this.props.currentUser}
           activeBooking={this.state.activeBooking}
-          offsetDate={this.props.offsetDate}
+          offsetDate={this.offsetDate}
           onHoverColumn={this.hoverColumn}
           bookings={this.props.bookings}
           laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
@@ -173,7 +179,7 @@ class Timetable extends React.Component {
           currentUser={this.props.currentUser}
           users={this.props.users}
           laundry={this.props.laundry}
-          offsetDate={this.props.offsetDate}
+          offsetDate={this.offsetDate}
           booking={this.props.bookings[this.state.activeBooking]}
           machines={this.props.machines}/>
       </div>

@@ -480,7 +480,7 @@ class LaundryHandler extends Handler {
 
   /**
    * Lists bookings as events
-   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string, timezone}[]>}
+   * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string}[]>}
    */
   generateEvents () {
     return this
@@ -493,7 +493,6 @@ class LaundryHandler extends Handler {
         uid,
         timestamp,
         summary,
-        timezone: this.timezone,
         url: `${config.get('web.protocol')}://${config.get('web.host')}/laundries/${this.model.id}/timetable?offsetDate=${moment.tz(start, this.timezone).format('YYYY-MM-DD')}`
       })))
   }
