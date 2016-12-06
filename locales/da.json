@@ -209,5 +209,22 @@
     "error-500.message": "Noget gik galt i vores ende. Bare rolig, vi har logget det og vil forsøge at sikre, at det ikke sker igen ....",
     "about.title": "Om Laundree",
     "about.mission.title": "Vores mission",
-    "about.mission.text": "Vores mission er dobbeltsidet: Vi ønsker at skabe en nemmere og mere behagelig hverdag for udlejere og lejere, ved at udarbejde en platform der understøtter vaskefaciliteter og kommunikationen mellem udlejere og lejere. {nl}\n{nl}\nVi ønsker samtidig at forbedre miljøet ved at få flere folk til at dele deres vaskefaciliteter og vaske på flere tidspunkter i løbet af dagen. Dette er mere miljøvenligt, hvilket vi kan analysere ud fra anonyme data, indsamlet fra vores brugere."
+    "about.mission.text": "Vores mission er dobbeltsidet: Vi ønsker at skabe en nemmere og mere behagelig hverdag for udlejere og lejere, ved at udarbejde en platform der understøtter vaskefaciliteter og kommunikationen mellem udlejere og lejere. {nl}\n{nl}\nVi ønsker samtidig at forbedre miljøet ved at få flere folk til at dele deres vaskefaciliteter og vaske på flere tidspunkter i løbet af dagen. Dette er mere miljøvenligt, hvilket vi kan analysere ud fra anonyme data, indsamlet fra vores brugere.",
+    "general.empty": " ",
+    "document-title.about": "Om Laundree",
+    "document-title.administrator-panel": "Administrator panel",
+    "document-title.base": "",
+    "document-title.bookings": "Dine bookinger",
+    "document-title.create-laundry": "",
+    "document-title.laundry-settings": "Vaskeri indstillinger",
+    "document-title.machines": "Maskiner",
+    "document-title.profile-settings": "Profil indstillinger",
+    "document-title.laundry-users": "Vaskeri brugere",
+    "document-title.not-found": "Siden ikke fundet",
+    "document-title.internal-error": "Server fejl",
+    "user-settings.email-addresses.load": "Hent adresser",
+    "user-settings.email-addresses.loading": "Henter adresser...",
+    "user-settings.calendar.title": "Kalender integration",
+    "user-settings.calendar.text": "Du kan eksportere dine bookings til din ynglings kalender program. {nl}\nBare klik {link}.",
+    "user-settings.calendar.text.link": "her"
 }
