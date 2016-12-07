@@ -9,6 +9,7 @@ calendar:
     company: 'laundree.io'
     product: 'booking-calendar'
   name: 'Booking'
+  ttl: 1800
 
 timezone: Europe/Copenhagen
 
