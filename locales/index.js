@@ -9,6 +9,5 @@ addLocaleData(daLocale.concat(enLocale))
 module.exports = {
   en: {name: 'English', messages: en},
   da: {name: 'Dansk', messages: da},
-  supported: ['en', 'da'],
-  localeFromRequest: req => req.session.locale || req.locale
+  supported: ['en', 'da']
 }

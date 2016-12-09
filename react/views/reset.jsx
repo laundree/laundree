@@ -38,7 +38,7 @@ class Reset extends ValueUpdater {
         </h1>
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#Logo'/>
+            <use xlinkHref='#MediaLogo'/>
           </svg>
         </Link>
         <ValidationForm

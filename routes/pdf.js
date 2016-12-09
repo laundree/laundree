@@ -42,7 +42,7 @@ router.get('/invite/:laundryId/:id', (req, res, next) => {
   }
 
   res.set('Content-Type', 'application/pdf')
-  createInvitePdf(laundryId, id).pipe(res)
+  createInvitePdf(laundryId, id, req.locale).pipe(res)
 })
 
 module.exports = router

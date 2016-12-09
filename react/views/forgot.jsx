@@ -42,7 +42,7 @@ class Forgot extends ValueUpdater {
         <FormattedMessage tagName='h1' id='auth.forgot.title'/>
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#Logo'/>
+            <use xlinkHref='#MediaLogo'/>
           </svg>
         </Link>
         <ValidationForm

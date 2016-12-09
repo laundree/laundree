@@ -226,5 +226,8 @@
     "user-settings.email-addresses.loading": "Loading addresses...",
     "user-settings.calendar.title": "Calendar integration",
     "user-settings.calendar.text": "You can export your bookings to your favorite calendar application. {nl}\n Just click {link}.",
-    "user-settings.calendar.text.link": "here"
+    "user-settings.calendar.text.link": "here",
+    "pdf.invite.text.1": "You can book these machines at laundree.io. Just scan the QR code below and follow the guide online.",
+    "pdf.invite.text.2": "Simple as that!",
+    "pdf.invite.text.3": "If you do not have a QR scanner, please download a free one on your device, or ask the administrator to add your e-mail address."
 }
