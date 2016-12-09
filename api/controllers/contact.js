@@ -6,7 +6,7 @@ const config = require('config')
 
 function contact (req, res) {
   const {message, subject, email, name} = req.swagger.params.body.value
-  var template, receiver, sender, userId
+  let template, receiver, sender, userId
   const user = req.user
   if (user) {
     sender = `"${user.model.displayName}" <${user.model.emails[0]}>`
@@ -20,8 +20,8 @@ function contact (req, res) {
     template = 'contact'
     receiver = config.get('emails.contact')
   }
-  sendEmail({message, subject, email, name, userId}, template, receiver)
-    .then(() => sendEmail({message, subject, name}, 'contact-receipt', sender))
+  sendEmail({message, subject, email, name, userId}, template, receiver, {locale: req.locale})
+    .then(() => sendEmail({message, subject, name}, 'contact-receipt', sender, {locale: req.locale}))
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }

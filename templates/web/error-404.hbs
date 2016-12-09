@@ -8,11 +8,11 @@
 <main>
     <section id="NotFound">
         <div class="message">
-            <h1>{{ formatMessage (getIntlMessage 'error-404.title') }}</h1>
+            <h1>{{ formatIntl 'error-404.title' messages=messages}}</h1>
             <p>
-                {{ formatMessage (getIntlMessage 'error-404.message.l1')}}<br/>
+                {{ formatIntl 'error-404.message.l1' messages=messages}}<br/>
                 <br/>
-                {{ formatMessage (getIntlMessage 'error-404.message.l2')}}
+                {{ formatIntl 'error-404.message.l2' messages=messages}}
             </p>
         </div>
         <svg version="1.1"  xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"

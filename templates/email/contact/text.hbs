@@ -1,3 +1,7 @@
 {{message}}
 
-From "{{name}}" with email "{{email}}".
+{{ formatIntl
+        'email.contact.from'
+        messages=messages
+        name=(format '"{name}"' name=name)
+        email=(format '"{email}"' email=email) }}

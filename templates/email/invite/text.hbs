@@ -1,7 +1,12 @@
-Hi,
+{{ formatIntl
+        'email.invite.message'
+        messages=messages
+        name=(format '"{name}"' name=laundry.name)
+        link='https://laundree.io'
+        signup='https://laundree.io/auth/sign-up'
+        nl='' }}
 
-You have been invited to join "{{{laundry.name}}}" on https://laundree.io .
-If you don't have an account, you may sign-up here: https://laundree.io/auth/sign-up .
-
-Best,
-Your laundree team!
+{{ formatIntl
+        'email.signature'
+        messages=messages
+        nl='' }}

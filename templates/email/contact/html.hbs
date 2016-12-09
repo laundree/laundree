@@ -24,7 +24,11 @@
             <td class="body">
                 <pre>{{message}}</pre>
                 <br/>
-                From <i>{{name}}</i> with email <a href="mailto:{{email}}">{{email}}</a>.
+                {{ formatIntl
+                        'email.contact.from'
+                        messages=messages
+                        name=(format '<i>{name}</i>' name=name)
+                        email=(format '<a href="mailto:{email}">{email}</a>' email=email) }}
             </td>
             <td></td>
         </tr>

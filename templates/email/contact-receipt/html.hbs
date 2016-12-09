@@ -22,15 +22,17 @@
         <tr>
             <td></td>
             <td class="body">
-                Dear {{name}},<br/>
-                <br/>
-                We have received the following message:<br/>
-                <pre>{{message}}</pre>
-                <br/>
-                We will get back to you as soon as possible! <br/>
-                <br/>
-                Best,<br/>
-                Your Laundree team
+                {{ formatIntl
+                        'email.contact-receipt.message'
+                        messages=messages
+                        name=name
+                        nl='<br />'
+                        message=(format '<pre>{message}</pre>' message=message)}}
+                <br/><br/>
+                {{ formatIntl
+                        'email.signature'
+                        messages=messages
+                        nl='<br />' }}
             </td>
             <td></td>
         </tr>

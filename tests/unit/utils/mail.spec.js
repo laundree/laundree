@@ -15,9 +15,9 @@ describe('utils', () => {
           .sendEmail({
             user: {id: 'someFancyUserId', displayName: 'Bob Bobbesen'},
             token: 'token123'
-          }, 'password-reset', 'test@example.com')
+          }, 'password-reset', 'test@example.com', {})
           .then((info) => {
-            var message = info.response.toString()
+            const message = info.response.toString()
             message.should.match(/https:\/\/laundree\.io\/auth\/reset\?user=someFancyUserId&token=token123/)
             message.should.match(/test@example\.com/)
             message.should.match(/Bob Bobbesen/)
@@ -48,10 +48,26 @@ describe('utils', () => {
           laundry: {name: 'Bobs Laundry'}
         }, 'invite-user', 'test@example.com')
         .then((info) => {
-          var message = info.response.toString()
+          const message = info.response.toString()
           message.match(/Hi Kurt Ravn/g).should.have.length(2)
           message.match(/join "Bobs Laundry"/g).should.have.length(1)
           message.match(/join <b>Bobs Laundry<\/b>/g).should.have.length(1)
+        }))
+      it('should render invite email correctly wrt. locale', () => mail
+        .sendEmail({
+          user: {
+            id: 'bob',
+            name: {firstName: 'Bob', lastName: 'Bobbesen', middleName: 'Sun'},
+            displayName: 'Kurt Ravn'
+          },
+          laundry: {name: 'Bobs Laundry'}
+        }, 'invite-user', 'test@example.com', {locale: 'da'})
+        .then((info) => {
+          // TODO add this
+          // const message = info.response.toString()
+          // message.match(/Hej Kurt Ravn/g).should.have.length(2)
+          // message.match(/tilmeld dig "Bobs Laundry"/g).should.have.length(1)
+          // message.match(/tilmeld dig <b>Bobs Laundry<\/b>/g).should.have.length(1)
         }))
     })
   })
