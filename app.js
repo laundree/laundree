@@ -19,7 +19,7 @@ const debug = require('debug')('laundree.app')
 app.use(setups.sessionSetup)
 app.use(locale(locales.supported))
 app.use((req, res, next) => {
-  req.locale = req.session.locale || req.locale
+  req.locale = req.session.locale || req.locale || 'en'
   next()
 })
 // Passport
