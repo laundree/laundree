@@ -43,7 +43,7 @@ const Home = () => <DocumentTitle title='document-title.home'>
       <div>
         <a href='/'>
           <svg id='Logo'>
-            <use xlinkHref='#Logo'/>
+            <use xlinkHref='#MediaLogo'/>
           </svg>
         </a>
         <FormattedMessage id='home.teaser' tagName='h2'/>

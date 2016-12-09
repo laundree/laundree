@@ -16,7 +16,7 @@ const {opbeat} = require('../lib/opbeat')
 const locales = require('../locales')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', locales.localeFromRequest(req))
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', req.locale)
     .then(store => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)

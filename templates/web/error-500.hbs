@@ -9,9 +9,9 @@
     <section id="InternalError">
 
         <div class="message">
-            <h1>{{ formatMessage (getIntlMessage 'error-500.title') }}</h1>
+            <h1>{{ formatIntl 'error-500.title' messages=messages }}</h1>
             <p>
-                {{ formatMessage (getIntlMessage 'error-500.message')}}<br/>
+                {{ formatIntl 'error-500.message' messages=messages }}<br/>
             </p>
         </div>
 

@@ -48,7 +48,7 @@ class SignUp extends ValueUpdater {
         <FormattedMessage id='auth.signup.title' tagName='h1'/>
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#Logo'/>
+            <use xlinkHref='#MediaLogo'/>
           </svg>
         </Link>
         <div className='auth_alternatives'>

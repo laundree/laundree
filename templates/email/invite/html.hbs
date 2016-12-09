@@ -22,15 +22,20 @@
         <tr>
             <td></td>
             <td class="body">
-                Hi,<br />
-                <br />
-                You have been invited to join <b>{{{laundry.name}}}</b> on <a href='https://laundree.io'>laundree.io</a>.<br />
-                If you don't have an account, you may sign-up here:
-                <br />
-                <a href='https://laundree.io/auth/sign-up' class='signup'>Sign-up</a>
-                <br />
-                Best,<br />
-                Your laundree team!
+                {{ formatIntl
+                        'email.invite.message'
+                        messages=messages
+                        name=(format '<b>{name}</b>' name=laundry.name)
+                        link=(format '<a href="https://laundree.io">{link}</a>'
+                                link=(formatIntl 'email.invite.message.link' messages=messages))
+                        signup=(format "<a href='https://laundree.io/auth/sign-up' class='signup'>{link}</a>"
+                                link=(formatIntl 'email.invite.message.signup' messages=messages))
+                        nl='<br />' }}
+                <br/><br/>
+                {{ formatIntl
+                        'email.signature'
+                        messages=messages
+                        nl='<br />' }}
             </td>
             <td></td>
         </tr>

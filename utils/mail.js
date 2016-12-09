@@ -7,16 +7,21 @@ const EmailTemplate = require('email-templates').EmailTemplate
 const {createTransport} = require('nodemailer')
 const config = require('config')
 const debug = require('debug')('laundree.utils.mail')
+const locales = require('../locales')
+
 /**
  * Render a template
  * @param {Object} data
  * @param {string} template
+ * @param {string} locale
  * @return {Promise.<{html:string, text: string, subject:string}>}
  */
-function render (data, template) {
+function render (data, template, locale) {
   debug('Rendering email')
-  const t = new EmailTemplate(path.join(__dirname, '..', 'templates', 'email', template))
-  return t.render(data)
+  const messages = locales[locale].messages
+  const t = new EmailTemplate(
+    path.join(__dirname, '..', 'templates', 'email', template))
+  return t.render(Object.assign(data, {messages}))
 }
 
 const standardTransporter = config.get('mailer.stubTransporter')
@@ -56,12 +61,13 @@ function sendRenderedEmail (to, content, from, transporter) {
  * @param {string} template
  * @param {string} to
  * @param from=
+ * @param {string=} locale
  * @param transporter=
  * @returns {Promise}
  */
-function sendEmail (data, template, to, from = config.get('emails.from'), transporter = standardTransporter) {
+function sendEmail (data, template, to, {locale = 'en', from = config.get('emails.from'), transporter = standardTransporter} = {}) {
   debug(`Sending email to ${to}`)
-  return render(data, template).then((rendered) => sendRenderedEmail(to, rendered, from, transporter))
+  return render(data, template, locale).then((rendered) => sendRenderedEmail(to, rendered, from, transporter))
 }
 
 module.exports = {

@@ -2,9 +2,9 @@
  * Created by budde on 05/05/16.
  */
 
-var utils = require('../../utils')
+const utils = require('../../utils')
 
-var UserHandler = require('../../handlers').UserHandler
+const UserHandler = require('../../handlers').UserHandler
 
 function getUser (req, res) {
   const {user} = req.subjects
@@ -12,20 +12,20 @@ function getUser (req, res) {
 }
 
 function listUsers (req, res) {
-  var filter = {}
-  var email = req.swagger.params.email.value
-  var limit = req.swagger.params.page_size.value
+  const filter = {}
+  const email = req.swagger.params.email.value
+  const limit = req.swagger.params.page_size.value
   if (email) {
     filter['profiles.emails.value'] = email.toLowerCase()
   }
-  var since = req.swagger.params.since.value
+  const since = req.swagger.params.since.value
   if (since) {
     filter._id = {$gt: since}
   }
   UserHandler.find(filter, {limit, sort: {_id: 1}})
     .then((users) => users.map((user) => user.toRestSummary()))
     .then((users) => {
-      var links = {
+      const links = {
         first: `/api/users?page_size=${limit}`
       }
       if (users.length === limit) {
@@ -54,7 +54,7 @@ function startPasswordReset (req, res) {
     .then((token) => utils.mail.sendEmail({
       user: {id: user.model.id, displayName: user.model.displayName},
       token: token
-    }, 'password-reset', user.model.emails[0]))
+    }, 'password-reset', user.model.emails[0], {locale: req.locale}))
     .then(() => utils.api.returnSuccess(res))
     .catch(utils.api.generateErrorHandler(res))
 }
@@ -72,14 +72,14 @@ function passwordReset (req, res) {
 
 function startEmailVerification (req, res) {
   const {user} = req.subjects
-  var email = req.swagger.params.body.value.email
+  const email = req.swagger.params.body.value.email
   user.generateVerifyEmailToken(email)
     .then((token) => !token ? utils.api.returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
       email: email,
       emailEncoded: encodeURIComponent(email),
       token: token,
       user: {id: user.model.id, displayName: user.model.displayName}
-    }, 'verify-email', email)
+    }, 'verify-email', email, {locale: req.locale})
       .then(() => utils.api.returnSuccess(res)))
     .catch(utils.api.generateErrorHandler(res))
 }
