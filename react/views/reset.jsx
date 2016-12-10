@@ -21,11 +21,11 @@ class Reset extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: <FormattedMessage id='auth.reset.success'/>, success: true}
+            notion: {message: <FormattedMessage id='auth.reset.success'/>, success: true}
           }),
           () => this.setState({
             loading: false,
-            message: {message: <FormattedMessage id='auth.reset.error'/>, success: false}
+            notion: {message: <FormattedMessage id='auth.reset.error'/>, success: false}
           }))
     }
   }
