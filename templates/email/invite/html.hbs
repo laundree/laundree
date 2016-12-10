@@ -1,48 +1,16 @@
-<div class="container">
-    <table>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="logo body">
-                <img src="https://laundree.io/images/mail_logo.png">
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <h1>Invitation</h1>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="body">
-                {{ formatIntl
-                        'email.invite.message'
-                        messages=messages
-                        name=(format '<b>{name}</b>' name=laundry.name)
-                        link=(format '<a href="https://laundree.io">{link}</a>'
-                                link=(formatIntl 'email.invite.message.link' messages=messages))
-                        signup=(format "<a href='https://laundree.io/auth/sign-up' class='signup'>{link}</a>"
-                                link=(formatIntl 'email.invite.message.signup' messages=messages))
-                        nl='<br />' }}
-                <br/><br/>
-                {{ formatIntl
-                        'email.signature'
-                        messages=messages
-                        nl='<br />' }}
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
+{{#> email_layout.hbs title=(formatIntl 'email.invite.title' messages=messages)}}
+    {{ formatIntl
+            'email.invite.message'
+            messages=messages
+            name=(format '<b>{name}</b>' name=laundry.name)
+            link=(format '<a href="https://laundree.io">{link}</a>'
+                    link=(formatIntl 'email.invite.message.link' messages=messages))
+            signup=(format "<a href='https://laundree.io/auth/sign-up' class='signup'>{link}</a>"
+                    link=(formatIntl 'email.invite.message.signup' messages=messages))
+            nl='<br />' }}
+    <br/><br/>
+    {{ formatIntl
+            'email.signature'
+            messages=messages
+            nl='<br />' }}
+{{/email_layout.hbs}}

@@ -8,3 +8,20 @@ If you didn't create a laundree account or request to get your email address ver
 
 Best,
 Your laundree team!
+
+{{ formatIntl
+        'email.verify-email.message'
+        messages=messages
+        name=user.displayName
+        email=(format '"{email}"' email=email)
+        link=(format
+                'https://laundree.io/auth/verify?user={userId}&email={email}&token={token}'
+                userId=user.id
+                email=emailEncoded
+                token=token)
+        nl='' }}
+
+{{ formatIntl
+        'email.signature'
+        messages=messages
+        nl='' }}

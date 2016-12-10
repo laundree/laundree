@@ -1,41 +1,15 @@
-<div class="container">
-    <table>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="logo body">
-                <img src="https://laundree.io/images/mail_logo.png">
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <h1>Invitation</h1>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="body">
-                Hi {{{user.displayName}}}<br/>
-                <br />
-                You have been invited to join <b>{{{laundry.name}}}</b> on <a href='https://laundree.io'>laundree.io</a>.<br />
-                Login to your account to view the laundry.<br />
-                <br />
-                Best,<br />
-                Your laundree team!
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
+{{#> email_layout.hbs title=(formatIntl 'email.invite-user.title' messages=messages)}}
+    {{ formatIntl
+            'email.invite-user.message'
+            messages=messages
+            name=user.displayName
+            laundry=(format '<b>{name}</b>' name=laundry.name)
+            link=(format '<a href="https://laundree.io">{link}</a>'
+                    link=(formatIntl 'email.invite-user.message.link' messages=messages))
+            nl='<br />' }}
+    <br/><br/>
+    {{ formatIntl
+            'email.signature'
+            messages=messages
+            nl='<br />' }}
+{{/email_layout.hbs}}

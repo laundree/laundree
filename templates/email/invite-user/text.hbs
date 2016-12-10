@@ -1,7 +1,12 @@
-Hi {{{user.displayName}}}
+{{ formatIntl
+        'email.invite-user.message'
+        messages=messages
+        name=user.displayName
+        laundry=(format '"{name}"' name=laundry.name)
+        link="https://laundree.io"
+        nl='' }}
 
-You have been invited to join "{{{laundry.name}}}" on https://laundree.io.
-Login to your account to view the laundry.
-
-Best,
-Your laundree team!
+{{ formatIntl
+        'email.signature'
+        messages=messages
+        nl='' }}
