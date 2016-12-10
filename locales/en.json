@@ -245,5 +245,8 @@
   "email.invite-user.title": "Invitation",
   "email.invite-user.subject": "Invitation to {name}",
   "email.invite-user.message": "Hi {name},{nl}\n{nl}\nYou have been invited to join {laundry} on {link}.{nl}\nLogin to your account to view the laundry.",
-  "email.invite-user.message.link": "laundree"
+  "email.invite-user.message.link": "laundree",
+  "email.password-reset.title": "Reset your password",
+  "email.password-reset.subject": "Reset your password",
+  "email.password-reset.message": "Hi {name},{nl}\n{nl}\nThis email is an response to your request to reset your password.{nl}\nTo reset your password follow the link below within the next 60 minutes.{nl}\n{nl}\n{link}{nl}\n{nl}\nIf you did not request to reset your password, please ignore this email."
 }
