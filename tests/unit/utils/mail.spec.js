@@ -22,6 +22,7 @@ describe('utils', () => {
             message.should.match(/test@example\.com/)
             message.should.match(/Bob Bobbesen/)
             message.should.match(/someFancyUserId/)
+            message.should.match(/logo body/)
           }))
       it('should render verify email correctly', () => mail
         .sendEmail({
@@ -37,6 +38,7 @@ describe('utils', () => {
           message.should.match(/token123/)
           message.should.match(/someFancyUserId/)
           message.should.match(/test@example\.com/)
+          message.should.match(/logo body/)
         }))
       it('should render invite email correctly', () => mail
         .sendEmail({
@@ -45,13 +47,14 @@ describe('utils', () => {
             name: {firstName: 'Bob', lastName: 'Bobbesen', middleName: 'Sun'},
             displayName: 'Kurt Ravn'
           },
-          laundry: {name: 'Bobs Laundry'}
+          laundry: {name: 'Bobs Lau ndry'}
         }, 'invite-user', 'test@example.com')
         .then((info) => {
           const message = info.response.toString()
           message.match(/Hi Kurt Ravn/g).should.have.length(2)
           message.match(/join "Bobs Laundry"/g).should.have.length(1)
           message.match(/join <b>Bobs Laundry<\/b>/g).should.have.length(1)
+          message.should.match(/logo body/)
         }))
       it('should render invite email correctly wrt. locale', () => mail
         .sendEmail({

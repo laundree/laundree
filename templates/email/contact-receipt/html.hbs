@@ -1,45 +1,13 @@
-<div class="container">
-    <table>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="logo body">
-                <img src="https://laundree.io/images/mail_logo.png">
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <h1>{{subject}}</h1>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="body">
-                {{ formatIntl
-                        'email.contact-receipt.message'
-                        messages=messages
-                        name=name
-                        nl='<br />'
-                        message=(format '<pre>{message}</pre>' message=message)}}
-                <br/><br/>
-                {{ formatIntl
-                        'email.signature'
-                        messages=messages
-                        nl='<br />' }}
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
+{{#> email_layout.hbs title=subject}}
+    {{ formatIntl
+            'email.contact-receipt.message'
+            messages=messages
+            name=name
+            nl='<br />'
+            message=(format '<pre>{message}</pre>' message=message)}}
+    <br/><br/>
+    {{ formatIntl
+            'email.signature'
+            messages=messages
+            nl='<br />' }}
+{{/email_layout.hbs}}

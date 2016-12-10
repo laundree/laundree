@@ -3,7 +3,7 @@
  */
 const Promise = require('promise')
 const path = require('path')
-const EmailTemplate = require('email-templates').EmailTemplate
+const {EmailTemplate} = require('email-templates')
 const {createTransport} = require('nodemailer')
 const config = require('config')
 const debug = require('debug')('laundree.utils.mail')
