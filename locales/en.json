@@ -234,6 +234,8 @@
   "email.contact.subject": "[Contact] {subject}",
   "email.contact-receipt.message": "Dear {name},{nl}\n{nl}\nWe have received the following message:{nl}\n{nl}\n{message}{nl}\n{nl}\nWe will get back to you as soon as possible!",
   "email.contact-receipt.subject": "[Receipt] {subject}",
+  "email.support.from": "From user with ID {userId}, name {name}, and email {email}",
+  "email.support.subject": "[Support] {subject}",
   "email.signature": "Best,{nl}\nYour Laundree team",
   "email.invite.message": "Hi,{nl}\n{nl}\nYou have been invited to join {name} on {link}{nl}\nIf you don't have an account, you may sign-up here:{nl}\n{link}",
   "email.invite.message.link": "laundree",

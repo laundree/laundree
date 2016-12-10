@@ -1,38 +1,10 @@
-<div class="container">
-    <table>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="logo body">
-                <img src="https://laundree.io/images/mail_logo.png">
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <h1>{{subject}}</h1>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="body">
-                <pre>{{message}}</pre>
-                <br/>
-                From user with ID: "{{userId}}", name <i>{{name}}</i>, and email <a
-                    href="mailto:{{email}}">{{email}}</a>..
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
+{{#> email_layout.hbs title=subject}}
+    <pre>{{message}}</pre>
+    <br/>
+    {{ formatIntl
+            'email.support.from'
+            messages=messages
+            userId=(format '<i>{userId}</i>' userId=userId)
+            name=(format '<i>{name}</i>' name=name)
+            email=(format '<a href="mailto:{email}">{email}</a>' email=email) }}
+{{/email_layout.hbs}}

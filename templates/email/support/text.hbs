@@ -1,3 +1,8 @@
 {{message}}
 
-From user with ID: "{{userId}}", "{{name}}", and email "{{email}}".
+{{ formatIntl
+        'email.support.from'
+        messages=messages
+        userId=(format '"{userId}"' userId=userId)
+        name=(format '"{name}"' name=name)
+        email=(format '"{email}"' email=email) }}
