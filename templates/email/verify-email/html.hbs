@@ -1,44 +1,18 @@
-<div class="container">
-    <table>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="logo body">
-                <img src="https://laundree.io/images/mail_logo.png">
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td>
-                <h1>Verify your email</h1>
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="body">
-                Hi {{{user.displayName}}}<br />
-                <br />
-                Please verify that you own the email-address: {{{email}}}, by following the link below
-                <br />
-                <a href="https://laundree.io/auth/verify?user={{{user.id}}}&email={{{emailEncoded}}}&token={{{token}}}">https://laundree.io/auth/verify?user={{{user.id}}}&email={{{emailEncoded}}}&token={{{token}}}</a><br />
-                <br />
-                If you didn't create a laundree account or request to get your email address verified, please ignore this message.<br />
-                <br />
-                Best,<br />
-                Your laundree team!
-            </td>
-            <td></td>
-        </tr>
-        <tr>
-            <td></td>
-            <td class="verticalMargin"></td>
-            <td></td>
-        </tr>
-    </table>
-</div>
+{{#> email_layout.hbs title=(formatIntl 'email.verify-email.title' messages=messages)}}
+    {{ formatIntl
+            'email.verify-email.message'
+            messages=messages
+            name=user.displayName
+            email=(format '<b>{email}</b>' email=email)
+            link=(format
+                    '<a href="https://laundree.io/auth/verify?user={userId}&email={email}&token={token}">https://laundree.io/auth/verify?user={userId}&email={email}&token={token}</a>'
+                    userId=user.id
+                    email=emailEncoded
+                    token=token)
+            nl='<br />' }}
+    <br/><br/>
+    {{ formatIntl
+            'email.signature'
+            messages=messages
+            nl='<br />' }}
+{{/email_layout.hbs}}
