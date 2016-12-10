@@ -20,11 +20,11 @@ class Verification extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: <FormattedMessage id='auth.verification.success'/>, success: true}
+            notion: {message: <FormattedMessage id='auth.verification.success'/>, success: true}
           }),
           () => this.setState({
             loading: false,
-            message: {message: <FormattedMessage id='auth.verification.error'/>}
+            notion: {message: <FormattedMessage id='auth.verification.error'/>}
           }))
     }
   }
