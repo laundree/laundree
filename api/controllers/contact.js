@@ -25,7 +25,7 @@ function contact (req, res) {
     receiver = config.get('emails.contact')
   }
   sendEmail({message, subject, email: senderEmail, name: senderName, userId}, template, receiver, {locale: req.locale})
-    .then(() => sendEmail({message, subject, name}, 'contact-receipt', sender, {locale: req.locale}))
+    .then(() => sendEmail({message, subject, name: senderName}, 'contact-receipt', sender, {locale: req.locale}))
     .then(() => api.returnSuccess(res))
     .catch(api.generateErrorHandler(res))
 }
