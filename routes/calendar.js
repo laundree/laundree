@@ -15,14 +15,14 @@ router.get('/', (req, res, next) => {
     .generateCalendarToken()
     .then(token => {
       debug('Generated calendar token, redirecting')
-      res.redirect(`webcal://${config.get('web.host')}${req.baseUrl}/${req.user.model.id}/${token}/calendar.ics`)
+      res.redirect(`webcal://${config.get('web.host')}${req.baseUrl}/${req.user.model.id}/${token.secret}/calendar.ics`)
     })
     .catch(next)
 })
 
 router.get('/:userId/:calendarToken/calendar.ics', (req, res, next) => {
   const {calendarToken, userId} = req.params
-  debug('Starting calendar export')
+  debug('Starting calendar export', calendarToken)
   UserHandler
     .findFromId(userId)
     .then(user => {

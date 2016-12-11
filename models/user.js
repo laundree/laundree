@@ -7,23 +7,25 @@ const {union} = require('../utils/array')
 
 const userSchema = new Schema({
   role: {type: String, default: 'user', enum: ['user', 'admin']},
+  docVersion: {type: Number},
   demo: Boolean,
   oneTimePassword: {type: String},
   password: {type: String},
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
+  resetPassword: {
+    token: {type: Schema.Types.ObjectId, ref: 'Token'},
+    expire: Date
+  },
   latestProvider: String,
   lastSeen: Date,
   locale: String,
   overrideDisplayName: String,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
-  calendarTokens: [String],
+  calendarTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
   laundries: [{type: Schema.Types.ObjectId, ref: 'Laundry'}],
   explicitVerifiedEmails: [{type: String}],
-  explicitVerificationEmailTokens: [{
+  pendingExplicitEmailVerifications: [{
     email: {type: String, required: true},
-    hash: {type: String, required: true},
-    created: {type: Date, required: true, default: Date.now}
+    token: {type: Schema.Types.ObjectId, ref: 'Token'}
   }],
   profiles: [{
     provider: String,

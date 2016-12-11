@@ -73,39 +73,59 @@ class UserHandler extends Handler {
 
   /**
    * Will create a new password-reset token with 1h. expiration.
-   * @return {Promise.<string>}
+   * @return {Promise.<TokenHandler>}
    */
   generateResetToken () {
-    return utils.password.generateToken().then((token) => {
-      return utils.password.hashPassword(token).then((hash) => {
-        this.model.resetPasswordToken = hash
-        this.model.resetPasswordExpire = Date.now() + 3600000
+    debug('Generating reset token')
+    return this._generateToken(uuid.v4(), 'reset')
+      .then(token => this._revokeResetToken().then(() => {
+        debug('Generated token', token.model._id)
+        this.model.resetPassword = {
+          token: token.model._id,
+          expire: Date.now() + 3600000
+        }
         return this.model.save().then(() => token)
-      })
+      }))
+  }
+
+  _fetchPasswordResetToken () {
+    return TokenHandler
+      .findFromId(this.model.resetPassword.token)
+  }
+
+  _revokeResetToken () {
+    if (!this.model.resetPassword.token) return Promise.resolve()
+    return this._fetchPasswordResetToken().then(token => {
+      this.model.resetPassword = {}
+      return Promise.all([token.deleteToken(), this.model.save()])
     })
   }
 
   /**
    * Create a new calendar token
-   * @returns {Promise.<string>|*}
+   * @returns {Promise.<TokenHandler>}
    */
   generateCalendarToken () {
-    return utils.password.generateToken().then(token => {
-      return utils.password.hashPassword(token).then(hash => {
-        this.model.calendarTokens.push(hash)
+    debug('Generating calendar token')
+    return this
+      ._generateToken(uuid.v4(), 'calendar')
+      .then(token => {
+        debug('Token ', token.model.id)
+        this.model.calendarTokens.push(token.model._id)
         return this.model.save().then(() => token)
       })
-    })
   }
 
   /**
    * Verifies a calendar token
-   * @param token
+   * @param {string} token
    * @returns {Promise.<boolean>|*}
    */
   verifyCalendarToken (token) {
-    return Promise
-      .all(this.model.calendarTokens.map(hash => utils.password.comparePassword(token, hash)))
+    debug('Verifying calendar token', this.model.calendarTokens)
+    return this
+      ._fetchCalendarTokens()
+      .then(tokens => Promise.all(tokens.map(t => t.verify(token))))
       .then(result => result.find(r => r))
       .then(Boolean)
   }
@@ -159,16 +179,29 @@ class UserHandler extends Handler {
     return TokenHandler.find({_id: {$in: this.model.authTokens}})
   }
 
+  _fetchCalendarTokens () {
+    return TokenHandler.find({_id: {$in: this.model.calendarTokens}})
+  }
+
+  _fetchUserTokens () {
+    return TokenHandler.find({owner: this.model._id})
+  }
+
   /**
    * Generates a new auth token associated with this account.
    * @param {string} name
    * @return {Promise.<TokenHandler>}
    */
   generateAuthToken (name) {
-    return TokenHandler._createToken(this, name).then((token) => {
-      this.model.authTokens.push(token.model._id)
-      return this.model.save().then(() => token)
-    })
+    return this._generateToken(name, 'auth')
+      .then(token => {
+        this.model.authTokens.push(token.model._id)
+        return this.model.save().then(() => token)
+      })
+  }
+
+  _generateToken (name, type) {
+    return TokenHandler._createToken(this, name, type)
   }
 
   /**
@@ -242,19 +275,18 @@ class UserHandler extends Handler {
   /**
    * Will create a new email verification.
    * @param {string} email
-   * @return {Promise.<string>}
+   * @return {Promise.<TokenHandler>}
    */
   generateVerifyEmailToken (email) {
     email = email.toLowerCase()
     if (this.model.emails.indexOf(email) < 0) return Promise.resolve()
-    return utils.password
-      .generateToken()
-      .then((token) => utils.password.hashPassword(token).then((hash) => {
-        const cleanTokens = this.model.explicitVerificationEmailTokens.filter((token) => token.email !== email)
-        cleanTokens.push({email: email, hash: hash})
-        this.model.explicitVerificationEmailTokens = cleanTokens
+    return this._generateToken(uuid.v4(), 'verification')
+      .then(token => {
+        const cleanTokens = this.model.pendingExplicitEmailVerifications.filter(v => v.email !== email)
+        cleanTokens.push({email: email, token: token.model._id})
+        this.model.pendingExplicitEmailVerifications = cleanTokens
         return this.model.save().then(() => token)
-      }))
+      })
   }
 
   /**
@@ -265,15 +297,18 @@ class UserHandler extends Handler {
    */
   verifyEmail (email, token) {
     email = email.toLowerCase()
-    const storedToken = this.model.explicitVerificationEmailTokens.find(element => element.email === email)
+    const storedToken = this.model.pendingExplicitEmailVerifications.find(element => element.email === email)
     if (!storedToken) return Promise.resolve(false)
-    return utils.password.comparePassword(token, storedToken.hash).then(result => {
-      if (!result) return false
-      this.model.explicitVerificationEmailTokens = this.model.explicitVerificationEmailTokens
-        .filter((element) => element.email !== email)
-      this.model.explicitVerifiedEmails.push(email)
-      return this.model.save().then(() => true)
-    })
+    return TokenHandler
+      .findFromId(storedToken.token)
+      .then(t => t.verify(token))
+      .then(result => {
+        if (!result) return false
+        this.model.pendingExplicitEmailVerifications = this.model.pendingExplicitEmailVerifications
+          .filter(element => element.email !== email)
+        this.model.explicitVerifiedEmails.push(email)
+        return this.model.save().then(() => true)
+      })
   }
 
   isVerified (email) {
@@ -289,6 +324,7 @@ class UserHandler extends Handler {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
     const role = profile.emails.reduce((role, {value}) => role || config.get('defaultUsers')[value], null) || 'user'
     return new UserModel({
+      docVersion: 1,
       profiles: [Object.assign({}, profile, {emails: profile.emails.map(({value}) => ({value: value.toLowerCase()}))})],
       latestProvider: profile.provider,
       role
@@ -360,16 +396,13 @@ class UserHandler extends Handler {
   }
 
   resetPassword (password) {
-    return utils.password.hashPassword(password)
-      .then((hash) => {
-        this.model.password = hash
-        this.model.resetPasswordToken = undefined
-        this.model.resetPasswordExpire = undefined
-        return this.model.save()
-      }).then((model) => {
-        this.model = model
-        return this
-      })
+    return Promise.all([
+      utils.password.hashPassword(password)
+        .then(hash => {
+          this.model.password = hash
+          return this.model.save()
+        }),
+      this._revokeResetToken()])
   }
 
   get hasPassword () {
@@ -403,16 +436,17 @@ class UserHandler extends Handler {
    * @return {Promise.<boolean>}
    */
   verifyResetPasswordToken (token) {
-    if (!this.model.resetPasswordToken) return Promise.resolve(false)
-    if (!this.model.resetPasswordExpire) return Promise.resolve(false)
-    if (new Date() > this.model.resetPasswordExpire) return Promise.resolve(false)
-    return utils.password.comparePassword(token, this.model.resetPasswordToken)
+    debug('Verify reset password token', token, this.model.resetPassword)
+    if (!this.model.resetPassword.token) return Promise.resolve(false)
+    if (!this.model.resetPassword.expire) return Promise.resolve(false)
+    if (new Date() > this.model.resetPassword.expire) return Promise.resolve(false)
+    return this._fetchPasswordResetToken().then(tok => tok.verify(token))
   }
 
   deleteUser () {
     return Promise.all([
       this.fetchLaundries().then(ls => Promise.all(ls.map(l => l.removeUser(this)))),
-      this.fetchAuthTokens().then(ts => Promise.all(ts.map(t => t.deleteToken())))
+      this._fetchUserTokens().then(ts => Promise.all(ts.map(t => t.deleteToken())))
     ])
       .then(() => this.model.remove())
       .then(() => this)
@@ -469,6 +503,16 @@ class UserHandler extends Handler {
       displayName: this.model.displayName,
       href: this.restUrl
     }
+  }
+
+  get updateActions () {
+    return [
+      user => {
+        user.model.calendarTokens = []
+        user.model.docVersion = 1
+        return user.model.save().then(() => new UserHandler(user.model))
+      }
+    ]
   }
 
   get reduxModel () {

@@ -32,7 +32,7 @@ function createToken (req, res) {
     .then(([token]) => {
       if (token) return api.returnError(res, 409, 'Token already exists', {Location: token.restUrl})
       return req.user.generateAuthToken(name)
-        .then((token) => api.returnSuccess(res, token.toRest().then((result) => {
+        .then(token => api.returnSuccess(res, token.toRest().then(result => {
           result.secret = token.secret
           return result
         })))

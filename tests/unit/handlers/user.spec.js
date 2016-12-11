@@ -108,7 +108,7 @@ describe('handlers', () => {
     })
 
     describe('resetPassword', () => {
-      it('should reset the password', () => user.resetPassword('password12345').then((user) => {
+      it('should reset the password', () => user.resetPassword('password12345').then(() => {
         return user.verifyPassword('password12345').should.eventually.be.true
       }))
       it('should remove reset token', () => user.generateResetToken()
@@ -118,7 +118,7 @@ describe('handlers', () => {
 
     describe('verifyResetPasswordToken', () => {
       it('should verify', () => user.generateResetToken()
-        .then((token) => user.verifyResetPasswordToken(token).should.eventually.be.true))
+        .then(token => user.verifyResetPasswordToken(token.secret).should.eventually.be.true))
     })
 
     describe('createUserWithPassword', () => {
@@ -177,18 +177,18 @@ describe('handlers', () => {
       }))
     })
     describe('verifyEmail', () => {
-      it('should resolve to true', () => dbUtils.populateUsers(1).then((users) => {
+      it('should resolve to true', () => dbUtils.populateUsers(1).then(users => {
         const [user] = users
         const email = user.model.emails[0]
         return user.generateVerifyEmailToken(email)
-          .then((token) => user.verifyEmail(email, token))
+          .then(token => user.verifyEmail(email, token.secret))
           .should.eventually.be.true
       }))
       it('explicit verify email', () => dbUtils.populateUsers(1).then((users) => {
         const [user] = users
         const email = user.model.emails[0]
         return user.generateVerifyEmailToken(email)
-          .then((token) => user.verifyEmail(email, token))
+          .then(token => user.verifyEmail(email, token.secret))
           .then(() => user.model.explicitVerifiedEmails)
           .should.eventually.contain(email)
       }))
@@ -197,7 +197,7 @@ describe('handlers', () => {
         const [user] = users
         const email = user.model.emails[0]
         return user.generateVerifyEmailToken(email)
-          .then((token) => user.verifyEmail(email, token + 'asd'))
+          .then(token => user.verifyEmail(email, token.secret + 'asd'))
           .should.eventually.be.false
       }))
 
@@ -210,33 +210,27 @@ describe('handlers', () => {
         dbUtils.populateUsers(1).then((users) => {
           const [user] = users
           const email = user.model.emails[0]
-          return user.generateVerifyEmailToken(email).then((token1) =>
-            user.generateVerifyEmailToken(email).then((token2) => [token1, token2]))
-            .then((tokens) => {
-              const [token1, token2] = tokens
-              return Promise.all([user.verifyEmail(email, token1), user.verifyEmail(email, token2)])
-            })
-            .should.eventually.deep.equal([false, true])
+          return user.generateVerifyEmailToken(email).then(token1 =>
+            user.generateVerifyEmailToken(email)
+              .then(token2 => Promise.all([user.verifyEmail(email, token1.secret), user.verifyEmail(email, token2.secret)]))
+              .should.eventually.deep.equal([false, true]))
         }))
       it('should remove old', () =>
         dbUtils.populateUsers(1).then((users) => {
           const [user] = users
           const email = user.model.emails[0]
-          return user.generateVerifyEmailToken(email).then((token1) =>
-            user.generateVerifyEmailToken(email).then((token2) => [token1, token2]))
-            .then((tokens) => {
-              const [token1, token2] = tokens
-              return Promise.all([user.verifyEmail(email, token2), user.verifyEmail(email, token1)])
-            })
+          return user.generateVerifyEmailToken(email).then(token1 =>
+            user.generateVerifyEmailToken(email)
+              .then(token2 => Promise.all([user.verifyEmail(email, token2.secret), user.verifyEmail(email, token1.secret)])))
             .should.eventually.deep.equal([true, false])
         }))
       it('should not verify twice', () =>
         dbUtils.populateUsers(1).then((users) => {
           const [user] = users
           const email = user.model.emails[0]
-          return user.generateVerifyEmailToken(email).then((token1) =>
-            user.verifyEmail(email, token1).then((result1) =>
-              Promise.all([result1, user.verifyEmail(email, token1)]))
+          return user.generateVerifyEmailToken(email).then(token1 =>
+            user.verifyEmail(email, token1.secret).then(result1 =>
+              Promise.all([result1, user.verifyEmail(email, token1.secret)]))
               .should.eventually.deep.equal([true, false]))
         }))
     })
@@ -250,10 +244,10 @@ describe('handlers', () => {
       it('should fail on invalid token', () => user.verifyCalendarToken('invalid')
         .then(result => result.should.be.false))
       it('should succeed w token', () => user.generateCalendarToken()
-        .then(token => user.verifyCalendarToken(token))
+        .then(token => user.verifyCalendarToken(token.secret))
         .then(result => result.should.be.true))
       it('should succeed with more tokens', () => Promise.all([user.generateCalendarToken(), user.generateCalendarToken()])
-        .then(([token]) => user.verifyCalendarToken(token))
+        .then(([token]) => user.verifyCalendarToken(token.secret))
         .then(result => result.should.be.true))
     })
     describe('findAuthTokenFromSecret', () => {

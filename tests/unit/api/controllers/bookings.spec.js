@@ -49,7 +49,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              var arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
+              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -64,7 +64,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              var arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 9).map((machine) => machine.toRestSummary())
+              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 9).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -79,7 +79,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              var arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 8).map((machine) => machine.toRestSummary())
+              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 8).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -105,7 +105,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              var arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((booking) => booking.toRestSummary())
+              const arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((booking) => booking.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -121,7 +121,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect('Link', /rel=.first./)
               .then(res => {
-                var arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
+                const arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
                 res.body.should.deep.equal(arr)
               })))
 
