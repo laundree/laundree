@@ -512,7 +512,8 @@ describe('controllers', function () {
 
       it('success on right token', () =>
         dbUtils.populateUsers(1)
-          .then(([user]) => user.generateResetToken().then((token) => ({user, token})))
+          .then(([user]) => user.generateResetToken()
+            .then(token => ({user, token: token.secret})))
           .then(({user, token}) =>
             request(app)
               .post(`/api/users/${user.model.id}/password-reset`)
@@ -561,17 +562,19 @@ describe('controllers', function () {
 
       it('success on right token', () =>
         dbUtils.populateUsers(1)
-          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0]).then((token) => ({user, token})))
+          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0])
+            .then(token => ({user, token: token.secret})))
           .then(({user, token}) => request(app)
             .post(`/api/users/${user.model.id}/verify-email`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
-            .send({token: token, email: user.model.emails[0]})
+            .send({token, email: user.model.emails[0]})
             .expect(204)))
 
       it('success on crazy case token', () =>
         dbUtils.populateUsers(1)
-          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0]).then((token) => ({user, token})))
+          .then(([user]) => user.generateVerifyEmailToken(user.model.emails[0])
+            .then(token => ({user, token: token.secret})))
           .then(({user, token}) => request(app)
             .post(`/api/users/${user.model.id}/verify-email`)
             .set('Accept', 'application/json')

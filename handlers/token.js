@@ -26,15 +26,17 @@ class TokenHandler extends Handler {
    * Create a new token with given owner and name
    * @param {UserHandler} owner
    * @param {string} name
+   * @param {string} type
    * @return {Promise.<TokenHandler>}
    */
-  static _createToken (owner, name) {
+  static _createToken (owner, name, type) {
     return password.generateToken()
       .then((token) => Promise.all([token, password.hashPassword(token)]))
       .then((result) => {
         const [token, hash] = result
         return new TokenModel({
           name: name,
+          type,
           hash: hash,
           owner: owner.model.id
         })

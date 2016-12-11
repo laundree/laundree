@@ -51,9 +51,9 @@ function createUser (req, res) {
 function startPasswordReset (req, res) {
   const {user} = req.subjects
   user.generateResetToken()
-    .then((token) => utils.mail.sendEmail({
+    .then(token => utils.mail.sendEmail({
       user: {id: user.model.id, displayName: user.model.displayName},
-      token: token
+      token: token.secret
     }, 'password-reset', user.model.emails[0], {locale: req.locale}))
     .then(() => utils.api.returnSuccess(res))
     .catch(utils.api.generateErrorHandler(res))
@@ -74,10 +74,10 @@ function startEmailVerification (req, res) {
   const {user} = req.subjects
   const email = req.swagger.params.body.value.email
   user.generateVerifyEmailToken(email)
-    .then((token) => !token ? utils.api.returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
+    .then(token => !token ? utils.api.returnError(res, 400, 'Invalid email') : utils.mail.sendEmail({
       email: email,
       emailEncoded: encodeURIComponent(email),
-      token: token,
+      token: token.secret,
       user: {id: user.model.id, displayName: user.model.displayName}
     }, 'verify-email', email, {locale: req.locale})
       .then(() => utils.api.returnSuccess(res)))

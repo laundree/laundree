@@ -32,7 +32,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => {
-              var arr = laundries.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((token) => token.toRestSummary())
+              const arr = laundries.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((token) => token.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
       it('should allow custom output size', () =>
@@ -46,7 +46,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => {
-              var arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((laundry) => laundry.toRestSummary())
+              const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((laundry) => laundry.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -61,7 +61,7 @@ describe('controllers', function () {
               .expect('Link', /rel=.first./)
               .expect(200)
               .then(res => {
-                var arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((laundry) => laundry.toRestSummary())
+                const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((laundry) => laundry.toRestSummary())
                 res.body.should.deep.equal(arr)
               })))
 
@@ -797,6 +797,16 @@ describe('controllers', function () {
               .then(res => res.body.should.deep.equal({message: 'Not found'}))))
 
       it('should succeed', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
+          request(app)
+            .post(`/api/laundries/${laundry.model.id}/invite-code`)
+            .send()
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect(200)))
+
+      it('should succeed with valid key', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
             .post(`/api/laundries/${laundry.model.id}/invite-code`)
