@@ -20,7 +20,7 @@ const userSchema = new Schema({
   locale: String,
   overrideDisplayName: String,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
-  calendarTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
+  calendarTokensReferences: [{type: Schema.Types.ObjectId, ref: 'Token'}],
   laundries: [{type: Schema.Types.ObjectId, ref: 'Laundry'}],
   explicitVerifiedEmails: [{type: String}],
   pendingExplicitEmailVerifications: [{

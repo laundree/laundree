@@ -111,7 +111,7 @@ class UserHandler extends Handler {
       ._generateToken(uuid.v4(), 'calendar')
       .then(token => {
         debug('Token ', token.model.id)
-        this.model.calendarTokens.push(token.model._id)
+        this.model.calendarTokensReferences.push(token.model._id)
         return this.model.save().then(() => token)
       })
   }
@@ -122,9 +122,9 @@ class UserHandler extends Handler {
    * @returns {Promise.<boolean>|*}
    */
   verifyCalendarToken (token) {
-    debug('Verifying calendar token', this.model.calendarTokens)
+    debug('Verifying calendar token', this.model.calendarTokensReferences)
     return this
-      ._fetchCalendarTokens()
+      ._fetchcalendarTokensReferences()
       .then(tokens => Promise.all(tokens.map(t => t.verify(token))))
       .then(result => result.find(r => r))
       .then(Boolean)
@@ -179,8 +179,8 @@ class UserHandler extends Handler {
     return TokenHandler.find({_id: {$in: this.model.authTokens}})
   }
 
-  _fetchCalendarTokens () {
-    return TokenHandler.find({_id: {$in: this.model.calendarTokens}})
+  _fetchcalendarTokensReferences () {
+    return TokenHandler.find({_id: {$in: this.model.calendarTokensReferences}})
   }
 
   _fetchUserTokens () {
@@ -508,7 +508,7 @@ class UserHandler extends Handler {
   get updateActions () {
     return [
       user => {
-        user.model.calendarTokens = []
+        user.model.calendarTokensReferences = []
         user.model.docVersion = 1
         return user.model.save().then(() => new UserHandler(user.model))
       }
