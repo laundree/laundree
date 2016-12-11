@@ -14,6 +14,7 @@ const userSchema = new Schema({
   resetPasswordExpire: Date,
   latestProvider: String,
   lastSeen: Date,
+  locale: String,
   overrideDisplayName: String,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
   calendarTokens: [String],

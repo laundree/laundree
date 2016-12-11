@@ -11,13 +11,14 @@ const Promise = require('promise')
 const uuid = require('uuid')
 const {types: {UPDATE_USER}} = require('../redux/actions')
 const config = require('config')
+const debug = require('debug')('laundree.handlers.user')
+
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
  */
 function displayNameToName (displayName) {
-  var names = displayName.split(' ')
-  names = names.filter((name) => name.length)
+  const names = displayName.split(' ').filter(name => name.length)
   const noNames = names.length
   if (noNames === 0) return {}
   if (noNames === 1) return {givenName: names[0]}
@@ -428,6 +429,17 @@ class UserHandler extends Handler {
       this.model = model
       return date
     })
+  }
+
+  /**
+   * Sets the perfered locale of this user
+   * @param {string} locale
+   * @returns {Promise}
+   */
+  setLocale (locale) {
+    debug(`Setting locale of user ${this.model.displayName} to ${locale}`)
+    this.model.locale = locale
+    return this.save()
   }
 
   get restUrl () {
