@@ -1,7 +1,7 @@
 /**
  * Created by budde on 02/10/16.
  */
-const Promise = require('promise')
+
 const chai = require('chai')
 chai.should()
 const Handler = require('../../../handlers/handler')

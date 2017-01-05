@@ -5,6 +5,7 @@ const {Modal, DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const moment = require('moment')
+const Loader = require('./loader.jsx')
 
 class Booking extends React.Component {
 
@@ -76,17 +77,12 @@ class Bookings extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {showModal: false, loading: true}
+    this.state = {showModal: false}
     this.onCloseModal = () => this.setState({showModal: false})
   }
 
-  componentDidMount () {
-    sdk.listBookingsForUser(this.props.currentLaundry, this.props.user.id, {to: {$gte: new Date()}})
-    sdk.listMachines(this.props.currentLaundry)
-  }
-
   renderBookings () {
-    if (!this.props.userBookings) return <div className='loading blur'/>
+    if (!this.props.userBookings) return null
     if (!this.props.userBookings.length) {
       return <div className='empty_list'>
         <FormattedMessage id='bookings.no-bookings'/>
@@ -99,16 +95,25 @@ class Bookings extends React.Component {
         booking={booking} currentLaundry={this.props.currentLaundry}/></li>)}</ul>
   }
 
+  load () {
+    return Promise.all([
+      sdk.listBookingsForUser(this.props.currentLaundry, this.props.user.id, {to: {$gte: new Date()}}),
+      sdk.listMachines(this.props.currentLaundry)
+    ])
+  }
+
   render () {
     return <DocumentTitle title='document-title.bookings'>
-      <main className='naved'>
-        <h1 className='alignLeft'>
-          <FormattedMessage id='bookings.title'/>
-        </h1>
-        <section id='BookingList'>
-          {this.renderBookings()}
-        </section>
-      </main>
+      <Loader loader={() => this.load()}>
+        <main className='naved'>
+          <h1 className='alignLeft'>
+            <FormattedMessage id='bookings.title'/>
+          </h1>
+          <section id='BookingList'>
+            {this.renderBookings()}
+          </section>
+        </main>
+      </Loader>
     </DocumentTitle>
   }
 }

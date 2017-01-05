@@ -1,13 +1,12 @@
-var request = require('supertest-as-promised')
-var app = require('../../../../app').app
-var chai = require('chai')
+const request = require('supertest-as-promised')
+const app = require('../../../../app').app
+const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 
-var dbUtils = require('../../../db_utils')
+const dbUtils = require('../../../db_utils')
 const {UserHandler, TokenHandler} = require('../../../../handlers')
-const Promise = require('promise')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
@@ -282,7 +281,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => {
-              var arr = users.slice(0, 10).map((user) => user.toRestSummary())
+              const arr = users.slice(0, 10).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -296,7 +295,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => {
-              var arr = users.slice(0, 12).map((user) => user.toRestSummary())
+              const arr = users.slice(0, 12).map((user) => user.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 

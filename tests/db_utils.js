@@ -5,7 +5,6 @@ const mongoose = require('mongoose')
 const UserHandler = require('../handlers').UserHandler
 const faker = require('faker')
 const {range} = require('../utils/array')
-const Promise = require('promise')
 
 function clearDb () {
   return new Promise((resolve, reject) => {

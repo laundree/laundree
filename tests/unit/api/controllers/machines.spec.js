@@ -7,7 +7,6 @@ chai.should()
 const assert = chai.assert
 const {MachineHandler} = require('../../../../handlers')
 const dbUtils = require('../../../db_utils')
-const Promise = require('promise')
 
 describe('controllers', function () {
   this.timeout(10000)
@@ -35,7 +34,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              var arr = machines.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
+              const arr = machines.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -60,7 +59,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              var arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((laundry) => laundry.toRestSummary())
+              const arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((laundry) => laundry.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -75,7 +74,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect('Link', /rel=.first./)
               .then(res => {
-                var arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
+                const arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
                 res.body.should.deep.equal(arr)
               })))
 
@@ -90,7 +89,7 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect('Link', /rel=.first./)
               .then(res => {
-                var arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
+                const arr = machines.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
                 res.body.should.deep.equal(arr)
               })))
 

@@ -4,7 +4,7 @@
 const {createStore} = require('redux')
 const reducer = require('./reducer')
 const actions = require('./actions')
-const Promise = require('promise')
+
 const {LaundryHandler, UserHandler} = require('../handlers')
 
 function mapFlash (flashArray, type) {
@@ -32,7 +32,7 @@ function fetchInstance (url, pattern, _Handler) {
   const currentMatch = url.match(pattern)
   if (!currentMatch || !currentMatch[1]) return Promise.resolve()
   const currentId = currentMatch[1]
-  return _Handler.findFromId(currentId).then(l => l)
+  return _Handler.findFromId(currentId)
 }
 
 /**

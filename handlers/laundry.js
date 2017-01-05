@@ -7,7 +7,7 @@ const UserHandler = require('./user')
 const MachineHandler = require('./machine')
 const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
-const Promise = require('promise')
+
 const debug = require('debug')('laundree.handlers.laundry')
 const uuid = require('uuid')
 const config = require('config')

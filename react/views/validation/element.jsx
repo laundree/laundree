@@ -1,7 +1,7 @@
 const React = require('react')
 const regex = require('../../../utils/regex')
 
-var id = 0
+let id = 0
 
 function newId () {
   return id++

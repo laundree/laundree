@@ -11,6 +11,7 @@ const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
 const {BaseModal} = require('./modal')
+const Loader = require('./loader.jsx')
 
 class BookingInfo extends React.Component {
 
@@ -105,14 +106,13 @@ class Timetable extends React.Component {
 
   constructor (props) {
     super(props)
-    this.state = {numDays: 0, loading: true, offset: 0, hoverColumn: -1, activeBooking: null}
+    this.state = {numDays: 0, offset: 0, hoverColumn: -1, activeBooking: null}
     this.handleResize = () => this.setState({numDays: this.numDays})
     this.hoverColumn = (hoverColumn) => this.setState({hoverColumn})
     this.onActiveChange = (bookingId) => this.setState({activeBooking: bookingId})
   }
 
   componentDidMount () {
-    sdk.listMachinesAndUsers(this.props.laundry.id)
     window.addEventListener('resize', this.handleResize)
     const numDays = this.numDays
     this.setState({numDays})
@@ -121,7 +121,6 @@ class Timetable extends React.Component {
   componentWillReceiveProps ({laundry: {machines: machineIds}, machines}) {
     if (machineIds.length !== this.props.laundry.machines.length) this.setState({numDays: this.calculateNumDays(machines.length)})
     if (!this._mainRef || machineIds.map(id => machines[id]).filter(m => m).length !== machineIds.length) return
-    this.setState({loading: false})
     if (!this._mainRef.offsetHeight || this.state.scrolledToNav) return
     const now = this._mainRef.querySelector('#TimeTable .now')
     this.setState({scrolledToNav: true})
@@ -161,28 +160,26 @@ class Timetable extends React.Component {
     }
     const days = this.days
     return <main id='TimeTableMain' ref={refPuller}>
-      <div className={this.state.loading ? 'loading blur' : ''}>
-        <TimetableHeaders
-          hoverColumn={this.state.hoverColumn}
-          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-        <TimetableTables
-          onActiveChange={this.onActiveChange}
-          currentUser={this.props.currentUser}
-          activeBooking={this.state.activeBooking}
-          offsetDate={this.offsetDate}
-          onHoverColumn={this.hoverColumn}
-          bookings={this.props.bookings}
-          laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+      <TimetableHeaders
+        hoverColumn={this.state.hoverColumn}
+        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+      <TimetableTables
+        onActiveChange={this.onActiveChange}
+        currentUser={this.props.currentUser}
+        activeBooking={this.state.activeBooking}
+        offsetDate={this.offsetDate}
+        onHoverColumn={this.hoverColumn}
+        bookings={this.props.bookings}
+        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
 
-        <BookingInfo
-          onActiveChange={this.onActiveChange}
-          currentUser={this.props.currentUser}
-          users={this.props.users}
-          laundry={this.props.laundry}
-          offsetDate={this.offsetDate}
-          booking={this.props.bookings[this.state.activeBooking]}
-          machines={this.props.machines}/>
-      </div>
+      <BookingInfo
+        onActiveChange={this.onActiveChange}
+        currentUser={this.props.currentUser}
+        users={this.props.users}
+        laundry={this.props.laundry}
+        offsetDate={this.offsetDate}
+        booking={this.props.bookings[this.state.activeBooking]}
+        machines={this.props.machines}/>
     </main>
   }
 }
@@ -208,17 +205,21 @@ class TimetableWrapper extends React.Component {
         <FormattedMessage id='timetable.no-machines.title'/>
       </h1>
       {this.isOwner ? <section>
-        <FormattedMessage
-          id='timetable.no-machines.action.register'
-          values={{
-            link: <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>
-              <FormattedMessage id='timetable.no-machines.action.register.link'/>
-            </Link>
-          }}/>
-      </section> : <section>
-        <FormattedMessage id='timetable.no-machines.action.wait'/>
-      </section>}
+          <FormattedMessage
+            id='timetable.no-machines.action.register'
+            values={{
+              link: <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>
+                <FormattedMessage id='timetable.no-machines.action.register.link'/>
+              </Link>
+            }}/>
+        </section> : <section>
+          <FormattedMessage id='timetable.no-machines.action.wait'/>
+        </section>}
     </main>
+  }
+
+  load () {
+    return sdk.listMachinesAndUsers(this.props.laundry.id)
   }
 
   get isOwner () {
@@ -238,9 +239,10 @@ class TimetableWrapper extends React.Component {
   }
 
   render () {
-    if (!this.props.laundry) return null
     return <DocumentTitle title='document-title.timetable'>
-      {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
+      <Loader loader={() => this.load()}>
+        {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
+      </Loader>
     </DocumentTitle>
   }
 }

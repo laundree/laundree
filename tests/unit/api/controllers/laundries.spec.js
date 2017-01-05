@@ -7,7 +7,7 @@ chai.should()
 const assert = chai.assert
 const {LaundryHandler, LaundryInvitationHandler, UserHandler, BookingHandler} = require('../../../../handlers')
 const dbUtils = require('../../../db_utils')
-const Promise = require('promise')
+
 const base64UrlSafe = require('urlsafe-base64')
 
 describe('controllers', function () {

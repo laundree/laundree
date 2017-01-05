@@ -1,7 +1,6 @@
 const {LaundryHandler, UserHandler} = require('../../handlers')
 const {api, mail} = require('../../utils')
 const moment = require('moment-timezone')
-const Promise = require('promise')
 
 /**
  * Created by budde on 02/06/16.

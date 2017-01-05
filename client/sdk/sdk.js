@@ -4,14 +4,12 @@
 
 const request = require('superagent')
 const EventEmitter = require('events')
-const Promise = require('promise')
 
 function req (method, path, data = null) {
   const req = request[method](path)
-  if (!data) return req.then()
+  if (!data) return req
   return req
     .send(data)
-    .then()
 }
 
 function post (path, data = null) {
@@ -30,7 +28,7 @@ function get (path) {
   return req('get', path)
 }
 
-var jobId = 1
+let jobId = 1
 
 function setupF (f, instance, functionName) {
   f[functionName] = function () {
