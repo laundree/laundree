@@ -25,5 +25,6 @@ module.exports = {
   Support: require('./support.jsx'),
   About: require('./about.jsx'),
   Contact: require('./contact.jsx'),
-  AdminPanel: require('./admin_panel.jsx')
+  AdminPanel: require('./admin_panel.jsx'),
+  UserLoader: require('./user_loader.jsx')
 }

@@ -6,8 +6,13 @@ const {Route, IndexRoute, IndexRedirect} = require('react-router')
 const {
   Users, App, LeftNav, HomeLoggedIn, Home, Forgot, SignUp, Auth,
   LogIn, Timetable, Bookings, LaundrySettings, Machines, Reset, Verification,
-  Privacy, TermsAndConditions, UserSettings, About, Support, Contact
+  Privacy, TermsAndConditions, UserSettings, About, Support, Contact,
+  UserLoader
 } = require('../containers')
+
+function adminCheck (user) {
+  return user && user.role === 'admin'
+}
 
 function checkLaundryGenerator (store) {
   return (state, replace) => {
@@ -24,29 +29,19 @@ function checkLaundryGenerator (store) {
 }
 
 function checkExistingLaundryGenerator (store) {
-  return checkGenerator(store, ({laundry}) => laundry)
+  return checkGenerator(store, ({laundry, admin}) => admin || laundry)
 }
 
 function checkExistingUserGenerator (store) {
-  return checkGenerator(store, ({user}) => user)
+  return checkGenerator(store, ({user, admin}) => admin || user)
 }
 
 function checkLaundryOwnerGenerator (store) {
-  return checkGenerator(store, ({laundry}, {currentUser, users}) => {
-    const user = users[currentUser]
-    if (!user) return false
-    if (user.role === 'admin') return true
-    return laundry && laundry.owners.indexOf(currentUser) >= 0
-  })
+  return checkGenerator(store, ({laundry, admin}, {currentUser, users}) => admin || laundry && laundry.owners.indexOf(currentUser) >= 0)
 }
 
 function checkSelfGenerator (store) {
-  return checkGenerator(store, ({user}, {currentUser, users}) => {
-    const currentUserObj = users[currentUser]
-    if (!currentUserObj) return false
-    if (currentUserObj.role === 'admin') return true
-    return user && user.id === currentUser
-  })
+  return checkGenerator(store, ({user, admin}, {currentUser, users}) => admin || (user && user.id === currentUser))
 }
 
 function checkGenerator (store, check) {
@@ -56,7 +51,8 @@ function checkGenerator (store, check) {
     const {params: {laundryId, userId}} = state
     const laundry = laundries[laundryId]
     const user = users[userId]
-    if (check({laundry, user}, reduxState)) return callback()
+    const admin = adminCheck(reduxState.users[reduxState.currentUser])
+    if (check({laundry, user, admin}, reduxState)) return callback()
     const error = new Error('Not found')
     error.status = 404
     callback(error)
@@ -79,7 +75,7 @@ function routeGenerator (store) {
           <Route path='users' component={Users} onEnter={checkLaundryOwnerGenerator(store)}/>
         </Route>
         <Route path='/support' component={Support}/>
-        <Route path='/users/:userId' onEnter={checkExistingUserGenerator(store)}>
+        <Route path='/users/:userId' component={UserLoader} onEnter={checkExistingUserGenerator(store)}>
           <IndexRedirect to='settings'/>
           <Route path='settings' component={UserSettings} onEnter={checkSelfGenerator(store)}/>
         </Route>

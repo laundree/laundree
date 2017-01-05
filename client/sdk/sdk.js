@@ -127,6 +127,14 @@ class Sdk {
     return this.emit('listMachinesAndUsers', laundryId)
   }
 
+  fetchLaundry (laundryId) {
+    return this.emit('fetchLaundry', laundryId)
+  }
+
+  fetchUser (userId) {
+    return this.emit('fetchUser', userId)
+  }
+
   updateStats () {
     return this.emit('updateStats')
   }

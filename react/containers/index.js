@@ -24,5 +24,6 @@ module.exports = {
   UserSettings: require('./user_settings'),
   Support: require('./support'),
   AdminPanel: require('./admin_panel'),
+  UserLoader: require('./user_loader'),
   Contact: require('../views').Contact
 }

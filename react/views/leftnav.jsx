@@ -1,6 +1,8 @@
 const React = require('react')
 const {Link} = require('react-router')
 const {FormattedMessage} = require('react-intl')
+const Loader = require('./loader.jsx')
+const sdk = require('../../client/sdk')
 
 class LeftNav extends React.Component {
 
@@ -30,7 +32,7 @@ class LeftNav extends React.Component {
     return this.props.laundries[this.props.currentLaundry]
   }
 
-  render () {
+  renderNav () {
     if (!this.laundry) return null
     const owner = this.isOwner
     return <div>
@@ -67,27 +69,27 @@ class LeftNav extends React.Component {
             </li>
             {owner
               ? <li>
-              <Link
-                to={'/laundries/' + this.laundry.id + '/machines'} activeClassName='active'
-                onClick={this.closeHandler}>
-                <svg>
-                  <use xlinkHref='#SimpleMachine'/>
-                </svg>
-                <FormattedMessage id='leftnav.machines'/>
-              </Link>
-            </li>
+                <Link
+                  to={'/laundries/' + this.laundry.id + '/machines'} activeClassName='active'
+                  onClick={this.closeHandler}>
+                  <svg>
+                    <use xlinkHref='#SimpleMachine'/>
+                  </svg>
+                  <FormattedMessage id='leftnav.machines'/>
+                </Link>
+              </li>
               : null}
             {owner
               ? <li>
-              <Link
-                to={'/laundries/' + this.laundry.id + '/users'} activeClassName='active'
-                onClick={this.closeHandler}>
-                <svg>
-                  <use xlinkHref='#Users'/>
-                </svg>
-                <FormattedMessage id='leftnav.users'/>
-              </Link>
-            </li>
+                <Link
+                  to={'/laundries/' + this.laundry.id + '/users'} activeClassName='active'
+                  onClick={this.closeHandler}>
+                  <svg>
+                    <use xlinkHref='#Users'/>
+                  </svg>
+                  <FormattedMessage id='leftnav.users'/>
+                </Link>
+              </li>
               : null}
           </ul>
           <hr/>
@@ -107,6 +109,16 @@ class LeftNav extends React.Component {
       </div>
       {this.props.children}
     </div>
+  }
+
+  load () {
+    return sdk.fetchLaundry(this.props.currentLaundry)
+  }
+
+  render () {
+    return <Loader loader={() => this.load()}>
+      {this.renderNav()}
+    </Loader>
   }
 }
 
