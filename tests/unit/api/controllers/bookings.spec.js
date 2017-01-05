@@ -8,7 +8,7 @@ chai.should()
 const assert = chai.assert
 const {BookingHandler} = require('../../../../handlers')
 const dbUtils = require('../../../db_utils')
-const Promise = require('promise')
+
 const moment = require('moment-timezone')
 
 function createDateTomorrow (hour = 0, minute = 0, tz = config.timezone) {

@@ -25,11 +25,11 @@ class SignUp extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            message: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
+            notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
           }),
           err => this.setState({
             loading: false,
-            message: {
+            notion: {
               message: <FormattedMessage id={err.status === 409
                 ? 'auth.signup.error.already-exists'
                 : 'auth.signup.error'}/>

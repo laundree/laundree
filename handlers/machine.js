@@ -5,7 +5,7 @@
 const Handler = require('./handler')
 const {MachineModel} = require('../models')
 const BookingHandler = require('./booking')
-const Promise = require('promise')
+
 const {types: {DELETE_MACHINE, UPDATE_MACHINE, CREATE_MACHINE}} = require('../redux/actions')
 
 class MachineHandler extends Handler {

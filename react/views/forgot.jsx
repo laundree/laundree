@@ -37,7 +37,7 @@ class Forgot extends ValueUpdater {
   }
 
   render () {
-    return <DocumentTitle title='document-title.resend-verification'>
+    return <DocumentTitle title='document-title.forgot'>
       <div>
         <FormattedMessage tagName='h1' id='auth.forgot.title'/>
         <Link to='/' id='Logo'>

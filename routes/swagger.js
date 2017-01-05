@@ -1,7 +1,7 @@
 /**
  * Created by budde on 05/05/16.
  */
-const Promise = require('promise')
+
 const path = require('path')
 const YAML = require('yamljs')
 const swaggerTools = require('swagger-tools')

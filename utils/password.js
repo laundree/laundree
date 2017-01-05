@@ -4,7 +4,7 @@
 const bcrypt = require('bcrypt')
 const crypto = require('crypto')
 const config = require('config')
-const Promise = require('promise')
+
 const base64UrlSafe = require('urlsafe-base64')
 
 /**

@@ -4,6 +4,7 @@ const {ValueUpdater} = require('./helpers')
 const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 const sdk = require('../../client/sdk')
+const Loader = require('./loader.jsx')
 
 class InviteUserForm extends ValueUpdater {
   constructor (props) {
@@ -186,8 +187,8 @@ class Users extends React.Component {
     </ul>
   }
 
-  componentDidMount () {
-    sdk.listUsersAndInvites(this.props.laundry.id)
+  load () {
+    return sdk.listUsersAndInvites(this.props.laundry.id)
   }
 
   get users () {
@@ -200,22 +201,24 @@ class Users extends React.Component {
 
   render () {
     return <DocumentTitle title='document-title.laundry-users'>
-      <main className='naved' id='Users'>
-        <h1 className='alignLeft'>
-          <FormattedMessage id='users.title'/>
-        </h1>
-        <section id='UserList'>
-          {this.renderUsers()}
-        </section>
-        <section id='InviteUserForm'>
-          <FormattedMessage id='users.invite-from-email' tagName='h2'/>
-          <InviteUserForm laundry={this.props.laundry}/>
-        </section>
-        <section id='QrInviteSection'>
-          <FormattedMessage id='users.invite-from-qr' tagName='h2'/>
-          <QrInvite laundry={this.props.laundry}/>
-        </section>
-      </main>
+      <Loader loader={() => this.load()}>
+        <main className='naved' id='Users'>
+          <h1 className='alignLeft'>
+            <FormattedMessage id='users.title'/>
+          </h1>
+          <section id='UserList'>
+            {this.renderUsers()}
+          </section>
+          <section id='InviteUserForm'>
+            <FormattedMessage id='users.invite-from-email' tagName='h2'/>
+            <InviteUserForm laundry={this.props.laundry}/>
+          </section>
+          <section id='QrInviteSection'>
+            <FormattedMessage id='users.invite-from-qr' tagName='h2'/>
+            <QrInvite laundry={this.props.laundry}/>
+          </section>
+        </main>
+      </Loader>
     </DocumentTitle>
   }
 }

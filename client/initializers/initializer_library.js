@@ -2,7 +2,7 @@
  * Created by budde on 22/04/16.
  */
 
-var Initializer = require('./initializer')
+const Initializer = require('./initializer')
 
 class InitializerLibrary extends Initializer {
 

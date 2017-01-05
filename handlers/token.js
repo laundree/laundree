@@ -5,7 +5,6 @@
 const Handler = require('./handler')
 const {password} = require('../utils')
 const {TokenModel} = require('../models')
-const Promise = require('promise')
 
 class TokenHandler extends Handler {
 

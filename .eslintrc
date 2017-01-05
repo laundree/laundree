@@ -6,7 +6,8 @@
   "parser": "babel-eslint",
   "rules": {
     "react/jsx-space-before-closing": 0,
-    "react/jsx-indent": 0
+    "react/jsx-indent": 0,
+    "no-var": "error"
   },
   "env": {
     "node": true

@@ -12,7 +12,7 @@ module.exports = {
       .createUserWithPassword(faker.name.findName(), email, password)
       .then(u => {
         user = u
-        return user.generateVerifyEmailToken(email).then(token => user.verifyEmail(email, token))
+        return user.generateVerifyEmailToken(email).then(token => user.verifyEmail(email, token.secret))
       })
       .then(() => done())
   },
@@ -32,7 +32,7 @@ module.exports = {
       .waitForElementVisible('#TopNav .laundries', timeout)
       .waitForElementVisible('#LeftNav', timeout)
       .click('#LeftNav ul li:nth-of-type(4) a')
-      .click('#QrSignUp span')
+      .click('#QrSignUp a.pdfLink')
       .pause(timeout)
       .window_handles(function (result) {
         this.assert.equal(result.value.length, 2)

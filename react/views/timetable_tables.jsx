@@ -1,7 +1,6 @@
 /**
  * Created by budde on 28/05/16.
  */
-const Promise = require('promise')
 const React = require('react')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')

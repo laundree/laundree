@@ -8,8 +8,6 @@ const assert = chai.assert
 const {TokenHandler} = require('../../../../handlers')
 const dbUtils = require('../../../db_utils')
 
-const Promise = require('promise')
-
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
   describe('tokens', function () {
@@ -31,7 +29,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => {
-              var arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 10).map((token) => token.toRestSummary())
+              const arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 10).map((token) => token.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -46,7 +44,7 @@ describe('controllers', function () {
             .expect('Link', /rel=.first./)
             .expect(200)
             .then(res => {
-              var arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((token) => token.toRestSummary())
+              const arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((token) => token.toRestSummary())
               res.body.should.deep.equal(arr)
             })))
 
@@ -61,7 +59,7 @@ describe('controllers', function () {
               .expect('Link', /rel=.first./)
               .expect(200)
               .then(res => {
-                var arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((token) => token.toRestSummary())
+                const arr = tokens.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((token) => token.toRestSummary())
                 res.body.should.deep.equal(arr)
               })))
 

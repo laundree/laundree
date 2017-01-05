@@ -4,6 +4,7 @@ const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dr
 const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
+const Loader = require('./loader.jsx')
 
 class MachineDropdown extends React.Component {
 
@@ -155,10 +156,10 @@ class MachineListItem extends React.Component {
         </ValidationElement>
         {this.props.onDelete
           ? <div className='delete action'>
-          <svg onClick={this.onDelete}>
-            <use xlinkHref='#Trash'/>
-          </svg>
-        </div>
+            <svg onClick={this.onDelete}>
+              <use xlinkHref='#Trash'/>
+            </svg>
+          </div>
           : null
         }
         {this.props.children}
@@ -196,8 +197,8 @@ class Machines extends React.Component {
     return (params) => sdk.machine(id).updateMachine(params)
   }
 
-  componentDidMount () {
-    sdk.listMachines(this.props.currentLaundry)
+  load () {
+    return sdk.listMachines(this.props.currentLaundry)
   }
 
   get blacklist () {
@@ -227,20 +228,22 @@ class Machines extends React.Component {
 
   render () {
     return <DocumentTitle title='document-title.machines'>
-      <main className='naved' id='LaundryMain'>
-        <FormattedMessage id='machines.title' tagName='h1'/>
-        {this.renderMachineList()}
-        <div className='create_machine'>
-          <FormattedMessage id='machines.create-machine.title' tagName='h2'/>
-          <MachineListItem
-            blacklist={this.blacklist}
-            onSubmit={this.creator}>
-            <div className='buttons'>
-              <Submit value='general.create'/>
-            </div>
-          </MachineListItem>
-        </div>
-      </main>
+      <Loader loader={() => this.load()}>
+        <main className='naved' id='LaundryMain'>
+          <FormattedMessage id='machines.title' tagName='h1'/>
+          {this.renderMachineList()}
+          <div className='create_machine'>
+            <FormattedMessage id='machines.create-machine.title' tagName='h2'/>
+            <MachineListItem
+              blacklist={this.blacklist}
+              onSubmit={this.creator}>
+              <div className='buttons'>
+                <Submit value='general.create'/>
+              </div>
+            </MachineListItem>
+          </div>
+        </main>
+      </Loader>
     </DocumentTitle>
   }
 }

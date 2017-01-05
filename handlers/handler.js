@@ -5,7 +5,7 @@ const {regex} = require('../utils')
 const EventEmitter = require('events')
 const {linkEmitter} = require('../lib/redis')
 const debug = require('debug')('laundree.handlers.handler')
-const Promise = require('promise')
+
 const {createAction} = require('redux-actions')
 const base64UrlSafe = require('urlsafe-base64')
 

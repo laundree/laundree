@@ -4,7 +4,6 @@
 
 const Handler = require('./handler')
 const {BookingModel} = require('../models')
-const Promise = require('promise')
 const {types: {DELETE_BOOKING, UPDATE_BOOKING, CREATE_BOOKING}} = require('../redux/actions')
 
 class BookingHandler extends Handler {

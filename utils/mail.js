@@ -1,7 +1,7 @@
 /**
  * Created by budde on 07/05/16.
  */
-const Promise = require('promise')
+
 const path = require('path')
 const {EmailTemplate} = require('email-templates')
 const {createTransport} = require('nodemailer')

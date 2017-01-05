@@ -7,7 +7,7 @@ const config = require('config')
 const debug = require('debug')('laundree.models')
 
 mongoose.connect(config.get('mongo.url'))
-mongoose.Promise = require('promise')
+mongoose.Promise = Promise
 
 mongoose.connection.on('connected', () => debug('Mongoose connected'))
 
