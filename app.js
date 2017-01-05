@@ -18,6 +18,7 @@ const debug = require('debug')('laundree.app')
 // Session
 app.use(setups.sessionSetup)
 app.use(locale(locales.supported))
+setups.handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 
 setups.passportSetup(app)
 
@@ -30,7 +31,6 @@ app.use((req, res, next) => {
   next()
 })
 
-setups.handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 setups.morganSetup(app)
 setups.defaultUserSetup()
 

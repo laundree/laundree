@@ -321,12 +321,15 @@ class UserSettings extends React.Component {
       </div>
     }
     return <ul className='bigList'>
-      {user.laundries.map(id => this.props.laundries[id]).map(laundry =>
-        <li key={laundry.id}>
-          <div className='name'>
-            <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
-          </div>
-        </li>)}
+      {user.laundries
+        .map(id => this.props.laundries[id])
+        .filter(l => l)
+        .map(laundry =>
+          <li key={laundry.id}>
+            <div className='name'>
+              <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
+            </div>
+          </li>)}
     </ul>
   }
 
