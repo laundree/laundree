@@ -17,7 +17,7 @@ function listMachines (req, res) {
   return MachineHandler.find(filter, {limit, sort: {_id: 1}})
     .then((machines) => machines.map((machine) => machine.toRestSummary()))
     .then((machines) => {
-      var links = {
+      const links = {
         first: `/api/laundries/${laundry.model.id}/machines?page_size=${limit}`
       }
       if (machines.length === limit) {

@@ -2,17 +2,17 @@
  * Created by budde on 06/05/16.
  */
 
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
-var clearDb = require('../../db_utils').clearDb
-var UserModel = require('../../../models').UserModel
+const clearDb = require('../../db_utils').clearDb
+const UserModel = require('../../../models').UserModel
 
 describe('models', () => {
   describe('UserModel', function () {
     this.timeout(20000)
-    var user
+    let user
     beforeEach(() => clearDb().then(() => new UserModel({
       latestProvider: 'facebook',
       explicitVerifiedEmails: 'alice@example.com',

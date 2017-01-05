@@ -2,7 +2,7 @@
  * Created by budde on 06/07/16.
  */
 const {string} = require('../../../utils')
-var chai = require('chai')
+const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()
 

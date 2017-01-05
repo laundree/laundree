@@ -17,7 +17,7 @@ function range (start, end) {
     start = 0
   }
   const array = []
-  for (var i = start; i < end; i++) {
+  for (let i = start; i < end; i++) {
     array.push(i)
   }
   return array

@@ -6,9 +6,9 @@ const debug = require('debug')('laundree.client')
 
 debug('┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴')
 
-var initializers = require('./initializers')
+const initializers = require('./initializers')
 
-var library = new initializers.InitializerLibrary()
+const library = new initializers.InitializerLibrary()
 library.registerInitializer(initializers.AppInitializer)
 
 library.setup()

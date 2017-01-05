@@ -2,13 +2,13 @@
  * Created by budde on 06/05/16.
  */
 
-var password = require('../../../utils').password
+const password = require('../../../utils').password
 
-var chai = require('chai')
+const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()
 
-var clearPassword = 'password1234'
+const clearPassword = 'password1234'
 
 describe('utils', () => {
   describe('password', () => {

@@ -2,12 +2,12 @@
  * Created by budde on 27/04/16.
  */
 
-var chai = require('chai')
-var chaiAsPromised = require('chai-as-promised')
+const chai = require('chai')
+const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
-var dbUtils = require('../../db_utils')
-var clearDb = dbUtils.clearDb
+const dbUtils = require('../../db_utils')
+const clearDb = dbUtils.clearDb
 
 describe('handlers', () => {
   describe('BookingHandler', function () {
