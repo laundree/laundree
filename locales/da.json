@@ -22,7 +22,6 @@
     "document-title.login": "Log ind",
     "document-title.signup": "Tilmeld",
     "document-title.timetable": "Tidsplan",
-  "document-title.forgot": "Nulstil dit kodeord",
     "home.teaser": "Et nemt og gratis booking system til dit vaskeri",
     "home.clip.credit": "Klip af {link}",
     "home.clip.credit.link": "Beachfront",
@@ -44,11 +43,11 @@
     "topnav.logout": "Log ud",
     "topnav.login": "Log ind",
     "topnav.manage": "Administrer din konto",
-    "footer.donate": "Har du lyst til at hjælpe os med at holde serverne kørende med fuld gas? Så er du velkommen til at donere via {link}",
+    "footer.donate": "Har du lyst til at hjælpe os med at holde serverne kørende med fuld fart? Så er du velkommen til at donere et beløb via {link}",
     "footer.donate.link": "PayPal",
     "footer.github": "Laundree er 100% open source og ethvert bidrag er meget værdsat. Opret et issue eller pull-request eller fork os på {link}",
     "footer.github.link": "GitHub",
-    "footer.contact": "Vil du vide mere? Kontakt os venligst og vi vil gøre vores bedste for at svare hurtigst muligt. Du kan finde vores srive til os {link}",
+    "footer.contact": "Vil du vide mere? Kontakt os venligst og vi vil gøre vores bedste for at svare hurtigst muligt. Du kan finde vores kontaktoplysninger {link}",
     "footer.contact.link": "her",
     "footer.created": "Lavet af Christian Budde Christensen, Malene Sjørslev, Cecilie Andreasen og Gitte Ellegaard i {link}",
     "footer.created.link": "Aarhus, Danmark",
@@ -252,5 +251,6 @@
     "email.password-reset.message": "Hej {name},{nl}\n{nl}\nDenne e-mail er et svar på din forespørgsel om at nulstille dit kodeord.{nl}\nDu kan nulstille ved at følge nedenstående link indenfor de næste 60 minutter.{nl}\n{nl}\n{link}{nl}\n{nl}\nHvis du ikke anmodede om at få dit kodeord nulstillet, så bare ignorer denne e-mail.",
     "email.verify-email.title": "Bekræft din e-mail addresse",
     "email.verify-email.subject": "Bekræft din e-mail addresse",
-    "email.verify-email.message": "Hej {name},{nl}\n{nl}\nBekræft venligst at du ejer denne e-mail adresse ({email}), ved at følge nedenstående link.{nl}\n{nl}\n{link}{nl}\n{nl}\nHvis du ikke har oprettet en laundree konto eller anmodede om at få adressen bekræftet, så ignorer venligst denne e-mail."
+    "email.verify-email.message": "Hej {name},{nl}\n{nl}\nBekræft venligst at du ejer denne e-mail adresse ({email}), ved at følge nedenstående link.{nl}\n{nl}\n{link}{nl}\n{nl}\nHvis du ikke har oprettet en laundree konto eller anmodede om at få adressen bekræftet, så ignorer venligst denne e-mail.",
+    "document-title.forgot": "Nulstil dit kodeord"
 }

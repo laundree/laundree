@@ -22,7 +22,6 @@
     "document-title.login": "Login",
     "document-title.signup": "Sign up",
     "document-title.timetable": "Timetable",
-  "document-title.forgot": "Reset your password",
     "home.teaser": "An free and easy booking system for your laundry",
     "home.clip.credit": "Clip by {link}",
     "home.clip.credit.link": "Beachfront",
@@ -252,5 +251,6 @@
     "email.password-reset.message": "Hi {name},{nl}\n{nl}\nThis email is an response to your request to reset your password.{nl}\nTo reset your password follow the link below within the next 60 minutes.{nl}\n{nl}\n{link}{nl}\n{nl}\nIf you did not request to reset your password, please ignore this email.",
     "email.verify-email.title": "Verify your email",
     "email.verify-email.subject": "Verify your email",
-    "email.verify-email.message": "Hi {name},{nl}\n{nl}\nPlease verify that you own the email-address: {email}, by following the link below.{nl}\n{nl}\n{link}{nl}\n{nl}\nIf you didn't create a laundree account or request to get your email address verified, please ignore this message."
+    "email.verify-email.message": "Hi {name},{nl}\n{nl}\nPlease verify that you own the email-address: {email}, by following the link below.{nl}\n{nl}\n{link}{nl}\n{nl}\nIf you didn't create a laundree account or request to get your email address verified, please ignore this message.",
+    "document-title.forgot": "Reset your password"
 }
