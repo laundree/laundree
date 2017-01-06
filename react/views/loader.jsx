@@ -4,10 +4,11 @@ class Loader extends React.Component {
 
   constructor (props, initState = {}) {
     super(props)
-    this.state = Object.assign({}, initState, {loaded: false})
+    this.state = Object.assign({}, initState, {loaded: Boolean(this.props.loaded)})
   }
 
   componentDidMount () {
+    if (this.state.loaded) return
     Promise
       .resolve(this.props.loader())
       .then(() => this.setState({loaded: true}))
@@ -22,7 +23,8 @@ class Loader extends React.Component {
 
 Loader.propTypes = {
   children: React.PropTypes.any.isRequired,
-  loader: React.PropTypes.func.isRequired
+  loader: React.PropTypes.func.isRequired,
+  loaded: React.PropTypes.any
 }
 
 module.exports = Loader

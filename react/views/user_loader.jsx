@@ -3,7 +3,8 @@ const Loader = require('./loader.jsx')
 const sdk = require('../../client/sdk')
 
 const UserLoader = ({userId, children, users}) => <Loader
-  loader={() => users[userId] || sdk.fetchUser(userId)}>{children}</Loader>
+  loader={() => sdk.fetchUser(userId)}
+  loaded={users[userId]}>{children}</Loader>
 
 UserLoader.propTypes = {
   children: React.PropTypes.any,
