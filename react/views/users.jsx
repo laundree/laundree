@@ -5,6 +5,8 @@ const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 const sdk = require('../../client/sdk')
 const Loader = require('./loader.jsx')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const {Link} = require('react-router')
 
 class InviteUserForm extends ValueUpdater {
   constructor (props) {
@@ -79,11 +81,44 @@ class UserItem extends React.Component {
     this.handleDelete = () => sdk.laundry(this.props.laundry.id).removeUserFromLaundry(this.props.user.id)
   }
 
-  renderOwner () {
-    if (!this.isOwner) return null
-    return <span className='owner'>
-      <FormattedMessage id='users.owner'/>
-    </span>
+  makeOwner () {
+    sdk.laundry(this.props.laundry.id).addOwner(this.props.user.id)
+  }
+
+  makeUser () {
+    sdk.laundry(this.props.laundry.id).removeOwner(this.props.user.id)
+  }
+
+  get isCurrentUser () {
+    return this.props.user.id === this.props.currentUser.id
+  }
+
+  renderRole () {
+    const isOwner = this.isOwner
+    if (this.isCurrentUser || (isOwner && this.props.laundry.owners.length === 1)) {
+      return <span className='owner'><FormattedMessage id='users.owner'/></span>
+    }
+    return <DropDown>
+      <DropDownTitle>
+          <span className='owner'>
+            <FormattedMessage id={isOwner ? 'users.owner' : 'users.user'}/>
+          </span>
+      </DropDownTitle>
+      <DropDownContent>
+        <ul className='dropDownList'>
+          <DropDownCloser>
+            <li className={isOwner ? 'active' : ''} onClick={() => this.makeOwner()}>
+              <span className='link'><FormattedMessage id='users.owner'/></span>
+            </li>
+          </DropDownCloser>
+          <DropDownCloser>
+            <li className={isOwner ? '' : 'active'} onClick={() => this.makeUser()}>
+              <span className='link'><FormattedMessage id='users.user'/></span>
+            </li>
+          </DropDownCloser>
+        </ul>
+      </DropDownContent>
+    </DropDown>
   }
 
   renderDelete () {
@@ -99,6 +134,21 @@ class UserItem extends React.Component {
     return this.props.laundry.owners.indexOf(this.props.user.id) >= 0
   }
 
+  renderName () {
+    if (!this.addUserLink) return this.props.user.displayName
+    return <Link to={`/users/${this.props.user.id}/settings`}>
+      {this.props.user.displayName}
+    </Link>
+  }
+
+  renderAvatar () {
+    const avatarImage = <img className='avatar' src={this.props.user.photo}/>
+    if (!this.addUserLink) return avatarImage
+    return <Link to={`/users/${this.props.user.id}/settings`}>
+      {avatarImage}
+    </Link>
+  }
+
   render () {
     return <div>
       <Modal
@@ -110,14 +160,18 @@ class UserItem extends React.Component {
           {label: 'general.no', action: this.onCloseModal}
         ]}/>
       <div className='avatarContainer'>
-        <img className='avatar' src={this.props.user.photo}/>
+        {this.renderAvatar()}
       </div>
       <div className='name'>
-        {this.props.user.displayName}
-        {this.renderOwner()}
+        {this.renderName()}
         {this.renderDelete()}
+        {this.renderRole()}
       </div>
     </div>
+  }
+
+  get addUserLink () {
+    return this.props.user.id === this.props.currentUser.id || this.props.currentUser.role === 'admin'
   }
 }
 
@@ -130,7 +184,8 @@ UserItem.propTypes = {
   laundry: React.PropTypes.shape({
     id: React.PropTypes.string,
     owners: React.PropTypes.array
-  }).isRequired
+  }).isRequired,
+  currentUser: React.PropTypes.object.isRequired
 }
 
 class InviteItem extends React.Component {
@@ -182,7 +237,10 @@ class Users extends React.Component {
 
   renderUsers () {
     return <ul className='bigList'>
-      {this.users.map((user) => <li key={user.id}><UserItem user={user} laundry={this.props.laundry}/></li>)}
+      {this.users.map(user => <li key={user.id}><UserItem
+        user={user}
+        currentUser={this.currentUser}
+        laundry={this.props.laundry}/></li>)}
       {this.invites.map(invite => <li key={invite.id}><InviteItem invite={invite}/></li>)}
     </ul>
   }
@@ -192,11 +250,15 @@ class Users extends React.Component {
   }
 
   get users () {
-    return this.props.laundry.users.map((id) => this.props.users[id]).filter((u) => u)
+    return this.props.laundry.users.map(id => this.props.users[id]).filter(u => u)
   }
 
   get invites () {
     return this.props.laundry.invites.map((id) => this.props.invites[id]).filter((i) => i).filter(({used}) => !used)
+  }
+
+  get currentUser () {
+    return this.props.users[this.props.currentUser]
   }
 
   render () {
@@ -226,7 +288,8 @@ class Users extends React.Component {
 Users.propTypes = {
   invites: React.PropTypes.object,
   users: React.PropTypes.object,
-  laundry: React.PropTypes.object
+  laundry: React.PropTypes.object,
+  currentUser: React.PropTypes.string.isRequired
 }
 
 module.exports = Users

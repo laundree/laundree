@@ -7,9 +7,10 @@ const EventEmitter = require('events')
 
 function req (method, path, data = null) {
   const req = request[method](path)
-  if (!data) return req
+  if (!data) return req.then()
   return req
     .send(data)
+    .then()
 }
 
 function post (path, data = null) {
@@ -285,7 +286,6 @@ class LaundrySdk extends ResourceSdk {
   }
 
   inviteUserByEmail (email) {
-    console.log(this)
     return post(`${this.baseUrl}/api/laundries/${this.id}/invite-by-email`, {email})
   }
 
@@ -295,6 +295,14 @@ class LaundrySdk extends ResourceSdk {
 
   createInviteCode () {
     return post(`${this.baseUrl}/api/laundries/${this.id}/invite-code`).then(({body}) => body)
+  }
+
+  addOwner (userId) {
+    return post(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
+  }
+
+  removeOwner (userId) {
+    return del(`${this.baseUrl}/api/laundries/${this.id}/owners/${userId}`)
   }
 }
 
