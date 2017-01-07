@@ -254,5 +254,7 @@
     "email.verify-email.title": "Verify your email",
     "email.verify-email.subject": "Verify your email",
     "email.verify-email.message": "Hi {name},{nl}\n{nl}\nPlease verify that you own the email-address: {email}, by following the link below.{nl}\n{nl}\n{link}{nl}\n{nl}\nIf you didn't create a laundree account or request to get your email address verified, please ignore this message.",
-    "document-title.forgot": "Reset your password"
+    "document-title.forgot": "Reset your password",
+    "users.user": "User",
+    "laundry-settings.leave-laundry": "Leave laundry"
 }
