@@ -112,11 +112,11 @@ class LeftNav extends React.Component {
   }
 
   load () {
-    return this.laundry || sdk.fetchLaundry(this.props.currentLaundry)
+    return sdk.fetchLaundry(this.props.currentLaundry)
   }
 
   render () {
-    return <Loader loader={() => this.load()}>
+    return <Loader loader={() => this.load()} loaded={this.laundry}>
       {this.renderNav()}
     </Loader>
   }

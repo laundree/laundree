@@ -147,10 +147,9 @@ function inviteUserByEmail (req, res) {
 }
 
 function removeUserFromLaundry (req, res) {
-  const {user, currentUser, laundry} = req.subjects
-  if (!currentUser.isAdmin) {
-    if (!laundry.isUser(user)) return api.returnError(res, 403, 'Not allowed')
-    if (!laundry.isOwner(currentUser) && user.model.id !== currentUser.model.id) return api.returnError(res, 403, 'Not allowed')
+  const {user, laundry} = req.subjects
+  if (!laundry.isUser(user)) {
+    return api.returnError(res, 403, 'Not allowed')
   }
   if (laundry.isOwner(user)) return api.returnError(res, 403, 'Not allowed')
   laundry.removeUser(user)
@@ -167,6 +166,29 @@ function createInviteCode (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function addOwner (req, res) {
+  const {laundry, user} = req.subjects
+  if (!laundry.isUser(user) || laundry.isOwner(user)) {
+    return api.returnError(res, 403, 'Not allowed')
+  }
+  laundry.addOwner(user)
+    .then(() => api.returnSuccess(res))
+    .catch(api.generateErrorHandler(res))
+}
+
+function removeOwner (req, res) {
+  const {laundry, user} = req.subjects
+  if (!laundry.isOwner(user)) {
+    return api.returnError(res, 403, 'Not allowed')
+  }
+  if (!laundry.ownerIds.find(id => id !== user.model.id)) {
+    return api.returnError(res, 403, 'Not allowed')
+  }
+  laundry.removeOwner(user)
+    .then(() => api.returnSuccess(res))
+    .catch(api.generateErrorHandler(res))
+}
+
 module.exports = {
   createDemoLaundry,
   inviteUserByEmail,
@@ -176,5 +198,7 @@ module.exports = {
   deleteLaundry,
   createLaundry,
   removeUserFromLaundry,
-  createInviteCode
+  createInviteCode,
+  addOwner,
+  removeOwner
 }

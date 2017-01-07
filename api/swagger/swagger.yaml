@@ -898,13 +898,85 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /laundries/{laundryId}/owners/{userId}:
+    x-swagger-router-controller: laundries
+    post:
+      operationId: addOwner
+      security:
+        - administrator: []
+        - laundryOwner: []
+      tags:
+        - Laundries
+        - Users
+      parameters:
+        - name: laundryId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: userId
+          in: path
+          required: true
+          type: string
+          description: User id
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+    delete:
+      operationId: removeOwner
+      security:
+        - administrator: []
+        - laundryOwner: []
+      tags:
+        - Laundries
+        - Users
+      parameters:
+        - name: laundryId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: userId
+          in: path
+          required: true
+          type: string
+          description: User id
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /laundries/{laundryId}/users/{userId}:
     x-swagger-router-controller: laundries
     delete:
       operationId: removeUserFromLaundry
       security:
-        - laundryUser: []
+        - laundryOwner: []
         - administrator: []
+        - self: []
       tags:
         - Laundries
         - Users

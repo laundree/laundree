@@ -270,6 +270,16 @@ class LaundryHandler extends Handler {
   }
 
   /**
+   * Will remove the given user from owner-list
+   * @param user
+   * @return {Promise}
+   */
+  removeOwner (user) {
+    this.model.owners.pull(user.model._id)
+    return this.save()
+  }
+
+  /**
    * Will remove given user from laundry. Both as user or potential owner.
    * @param {UserHandler} user
    * @return {Promise.<LaundryHandler>}

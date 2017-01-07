@@ -1,6 +1,13 @@
 #Users
   #UserList
     li
+      overflow: visible
+      .dropDown
+        float: right
+        .dropDownContent
+          &:before
+            left: 1em
+          width: 6em
       &:hover
         .name
           .action.delete
