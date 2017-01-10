@@ -39,6 +39,26 @@ module.exports = {
       })
       .end()
   },
+  'Can create invite link': client => {
+    client
+      .url(client.launch_url)
+      .click('#TopNav a.log-in')
+      .waitForElementPresent('#SignIn', timeout)
+      .setValue('#SignIn label:nth-of-type(1) input', email)
+      .setValue('#SignIn label:nth-of-type(2) input', password)
+      .submitForm('#SignIn')
+      .waitForElementVisible('#CreateLaundry', timeout)
+      .click('#CreateLaundry .expand_button button')
+      .waitForElementVisible('#CreateLaundry form input[type=text]', timeout)
+      .setValue('#CreateLaundry form input[type=text]', faker.company.companyName())
+      .submitForm('#CreateLaundry form')
+      .waitForElementVisible('#TopNav .laundries', timeout)
+      .waitForElementVisible('#LeftNav', timeout)
+      .click('#LeftNav ul li:nth-of-type(4) a')
+      .click('#UserLinkSignUp button')
+      .waitForElementVisible('#UserLinkSignUp .linkContainer .link', timeout)
+      .end()
+  },
   'Can create laundry': client => {
     client
       .url(client.launch_url)
