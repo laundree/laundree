@@ -318,8 +318,11 @@ input[type=text], input[type=password]
   background-color: #d1d1d1
   color: #e2e2e2
 
-input[type=submit], button
+input[type=submit], button, a.button
   width: 10em
+  display: inline-block
+  text-decoration: none
+  text-align: center
   background: #28aaba
   border: 0
   color: #ffffff
@@ -334,7 +337,11 @@ input[type=submit], button
 
   &.inactive
     +inactive_button_style
+  &:hover
+    text-decoration: none
 
+a.button
+  width: 8em
 form.invalid, form.initial
   input[type=submit], button
     +inactive_button_style

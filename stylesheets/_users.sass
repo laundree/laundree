@@ -50,10 +50,27 @@
     padding-top: 2em
     #QrSignUp
       padding-top: 2em
-      .pdfLink
-        text-decoration: underline
-        cursor: pointer
-        font-weight: bold
+  #LinkInviteSection
+    padding-top: 2em
+    #UserLinkSignUp
+      padding-top: 2em
+      .linkContainer
+        .link
+          border-radius: 0.2em
+          background-color: #7dd8d5
+          text-align: center
+          line-height: 5em
+          max-width: 40em
+          color: #fff
+          width: 100%
+          display: block
+          border: 0
+          outline: 0
+          font-family: Consolas, Menlo, Monaco, monospace
+          &:focus
+            +box-shadow(none)
+          &::selection, &::-moz-selection
+            background-color: #0F6084
 
   #InviteUserForm
     padding-top: 2em

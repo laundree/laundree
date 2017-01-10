@@ -60,16 +60,78 @@ class QrInvite extends React.Component {
       <FormattedMessage
         id='users.qr-signup.message'
         values={{
-          nl: <br />,
-          link: <a href={`/pdf/invite/${this.props.laundry.id}`} target='_blank' className='pdfLink'><FormattedMessage
-            id='users.qr-signup.message.link'/></a>
+          nl: <br />
         }}/>
+      <div className='buttonContainer'>
+        <a href={`/pdf/invite/${this.props.laundry.id}`} target='_blank' className='pdfLink button'>
+          <FormattedMessage id='users.qr-signup.generate-code'/>
+        </a>
+      </div>
     </div>
   }
 }
 
 QrInvite.propTypes = {
   laundry: React.PropTypes.object.isRequired
+}
+
+class LinkElement extends React.Component {
+  fetchElement (e) {
+    this.element = e
+  }
+
+  render () {
+    return <div ref={e => this.fetchElement(e)} className='link'>{this.props.link}</div>
+  }
+}
+
+LinkElement.propTypes = {
+  link: React.PropTypes.string.isRequired
+}
+
+class LinkInvite extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {link: null}
+  }
+
+  generateLink () {
+    if (this.state.generating) return
+    this.setState({generating: true})
+    sdk.laundry(this.props.laundry.id)
+      .createInviteCode()
+      .then(({href}) => this.setState({link: href, generating: false}))
+  }
+
+  renderLink () {
+    if (this.state.link) {
+      return <LinkElement link={this.state.link}/>
+    }
+    return <button onClick={() => this.generateLink()} className={this.state.generating ? 'inactive' : ''}>
+      {this.state.generating
+        ? <FormattedMessage id='general.generating'/>
+        : <FormattedMessage id='users.invite-form-link.button'/> }
+    </button>
+  }
+
+  render () {
+    return <div id='UserLinkSignUp'>
+      <FormattedMessage id='users.invite-form-link.text' values={{
+        nl: <br />
+      }}/>
+      <div className={'linkContainer buttonContainer ' + (this.state.generating ? 'generating' : '')}>
+        {this.renderLink()}
+      </div>
+    </div>
+  }
+}
+
+LinkInvite.propTypes = {
+  laundry: React.PropTypes.shape({
+    id: React.PropTypes.string,
+    owners: React.PropTypes.array
+  }).isRequired
 }
 
 class UserItem extends React.Component {
@@ -278,6 +340,10 @@ class Users extends React.Component {
           <section id='QrInviteSection'>
             <FormattedMessage id='users.invite-from-qr' tagName='h2'/>
             <QrInvite laundry={this.props.laundry}/>
+          </section>
+          <section id='LinkInviteSection'>
+            <FormattedMessage id='users.invite-from-link' tagName='h2'/>
+            <LinkInvite laundry={this.props.laundry}/>
           </section>
         </main>
       </Loader>
