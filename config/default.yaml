@@ -73,6 +73,7 @@ emails:
 
 defaultUsers:
   budde@laundree.io: admin
+  malene@laundree.io: admin
 
 mode: 'master'
 

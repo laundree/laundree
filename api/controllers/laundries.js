@@ -162,7 +162,11 @@ function createInviteCode (req, res) {
   if (laundry.model.demo) return api.returnError(res, 403, 'Not allowed')
   laundry
     .createInviteCode()
-    .then(key => api.returnSuccess(res, {key, pdfHref: `/pdf/invite/${laundry.shortId}/${key}`}))
+    .then(key => api.returnSuccess(res, {
+      key,
+      pdfHref: `/pdf/invite/${laundry.shortId}/${key}`,
+      href: `https://laundree.io/s/${laundry.shortId}/${key}`
+    }))
     .catch(api.generateErrorHandler(res))
 }
 
