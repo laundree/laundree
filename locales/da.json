@@ -137,7 +137,7 @@
   "users.invite-from-email": "Inviter bruger med e-mail",
   "users.invite-from-qr": "Inviter bruger med QR-kode",
   "users.owner": "Ejer",
-  "users.qr-signup.message": "Du kan invitere dine lejere ved at generere et PDF-dokument, udskrive det og hænge det i vaskerummet. {nl}\nDette gør det muligt for alle, med fysisk adgang til dine maskiner, at registrere sig til dit vaskeri. {nl}\nGenerer din PDF {link}",
+  "users.qr-signup.message": "Du kan invitere dine lejere ved at generere et PDF-dokument, udskrive det og hænge det i vaskerummet. {nl}\nDette gør det muligt for alle, med fysisk adgang til dine maskiner, at registrere sig til dit vaskeri.",
   "users.invite.demo": "Beklager, men du kan ikke tilføje brugere til et demo vaskeri",
   "users.error.invalid-email": "Indtast venligt en gyldig e-mail adresse",
   "admin-panel.users": "Brugere",
@@ -253,5 +253,11 @@
   "email.verify-email.message": "Hej {name},{nl}\n{nl}\nBekræft venligst at du ejer denne e-mail adresse ({email}) ved at følge nedenstående link.{nl}\n{nl}\n{link}{nl}\n{nl}\nHvis du ikke har oprettet en laundree konto eller anmodede om at få adressen bekræftet, skal du blot ignorere denne e-mail.",
   "document-title.forgot": "Nulstil dit kodeord",
   "users.user": "Bruger",
-  "laundry-settings.leave-laundry": "Forlad vaskeri"
+  "laundry-settings.leave-laundry": "Forlad vaskeri",
+  "general.generate": "Generer",
+  "general.generating": "Genererer",
+  "users.qr-signup.generate-code": "Generer QR-kode",
+  "users.invite-from-link": "Inviter bruger med link",
+  "users.invite-form-link.text": "Du kan invitere brugere ved at genere og dele et link. {nl}\nBemærk dog at alle som har adgang til linket can få adgang til dit vaskeri!",
+  "users.invite-form-link.button": "Generer link"
 }
