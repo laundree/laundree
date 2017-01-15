@@ -22,7 +22,7 @@ class Loader extends React.Component {
 }
 
 Loader.propTypes = {
-  children: React.PropTypes.any.isRequired,
+  children: React.PropTypes.any,
   loader: React.PropTypes.func.isRequired,
   loaded: React.PropTypes.any
 }
