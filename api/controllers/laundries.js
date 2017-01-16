@@ -164,7 +164,6 @@ function createInviteCode (req, res) {
     .createInviteCode()
     .then(key => api.returnSuccess(res, {
       key,
-      pdfHref: `/pdf/invite/${laundry.shortId}/${key}`,
       href: `https://laundree.io/s/${laundry.shortId}/${key}`
     }))
     .catch(api.generateErrorHandler(res))

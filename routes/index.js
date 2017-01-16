@@ -10,7 +10,6 @@ function fetchRoutes () {
   router.use('/javascripts', require('./javascripts'))
   router.use('/identicon', require('./identicon'))
   router.use('/auth', require('./auth'))
-  router.use('/pdf', require('./pdf'))
   router.use('/calendar', require('./calendar'))
   router.use('/s', require('./invite-code'))
   router.use('/', require('./app.jsx'))

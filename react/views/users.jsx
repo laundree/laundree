@@ -7,6 +7,9 @@ const sdk = require('../../client/sdk')
 const Loader = require('./loader.jsx')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
 const {Link} = require('react-router')
+const {createInvitePdf} = require('../../utils/pdf')
+const request = require('superagent')
+const toBuffer = require('blob-to-buffer')
 
 class InviteUserForm extends ValueUpdater {
   constructor (props) {
@@ -54,7 +57,59 @@ InviteUserForm.propTypes = {
 }
 
 class QrInvite extends React.Component {
-
+  constructor (props) {
+    super(props)
+    this.state = {}
+  }
+  generatePdf () {
+    if (this.state.generating) return
+    this.setState({generating: true})
+    Promise
+      .all([sdk.laundry(this.props.laundry.id).createInviteCode(), this.fetchLogo()])
+      .then(([{key}, logoBuffer]) => this.generatePdfBuffer(logoBuffer, key))
+      .then(buffer => this.setState({pdf: buffer, generating: false}))
+  }
+  generatePdfBuffer (logoBuffer, code) {
+    return new Promise((resolve, reject) => {
+      const stream = createInvitePdf(
+        logoBuffer,
+        this.props.laundry.id,
+        code,
+        this.props.locale)
+      const buffers = []
+      stream.on('data', d => buffers.push(d))
+      stream.on('end', () => resolve(Buffer.concat(buffers)))
+      stream.on('error', reject)
+    })
+  }
+  fetchLogo () {
+    return request
+      .get('/images/logo.png')
+      .responseType('blob')
+      .then(({body}) => new Promise((resolve, reject) => toBuffer(body, (err, buffer) => {
+        if (err) return reject(err)
+        resolve(buffer)
+      })))
+  }
+  generateLink () {
+    if (!this.state.pdf) {
+      return <button
+        className={'pdfLink' + (this.state.generating ? 'inactive' : '')}
+        onClick={() => this.generatePdf()}>
+            {this.state.generating
+              ? <FormattedMessage id='general.generating'/>
+              : <FormattedMessage id='users.qr-signup.generate-code'/> }
+              </button>
+    }
+    return <a
+      className='button red qr-download'
+      href={`data:application/pdf;base64,${this.state.pdf.toString('base64')}`} target='_blank'>
+        <svg>
+          <use xlinkHref='#MediaDownload' />
+        </svg>
+        <FormattedMessage id='users.qr-signup.download'/>
+      </a>
+  }
   render () {
     return <div id='QrSignUp'>
       <FormattedMessage
@@ -62,26 +117,21 @@ class QrInvite extends React.Component {
         values={{
           nl: <br />
         }}/>
-      <div className='buttonContainer'>
-        <a href={`/pdf/invite/${this.props.laundry.id}`} target='_blank' className='pdfLink button'>
-          <FormattedMessage id='users.qr-signup.generate-code'/>
-        </a>
+      <div className={'linkContainer buttonContainer' + (this.state.generating ? ' generating' : '')}>
+        {this.generateLink()}
       </div>
     </div>
   }
 }
 
 QrInvite.propTypes = {
-  laundry: React.PropTypes.object.isRequired
+  laundry: React.PropTypes.object.isRequired,
+  locale: React.PropTypes.string.isRequired
 }
 
 class LinkElement extends React.Component {
-  fetchElement (e) {
-    this.element = e
-  }
-
   render () {
-    return <div ref={e => this.fetchElement(e)} className='link'>{this.props.link}</div>
+    return <div className='link'>{this.props.link}</div>
   }
 }
 
@@ -339,7 +389,7 @@ class Users extends React.Component {
           </section>
           <section id='QrInviteSection'>
             <FormattedMessage id='users.invite-from-qr' tagName='h2'/>
-            <QrInvite laundry={this.props.laundry}/>
+            <QrInvite laundry={this.props.laundry} locale={this.props.locale}/>
           </section>
           <section id='LinkInviteSection'>
             <FormattedMessage id='users.invite-from-link' tagName='h2'/>
@@ -352,6 +402,7 @@ class Users extends React.Component {
 }
 
 Users.propTypes = {
+  locale: React.PropTypes.string.isRequired,
   invites: React.PropTypes.object,
   users: React.PropTypes.object,
   laundry: React.PropTypes.object,
