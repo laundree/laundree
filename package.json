@@ -32,7 +32,7 @@
     "moment-timezone": "^0.5.7",
     "mongoose": "^4.6.8",
     "morgan": "~1.7.0",
-    "node-sass-middleware": "^0.10.0",
+    "node-sass-middleware": "^0.11.0",
     "nodemailer": "^2.3.2",
     "nodemailer-stub-transport": "^1.0.0",
     "opbeat": "^4.0.0",
