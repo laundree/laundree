@@ -46,15 +46,17 @@
           width: 3em
           background-color: #ffffff
           +border-radius(0.2em)
-  #QrInviteSection
+  #LinkInviteSection, #QrInviteSection
     padding-top: 2em
-    #QrSignUp
-      padding-top: 2em
-  #LinkInviteSection
-    padding-top: 2em
-    #UserLinkSignUp
+    #UserLinkSignUp, #QrSignUp
       padding-top: 2em
       .linkContainer
+        .qr-download svg
+          height: 1em
+          width: 1em
+          display: block
+          float: left
+          fill: #ffffff
         .link
           border-radius: 0.2em
           background-color: #7dd8d5
@@ -91,4 +93,3 @@
           right: 0
           text-align: center
           line-height: 10em
-

@@ -32,7 +32,9 @@ module.exports = {
       .waitForElementVisible('#TopNav .laundries', timeout)
       .waitForElementVisible('#LeftNav', timeout)
       .click('#LeftNav ul li:nth-of-type(4) a')
-      .click('#QrSignUp a.pdfLink')
+      .click('#QrSignUp .pdfLink')
+      .waitForElementVisible('#QrSignUp .qr-download', timeout)
+      .click('#QrSignUp .qr-download')
       .pause(timeout)
       .window_handles(function (result) {
         this.assert.equal(result.value.length, 2)

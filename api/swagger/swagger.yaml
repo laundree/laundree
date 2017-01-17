@@ -1070,13 +1070,10 @@ paths:
             properties:
               key:
                 type: string
-              pdfHref:
-                type: string
               href:
                 type: string
             required:
               - key
-              - pdfHref
               - href
         "404":
           description: Laundry not found

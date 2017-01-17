@@ -1,15 +1,14 @@
 const PdfDocument = require('pdfkit')
 const qr = require('qr-image')
-const path = require('path')
 const locales = require('../locales')
 
-function createInvitePdf (laundryId, id, locale) {
+function createInvitePdf (logoString, laundryId, id, locale) {
   const doc = new PdfDocument({size: [2 * 240, 2 * 320]})
   const link = `https://laundree.io/s/${laundryId}/${id}`
   const logoWidth = 150
   const logoX = (doc.page.width - logoWidth) / 2
   doc
-    .image(path.resolve(__dirname, '..', 'public', 'images', 'logo.png'), logoX, 40, {width: logoWidth})
+    .image(logoString, logoX, 40, {width: logoWidth})
     .fontSize(13)
     .moveDown(6)
     .text(locales[locale].messages['pdf.invite.text.1'], {align: 'justify'})
