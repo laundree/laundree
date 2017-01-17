@@ -854,9 +854,8 @@ describe('controllers', function () {
             .then(res => LaundryHandler
               .findFromId(laundry.model._id)
               .then(laundry => {
-                const {key, pdfHref} = res.body
+                const {key} = res.body
                 base64UrlSafe.validate(key).should.be.true
-                pdfHref.should.equal(`/pdf/invite/${laundry.shortId}/${key}`)
                 return laundry.verifyInviteCode(key).should.eventually.be.true
               }))))
 
