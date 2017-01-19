@@ -14,8 +14,74 @@ body.app
 main#TimeTableMain
   height: 100%
   width: 100%
-  overflow: hidden
+  $cell: 2.5em
   header
+    .dropDown
+      display: inline-block
+      .dropDownTitle
+        display: inline
+      .dropDownContent
+        width: auto
+        top: calc(100% + 1em)
+        &:before
+          left: 2em
+        .calendar
+          nav
+            max-width: $cell * 7
+            text-transform: capitalize
+            font-family: "Roboto Condensed", sans-serif
+            text-align: center
+            padding: 0.4em
+            border-bottom: 0.1em solid #e6e6e6
+            margin-bottom: 0.4em
+            +user-select(none)
+            .arrow
+              margin: 0.3em 0
+              display: inline-block
+              cursor: pointer
+            .left
+              float: left
+              +arrow(#1e6a72, 0.4em, left)
+            .right
+              float: right
+              +arrow(#1e6a72, 0.4em, right)
+
+          padding: 1em
+          table
+            table-layout: fixed
+            border-spacing: 0
+            width: $cell * 7
+            th
+              height: $cell
+              width: $cell
+              line-height: $cell
+              text-align: center
+            td
+              +user-select(none)
+              cursor: pointer
+              height: $cell
+              width: $cell
+              line-height: $cell
+              text-align: center
+              a, a:hover
+                display: block
+                height: 100%
+                width: 100%
+                text-decoration: none
+              &.otherMonth
+                a
+                  color: #909090
+                background-color: #f1f1f1
+              &.today
+                a
+                  font-weight: bold
+              &.active, &.active.today
+                background-color: #e5ab55
+              &.hover, &.hover.today
+                background-color: #55c4e5
+              &.hover, &.active
+                a
+                  color: #ffffff
     position: relative
     z-index: 15
     background-color: #66D3D3
@@ -23,36 +89,18 @@ main#TimeTableMain
     padding:
       top: 5em
       left: 15em
-    &.today
-      .date_nav
-        .nav
-          .left
-            +arrow(#5bb5b5, 0.5em, left)
-            cursor: auto
-          svg
-            cursor: auto
-            fill: #5bb5b5
     .date_nav
       .nav
         +user-select(none)
         font-style: italic
         display: inline-block
         padding: 0 0 0 2em
+        cursor: pointer
         svg
-          cursor: pointer
           height: 1em
           width: 1em
           margin: 0 1em 0 0
           fill: #1e6a72
-        .arrow
-          display: inline-block
-          cursor: pointer
-        .left
-          margin-right: 1em
-          +arrow(#1e6a72, 0.5em, left)
-        .right
-          margin-left: 1em
-          +arrow(#1e6a72, 0.5em, right)
       h1
         display: inline-block
         padding-left: 1.5em
@@ -332,10 +380,18 @@ main#TimeTableMain
             .longName
               display: none
       .date_nav
-        .nav
-          +user-select(none)
+        .dropDown
+          .dropDownContent
+            width: 100%
+            nav
+              margin: auto
+            .calendar
+              table
+                margin: auto
           display: block
-          line-height: 1.5em
+          .nav
+            +user-select(none)
+            line-height: 1.5em
 
 @media only screen and (max-width: 30em)
   main#TimeTableMain
