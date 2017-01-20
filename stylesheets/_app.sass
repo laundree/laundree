@@ -24,7 +24,7 @@ main#TimeTableMain
         width: auto
         top: calc(100% + 1em)
         &:before
-          left: 2em
+          left: 1em
         .calendar
           nav
             max-width: $cell * 7
@@ -75,10 +75,10 @@ main#TimeTableMain
               &.today
                 a
                   font-weight: bold
-              &.active, &.active.today
-                background-color: #e5ab55
-              &.hover, &.hover.today
-                background-color: #55c4e5
+              &.active
+                background-color: #44b7b4
+              &.hover
+                background-color: #57ccc9
               &.hover, &.active
                 a
                   color: #ffffff
@@ -90,11 +90,23 @@ main#TimeTableMain
       top: 5em
       left: 15em
     .date_nav
+      .timeTableHeaderNav
+        padding: 0 1em
+        display: inline-block
+        > .arrow
+          display: inline-block
+          &.left
+            margin-right: 0.5em
+            +arrow(#1e6a72, 0.5em, left)
+          &.right
+            margin-left: 0.5em
+            +arrow(#1e6a72, 0.5em, right)
+
       .nav
         +user-select(none)
         font-style: italic
         display: inline-block
-        padding: 0 0 0 2em
+        padding: 0 1em
         cursor: pointer
         svg
           height: 1em
@@ -380,19 +392,25 @@ main#TimeTableMain
             .longName
               display: none
       .date_nav
-        .dropDown
-          .dropDownContent
-            width: 100%
-            nav
-              margin: auto
-            .calendar
-              table
-                margin: auto
+        .timeTableHeaderNav
+          position: relative
           display: block
+          text-align: center
           .nav
             +user-select(none)
             line-height: 1.5em
-
+          .dropDown
+            position: static
+            .dropDownContent
+              width: calc(100% - 2em)
+              left: 1em
+              &:before
+                left: calc(50% - 0.5em)
+              .calendar
+                nav
+                  margin: auto
+                table
+                    margin: auto
 @media only screen and (max-width: 30em)
   main#TimeTableMain
     #ActiveBooking

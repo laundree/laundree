@@ -168,6 +168,13 @@ class TimeTableHeaderNav extends React.Component {
   get lastDate () {
     return this.props.dates[this.props.dates.length - 1]
   }
+  get yesterday () {
+    return this.firstDate.clone().subtract(1, 'd')
+  }
+
+  get tomorrow () {
+    return this.firstDate.clone().add(1, 'd')
+  }
 
   renderTitle () {
     if (this.props.dates.length === 1) {
@@ -201,7 +208,9 @@ class TimeTableHeaderNav extends React.Component {
 
   render () {
     if (this.props.dates.length === 0) return null
-    return <DropDown>
+    return <div className='timeTableHeaderNav'>
+      <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-MM-DD')}`} className='arrow left'/>
+      <DropDown>
       <DropDownTitle>{this.renderTitle()}</DropDownTitle>
       <DropDownContent>
         <CalendarNavigationElement
@@ -209,6 +218,8 @@ class TimeTableHeaderNav extends React.Component {
           laundry={this.props.laundry}/>
       </DropDownContent>
     </DropDown>
+    <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-MM-DD')}`} className='arrow right'/>
+  </div>
   }
 }
 
