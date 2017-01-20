@@ -4,7 +4,7 @@ const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
-const moment = require('moment-timezone')
+const LocationSelector = require('./LocationSelector.jsx')
 
 class LaundrySettingsForm extends ValueUpdater {
 
@@ -14,7 +14,7 @@ class LaundrySettingsForm extends ValueUpdater {
       evt.preventDefault()
       this.setState({loading: true})
       sdk.laundry(this.props.laundry.id)
-        .updateLaundry({name: this.state.values.name, timezone: this.state.values.timezone})
+        .updateLaundry({name: this.state.values.name, googlePlaceId: this.state.values.place})
         .then(() => this.setState({loading: false, notion: null}))
         .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
     }
@@ -23,9 +23,9 @@ class LaundrySettingsForm extends ValueUpdater {
   errorToMessage ({status, message}) {
     switch (status) {
       case 409:
-        return <FormattedMessage id='laundry-settings.name-or-timezone.error.duplicate'/>
+        return <FormattedMessage id='laundry-settings.name-or-place.error.duplicate'/>
       case 400:
-        return <FormattedMessage id='laundry-settings.name-or-timezone.error.invalid-timezone'/>
+        return <FormattedMessage id='laundry-settings.name-or-place.error.invalid-place'/>
       default:
         return message
     }
@@ -34,30 +34,30 @@ class LaundrySettingsForm extends ValueUpdater {
   get initialValues () {
     return {
       name: this.props.laundry.name,
-      timezone: this.props.laundry.timezone
+      place: this.props.laundry.googlePlaceId
     }
   }
 
-  componentWillReceiveProps ({laundry: {name, timezone}}) {
-    if (name === this.props.laundry.name && timezone === this.props.laundry.timezone) return
-    this.reset({values: {name, timezone}})
+  componentWillReceiveProps ({laundry: {name, googlePlaceId}}) {
+    if (name === this.props.laundry.name && googlePlaceId === this.props.laundry.googlePlaceId) return
+    this.reset({values: {name, place: googlePlaceId}})
   }
 
   get nameErrorMessage () {
     return this.state.values.name.trim()
-      ? 'laundry-settings.name-or-timezone.error.new-name'
-      : 'laundry-settings.name-or-timezone.error.no-name'
+      ? 'laundry-settings.name-or-place.error.new-name'
+      : 'laundry-settings.name-or-place.error.no-name'
   }
 
-  get timezoneErrorMessage () {
-    const tz = this.state.values.timezone.trim()
-    if (!tz) return 'laundry-settings.name-or-timezone.error.no-timezone'
-    if (tz === this.props.laundry.timezone) return 'laundry-settings.name-or-timezone.error.new-timezone'
-    return 'laundry-settings.name-or-timezone.error.valid-timezone'
+  get placeErrorMessage () {
+    const placeId = this.state.values.place
+    if (!placeId) return 'laundry-settings.name-or-place.error.no-place'
+    if (placeId === this.props.laundry.googlePlaceId) return 'laundry-settings.name-or-place.error.new-place'
+    return 'laundry-settings.name-or-place.error.valid-place'
   }
 
   get nameErrorValues () {
-    if (this.state.values.timezone !== this.props.laundry.timezone) return []
+    if (this.state.values.place !== this.props.laundry.googlePlaceId) return []
     return ['', this.props.laundry.name]
   }
 
@@ -70,9 +70,13 @@ class LaundrySettingsForm extends ValueUpdater {
         </label>
       </ValidationElement>
       <ValidationElement
-        sesh={this.state.sesh} value={this.state.values.timezone} oneOf={moment.tz.names()} trim>
-        <Label data-validate-error={this.timezoneErrorMessage}>
-          <input type='text' value={this.state.values.timezone} onChange={this.generateValueUpdater('timezone')}/>
+        sesh={this.state.sesh} value={this.state.values.place} nonEmpty>
+        <Label data-validate-error={this.placeErrorMessage}>
+          <LocationSelector
+            googleApiKey={this.props.googleApiKey}
+            locale={this.props.locale}
+            value={this.state.values.place}
+            onChange={this.generateValueUpdater('place')}/>
         </Label>
       </ValidationElement>
       <div className='buttons'>
@@ -83,6 +87,8 @@ class LaundrySettingsForm extends ValueUpdater {
 }
 
 LaundrySettingsForm.propTypes = {
+  locale: React.PropTypes.string.isRequired,
+  googleApiKey: React.PropTypes.string.isRequired,
   laundry: React.PropTypes.object.isRequired
 }
 
@@ -439,9 +445,9 @@ class LaundrySettings extends React.Component {
   renderOwnerSettings () {
     if (!this.isOwner) return null
     return <div>
-      <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.name-or-timezone.title'/>
-        <LaundrySettingsForm laundry={this.laundry}/>
+      <section id='LaundrySettingsNameOrPlace'>
+        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title'/>
+        <LaundrySettingsForm laundry={this.laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale}/>
       </section>
       <section>
         <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title'/>
@@ -479,6 +485,8 @@ class LaundrySettings extends React.Component {
 LaundrySettings.propTypes = {
   currentLaundry: React.PropTypes.string,
   laundries: React.PropTypes.object,
+  locale: React.PropTypes.string.isRequired,
+  googleApiKey: React.PropTypes.string.isRequired,
   user: React.PropTypes.shape({
     id: React.PropTypes.string,
     role: React.PropTypes.string,

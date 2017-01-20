@@ -18,5 +18,5 @@ module.exports = combineReducers({
   invites: require('./laundry_invitations'),
   stats: require('./stats'),
   jobs: require('./jobs'),
-  locale: require('./locale')
+  config: require('./config')
 })

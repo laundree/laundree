@@ -12,6 +12,7 @@ calendar:
   ttl: 1800
 
 timezone: Europe/Copenhagen
+googlePlaceId: 'ChIJ-1-U7rYnS0YRzZLgw9BDh1I'
 
 redis:
   host: 'localhost'
@@ -55,6 +56,8 @@ facebook:
   callbackUrl: 'https://someUrl/auth/facebook/callback'
 
 google:
+  clientApiKey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  serverApiKey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   clientId: '0000000000000000000000000000000000000000000000.apps.googleusercontent.com'
   clientSecret: '000000000000000000000000'
   callbackUrl: 'https://someUrl/auth/google/callback'

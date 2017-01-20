@@ -1,6 +1,5 @@
 const {LaundryHandler, UserHandler} = require('../../handlers')
 const {api, mail} = require('../../utils')
-const moment = require('moment-timezone')
 
 /**
  * Created by budde on 02/06/16.
@@ -33,15 +32,20 @@ function listLaundries (req, res) {
 }
 
 function createLaundry (req, res) {
-  const name = req.swagger.params.body.value.name.trim()
+  const {name, googlePlaceId} = req.swagger.params.body.value
   const {currentUser} = req.subjects
   if (currentUser.isDemo) return api.returnError(res, 403, 'Not allowed')
   LaundryHandler
-    .find({name})
-    .then(([laundry]) => {
-      if (laundry) return api.returnError(res, 409, 'Laundry already exists', {Location: laundry.restUrl})
-      return req.user.createLaundry(name)
-        .then((laundry) => api.returnSuccess(res, laundry.toRest()))
+    .timeZoneFromGooglePlaceId(googlePlaceId)
+    .then(timezone => {
+      if (!timezone) return api.returnError(res, 400, 'Invalid place-id')
+      return LaundryHandler
+        .find({name: name.trim()})
+        .then(([laundry]) => {
+          if (laundry) return api.returnError(res, 409, 'Laundry already exists', {Location: laundry.restUrl})
+          return req.user.createLaundry(name.trim(), timezone, googlePlaceId)
+            .then((laundry) => api.returnSuccess(res, laundry.toRest()))
+        })
     })
     .catch(api.generateErrorHandler(res))
 }
@@ -55,10 +59,10 @@ function createDemoLaundry (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
-function sanitizeBody ({timezone, name, rules}) {
+function sanitizeBody ({name, rules, googlePlaceId}) {
   const updateObject = {}
-  if (timezone && timezone.trim()) {
-    updateObject.timezone = timezone.trim()
+  if (googlePlaceId && googlePlaceId.trim()) {
+    updateObject.googlePlaceId = googlePlaceId.trim()
   }
   if (name && name.trim()) {
     updateObject.name = name.trim()
@@ -73,27 +77,54 @@ function timeToMinutes ({hour, minute}) {
   return hour * 60 + minute
 }
 
-function validateBody (res, laundry, body) {
-  const {timezone, rules, name} = body
-  if (timezone && moment.tz.names().indexOf(timezone) < 0) {
-    api.returnError(res, 400, 'Invalid timezone')
-    return undefined
-  }
-  if (rules && rules.timeLimit && timeToMinutes(rules.timeLimit.from) >= timeToMinutes(rules.timeLimit.to)) {
-    api.returnError(res, 400, 'From must be before to')
-    return undefined
-  }
+function validateLaundryName (res, laundry, body) {
+  const {name} = body
   if (!name || name === laundry.model.name) return body
-  LaundryHandler
+  return LaundryHandler
     .find({name})
     .then(([l]) => {
       if (l) {
         api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
-        return undefined
+        return null
       }
       return body
     })
-  return body
+}
+
+function validateGooglePlaceId (res, laundry, body) {
+  const {googlePlaceId} = body
+  if (!googlePlaceId || googlePlaceId === laundry.model.googlePlaceId) return body
+  return LaundryHandler
+    .timeZoneFromGooglePlaceId(googlePlaceId)
+    .then(timeZone => {
+      if (!timeZone) {
+        api.returnError(res, 400, 'Invalid place-id')
+        return null
+      }
+      body.timezone = timeZone
+      return body
+    })
+}
+
+function validateRules (res, body) {
+  const {rules} = body
+  if (!rules || !rules.timeLimit) return body
+  if (timeToMinutes(rules.timeLimit.from) < timeToMinutes(rules.timeLimit.to)) return body
+  api.returnError(res, 400, 'From must be before to')
+  return null
+}
+
+function validateBody (res, laundry, body) {
+  return Promise
+    .resolve(validateRules(res, body))
+    .then(body => {
+      if (!body) return body
+      return validateLaundryName(res, laundry, body)
+    })
+    .then(body => {
+      if (!body) return body
+      return validateGooglePlaceId(res, laundry, body)
+    })
 }
 
 function updateLaundry (req, res) {

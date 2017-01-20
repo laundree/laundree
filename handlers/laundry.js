@@ -14,6 +14,7 @@ const config = require('config')
 const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
 const moment = require('moment-timezone')
 const {generateBase64UrlSafeCode, hashPassword, comparePassword} = require('../utils/password')
+const googleMapsClient = require('@google/maps').createClient({key: config.get('google.serverApiKey')})
 
 function objToMintues ({hour, minute}) {
   return hour * 60 + minute
@@ -25,13 +26,17 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} owner
    * @param {string} name
    * @param {boolean} demo
+   * @param {string} timeZone
+   * @param {string} googlePlaceId
    * @return {Promise.<LaundryHandler>}
    */
-  static createLaundry (owner, name, demo = false) {
+  static createLaundry (owner, name, demo = false, timeZone = '', googlePlaceId = '') {
     return new LaundryModel({
       name,
       owners: [owner.model._id],
       users: [owner.model._id],
+      timezone: timeZone,
+      googlePlaceId,
       demo
     })
       .save()
@@ -48,6 +53,24 @@ class LaundryHandler extends Handler {
       .createLaundry(owner, name, true)
       .then(laundry => [{name: 'Washer', type: 'wash'}, {name: 'Dryer', type: 'dry'}]
         .reduce((prom, {name, type}) => prom.then(() => laundry.createMachine(name, type)), Promise.resolve()))
+  }
+
+  static timeZoneFromGooglePlaceId (placeId) {
+    return new Promise((resolve, reject) => {
+      googleMapsClient.reverseGeocode({place_id: placeId}, (err, response) => {
+        if (err) return reject(err)
+        if (response.status !== 200) return resolve('')
+        const {json: {results: [result]}} = response
+        if (!result) return resolve('')
+        const {geometry: {location}} = result
+        if (!location) return resolve('')
+        googleMapsClient.timezone({location, timestamp: new Date()}, (err, response) => {
+          if (err) return reject(err)
+          if (response.status !== 200) return resolve('')
+          resolve(response.json.timeZoneId)
+        })
+      })
+    })
   }
 
   /**
@@ -301,10 +324,11 @@ class LaundryHandler extends Handler {
     })
   }
 
-  updateLaundry ({name, timezone, rules}) {
+  updateLaundry ({name, timezone, rules, googlePlaceId}) {
     debug('Updating laundry')
     if (name) this.model.name = name
     if (timezone) this.model.timezone = timezone
+    if (googlePlaceId) this.model.googlePlaceId = googlePlaceId
     if (rules) this.model.rules = rules
     return this.save()
   }
@@ -380,6 +404,10 @@ class LaundryHandler extends Handler {
 
   get timezone () {
     return this.model.timezone || config.get('timezone')
+  }
+
+  get googlePlaceId () {
+    return this.model.googlePlaceId || config.get('googlePlaceId')
   }
 
   get rules () {
@@ -516,6 +544,7 @@ class LaundryHandler extends Handler {
       owners: this.ownerIds,
       invites: this.inviteIds,
       timezone: this.timezone,
+      googlePlaceId: this.googlePlaceId,
       demo: this.model.demo,
       rules: this.rules
     }

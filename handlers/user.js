@@ -230,11 +230,13 @@ class UserHandler extends Handler {
   /**
    * Create a new laundry with the current user as owner.
    * @param {string} name
+   * @param {string=} timeZone
+   * @param {string=} googlePlaceId
    * @return {Promise.<LaundryHandler>}
    */
-  createLaundry (name) {
+  createLaundry (name, timeZone, googlePlaceId) {
     const LaundryHandler = require('./laundry')
-    return LaundryHandler.createLaundry(this, name)
+    return LaundryHandler.createLaundry(this, name, false, timeZone, googlePlaceId)
   }
 
   /**

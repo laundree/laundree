@@ -28,7 +28,7 @@ const UPDATE_STATS = 'UPDATE_STATS'
 const FINISH_JOB = 'FINISH_JOB'
 const UPDATE_LAUNDRY_LIST_SIZE = 'UPDATE_LAUNDRY_LIST_SIZE'
 const UPDATE_USER_LIST_SIZE = 'UPDATE_USER_LIST_SIZE'
-const SET_LOCALE = 'SET_LOCALE'
+const CONFIGURE = 'CONFIGURE'
 
 function mapper (handler) {
   return handler.model ? handler.reduxModel : handler
@@ -65,11 +65,11 @@ module.exports = {
     UPDATE_LAUNDRY_LIST_SIZE,
     UPDATE_USER_LIST_SIZE,
     FINISH_JOB,
-    SET_LOCALE
+    CONFIGURE
   },
   listLaundries: createAction(LIST_LAUNDRIES, arrayMapper),
   signInUser: createAction(SIGN_IN_USER, mapper),
-  setLocale: createAction(SET_LOCALE),
+  configure: createAction(CONFIGURE),
   listUsers: createAction(LIST_USERS, arrayMapper),
   listMachines: createAction(LIST_MACHINES, arrayMapper),
   listBookingsForUser: createAction(LIST_BOOKINGS_FOR_USER, ({user, bookings}) => ({

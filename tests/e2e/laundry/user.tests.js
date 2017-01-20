@@ -34,7 +34,7 @@ module.exports = {
       .setValue('#SignIn label:nth-of-type(2) input', password)
       .submitForm('#SignIn')
       .waitForElementVisible('#LeftNav', timeout * 5)
-      .url(`${client.launch_url}/laundries/${laundry.model.id}/users`)
+      .url(`${client.launch_url}laundries/${laundry.model.id}/users`)
       .waitForElementVisible('#NotFound', timeout)
       .end()
   }
