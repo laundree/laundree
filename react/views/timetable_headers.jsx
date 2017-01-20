@@ -5,8 +5,9 @@
 const React = require('react')
 const {FormattedDate, FormattedMessage} = require('react-intl')
 const string = require('../../utils/string')
-const {Link} = require('react-router')
 const moment = require('moment-timezone')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const {Link} = require('react-router')
 
 const TimetableHeader = (props) => {
   const machines = props.laundry.machines
@@ -48,6 +49,116 @@ TimetableHeader.propTypes = {
   machines: React.PropTypes.object.isRequired
 }
 
+class CalendarNavigationElement extends React.Component {
+
+  constructor (props) {
+    super(props)
+    this.state = {current: this.firstDate}
+  }
+
+  week (mom = moment()) {
+    return [
+      mom.clone().day(1),
+      mom.clone().day(2),
+      mom.clone().day(3),
+      mom.clone().day(4),
+      mom.clone().day(5),
+      mom.clone().day(6),
+      mom.clone().day(7)
+    ]
+  }
+
+  _monthBuilder (reference, date) {
+    const mondayProspect = date.clone().day(1)
+    const monday = mondayProspect.isSameOrBefore(date)
+      ? mondayProspect
+      : mondayProspect.clone().subtract(7, 'days')
+    if (monday.month() > reference.month() && monday.year() === reference.year()) {
+      return []
+    }
+    if (monday.month() < reference.month() && monday.year() > reference.year()) {
+      return []
+    }
+    return [this.week(monday)].concat(this._monthBuilder(reference, date.clone().add(7, 'days')))
+  }
+
+  month (mom) {
+    const firstDay = mom.clone().date(1)
+    return this._monthBuilder(firstDay, firstDay)
+  }
+
+  get header () {
+    return <thead>
+    <tr>
+      {this.week().map(d => <th key={d.unix()}><FormattedDate weekday='narrow' value={d.toDate()}/></th>)}
+    </tr>
+    </thead>
+  }
+
+  generateClassName (now, day) {
+    const otherMonth = this.state.current.month() !== day.month()
+    const today = now.isSame(day, 'day')
+    const active = day.isSameOrBefore(this.lastDate) && day.isSameOrAfter(this.firstDate)
+    const hover = this.state.hover && day.isSameOrAfter(this.state.hover.start) && day.isSameOrBefore(this.state.hover.end) ? 'hover' : ''
+    return `${otherMonth ? 'otherMonth' : ''} ${today ? 'today' : ''} ${active ? 'active' : ''} ${hover ? 'hover' : ''}`
+  }
+
+  get firstDate () {
+    return this.props.dates[0]
+  }
+
+  get lastDate () {
+    return this.props.dates[this.props.dates.length - 1]
+  }
+
+  renderMonth () {
+    const now = moment()
+    return <tbody>
+    {this
+      .month(this.state.current)
+      .map(week => <tr key={`${week[0].month()}-${week[0].date()}`}>
+        {week.map(day => <td
+          onMouseOver={() => this.setState({
+            hover: {
+              start: day,
+              end: day.clone().add(this.props.dates.length - 1, 'days')
+            }
+          })}
+          key={day.date()} className={this.generateClassName(now, day)}>
+          <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${day.format('YYYY-MM-DD')}`}>
+            {day.date()}
+          </Link>
+        </td>)}
+      </tr>)}
+    </tbody>
+  }
+
+  render () {
+    return <div className='calendar'>
+      <nav>
+        <span
+          className='arrow left'
+          onClick={() => this.setState(({current}) => ({current: current.clone().subtract(1, 'month')}))}/>
+        <FormattedDate value={this.state.current.toDate()} month='long' year='numeric'/>
+        <span
+          className='arrow right'
+          onClick={() => this.setState(({current}) => ({current: current.clone().add(1, 'month')}))}/>
+      </nav>
+      <table onMouseOut={() => this.setState({hover: null})}>
+        {this.header}
+        <DropDownCloser>
+          {this.renderMonth()}
+        </DropDownCloser>
+      </table>
+    </div>
+  }
+}
+
+CalendarNavigationElement.propTypes = {
+  laundry: React.PropTypes.object.isRequired,
+  dates: React.PropTypes.arrayOf(React.PropTypes.objectOf(moment)).isRequired
+}
+
 class TimeTableHeaderNav extends React.Component {
 
   get firstDate () {
@@ -58,41 +169,22 @@ class TimeTableHeaderNav extends React.Component {
     return this.props.dates[this.props.dates.length - 1]
   }
 
-  get yesterday () {
-    return this.firstDate.clone().subtract(1, 'd')
-  }
-
-  get tomorrow () {
-    return this.firstDate.clone().add(1, 'd')
-  }
-
-  render () {
-    const calendar = <Link to={`/laundries/${this.props.laundry.id}/timetable`}>
-      <svg className='today'>
-        <use xlinkHref='#Calendar'/>
-      </svg>
-    </Link>
-    if (this.props.dates.length === 0) return null
-    const navLeft = <Link
-      className='left arrow'
-      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-MM-DD')}`}/>
-    const navRight = <Link
-      className='right arrow'
-      to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-MM-DD')}`}/>
+  renderTitle () {
     if (this.props.dates.length === 1) {
       return <div className='nav'>
-        {navLeft}
-        {calendar}
+        <svg className='today'>
+          <use xlinkHref='#Calendar'/>
+        </svg>
         <FormattedDate
           weekday='short' month='numeric' day='numeric'
           value={this.firstDate}/>
-        {navRight}
       </div>
     }
 
     return <div className='nav'>
-      {navLeft}
-      {calendar}
+      <svg className='today'>
+        <use xlinkHref='#Calendar'/>
+      </svg>
       <FormattedMessage
         id='timetable.nav'
         values={{
@@ -104,8 +196,19 @@ class TimeTableHeaderNav extends React.Component {
             value={new Date(this.lastDate.format('YYYY-MM-DD'))}/>
         }}
       />
-      {navRight}
     </div>
+  }
+
+  render () {
+    if (this.props.dates.length === 0) return null
+    return <DropDown>
+      <DropDownTitle>{this.renderTitle()}</DropDownTitle>
+      <DropDownContent>
+        <CalendarNavigationElement
+          dates={this.props.dates}
+          laundry={this.props.laundry}/>
+      </DropDownContent>
+    </DropDown>
   }
 }
 

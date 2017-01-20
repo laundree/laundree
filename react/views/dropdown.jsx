@@ -99,7 +99,7 @@ class DropDown extends React.Component {
       ref={this.refPuller}
       className={'dropDown ' + (this.state.open ? 'open ' : '') + (this.props.className ? this.props.className : '')}>
       {React.cloneElement(title, {onClick: this.onToggle})}
-      {content}
+      {this.state.open ? content : null}
     </div>
   }
 }

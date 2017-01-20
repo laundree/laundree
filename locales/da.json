@@ -115,7 +115,7 @@
   "leftnav.timetable": "Tidsplan",
   "auth.reset.success": "Dit kodeord er blevet nulstillet",
   "auth.reset.error": "Noget gik galt",
-  "timetable.nav": "fra {fromDate} til {toDate}",
+  "timetable.nav": "Fra {fromDate} til {toDate}",
   "bookings.title": "Dine bookinger",
   "bookings.no-bookings": "Du har ingen bookinger",
   "bookings.modal.delete-booking": "Er du sikker på, at du vil slette denne booking?",
