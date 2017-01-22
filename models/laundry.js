@@ -19,6 +19,7 @@ const laundrySchema = new Schema({
       to: {hour: Number, minute: Number}
     }
   },
+  googlePlaceId: {type: String},
   timezone: {type: String},
   signUpCodes: [String]
 }, {timestamps: true})

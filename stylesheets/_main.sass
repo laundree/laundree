@@ -106,6 +106,15 @@ body
 $footer_height: 20em
 $max_page_width: 70em
 
+.locationSelector.dropDown
+  > .dropDownContent
+    width: 100%
+    top: calc(100% + 1em)
+    &:before
+      left: 1em
+    .message
+      display: block
+
 .switch
   +user-select(none)
   height: 1.6em
@@ -173,9 +182,15 @@ $max_page_width: 70em
         width: 0.5em
         style: solid
         color: transparent transparent #ffffff transparent
-
+    > .dropDownMessage
+      line-height: 3em
+      color: #afafaf
+      padding: 0 1em
+      font-family: "Roboto Condensed", sans-serif
     > .dropDownList
       font-family: "Roboto Condensed", sans-serif
+      overflow: hidden
+      +border-radius(0.2em)
       li
         cursor: pointer
         color: #37545c
@@ -342,6 +357,7 @@ input[type=submit], button, a.button
 
 a.button
   width: 8em
+
 form.invalid, form.initial
   input[type=submit], button
     +inactive_button_style

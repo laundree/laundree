@@ -263,9 +263,9 @@ class LaundrySdk extends ResourceSdk {
     super('laundries', baseUrl, id)
   }
 
-  createLaundry (name) {
-    return post(`${this.baseUrl}/api/laundries`, {name})
-      .then((response) => response.body || null)
+  createLaundry (name, googlePlaceId) {
+    return post(`${this.baseUrl}/api/laundries`, {name, googlePlaceId})
+      .then(response => response.body || null)
   }
 
   /**
@@ -277,8 +277,8 @@ class LaundrySdk extends ResourceSdk {
       .then(({body}) => body)
   }
 
-  updateLaundry ({name, timezone, rules}) {
-    return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, timezone, rules})
+  updateLaundry ({name, googlePlaceId, rules}) {
+    return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, googlePlaceId, rules})
   }
 
   createMachine (name, type) {

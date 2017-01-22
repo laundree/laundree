@@ -5,6 +5,7 @@ const AdminPanel = require('../containers/admin_panel')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const {Input, Label, Submit, DocumentTitle} = require('./intl')
+const LocationSelector = require('./LocationSelector.jsx')
 
 class CreateLaundry extends ValueUpdater {
 
@@ -12,6 +13,7 @@ class CreateLaundry extends ValueUpdater {
     super(props)
     this.state.createExpanded = false
     this.state.loading = false
+    this.state.results = []
     this.expander = (evt) => {
       evt.target.blur()
       this.setState(({createExpanded}) => ({createExpanded: !createExpanded}))
@@ -20,7 +22,7 @@ class CreateLaundry extends ValueUpdater {
       event.preventDefault()
       this.setState({loading: true})
       sdk.laundry
-        .createLaundry(this.state.values.name.trim())
+        .createLaundry(this.state.values.name.trim(), this.state.values.placeId)
         .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
     }
   }
@@ -52,6 +54,10 @@ class CreateLaundry extends ValueUpdater {
     return {success: false, message}
   }
 
+  get initialValues () {
+    return {name: '', placeId: ''}
+  }
+
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
       <main id='CreateLaundry'>
@@ -61,11 +67,20 @@ class CreateLaundry extends ValueUpdater {
           <div className={this.calculateClassName()}>
             <ValidationForm className={this.state.loading ? 'blur' : ''} onSubmit={this.onSubmit}>
               {this.renderNotion()}
-              <ValidationElement name='name' nonEmpty value={this.state.values.name || ''}>
+              <ValidationElement name='name' nonEmpty value={this.state.values.name}>
                 <Label data-validate-error='home.logged-in.error.invalid-laundry-name'>
                   <Input
-                    type='text' value={this.state.values.name || ''} onChange={this.generateValueUpdater('name')}
+                    type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}
                     placeholder='general.laundry-name'/>
+                </Label>
+              </ValidationElement>
+              <ValidationElement value={this.state.values.placeId} nonEmpty>
+                <Label data-validate-error='home.logged-in.error.invalid-laundry-address'>
+                  <LocationSelector
+                    locale={this.props.locale}
+                    googleApiKey={this.props.googleApiKey}
+                    value={this.state.values.placeId}
+                    onChange={this.generateValueUpdater('placeId')}/>
                 </Label>
               </ValidationElement>
               <div className='buttons'>
@@ -86,13 +101,19 @@ class CreateLaundry extends ValueUpdater {
 }
 
 CreateLaundry.propTypes = {
-  user: React.PropTypes.object
+  user: React.PropTypes.object,
+  googleApiKey: React.PropTypes.string.isRequired,
+  locale: React.PropTypes.string.isRequired
 }
 
-const CreateLaundryOrAdminPanel = ({user}) => user.role === 'admin' ? <AdminPanel/> : <CreateLaundry user={user}/>
+const CreateLaundryOrAdminPanel = ({user, googleApiKey, locale}) => user.role === 'admin'
+  ? <AdminPanel/>
+  : <CreateLaundry user={user} googleApiKey={googleApiKey} locale={locale}/>
 
 CreateLaundryOrAdminPanel.propTypes = {
-  user: React.PropTypes.object
+  user: React.PropTypes.object,
+  googleApiKey: React.PropTypes.string.isRequired,
+  locale: React.PropTypes.string.isRequired
 }
 
 module.exports = CreateLaundryOrAdminPanel

@@ -44,10 +44,10 @@ function fetchInstance (url, pattern, _Handler) {
  * @param {string=} locale
  * @return {Promise}
  */
-function createInitialEvents (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en') {
+function createInitialEvents (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en', googleApiKey = '') {
   let events = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
-  events.push(actions.setLocale(locale))
+  events.push(actions.configure({locale, googleApiKey}))
   if (!currentUser) return Promise.resolve(events)
   events.push(actions.signInUser(currentUser))
   return Promise
@@ -58,8 +58,8 @@ function createInitialEvents (currentUser, successFlash = [], errorFlash = [], u
     .then(evts => evts.reduce((e1, e2) => e1.concat(e2), events))
 }
 
-function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en') {
-  return createInitialEvents(currentUser, successFlash, errorFlash, url, locale)
+function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en', googleApiKey = '') {
+  return createInitialEvents(currentUser, successFlash, errorFlash, url, locale, googleApiKey)
     .then((events) => {
       const store = createStore(reducer)
       events.forEach((event) => store.dispatch(event))

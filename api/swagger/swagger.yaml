@@ -628,9 +628,12 @@ paths:
           schema:
             required:
               - name
+              - googlePlaceId
             properties:
               name:
                 $ref: "#/definitions/name"
+              googlePlaceId:
+                type: string
       responses:
         "200":
           description: Success
@@ -699,7 +702,7 @@ paths:
             properties:
               name:
                 type: string
-              timezone:
+              googlePlaceId:
                 type: string
               rules:
                 properties:

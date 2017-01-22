@@ -100,7 +100,7 @@ describe('controllers', function () {
       it('should fail on not authenticated', () =>
         request(app)
           .post('/api/laundries')
-          .send({name: 'Laundry 1'})
+          .send({name: 'Laundry 1', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -110,7 +110,17 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
             .post('/api/laundries')
-            .send({name: ' '})
+            .send({name: ' ', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
+            .set('Accept', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(400)))
+
+      it('should fail on invalid place id', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .post('/api/laundries')
+            .send({name: ' ', googlePlaceId: '<3'})
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
@@ -120,7 +130,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
             .post('/api/laundries')
-            .send({name: laundries[0].model.name})
+            .send({name: laundries[0].model.name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -135,7 +145,7 @@ describe('controllers', function () {
         }).then(({user, token, laundries}) =>
           request(app)
             .post('/api/laundries')
-            .send({name: 'Some crazy laundry'})
+            .send({name: 'Some crazy laundry', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -146,7 +156,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
             .post('/api/laundries')
-            .send({name: laundries[0].model.name + ' 2'})
+            .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -159,12 +169,30 @@ describe('controllers', function () {
                 return laundry.toRest().then((result) => res.body.should.deep.equal(result))
               })
             })))
+      it('should set timezone', () =>
+        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
+          request(app)
+            .post('/api/laundries')
+            .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, token.secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+              const id = res.body.id
+              return LaundryHandler.findFromId(id).then((laundry) => {
+                laundry.should.not.be.undefined
+                laundry.model.timezone.should.equal('America/Godthab')
+                return laundry.toRest().then((result) => res.body.should.deep.equal(result))
+              })
+            })))
       it('should trim', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
           const name = `${laundry.model.name} 2   `
           return request(app)
             .post('/api/laundries')
-            .send({name})
+            .send({name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -396,20 +424,20 @@ describe('controllers', function () {
               .findFromId(laundries[0].model.id)
               .then(laundry => laundry.model.name.should.equal('L1')))))
 
-      it('should succeed with name and timezone', () =>
+      it('should succeed with name and place', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
             .put(`/api/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
-            .send({name: 'L1', timezone: 'Europe/Paris'})
+            .send({name: 'L1', googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
             .expect(204)
             .then(() => LaundryHandler
               .findFromId(laundries[0].model.id)
               .then(laundry => {
                 laundry.model.name.should.equal('L1')
-                laundry.timezone.should.equal('Europe/Paris')
+                laundry.timezone.should.equal('America/Godthab')
                 laundry.model.rules.toObject().should.deep.equal({timeLimit: {from: {}, to: {}}})
               }))))
 
@@ -452,20 +480,20 @@ describe('controllers', function () {
                 })
               }))))
 
-      it('should succeed with timezone', () =>
+      it('should succeed with place', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
             .put(`/api/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
-            .send({timezone: 'Europe/Paris'})
+            .send({googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
             .expect(204)
             .then(() => LaundryHandler
               .findFromId(laundries[0].model.id)
               .then(laundry => {
                 laundry.model.name.should.equal(laundries[0].model.name)
-                laundry.timezone.should.equal('Europe/Paris')
+                laundry.timezone.should.equal('America/Godthab')
               }))))
 
       it('should succeed when administrator', () =>
@@ -530,16 +558,16 @@ describe('controllers', function () {
             .send({})
             .expect(204)))
 
-      it('should fail invalid timezone', () =>
+      it('should fail with invalid place id', () =>
         dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
           request(app)
             .put(`/api/laundries/${laundry1.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
-            .send({timezone: 'Not/A valid timezone'})
+            .send({googlePlaceId: 'NotValid'})
             .expect(400)
-            .then(({body}) => body.should.deep.equal({message: 'Invalid timezone'}))))
+            .then(({body}) => body.should.deep.equal({message: 'Invalid place-id'}))))
 
       it('should fail invalid time-rule', () =>
         dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
