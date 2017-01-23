@@ -281,8 +281,8 @@ class LaundrySdk extends ResourceSdk {
     return put(`${this.baseUrl}/api/laundries/${this.id}`, {name, googlePlaceId, rules})
   }
 
-  createMachine (name, type) {
-    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type})
+  createMachine (name, type, broken) {
+    return post(`${this.baseUrl}/api/laundries/${this.id}/machines`, {name, type, broken})
   }
 
   inviteUserByEmail (email) {

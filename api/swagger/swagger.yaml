@@ -874,7 +874,10 @@ paths:
             required:
               - name
               - type
+              - broken
             properties:
+              broken:
+                type: boolean
               type:
                 $ref: "#/definitions/machineType"
               name:
@@ -1141,6 +1144,8 @@ paths:
           required: true
           schema:
             properties:
+              broken:
+                type: boolean
               type:
                 $ref: "#/definitions/machineType"
               name:
@@ -1674,6 +1679,8 @@ definitions:
       - id
       - href
       - name
+      - type
+      - broken
     properties:
       id:
         type: string
@@ -1681,6 +1688,10 @@ definitions:
         type: string
       name:
         type: string
+      type:
+        $ref: "#/definitions/machineType"
+      broken:
+        type: boolean
   Date:
     required:
       - year

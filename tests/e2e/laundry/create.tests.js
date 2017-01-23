@@ -39,6 +39,7 @@ module.exports = {
   'Can create invite PDF': client => {
     setupLaundry(client)
       .click('#LeftNav ul li:nth-of-type(4) a')
+      .waitForElementPresent('#QrSignUp .pdfLink', timeout)
       .click('#QrSignUp .pdfLink')
       .waitForElementVisible('#QrSignUp .qr-download', timeout)
       .click('#QrSignUp .qr-download')
@@ -51,6 +52,7 @@ module.exports = {
   'Can create invite link': client => {
     setupLaundry(client)
       .click('#LeftNav ul li:nth-of-type(4) a')
+      .waitForElementPresent('#UserLinkSignUp button', timeout)
       .click('#UserLinkSignUp button')
       .waitForElementVisible('#UserLinkSignUp .linkContainer .link', timeout)
       .end()

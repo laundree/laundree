@@ -19,7 +19,6 @@ class Booking extends React.Component {
 
   render () {
     const booking = this.props.booking
-    const machine = this.props.machines[booking.machine]
     const fromDate = new Date(booking.from)
     const toDate = new Date(booking.to)
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
@@ -36,7 +35,7 @@ class Booking extends React.Component {
       <div className='machineName'>
         <Link
           to={`/laundries/${this.props.currentLaundry}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
-          {machine ? machine.name : null}
+          {this.props.machine.name}
         </Link>
       </div>
       <div className='time_action_wrapper'>
@@ -64,7 +63,7 @@ class Booking extends React.Component {
 
 Booking.propTypes = {
   currentLaundry: React.PropTypes.string.isRequired,
-  machines: React.PropTypes.object.isRequired,
+  machine: React.PropTypes.object.isRequired,
   booking: React.PropTypes.shape({
     id: React.PropTypes.Sting,
     from: React.PropTypes.string,
@@ -83,16 +82,27 @@ class Bookings extends React.Component {
 
   renderBookings () {
     if (!this.props.userBookings) return null
-    if (!this.props.userBookings.length) {
+    const bookings = this.props.userBookings.map(bookingId => this.renderBooking(this.props.bookings[bookingId])).filter(b => b)
+    if (!bookings.length) {
       return <div className='empty_list'>
         <FormattedMessage id='bookings.no-bookings'/>
       </div>
     }
-    return <ul>{this.props.userBookings
-      .map((id) => this.props.bookings[id])
-      .map((booking) => <li key={booking.id}><Booking
-        machines={this.props.machines}
-        booking={booking} currentLaundry={this.props.currentLaundry}/></li>)}</ul>
+    return <ul>
+      {bookings}
+    </ul>
+  }
+
+  renderBooking (booking) {
+    const machine = this.props.machines[booking.machine]
+    if (!machine || machine.broken) {
+      return null
+    }
+    return <li key={booking.id}>
+      <Booking
+        currentLaundry={this.props.currentLaundry} machine={this.props.machines[booking.machine]}
+        booking={booking}/>
+    </li>
   }
 
   load () {

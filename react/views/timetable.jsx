@@ -171,7 +171,6 @@ class Timetable extends React.Component {
         onHoverColumn={this.hoverColumn}
         bookings={this.props.bookings}
         laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
-
       <BookingInfo
         onActiveChange={this.onActiveChange}
         currentUser={this.props.currentUser}

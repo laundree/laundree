@@ -16,23 +16,21 @@ class TimetableTable extends React.Component {
     super(props)
     this.state = Object.assign({bookings: {}, activeBooking: null}, this._calcPosition())
     this.firstBooking = false
-    this.tableMouseDownHandler = (event) => this.handleMouseDown(event)
-    this.tableMouseUpHandler = (event) => this.handleMouseUp(event)
-    this.tableMouseOverHandler = (event) => this.handleMouseOver(event)
-    this.tableMouseOutHandler = (event) => this.handleMouseOut(event)
   }
 
   _row (key, tooLate) {
     const machines = this.props.laundry.machines
-      .map((id) => this.props.machines[id])
-      .filter((m) => m)
+      .map(id => this.props.machines[id])
+      .filter(m => m)
     return <tr
       key={key}
       className={(tooLate ? 'too_late' : '') + (this.props.hoverRow === key ? ' hover' : '')}>
       {machines
-        .map((m) => {
+        .map(m => {
           const isBooked = this.isBooked(m.id, key)
-          if (!isBooked) return <td key={m.id}/>
+          if (!isBooked || m.broken) {
+            return <td key={m.id} className={m.broken ? 'broken' : ''}/>
+          }
           return <td key={m.id}>
             {this.createBookingLink(isBooked)}
           </td>
@@ -163,7 +161,11 @@ class TimetableTable extends React.Component {
     const {max, min} = TimetableTable._fixPos(from, to)
     const maxExclusive = {x: max.x + 1, y: max.y + 1}
     return Promise.all(range(min.x, maxExclusive.x)
-      .map((x) => sdk.machine(this.props.laundry.machines[x]).createBooking(this.posToDate(min), this.posToDate(maxExclusive))))
+      .map(x => {
+        const machine = this.props.machines[this.props.laundry.machines[x]]
+        if (machine.broken) return
+        return sdk.machine(machine.id).createBooking(this.posToDate(min), this.posToDate(maxExclusive))
+      }))
   }
 
   static _fixPos (pos1, pos2) {
@@ -221,10 +223,10 @@ class TimetableTable extends React.Component {
           ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
       </div>
       <table
-        onMouseOver={this.tableMouseOverHandler}
-        onMouseOut={this.tableMouseOutHandler}
-        onMouseDown={this.tableMouseDownHandler}
-        onMouseUp={this.tableMouseUpHandler}>
+        onMouseOver={event => this.handleMouseOver(event)}
+        onMouseOut={event => this.handleMouseOut(event)}
+        onMouseDown={event => this.handleMouseDown(event)}
+        onMouseUp={event => this.handleMouseUp(event)}>
         <tbody>
         {this.props.times.map((key) => this._row(key, tooLateKey >= key))}
         </tbody>

@@ -66,13 +66,13 @@ class MachineListItem extends React.Component {
       this.setState({selected})
     }
 
-    this.onChange = (evt) => this.setState({value: evt.target.value, initial: false})
+    this.onChange = evt => this.setState({value: evt.target.value, initial: false})
 
-    this.onSubmit = (evt) => {
+    this.onSubmit = evt => {
       evt.preventDefault()
       if (this.props.machine) return this.onUpdateName()
       this.props
-        .onSubmit(this.selected, this.value)
+        .onSubmit(this.selected, this.value, this.broken)
         .then(() => this.reset())
     }
 
@@ -101,8 +101,13 @@ class MachineListItem extends React.Component {
   }
 
   get initialState () {
-    if (!this.props.machine) return {sesh: 0, value: '', selected: 'wash', initial: true}
-    return {value: this.props.machine.name, selected: this.props.machine.type, initial: true}
+    if (!this.props.machine) return {sesh: 0, value: '', selected: 'wash', initial: true, broken: false}
+    return {
+      value: this.props.machine.name,
+      selected: this.props.machine.type,
+      broken: this.props.machine.broken,
+      initial: true
+    }
   }
 
   get selected () {
@@ -112,6 +117,10 @@ class MachineListItem extends React.Component {
 
   get value () {
     return this.state.value
+  }
+
+  get broken () {
+    return Boolean(this.props.machine && this.props.machine.broken)
   }
 
   get changed () {
@@ -137,7 +146,7 @@ class MachineListItem extends React.Component {
       />
       <ValidationForm
         sesh={this.state.sesh}
-        className='machine_form'
+        className={'machineForm ' + (this.broken ? 'broken' : '')}
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
         <MachineDropdown selected={this.selected} onSelect={this.onSelect}/>
@@ -162,6 +171,13 @@ class MachineListItem extends React.Component {
           </div>
           : null
         }
+        {this.props.onUpdate
+          ? <div className={`repair action`}>
+            <svg onClick={() => this.props.onUpdate({broken: !this.broken})}>
+              <use xlinkHref={this.broken ? '#MediaWrenchX' : '#MediaWrenchCheck'}/>
+            </svg>
+          </div>
+          : null }
         {this.props.children}
       </ValidationForm>
     </div>
@@ -171,6 +187,7 @@ class MachineListItem extends React.Component {
 MachineListItem.propTypes = {
   onSubmit: React.PropTypes.func,
   onDelete: React.PropTypes.func,
+  onRepair: React.PropTypes.func,
   onUpdate: React.PropTypes.func,
   children: React.PropTypes.any,
   machine: React.PropTypes.object,
@@ -182,19 +199,11 @@ class Machines extends React.Component {
   constructor (props) {
     super(props)
     this.state = {}
-    this.creator = (type, name) => sdk.laundry(this.props.currentLaundry).createMachine(name, type)
+    this.creator = (type, name, broken) => sdk.laundry(this.props.currentLaundry).createMachine(name, type, broken)
   }
 
   get laundry () {
     return this.props.laundries[this.props.currentLaundry]
-  }
-
-  generateDeleter (id) {
-    return () => sdk.machine(id).del()
-  }
-
-  generateUpdater (id) {
-    return (params) => sdk.machine(id).updateMachine(params)
   }
 
   load () {
@@ -220,8 +229,8 @@ class Machines extends React.Component {
         <MachineListItem
           blacklist={this.blacklist}
           machine={this.props.machines[machineId]}
-          onUpdate={this.generateUpdater(machineId)}
-          onDelete={this.generateDeleter(machineId)}/>
+          onUpdate={params => sdk.machine(machineId).updateMachine(params)}
+          onDelete={() => sdk.machine(machineId).del()}/>
       </li>)}
     </ul>
   }

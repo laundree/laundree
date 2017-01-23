@@ -8,7 +8,8 @@ const {Schema} = mongoose
 const machineSchema = new Schema({
   name: {type: String, required: true},
   type: {type: String, enum: ['wash', 'dry'], required: true},
-  laundry: {type: Schema.Types.ObjectId, ref: 'Laundry', required: true}
+  laundry: {type: Schema.Types.ObjectId, ref: 'Laundry', required: true},
+  broken: {type: Boolean, required: true, default: false}
 }, {timestamps: true})
 
 machineSchema.index({name: 1, laundry: 1}, {unique: true})
