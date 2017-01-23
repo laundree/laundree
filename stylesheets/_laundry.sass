@@ -13,7 +13,7 @@
     .buttons
       float: left
       width: 100%
-    .machine_form
+    .machineForm
       height: 10em
   .add_machine
     line-height: 2em
@@ -30,8 +30,23 @@
       margin: 0.5em 1em 0 0
       float: left
       fill: #e5954c
-  .machine_form
+  .machineForm
     height: 5em
+    .repair
+      svg
+        fill: #2d9241
+    &.broken
+      label
+        input
+          color: #28aaba
+          background-color: #a4e4e4
+      .dropDown
+        .dropDownTitle
+          background-color: #a4e4e4
+      .repair
+        svg
+          fill: #dc3f50
+
     .action
       float: left
       height: 2em
@@ -45,8 +60,13 @@
       svg
         cursor: pointer
         fill: #dc3f50
+    .repair
+      svg
+        cursor: pointer
     label
       float: left
+      input
+        +transition(0.1s, 0.1s background, color)
     .dropDown
       float: left
       .dropDownContent
@@ -62,6 +82,7 @@
         height: 1.5em
         fill: #28aaba
       .dropDownTitle
+        +transition(0.1s background)
         cursor: pointer
         width: 2.5em
         height: 1.5em
@@ -88,17 +109,25 @@
   #LaundryMain
     .empty_list
       max-width: 26.5em
-    .machine_form
+    .machineForm
+      .action
+        padding: 2.5em 0.5em 0
       label
         input
-          width: 15em
+          width: 13em
+
 @media only screen and (max-width: 30em)
   #LaundryMain
     .empty_list
       max-width: 23em
-    .machine_form
+    .machineForm
+      .dropDown
+        .dropDownTitle
+          margin-right: 0.5em
       label
         input
-          width: 12.5em
-      .action:last-of-type
-        padding-right: 0
+          width: 10.5em
+      .action
+        padding: 2.5em 0.5em 0
+        &:last-of-type
+          padding-right: 0

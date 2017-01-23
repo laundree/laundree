@@ -123,10 +123,11 @@ class LaundryHandler extends Handler {
    * Create a new machine with given name
    * @param {string} name
    * @param {string} type
+   * @param {boolean} broken
    * @return {Promise.<MachineHandler>}
    */
-  createMachine (name, type) {
-    return MachineHandler._createMachine(this, name, type).then((machine) => {
+  createMachine (name, type, broken) {
+    return MachineHandler._createMachine(this, name, type, broken).then((machine) => {
       this.model.machines.push(machine.model._id)
       return this.save().then(() => machine)
     })

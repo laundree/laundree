@@ -33,12 +33,13 @@ function createMachine (req, res) {
   const body = req.swagger.params.body.value
   const name = body.name.trim()
   const type = body.type
+  const broken = body.broken
   const laundry = req.subjects.laundry
   return MachineHandler
     .find({name: name, laundry: laundry.model._id})
     .then(([machine]) => {
       if (machine) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
-      return laundry.createMachine(name, type)
+      return laundry.createMachine(name, type, broken)
         .then((machine) => api.returnSuccess(res, machine.toRest()))
     })
     .catch(api.generateErrorHandler(res))
@@ -60,12 +61,13 @@ function updateMachine (req, res) {
   const body = req.swagger.params.body.value
   const name = body.name ? body.name.trim() : undefined
   const type = body.type
+  const broken = body.broken
   const {machine, laundry} = req.subjects
   return MachineHandler
     .find({name, laundry: laundry.model._id})
     .then(([m]) => {
       if (m && m.model.id !== machine.model.id) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
-      machine.update({name, type}).then(() => api.returnSuccess(res, machine.toRest()))
+      machine.update({name, type, broken}).then(() => api.returnSuccess(res, machine.toRest()))
     })
     .catch(api.generateErrorHandler(res))
 }

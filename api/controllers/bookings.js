@@ -36,8 +36,13 @@ function listBookings (req, res) {
 
 function createBooking (req, res) {
   const {machine, laundry} = req.subjects
+  if (machine.model.broken) {
+    return api.returnError(res, 400, 'Machine is broken')
+  }
   const {from, to} = req.swagger.params.body.value
-  if (!laundry.validateDateObject(from) || !laundry.validateDateObject(to)) return api.returnError(res, 400, 'Invalid date')
+  if (!laundry.validateDateObject(from) || !laundry.validateDateObject(to)) {
+    return api.returnError(res, 400, 'Invalid date')
+  }
   const fromDate = laundry.dateFromObject(from)
   const toDate = laundry.dateFromObject(to)
   if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to') // Test that from is before to

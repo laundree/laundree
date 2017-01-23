@@ -137,7 +137,7 @@ describe('controllers', function () {
         dbUtils.populateMachines(1).then(({user, token, laundry, machines}) =>
           request(app)
             .post(`/api/laundries/${laundry.model.id}/machines`)
-            .send({name: ' ', type: 'wash'})
+            .send({name: ' ', type: 'wash', broken: false})
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
@@ -189,7 +189,7 @@ describe('controllers', function () {
         dbUtils.populateMachines(1).then(({user, token, laundry, machine}) =>
           request(app)
             .post(`/api/laundries/${laundry.model.id}/machines`)
-            .send({name: machine.model.name, type: 'wash'})
+            .send({name: machine.model.name, type: 'wash', broken: false})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -205,7 +205,7 @@ describe('controllers', function () {
             .then(([m1, m2]) =>
               request(app)
                 .post(`/api/laundries/${l1.model.id}/machines`)
-                .send({name: m2.model.name, type: 'wash'})
+                .send({name: m2.model.name, type: 'wash', broken: false})
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
                 .auth(user.model.id, token.secret)
@@ -216,7 +216,7 @@ describe('controllers', function () {
         dbUtils.populateMachines(1).then(({user, token, laundry, machines}) =>
           request(app)
             .post(`/api/laundries/${laundry.model.id}/machines`)
-            .send({name: machines[0].model.name + ' 2', type: 'wash'})
+            .send({name: machines[0].model.name + ' 2', type: 'wash', broken: false})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -234,7 +234,7 @@ describe('controllers', function () {
         dbUtils.populateMachines(1).then(({laundry, machines}) =>
           request(app)
             .post(`/api/laundries/${laundry.model.id}/machines`)
-            .send({name: machines[0].model.name + ' 2', type: 'wash'})
+            .send({name: machines[0].model.name + ' 2', type: 'wash', broken: false})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(admin.model.id, admintoken.secret)

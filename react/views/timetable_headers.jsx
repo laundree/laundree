@@ -11,8 +11,8 @@ const {Link} = require('react-router')
 
 const TimetableHeader = (props) => {
   const machines = props.laundry.machines
-    .map((id) => props.machines[id])
-    .filter((m) => m)
+    .map(id => props.machines[id])
+    .filter(m => m)
   return <div className='header_container'>
     <div className='date'>
       <FormattedDate
@@ -25,15 +25,20 @@ const TimetableHeader = (props) => {
         {machines
           .map((machine, i) => <td
             key={machine.id}
-            className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '')}>
+            className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '') + (machine.broken ? ' broken' : '')}>
             <svg>
               <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}/>
             </svg>
+            {machine.broken ? <svg className='broken'>
+                <use xlinkHref='#CloseX'/>
+              </svg> : null}
           </td>)}
       </tr>
       <tr className='labels'>
         {machines
-          .map((machine, i) => <td key={machine.id} className={props.hoverColumn === i ? ' hoverColumn' : ''}>
+          .map((machine, i) => <td
+            key={machine.id}
+            className={(props.hoverColumn === i ? ' hoverColumn' : '') + (machine.broken ? ' broken' : '')}>
             <div><span className='longName'>{machine.name}</span><span
               className='shortName'>{string.shortName(machine.name)}</span></div>
           </td>)}
@@ -168,6 +173,7 @@ class TimeTableHeaderNav extends React.Component {
   get lastDate () {
     return this.props.dates[this.props.dates.length - 1]
   }
+
   get yesterday () {
     return this.firstDate.clone().subtract(1, 'd')
   }
@@ -209,17 +215,21 @@ class TimeTableHeaderNav extends React.Component {
   render () {
     if (this.props.dates.length === 0) return null
     return <div className='timeTableHeaderNav'>
-      <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-MM-DD')}`} className='arrow left'/>
+      <Link
+        to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-MM-DD')}`}
+        className='arrow left'/>
       <DropDown>
-      <DropDownTitle>{this.renderTitle()}</DropDownTitle>
-      <DropDownContent>
-        <CalendarNavigationElement
-          dates={this.props.dates}
-          laundry={this.props.laundry}/>
-      </DropDownContent>
-    </DropDown>
-    <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-MM-DD')}`} className='arrow right'/>
-  </div>
+        <DropDownTitle>{this.renderTitle()}</DropDownTitle>
+        <DropDownContent>
+          <CalendarNavigationElement
+            dates={this.props.dates}
+            laundry={this.props.laundry}/>
+        </DropDownContent>
+      </DropDown>
+      <Link
+        to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-MM-DD')}`}
+        className='arrow right'/>
+    </div>
   }
 }
 

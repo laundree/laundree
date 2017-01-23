@@ -23,7 +23,7 @@ module.exports = {
   },
   'test_settings': {
     'local': {
-      'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000',
+      'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000/',
       'selenium_port': process.env.SELENIUM_PORT || 4444,
       'selenium_host': process.env.SELENIUM_HOST || 'localhost',
       'silent': true,
@@ -41,7 +41,7 @@ module.exports = {
       }
     },
     'default': {
-      'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000',
+      'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000/',
       'selenium_port': 80,
       'selenium_host': 'ondemand.saucelabs.com',
       'silent': true,

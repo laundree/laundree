@@ -17,8 +17,8 @@ class MachineHandler extends Handler {
    * @param {string} type
    * @returns {Promise.<MachineHandler>}
    */
-  static _createMachine (laundry, name, type) {
-    const model = new MachineModel({laundry: laundry.model._id, name, type})
+  static _createMachine (laundry, name, type, broken) {
+    const model = new MachineModel({laundry: laundry.model._id, name, type, broken})
     return model.save()
       .then((model) => new MachineHandler(model))
       .then((machine) => {
@@ -43,9 +43,10 @@ class MachineHandler extends Handler {
     return LaundryHandler.find({_id: this.model.laundry}).then(([laundry]) => laundry)
   }
 
-  update ({name, type}) {
+  update ({name, type, broken}) {
     if (name) this.model.name = name
     if (type) this.model.type = type
+    if (broken !== undefined) this.model.broken = broken
     return this.model.save().then(() => {
       this.emitEvent('update')
       return this
@@ -100,14 +101,15 @@ class MachineHandler extends Handler {
   }
 
   toRest () {
-    return Promise.resolve({name: this.model.name, href: this.restUrl, id: this.model.id, type: this.model.type})
+    return Promise.resolve({name: this.model.name, href: this.restUrl, id: this.model.id, type: this.model.type, broken: this.model.broken})
   }
 
   get reduxModel () {
     return {
       id: this.model.id,
       type: this.model.type,
-      name: this.model.name
+      name: this.model.name,
+      broken: this.model.broken
     }
   }
 }

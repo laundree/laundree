@@ -422,6 +422,14 @@ describe('controllers', function () {
           .auth(user.model.id, token.secret)
           .expect(400)))
 
+      it('should fail on broken machine', () => dbUtils.populateMachines(1)
+        .then(({machine, user, token}) => machine.update({broken: true}).then(() => ({machine, user, token})))
+        .then(({machine, user, token}) => request(app)
+          .post(`/api/machines/${machine.model.id}/bookings`)
+          .send({from: createDateTomorrow(1), to: createDateTomorrow(2)})
+          .auth(user.model.id, token.secret)
+          .expect(400)))
+
       it('should succeed on midnight booking', () => dbUtils.populateMachines(1)
         .then(({machine, user, token}) => request(app)
           .post(`/api/machines/${machine.model.id}/bookings`)

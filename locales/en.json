@@ -137,7 +137,7 @@
     "users.invite-from-email": "Invite user from e-mail",
     "users.invite-from-qr": "Invite user from QR-code",
     "users.owner": "Owner",
-    "users.qr-signup.message": "You can invite your tenant by generating a PDF document, printing this, and hanging it in your laundry.{nl}\nThis will enable everyone with physical access to your machines, to register on your laundry.{nl}\nGenerate your PDF {link}.",
+    "users.qr-signup.message": "You can invite your tenant by generating a PDF document, printing this, and hanging it in your laundry.{nl}\nThis will enable everyone with physical access to your machines, to register on your laundry.",
     "users.invite.demo": "Sorry, but you can't add users to a demo laundry",
     "users.error.invalid-email": "Please enter a valid email address",
     "admin-panel.users": "Users",

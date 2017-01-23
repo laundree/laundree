@@ -152,14 +152,25 @@ main#TimeTableMain
                 text-align: center
                 font-weight: bold
                 height: 2em
+                position: relative
                 svg
                   width: 1.5em
                   height: 1.5em
                   fill: #fff
+                  &.broken
+                    position: absolute
+                    fill: #de4655
+                    height: 1em
+                    width: 1em
+                    left: 50%
+                    bottom: 0.2em
             &.labels
               td
                 &.hoverColumn
                   background-color: #49a09e
+                &.broken
+                  background-color: #44bbb8
+                  color: #63d0cd
                 +transition(0.1s background)
                 border-color: #66D3D3
                 background-color: #44B7B4
@@ -320,6 +331,9 @@ main#TimeTableMain
                 cursor: pointer
 
             td
+              &.broken
+                cursor: not-allowed
+                background-color: #70d4d1
               +transition(0.2s background-color)
               +user-select(none)
               background-clip: padding-box

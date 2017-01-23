@@ -13,7 +13,8 @@ function setup (client) {
     .setValue('#SignIn label:nth-of-type(2) input', password)
     .submitForm('#SignIn')
     .waitForElementVisible('#LeftNav', timeout * 5)
-    .url(`${client.launch_url}laundries/${laundry.model.id}/settings`)
+    .click('#LeftNav ul:last-of-type li:first-of-type')
+    .waitForElementPresent('#LaundrySettingsNameOrPlace', timeout)
 }
 
 module.exports = {
