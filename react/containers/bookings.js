@@ -12,11 +12,10 @@ const mapStateToProps = ({
   {params: {laundryId}}) => {
   return {
     user: users[currentUser],
-    laundries,
+    laundry: laundries[laundryId],
     machines,
     bookings,
-    userBookings: userBookings ? userBookings.bookings : null,
-    currentLaundry: laundryId
+    userBookings: userBookings ? userBookings.bookings : null
   }
 }
 

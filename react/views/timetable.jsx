@@ -53,6 +53,7 @@ class BookingInfo extends React.Component {
           values={{
             machine: <i>{this.props.machines[this.props.booking.machine].name}</i>,
             fromTime: <FormattedDate
+              timeZone={this.props.laundry.timezone}
               weekday={today ? undefined : 'long'}
               month={today ? undefined : 'numeric'}
               day={today ? undefined : 'numeric'}
@@ -60,6 +61,7 @@ class BookingInfo extends React.Component {
               minute='numeric'
               value={this.props.booking.from}/>,
             toTime: <FormattedDate
+              timeZone={this.props.laundry.timezone}
               weekday={sameDay ? undefined : 'long'}
               month={sameDay ? undefined : 'numeric'}
               day={sameDay ? undefined : 'numeric'}
