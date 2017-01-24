@@ -17,7 +17,7 @@ const locales = require('../locales')
 const config = require('config')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', req.locale, config.get('google.clientApiKey'))
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', req.locale, config.get('google.clientApiKey'), req.session.returningUser)
     .then(store => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)

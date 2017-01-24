@@ -6,22 +6,30 @@ const path = require('path')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const flash = require('connect-flash')
-const {fetchRoutes} = require('./routes')
+const {fetchRoutes, fetchPseudoStaticRoutes} = require('./routes')
 const setups = require('./lib')
-const config = require('config')
 const app = express()
 const {error} = require('./utils')
 const locale = require('locale')
 const locales = require('./locales')
 const debug = require('debug')('laundree.app')
 
-// Session
-app.use(setups.sessionSetup)
-app.use(locale(locales.supported))
-setups.handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
+// SETUP MORGAN
+setups.morganSetup(app)
 
+// SETUP STATIC + PSEUDO-STATIC ROUTES
+app.use(fetchPseudoStaticRoutes())
+app.use(express.static(path.join(__dirname, 'public')))
+app.use(express.static(path.join(__dirname, 'dist')))
+
+// SETUP SESSION
+app.use(setups.sessionSetup)
+
+// SETUP PASSPORT
 setups.passportSetup(app)
 
+// SETUP LOCALE
+app.use(locale(locales.supported))
 app.use((req, res, next) => {
   let locale = (req.user && req.user.model.locale) || req.session.locale || req.locale
   if (locales.supported.indexOf(locale) < 0) {
@@ -31,30 +39,20 @@ app.use((req, res, next) => {
   next()
 })
 
-setups.morganSetup(app)
+// SETUP DEFAULT USERS
 setups.defaultUserSetup()
 
-app.use(require('node-sass-middleware')({
-  src: path.join(__dirname, 'stylesheets'),
-  dest: path.join(__dirname, 'dist/stylesheets'),
-  prefix: '/stylesheets',
-  outputStyle: config.get('sass.outputStyle'),
-  indentedSyntax: true,
-  sourceMap: true
-}))
-
-// Routes
-app.use(express.static(path.join(__dirname, 'public')))
-app.use(express.static(path.join(__dirname, 'dist')))
+// SETUP HANDLEBARS
+setups.handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use(flash())
-// Swagger
+
 module.exports = {
   app,
-  promise: fetchRoutes().then((routes) => {
+  promise: fetchRoutes().then(routes => {
     app.use('/', routes)
     app.get('/err', (req, res, next) => {
       next(new Error('This is a test error'))

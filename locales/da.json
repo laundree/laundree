@@ -42,6 +42,7 @@
     "topnav.support": "Support",
     "topnav.logout": "Log ud",
     "topnav.login": "Log ind",
+  "topnav.sign-up": "Tilmeld dig",
     "topnav.manage": "Administrer din konto",
     "footer.donate": "Har du lyst til at hjælpe os med at holde serverne kørende med fuld fart? Så er du velkommen til at donere et beløb via {link}",
     "footer.donate.link": "PayPal",

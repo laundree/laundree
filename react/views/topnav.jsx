@@ -14,7 +14,7 @@ class TopNav extends React.Component {
   }
 
   renderGlobe () {
-    return <LocaleSelect locale={this.props.locale} location={this.props.location}/>
+    return <LocaleSelect locale={this.props.config.locale} location={this.props.location}/>
   }
 
   renderLaundries () {
@@ -70,12 +70,12 @@ class TopNav extends React.Component {
           <DropDownContent className='right'>
             <ul className='dropDownList'>
               {this.props.user.demo ? null : <li>
-                <DropDownCloser>
-                  <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
-                    <FormattedMessage id='topnav.manage'/>
-                  </Link>
-                </DropDownCloser>
-              </li>}
+                  <DropDownCloser>
+                    <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
+                      <FormattedMessage id='topnav.manage'/>
+                    </Link>
+                  </DropDownCloser>
+                </li>}
               <li>
                 <a href='/logout'>
                   <FormattedMessage id='topnav.logout'/>
@@ -109,8 +109,8 @@ class TopNav extends React.Component {
       </Link>
       <div className='rightNav'>
         {this.renderGlobe()}
-        <Link to='/auth' className='log-in'>
-          <FormattedMessage id='topnav.login'/>
+        <Link to={this.props.config.returningUser ? '/auth' : '/auth/sign-up'} className='log-in'>
+          <FormattedMessage id={this.props.config.returningUser ? 'topnav.login' : 'topnav.sign-up'}/>
         </Link>
       </div>
     </nav>
@@ -129,7 +129,10 @@ TopNav.propTypes = {
   }),
   location: React.PropTypes.object,
   currentLaundry: React.PropTypes.string,
-  locale: React.PropTypes.string,
+  config: React.PropTypes.shape({
+    locale: React.PropTypes.string.isRequired,
+    returningUser: React.PropTypes.bool.isRequired
+  }),
   laundries: React.PropTypes.object
 }
 

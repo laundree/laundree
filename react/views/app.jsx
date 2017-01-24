@@ -11,7 +11,7 @@ class App extends React.Component {
     return <DocumentTitle title='document-title.base'>
       <div className={this.props.user ? '' : 'footer'}>
         <TopNav
-          locale={this.props.locale}
+          config={this.props.config}
           user={this.props.user}
           location={this.props.location}
           currentLaundry={this.props.currentLaundry}
@@ -25,7 +25,10 @@ class App extends React.Component {
 
 App.propTypes = {
   location: React.PropTypes.object,
-  locale: React.PropTypes.string,
+  config: React.PropTypes.shape({
+    locale: React.PropTypes.string.isRequired,
+    returningUser: React.PropTypes.bool.isRequired
+  }),
   children: React.PropTypes.any,
   currentLaundry: React.PropTypes.string,
   laundries: React.PropTypes.object,
