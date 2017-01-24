@@ -3,7 +3,7 @@
  */
 
 const faker = require('faker')
-const {timeout} = require('../../nightwatch_utils.js')
+const {timeout, signIn} = require('../../nightwatch_utils.js')
 const {UserHandler} = require('../../../handlers')
 
 let email, password, user
@@ -20,13 +20,7 @@ module.exports = {
       })
   },
   'Can not login un-verified': client => {
-    client
-      .url(client.launch_url)
-      .click('#TopNav a.log-in')
-      .waitForElementPresent('#SignIn', timeout)
-      .setValue('#SignIn label:nth-of-type(1) input', email)
-      .setValue('#SignIn label:nth-of-type(2) input', password)
-      .submitForm('#SignIn')
+    signIn(client.url(client.launch_url), email, password)
       .waitForElementVisible('#SignIn .error.notion', timeout)
     client.expect.element('#SignIn .error.notion').text.to.contain('The email provided isn\'t verified.')
     client.end()
@@ -36,24 +30,37 @@ module.exports = {
       .url(client.launch_url)
     user
       .generateVerifyEmailToken(email)
-      .then(token => user.verifyEmail(email, token))
+      .then(token => user.verifyEmail(email, token.secret))
       .then(() => {
-        client
-          .click('#TopNav a.log-in')
-          .waitForElementPresent('#SignIn', timeout)
-          .setValue('#SignIn label:nth-of-type(1) input', email)
-          .setValue('#SignIn label:nth-of-type(2) input', password)
-          .submitForm('#SignIn')
+        signIn(client, email, password)
           .waitForElementVisible('#CreateLaundry', timeout)
           .end()
+      })
+  },
+  'Can be marked returning': client => {
+    client
+      .url(client.launch_url)
+    user
+      .generateVerifyEmailToken(email)
+      .then(token => user.verifyEmail(email, token.secret))
+      .then(() => {
+        signIn(client, email, password)
+          .waitForElementVisible('#CreateLaundry', timeout)
+          .click('#TopNav .rightNav .dropDown.user .dropDownTitle img')
+          .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
+          .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
+          .click('#TopNav .rightNav .user .dropDownContent li:last-of-type a')
+          .waitForElementPresent('#Home #Logo', timeout)
+          .expect.element('#TopNav .rightNav a.log-in').text.to.match(/[lL][oO][gG] [Ii][nN]/)
+        client.end()
       })
   },
   'Can reset password': client => {
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementPresent('#SignIn', timeout)
-      .click('#SignIn a.forgot')
+      .waitForElementPresent('#Auth', timeout)
+      .click('#Auth  .forgot div:last-of-type a')
       .waitForElementPresent('#ForgotPassword', timeout)
       .setValue('#ForgotPassword input[type=text]', email.toUpperCase())
       .submitForm('#ForgotPassword')
@@ -64,8 +71,8 @@ module.exports = {
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementPresent('#SignIn', timeout)
-      .click('#SignIn a.forgot')
+      .waitForElementPresent('#Auth', timeout)
+      .click('#Auth  .forgot div:last-of-type a')
       .waitForElementPresent('#ForgotPassword', timeout)
       .setValue('#ForgotPassword input[type=text]', 'foo' + email.toUpperCase())
       .submitForm('#ForgotPassword')
@@ -79,8 +86,6 @@ module.exports = {
     client
       .url(client.launch_url)
       .click('#TopNav a.log-in')
-      .waitForElementPresent('#SignIn', timeout)
-      .click('#SignIn div.forgot div:last-of-type a')
       .waitForElementPresent('#Auth form', timeout)
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)

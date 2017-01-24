@@ -36,3 +36,4 @@ npm-debug.log
 reports
 config/local.yaml
 dist
+docker-compose.tmp.yml

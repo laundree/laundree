@@ -1,5 +1,5 @@
 const faker = require('faker')
-const {timeout} = require('../../nightwatch_utils.js')
+const {timeout, signIn} = require('../../nightwatch_utils.js')
 const {UserHandler} = require('../../../handlers')
 
 let email, password, user, laundry
@@ -26,13 +26,8 @@ module.exports = {
       .then(() => done(), err => console.log(err))
   },
   'Can not access forbidden page': client => {
-    client
-      .url(client.launch_url)
-      .click('#TopNav a.log-in')
-      .waitForElementPresent('#SignIn', timeout)
-      .setValue('#SignIn label:nth-of-type(1) input', email)
-      .setValue('#SignIn label:nth-of-type(2) input', password)
-      .submitForm('#SignIn')
+    signIn(client
+      .url(client.launch_url), email, password)
       .waitForElementVisible('#LeftNav', timeout * 5)
       .url(`${client.launch_url}laundries/${laundry.model.id}/users`)
       .waitForElementVisible('#NotFound', timeout)

@@ -3,12 +3,28 @@
  */
 
 const express = require('express')
-const router = express.Router()
+const path = require('path')
+const config = require('config')
+const setupSass = require('node-sass-middleware')
 
-function fetchRoutes () {
-  router.use('/logout', require('./logout'))
+function fetchPseudoStaticRoutes () {
+  const router = express.Router()
   router.use('/javascripts', require('./javascripts'))
   router.use('/identicon', require('./identicon'))
+  router.use(setupSass({
+    src: path.join(__dirname, '..', 'stylesheets'),
+    dest: path.join(__dirname, '..', 'dist', 'stylesheets'),
+    prefix: '/stylesheets',
+    outputStyle: config.get('sass.outputStyle'),
+    indentedSyntax: true,
+    sourceMap: true
+  }))
+  return router
+}
+
+function fetchRoutes () {
+  const router = express.Router()
+  router.use('/logout', require('./logout'))
   router.use('/auth', require('./auth'))
   router.use('/calendar', require('./calendar'))
   router.use('/s', require('./invite-code'))
@@ -20,4 +36,4 @@ function fetchRoutes () {
   })
 }
 
-module.exports = {fetchRoutes}
+module.exports = {fetchPseudoStaticRoutes, fetchRoutes}

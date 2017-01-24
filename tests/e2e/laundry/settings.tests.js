@@ -1,17 +1,12 @@
 const faker = require('faker')
-const {timeout} = require('../../nightwatch_utils.js')
+const {timeout, signIn} = require('../../nightwatch_utils.js')
 const {UserHandler} = require('../../../handlers')
 
 let email, password, laundry
 
 function setup (client) {
-  return client
-    .url(client.launch_url)
-    .click('#TopNav a.log-in')
-    .waitForElementPresent('#SignIn', timeout)
-    .setValue('#SignIn label:nth-of-type(1) input', email)
-    .setValue('#SignIn label:nth-of-type(2) input', password)
-    .submitForm('#SignIn')
+  return signIn(client
+    .url(client.launch_url), email, password)
     .waitForElementVisible('#LeftNav', timeout * 5)
     .click('#LeftNav ul:last-of-type li:first-of-type')
     .waitForElementPresent('#LaundrySettingsNameOrPlace', timeout)

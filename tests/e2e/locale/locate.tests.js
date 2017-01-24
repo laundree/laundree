@@ -25,7 +25,7 @@ module.exports = {
       .waitForElementVisible('#AuthNav .language .dropDownContent', timeout)
       .click('#AuthNav .language .dropDownContent li:nth-of-type(2) a')
       .waitForElementVisible('#Auth h1', timeout)
-      .expect.element('#Auth h1').text.to.contain('Log ind')
+      .expect.element('#Auth h1').text.to.contain('Opret en konto')
     client.end()
   }
 }
