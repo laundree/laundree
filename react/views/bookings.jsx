@@ -34,7 +34,7 @@ class Booking extends React.Component {
       />
       <div className='machineName'>
         <Link
-          to={`/laundries/${this.props.currentLaundry}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
+          to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
           {this.props.machine.name}
         </Link>
       </div>
@@ -45,9 +45,11 @@ class Booking extends React.Component {
           </svg>
           <FormattedDate
             weekday={today ? undefined : 'long'}
+            timeZone={this.props.laundry.timezone}
             month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
             value={booking.from}/>
           <FormattedDate
+            timeZone={this.props.laundry.timezone}
             weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
             day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric'
             value={booking.to}/>
@@ -62,7 +64,7 @@ class Booking extends React.Component {
 }
 
 Booking.propTypes = {
-  currentLaundry: React.PropTypes.string.isRequired,
+  laundry: React.PropTypes.object.isRequired,
   machine: React.PropTypes.object.isRequired,
   booking: React.PropTypes.shape({
     id: React.PropTypes.Sting,
@@ -100,15 +102,16 @@ class Bookings extends React.Component {
     }
     return <li key={booking.id}>
       <Booking
-        currentLaundry={this.props.currentLaundry} machine={this.props.machines[booking.machine]}
+        laundry={this.props.laundry}
+        machine={this.props.machines[booking.machine]}
         booking={booking}/>
     </li>
   }
 
   load () {
     return Promise.all([
-      sdk.listBookingsForUser(this.props.currentLaundry, this.props.user.id, {to: {$gte: new Date()}}),
-      sdk.listMachines(this.props.currentLaundry)
+      sdk.listBookingsForUser(this.props.laundry.id, this.props.user.id, {to: {$gte: new Date()}}),
+      sdk.listMachines(this.props.laundry.id)
     ])
   }
 
@@ -129,7 +132,7 @@ class Bookings extends React.Component {
 }
 
 Bookings.propTypes = {
-  currentLaundry: React.PropTypes.string.isRequired,
+  laundry: React.PropTypes.object.isRequired,
   user: React.PropTypes.object.isRequired,
   userBookings: React.PropTypes.arrayOf(React.PropTypes.string),
   bookings: React.PropTypes.object.isRequired,
