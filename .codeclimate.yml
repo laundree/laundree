@@ -15,6 +15,13 @@ engines:
     config:
       languages:
       - javascript
+    exclude_fingerprints:
+    - e1377f34b7210e2f55283af9c9a5f6ae
+    - 6792a0c524bfbd3e2471bd00e3ea2ed3
+    - c21d9ae0659db3a9e1d61b25517ee485
+    - 3207099adbf565a3b8fbbf4822bfdd05
+    - bfcdabae68ca0ef85926f08dea2ba61b
+    - 8fd53c6603eda28050fa4a238343b7bc
   eslint:
     enabled: false
   fixme:

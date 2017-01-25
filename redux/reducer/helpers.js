@@ -20,26 +20,38 @@ function arrayToObject (array) {
  */
 function setupCollection (addActions, deleteActions = [], listActions = [], mappers = {}) {
   const actionMap = {}
-  addActions.forEach((action) => {
-    const mapper = mappers[action] || ((p) => p)
+  addActions.forEach(action => {
+    const mapper = mappers[action] || (p => p)
     actionMap[action] = (state, {payload}) => {
       payload = mapper(payload)
       return object.assignImmutable(state, payload.id, payload)
     }
   })
-  deleteActions.forEach((deleteAction) => {
-    const mapper = mappers[deleteAction] || ((p) => p)
+  deleteActions.forEach(deleteAction => {
+    const mapper = mappers[deleteAction] || (p => p)
     actionMap[deleteAction] = (state, {payload}) => Object.keys(state).reduce((s, key) => {
       if (key === mapper(payload)) return s
       s[key] = state[key]
       return s
     }, {})
   })
-  listActions.forEach((listAction) => {
-    const mapper = mappers[listAction] || ((p) => p)
+  listActions.forEach(listAction => {
+    const mapper = mappers[listAction] || (p => p)
     actionMap[listAction] = (state, {payload}) => Object.assign({}, state, arrayToObject(mapper(payload)))
   })
   return handleActions(actionMap, {})
 }
 
-module.exports = {setupCollection}
+function setupList (listAction) {
+  const actionMap = {}
+  actionMap[listAction] = (state, {payload}) => payload.map(({id}) => id)
+  return handleActions(actionMap, [])
+}
+
+function setupSingleton (type, defaultValue = null, map = v => v) {
+  const actionMap = {}
+  actionMap[type] = (state, {payload}) => map(payload, state)
+  return handleActions(actionMap, defaultValue)
+}
+
+module.exports = {setupCollection, setupList, setupSingleton}
