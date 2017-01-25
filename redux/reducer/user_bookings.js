@@ -22,7 +22,7 @@ actionMap[actions.types.CREATE_BOOKING] = (state, {payload: {id, owner}}) => {
 actionMap[actions.types.DELETE_BOOKING] = (state, action) => {
   if (!state) return null
   const {user, bookings} = state
-  return {user, bookings: bookings.filter((id) => id !== action.payload)}
+  return {user, bookings: bookings.filter(id => id !== action.payload)}
 }
 
 module.exports = handleActions(actionMap, null)
