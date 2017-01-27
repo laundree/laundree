@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const Machines = require('../views').Machines
+const Machines = require('../views/Machines')
 
 const mapStateToProps = (store, {params: {laundryId}}) => {
   return {

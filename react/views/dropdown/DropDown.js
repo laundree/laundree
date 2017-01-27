@@ -1,46 +1,6 @@
 const React = require('react')
-
-const DropDownTitle = (props) => <div className='dropDownTitle' onClick={props.onClick}>{props.children}</div>
-
-DropDownTitle.propTypes = {
-  onClick: React.PropTypes.func,
-  children: React.PropTypes.any
-}
-
-const DropDownContent = (props) => <div
-  className={'dropDownContent ' + (props.className ? props.className : '')}>{props.children}</div>
-
-DropDownContent.propTypes = {
-  className: React.PropTypes.string,
-  children: React.PropTypes.any
-}
-
-class DropDownCloser extends React.Component {
-  constructor (props) {
-    super(props)
-    this.generateOnClick = (fn) => (evt) => {
-      if (fn) fn(evt)
-      this.context.closeDropDown()
-    }
-  }
-
-  get child () {
-    return React.Children.only(this.props.children)
-  }
-
-  render () {
-    const child = this.child
-    return React.cloneElement(this.child, {onClick: this.generateOnClick(child.props.onClick)})
-  }
-}
-
-DropDownCloser.contextTypes = {
-  closeDropDown: React.PropTypes.func.isRequired
-}
-
-DropDownCloser.propTypes = {
-  children: React.PropTypes.any
-}
+const DropDownTitle = require('./DropDownTitle')
+const DropDownContent = require('./DropDownContent')
 
 class DropDown extends React.Component {
 
@@ -113,4 +73,4 @@ DropDown.propTypes = {
   children: React.PropTypes.arrayOf(React.PropTypes.element).isRequired
 }
 
-module.exports = {DropDown, DropDownTitle, DropDownContent, DropDownCloser}
+module.exports = DropDown

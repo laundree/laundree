@@ -1,11 +1,11 @@
 const React = require('react')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
-const AdminPanel = require('../containers/admin_panel')
+const AdminPanel = require('../containers/AdminPanel')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const {Input, Label, Submit, DocumentTitle} = require('./intl')
-const LocationSelector = require('./LocationSelector.jsx')
+const LocationSelector = require('./LocationSelector')
 
 class CreateLaundry extends ValueUpdater {
 

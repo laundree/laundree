@@ -2,8 +2,8 @@
  * Created by budde on 05/06/16.
  */
 const React = require('react')
-const TopNav = require('./topnav.jsx')
-const Footer = require('./footer.jsx')
+const TopNav = require('./TopNav')
+const Footer = require('./Footer')
 const {DocumentTitle} = require('./intl')
 
 class App extends React.Component {

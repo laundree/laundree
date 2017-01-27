@@ -4,7 +4,7 @@ const {ValueUpdater} = require('./helpers')
 const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
-const LocationSelector = require('./LocationSelector.jsx')
+const LocationSelector = require('./LocationSelector')
 
 class LaundrySettingsForm extends ValueUpdater {
 

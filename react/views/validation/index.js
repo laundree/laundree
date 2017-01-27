@@ -1,4 +1,4 @@
 module.exports = {
-  ValidationForm: require('./form.jsx'),
-  ValidationElement: require('./element.jsx')
+  ValidationForm: require('./ValidationForm'),
+  ValidationElement: require('./ValidationElement')
 }

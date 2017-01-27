@@ -1,7 +1,7 @@
 const React = require('react')
 const {Link} = require('react-router')
 const {FormattedMessage} = require('react-intl')
-const Loader = require('./loader.jsx')
+const Loader = require('./Loader')
 const sdk = require('../../client/sdk')
 
 class LeftNav extends React.Component {

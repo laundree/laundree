@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const {HomeLoggedIn} = require('../views')
+const HomeLoggedIn = require('../views/HomeLoggedIn')
 
 const mapStateToProps = ({users, currentUser, config: {googleApiKey, locale}}) => {
   return {user: users[currentUser], googleApiKey, locale}

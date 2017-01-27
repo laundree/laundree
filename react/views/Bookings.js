@@ -5,7 +5,7 @@ const {Modal, DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const moment = require('moment')
-const Loader = require('./loader.jsx')
+const Loader = require('./Loader')
 
 class Booking extends React.Component {
 

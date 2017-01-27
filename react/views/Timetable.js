@@ -3,15 +3,15 @@
  */
 const React = require('react')
 const {DocumentTitle} = require('./intl')
-const TimetableTables = require('./timetable_tables.jsx')
-const TimetableHeaders = require('./timetable_headers.jsx')
+const TimetableTables = require('./TimetableTables')
+const TimetableHeaders = require('./TimetableHeaders')
 const {Link} = require('react-router')
 const {FormattedDate, FormattedMessage} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
 const moment = require('moment-timezone')
 const {BaseModal} = require('./modal')
-const Loader = require('./loader.jsx')
+const Loader = require('./Loader')
 
 class BookingInfo extends React.Component {
 
@@ -109,13 +109,14 @@ class Timetable extends React.Component {
   constructor (props) {
     super(props)
     this.state = {numDays: 0, offset: 0, hoverColumn: -1, activeBooking: null}
-    this.handleResize = () => this.setState({numDays: this.numDays})
-    this.hoverColumn = (hoverColumn) => this.setState({hoverColumn})
-    this.onActiveChange = (bookingId) => this.setState({activeBooking: bookingId})
+  }
+
+  handleResize () {
+    this.setState({numDays: this.numDays})
   }
 
   componentDidMount () {
-    window.addEventListener('resize', this.handleResize)
+    window.addEventListener('resize', () => this.handleResize())
     const numDays = this.numDays
     this.setState({numDays})
   }
@@ -131,7 +132,7 @@ class Timetable extends React.Component {
   }
 
   componentWillUnmount () {
-    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('resize', () => this.handleResize())
   }
 
   get numDays () {
@@ -166,15 +167,16 @@ class Timetable extends React.Component {
         hoverColumn={this.state.hoverColumn}
         laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
       <TimetableTables
-        onActiveChange={this.onActiveChange}
+        onActiveChange={activeBooking => this.setState({activeBooking})}
         currentUser={this.props.currentUser}
         activeBooking={this.state.activeBooking}
         offsetDate={this.offsetDate}
-        onHoverColumn={this.hoverColumn}
+        onHoverColumn={hoverColumn => this.setState({hoverColumn})}
+        hoverColumn={this.state.hoverColumn}
         bookings={this.props.bookings}
         laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
       <BookingInfo
-        onActiveChange={this.onActiveChange}
+        onActiveChange={activeBooking => this.setState({activeBooking})}
         currentUser={this.props.currentUser}
         users={this.props.users}
         laundry={this.props.laundry}

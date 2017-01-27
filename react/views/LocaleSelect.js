@@ -1,5 +1,5 @@
 const React = require('react')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
 const locales = require('../../locales')
 
 const LocaleSelect = props => <DropDown className='language'>

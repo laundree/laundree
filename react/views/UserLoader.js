@@ -1,5 +1,5 @@
 const React = require('react')
-const Loader = require('./loader.jsx')
+const Loader = require('./Loader')
 const sdk = require('../../client/sdk')
 
 function hasLaundries (laundries, user) {

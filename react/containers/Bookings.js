@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const Bookings = require('../views').Bookings
+const Bookings = require('../views/Bookings')
 
 const mapStateToProps = ({
   users, laundries, machines,

@@ -1,2 +1,1 @@
-
-module.exports = require('./privacy.jsx')
+module.exports = require('./Privacy')

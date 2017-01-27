@@ -1,5 +1,5 @@
 const React = require('react')
-const ContactForm = require('./contact_form.jsx')
+const ContactForm = require('./ContactForm')
 const {DocumentTitle} = require('./intl')
 const {FormattedMessage, FormattedHTMLMessage} = require('react-intl')
 

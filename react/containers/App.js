@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const {App} = require('../views')
+const App = require('../views/App')
 
 const mapStateToProps = ({users, currentUser, laundries, config}, {location, params: {laundryId}}) => {
   return {

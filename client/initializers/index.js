@@ -3,5 +3,5 @@
  */
 module.exports = {
   InitializerLibrary: require('./initializer_library'),
-  AppInitializer: require('./app.jsx')
+  AppInitializer: require('./app')
 }

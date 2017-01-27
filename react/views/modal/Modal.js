@@ -3,7 +3,7 @@
  */
 
 const React = require('react')
-const BaseModal = require('./base_modal.jsx')
+const BaseModal = require('./BaseModal')
 
 class Modal extends BaseModal {
   renderContent () {

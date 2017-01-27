@@ -3,8 +3,8 @@
  */
 const React = require('react')
 const {Link} = require('react-router')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
-const LocaleSelect = require('./locale_select.jsx')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
+const LocaleSelect = require('./LocaleSelect')
 const {FormattedMessage} = require('react-intl')
 
 class TopNav extends React.Component {

@@ -9,7 +9,7 @@ const {USER_NOT_VERIFIED} = require('../../utils/flash')
 const {ValueUpdater} = require('./helpers')
 const {FormattedMessage} = require('react-intl')
 
-class LogIn extends ValueUpdater {
+class Login extends ValueUpdater {
 
   handleNotion () {
     if (!this.props.flash.length) return null
@@ -123,7 +123,7 @@ class LogIn extends ValueUpdater {
   }
 }
 
-LogIn.propTypes = {
+Login.propTypes = {
   to: React.PropTypes.string,
   flash: React.PropTypes.arrayOf(React.PropTypes.shape({
     type: React.PropTypes.string.isRequired,
@@ -131,4 +131,4 @@ LogIn.propTypes = {
   })).isRequired
 }
 
-module.exports = LogIn
+module.exports = Login

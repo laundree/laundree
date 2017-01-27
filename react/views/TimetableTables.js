@@ -10,6 +10,18 @@ function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
 }
 
+/**
+ *
+ * @param parent
+ * @param child
+ * @return {boolean}
+ */
+function isChildOf (parent, child) {
+  if (!child.parentNode) return false
+  if (child.parentNode === parent) return true
+  return isChildOf(parent, child.parentNode)
+}
+
 class TimetableTable extends React.Component {
 
   constructor (props) {
@@ -26,14 +38,17 @@ class TimetableTable extends React.Component {
       key={key}
       className={(tooLate ? 'too_late' : '') + (this.props.hoverRow === key ? ' hover' : '')}>
       {machines
-        .map(m => {
-          const isBooked = this.isBooked(m.id, key)
-          if (!isBooked || m.broken) {
-            return <td key={m.id} className={m.broken ? 'broken' : ''}/>
+        .map((m, i) => {
+          if (m.broken) {
+            return <td key={m.id} className='broken'/>
           }
-          return <td key={m.id}>
-            {this.createBookingLink(isBooked)}
-          </td>
+          const isBooked = this.isBooked(m.id, key)
+          if (isBooked) {
+            return <td key={m.id}>
+              {this.createBookingLink(isBooked)}
+            </td>
+          }
+          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''}/>
         })}
     </tr>
   }
@@ -57,10 +72,19 @@ class TimetableTable extends React.Component {
 
   componentDidMount () {
     this._interval = setInterval(() => this.tick(), 60 * 1000)
+    this.bodyListener = evt => {
+      if (!this.state.mouseDownStart) return
+      if (!this.tableRef) return
+      if (isChildOf(this.tableRef, evt.target)) return
+      this.setState({mouseDownStart: null})
+    }
+    this.bodyRef = window.document.querySelector('body')
+    this.bodyRef.addEventListener('mouseup', this.bodyListener)
   }
 
   componentWillUnmount () {
     clearInterval(this._interval)
+    this.bodyRef.removeEventListener('mouseover', this.bodyListener)
   }
 
   componentWillReceiveProps ({bookings}) {
@@ -94,8 +118,21 @@ class TimetableTable extends React.Component {
     ref.scrollIntoView()
   }
 
-  isBooked (x, y) {
-    return this.state.bookings[`${x}:${y}`]
+  isBooked (machine, row) {
+    return this.state.bookings[`${machine}:${row}`]
+  }
+
+  isSelecting (x, y) {
+    if (!this.state.mouseDownStart || this.props.hoverRow < 0 || this.props.hoverColumn < 0) {
+      return false
+    }
+    const {x: mouseX, y: mouseY} = this.state.mouseDownStart
+    const hoverX = this.props.hoverColumn
+    const hoverY = this.props.hoverRow
+    return x >= Math.min(mouseX, hoverX) &&
+      y >= Math.min(mouseY, hoverY) &&
+      y <= Math.max(mouseY, hoverY) &&
+      x <= Math.max(mouseX, hoverX)
   }
 
   isActive (bookingId) {
@@ -121,20 +158,21 @@ class TimetableTable extends React.Component {
     switch (event.target.tagName.toLowerCase()) {
       case 'td':
         const td = event.target
-        this._mouseDownStart = this.tdToTablePos(td)
+        this.setState({mouseDownStart: this.tdToTablePos(td)})
         break
       default:
-        this._mouseDownStart = undefined
+        this.setState({mouseDownStart: null})
     }
   }
 
   handleMouseUp (event) {
-    if (!this._mouseDownStart) return
+    if (!this.state.mouseDownStart) return
     switch (event.target.tagName.toLowerCase()) {
       case 'td':
         const td = event.target
         const to = this.tdToTablePos(td)
-        this.book(this._mouseDownStart, to)
+        this.book(this.state.mouseDownStart, to)
+        this.setState({mouseDownStart: null})
     }
   }
 
@@ -175,8 +213,12 @@ class TimetableTable extends React.Component {
     }
   }
 
-  handleMouseOut () {
+  reset () {
     this.hover({x: -1, y: -1})
+  }
+
+  handleMouseOut () {
+    this.reset()
   }
 
   hover ({x, y}) {
@@ -194,7 +236,7 @@ class TimetableTable extends React.Component {
         this.hoverTd(event.target)
         break
       default:
-        this.handleMouseOut()
+        this.reset()
     }
   }
 
@@ -213,16 +255,20 @@ class TimetableTable extends React.Component {
     const time = now.format('H:mm')
     const tooLate = now.clone().add(10, 'm')
     const tooLateKey = this.calculateTooLateKey(tooLate)
-    const refPuller = (ref) => {
-      this.ref = ref
-    }
-    return <div className='overlay_container' ref={refPuller}>
+    return <div
+      className='overlay_container'
+      ref={ref => {
+        this.ref = ref
+      }}>
       <div className='overlay'>
         <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}/>
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
           ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
       </div>
       <table
+        ref={ref => {
+          this.tableRef = ref
+        }}
         onMouseOver={event => this.handleMouseOver(event)}
         onMouseOut={event => this.handleMouseOut(event)}
         onMouseDown={event => this.handleMouseDown(event)}
@@ -247,6 +293,7 @@ TimetableTable.propTypes = {
   date: React.PropTypes.object.isRequired,
   onHoverRow: React.PropTypes.func.isRequired,
   hoverRow: React.PropTypes.number.isRequired,
+  hoverColumn: React.PropTypes.number.isRequired,
   times: React.PropTypes.arrayOf(React.PropTypes.number).isRequired
 }
 
@@ -255,7 +302,6 @@ class TimetableTables extends React.Component {
   constructor (props) {
     super(props)
     this.state = {hoverRow: -1}
-    this.hoverRowHandler = (row) => this.setState({hoverRow: row})
   }
 
   componentWillReceiveProps ({dates, laundry: {id}}) {
@@ -273,10 +319,6 @@ class TimetableTables extends React.Component {
       month: lastDateExclusive.month(),
       day: lastDateExclusive.date()
     })
-  }
-
-  hoverColumnWrapper (i) {
-    return (j) => this.props.onHoverColumn(j < 0 ? -1 : (i * this.props.laundry.machines.length + j))
   }
 
   get times () {
@@ -304,9 +346,12 @@ class TimetableTables extends React.Component {
           onActiveChange={this.props.onActiveChange}
           activeBooking={this.props.activeBooking}
           hoverRow={this.state.hoverRow}
-          onHoverRow={this.hoverRowHandler}
-          onHoverColumn={this.hoverColumnWrapper(i)}
-          date={date} machines={this.props.machines} laundry={this.props.laundry}
+          hoverColumn={this.props.hoverColumn - (this.props.laundry.machines.length * i)}
+          onHoverRow={row => this.setState({hoverRow: row})}
+          onHoverColumn={j => this.props.onHoverColumn(j < 0 ? -1 : (i * this.props.laundry.machines.length + j))}
+          date={date}
+          machines={this.props.machines}
+          laundry={this.props.laundry}
           bookings={this.props.bookings}
           times={times}
           key={date.format('YYYY-MM-DD')}/>)}
@@ -322,6 +367,7 @@ TimetableTables.propTypes = {
   activeBooking: React.PropTypes.string,
   offsetDate: React.PropTypes.string,
   onHoverColumn: React.PropTypes.func.isRequired,
+  hoverColumn: React.PropTypes.number.isRequired,
   dates: React.PropTypes.array.isRequired,
   laundry: React.PropTypes.object.isRequired,
   machines: React.PropTypes.object.isRequired,

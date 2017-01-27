@@ -3,6 +3,6 @@
  */
 
 module.exports = {
-  BaseModal: require('./base_modal.jsx'),
-  Modal: require('./modal.jsx')
+  BaseModal: require('./BaseModal'),
+  Modal: require('./Modal')
 }

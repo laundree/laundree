@@ -1,5 +1,5 @@
 const connect = require('react-redux').connect
-const {Support} = require('../views')
+const Support = require('../views/Support')
 
 const mapStateToProps = ({currentUser, users}) => {
   return {currentUser, users}

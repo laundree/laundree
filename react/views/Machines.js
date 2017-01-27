@@ -1,10 +1,10 @@
 const React = require('react')
 const {ValidationElement, ValidationForm} = require('./validation')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
 const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
-const Loader = require('./loader.jsx')
+const Loader = require('./Loader')
 
 class MachineDropdown extends React.Component {
 

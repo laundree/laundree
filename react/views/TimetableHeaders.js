@@ -6,7 +6,7 @@ const React = require('react')
 const {FormattedDate, FormattedMessage} = require('react-intl')
 const string = require('../../utils/string')
 const moment = require('moment-timezone')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown.jsx')
+const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
 const {Link} = require('react-router')
 
 const TimetableHeader = (props) => {

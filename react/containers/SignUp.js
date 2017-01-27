@@ -3,7 +3,7 @@
  */
 
 const connect = require('react-redux').connect
-const {SignUp} = require('../views')
+const SignUp = require('../views/SignUp')
 
 const mapStateToProps = ({location}) => ({to: location && location.query && location.query.to})
 
