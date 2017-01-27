@@ -3,7 +3,7 @@ exclude_paths:
 - "tests"
 - 'templates'
 - 'gulpfile.js'
-- '**.jsx'
+- 'react/**.js'
 - '**/index.js'
 engines:
   scss-lint:
