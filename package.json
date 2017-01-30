@@ -94,7 +94,7 @@
     "selenium-standalone": "^5.8.0",
     "sinon": "^1.17.6",
     "sinon-chai": "^2.8.0",
-    "supertest": "^2.0.0",
+    "supertest": "^3.0.0",
     "supertest-as-promised": "^4.0.0",
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0"
