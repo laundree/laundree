@@ -513,6 +513,46 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /tokens/email-password:
+    x-swagger-router-controller: tokens
+    post:
+      operationId: createTokenFromEmailPassword
+      tags:
+        - Tokens
+      parameters:
+        - name: body
+          in: body
+          schema:
+            required:
+              - name
+              - email
+              - password
+            properties:
+              name:
+                $ref: "#/definitions/name"
+              email:
+                type: string
+                format: email
+              password:
+                $ref: "#/definitions/password"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Token"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        "409":
+          description: Token conflict
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /tokens/{tokenId}:
     x-swagger-router-controller: tokens
     get:

@@ -57,6 +57,21 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Finds a user from verified email and valid password
+   * @param email
+   * @param password
+   * @returns {Promise.<UserHandler>}
+   */
+  static findFromVerifiedEmailAndVerifyPassword (email, password) {
+    return UserHandler.findFromEmail(email)
+      .then(user => {
+        if (!user) return
+        if (!user.isVerified(email)) return
+        return user.verifyPassword(password)
+          .then(result => result ? user : undefined)
+      })
+  }
+  /**
    * Will eventually add profile if a profile with the same provider isn't present, or
    * replace the existing profile if it is.
    *
@@ -313,7 +328,7 @@ class UserHandler extends Handler {
   }
 
   isVerified (email) {
-    return this.model.verifiedEmails.indexOf(email) >= 0
+    return this.model.verifiedEmails.indexOf(email.toLowerCase()) >= 0
   }
 
   /**
@@ -337,6 +352,12 @@ class UserHandler extends Handler {
       })
   }
 
+  /**
+   * @param {String} displayName
+   * @param {String} email
+   * @param {String} password
+   * @returns {Promise.<UserHandler>}
+   */
   static createUserWithPassword (displayName, email, password) {
     displayName = displayName.split(' ').filter((name) => name.length).join(' ')
 

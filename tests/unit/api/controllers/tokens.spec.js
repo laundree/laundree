@@ -5,8 +5,9 @@ chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {TokenHandler} = require('../../../../handlers')
+const {TokenHandler, UserHandler} = require('../../../../handlers')
 const dbUtils = require('../../../db_utils')
+const faker = require('faker')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
@@ -130,6 +131,42 @@ describe('controllers', function () {
                 })
               })
             })))
+    })
+    describe('POST /api/tokens/email-password', () => {
+      let user, token
+      const name = faker.name.findName()
+      const email = faker.internet.email()
+      const password = faker.internet.password()
+      const tokenName = 'token1'
+      beforeEach(() => UserHandler.createUserWithPassword(name, email, password).then(u => {
+        user = u
+        return Promise.all([
+          user.generateVerifyEmailToken(email).then(token => user.verifyEmail(email, token.secret)),
+          user.generateAuthToken(tokenName).then(t => {
+            token = t
+          })
+        ])
+      }))
+      it('should fail with wrong email', () => request(app)
+        .post('/api/tokens/email-password')
+        .send({email: 'nonExistingEmail@gmail.com', password, name: 'New Token 1'})
+        .expect(403))
+      it('should fail with wrong password', () => request(app)
+        .post('/api/tokens/email-password')
+        .send({email, password: password + 'lol', name: 'New Token 1'})
+        .expect(403))
+      it('should fail existing token', () => request(app)
+        .post('/api/tokens/email-password')
+        .send({email, password: password, name: tokenName})
+        .expect('Location', token.restUrl)
+        .expect(409))
+      it('should succeed', () => request(app)
+        .post('/api/tokens/email-password')
+        .send({email, password: password, name: 'Token 1'})
+        .expect(200)
+        .then(({body}) => TokenHandler.findFromId(body.id)
+          .then(t => t.toRest())
+          .then(t => Object.assign(t, {secret: body.secret}).should.deep.equal(body))))
     })
     describe('GET /tokens/{id}', () => {
       it('should fail on not authenticated', () =>

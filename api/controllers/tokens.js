@@ -1,7 +1,7 @@
 /**
  * Created by budde on 02/06/16.
  */
-const {TokenHandler} = require('../../handlers')
+const {TokenHandler, UserHandler} = require('../../handlers')
 const {api} = require('../../utils')
 
 function listTokens (req, res) {
@@ -26,16 +26,18 @@ function listTokens (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function _tokenExists (name, user) {
+  return TokenHandler.find({name, owner: user.model._id})
+    .then(([token]) => token)
+}
+
 function createToken (req, res) {
   const name = req.swagger.params.body.value.name.trim()
-  TokenHandler.find({name: name, owner: req.user.model._id})
-    .then(([token]) => {
+  _tokenExists(name, req.user)
+    .then(token => {
       if (token) return api.returnError(res, 409, 'Token already exists', {Location: token.restUrl})
       return req.user.generateAuthToken(name)
-        .then(token => api.returnSuccess(res, token.toRest().then(result => {
-          result.secret = token.secret
-          return result
-        })))
+        .then(token => api.returnSuccess(res, token.toSecretRest()))
     })
     .catch(api.generateErrorHandler(res))
 }
@@ -50,9 +52,24 @@ function deleteToken (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function createTokenFromEmailPassword (req, res) {
+  const {email, password, name} = req.swagger.params.body.value
+  return UserHandler.findFromVerifiedEmailAndVerifyPassword(email, password)
+    .then(user => {
+      if (!user) return api.returnError(res, 403, 'Unauthorized')
+      return _tokenExists(name, user)
+        .then(token => {
+          if (token) return api.returnError(res, 409, 'Token already exists', {Location: token.restUrl})
+          return user.generateAuthToken(name).then(token => api.returnSuccess(res, token.toSecretRest()))
+        })
+    })
+    .catch(api.generateErrorHandler(res))
+}
+
 module.exports = {
-  listTokens: listTokens,
-  createToken: createToken,
-  deleteToken: deleteToken,
-  fetchToken: fetchToken
+  createTokenFromEmailPassword,
+  listTokens,
+  createToken,
+  deleteToken,
+  fetchToken
 }
