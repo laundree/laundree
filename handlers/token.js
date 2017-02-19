@@ -91,7 +91,14 @@ class TokenHandler extends Handler {
         href: this.restUrl
       }))
   }
-
+  toSecretRest () {
+    return this
+      .toRest()
+      .then(o => {
+        o.secret = this.secret
+        return o
+      })
+  }
   toRestSummary () {
     return {id: this.model.id, name: this.model.name, href: this.restUrl}
   }

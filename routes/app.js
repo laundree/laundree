@@ -17,7 +17,7 @@ const locales = require('../locales')
 const config = require('config')
 
 router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'), '', req.locale, config.get('google.clientApiKey'), req.session.returningUser)
+  createInitialStore(req.user, req.flash('success'), req.flash('error'), req.locale, config.get('google.clientApiKey'), req.session.returningUser)
     .then(store => {
       match({routes: routeGenerator(store), location: req.originalUrl}, (error, redirectLocation, renderProps) => {
         if (error) return next(error)
@@ -31,13 +31,14 @@ router.use((req, res, next) => {
           const pattern = renderProps.routes.map(r => r.path).join('/').replace('//', '/')
           opbeat.setTransactionName(`${req.method} ${pattern}`)
         }
-        const locale = store.getState().config.locale
+        const locale = req.locale
         const html = renderToString(
           <IntlProvider locale={locale} messages={locales[locale].messages}>
             <Provider store={store}>
               {React.createElement(RouterContext, Object.assign({}, renderProps))}
             </Provider>
           </IntlProvider>)
+
         const title = DocumentTitle.rewind()
         res.renderHb('app.hbs', {
           html,
