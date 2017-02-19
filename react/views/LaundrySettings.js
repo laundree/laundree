@@ -5,6 +5,7 @@ const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const LocationSelector = require('./LocationSelector')
+const Switch = require('./Switch')
 
 class LaundrySettingsForm extends ValueUpdater {
   constructor (props) {
@@ -177,27 +178,6 @@ class LeaveLaundry extends React.Component {
 LeaveLaundry.propTypes = {
   laundry: React.PropTypes.object.isRequired,
   user: React.PropTypes.object.isRequired
-}
-class Switch extends React.Component {
-  constructor (props) {
-    super(props)
-    this.onClick = () => this.props.onChange(!this.isOn)
-  }
-
-  get isOn () {
-    return Boolean(this.props.on)
-  }
-
-  render () {
-    return <div
-      onClick={this.onClick}
-      className={'switch ' + (this.isOn ? 'on' : 'off')}/>
-  }
-}
-
-Switch.propTypes = {
-  on: React.PropTypes.bool,
-  onChange: React.PropTypes.func.isRequired
 }
 
 function timeStringToMinutes (time) {

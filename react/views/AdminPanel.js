@@ -3,6 +3,7 @@ const {DocumentTitle} = require('./intl')
 const {Link} = require('react-router')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
+const Switch = require('./Switch')
 
 class Stats extends React.Component {
   componentDidMount () {
@@ -161,6 +162,10 @@ class QueryList extends React.Component {
             type='text' placeholder='Filter' value={this.state.q || ''}
             onChange={this.onFilterUpdate}/>
         </label>
+        <div className='demoSwitch'>
+          <Switch onChange={demoOn => this.setState({demoOn})} on={this.state.demoOn}/>
+          <FormattedMessage id='admin-panel.show-demo'/>
+        </div>
       </div>
       {this.elements.length
         ? <ul className='bigList'>
@@ -243,6 +248,7 @@ class UserList extends QueryList {
   render () {
     return <section id='UserList'>
       <FormattedMessage id='admin-panel.users' tagName='h2'/>
+
       {this.renderList()}
     </section>
   }
