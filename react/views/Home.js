@@ -46,7 +46,7 @@ const Home = () => <DocumentTitle title='document-title.home'>
             <use xlinkHref='#MediaLogo'/>
           </svg>
         </a>
-        <FormattedMessage id='home.teaser' tagName='h2'/>
+        <FormattedMessage id='home.teaser' tagName='h2' values={{nl: <br />}}/>
         <div className='credit'>
           <FormattedMessage id='home.clip.credit' values={{
             link: <a href='http://www.beachfrontbroll.com' target='_blank'>
