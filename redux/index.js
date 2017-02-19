@@ -2,10 +2,8 @@
  * Created by budde on 28/05/16.
  */
 const {createStore} = require('redux')
-const reducer = require('./reducer')
-const actions = require('./actions')
-
-const {LaundryHandler, UserHandler} = require('../handlers')
+const actions = require('../redux/actions')
+const reducers = require('../redux/reducers')
 
 function mapFlash (flashArray, type) {
   return flashArray
@@ -13,26 +11,8 @@ function mapFlash (flashArray, type) {
     .map((flash) => actions.flash(flash))
 }
 
-function fetchLaundries (currentUser, url) {
-  if (!currentUser.isAdmin) return currentUser.fetchLaundries().then(actions.listLaundries)
-  return fetchInstance(url, /\/laundries\/([^/]+)/, LaundryHandler)
-    .then(laundry => laundry ? [actions.listLaundries([laundry])] : [])
-}
-
-function fetchUsers (currentUser, url) {
-  if (!currentUser.isAdmin) return Promise.resolve([])
-  return fetchInstance(url, /\/users\/([^/]+)/, UserHandler)
-    .then(user => {
-      if (!user) return []
-      return user.fetchLaundries().then(ls => [actions.listUsers([user]), actions.listLaundries(ls)])
-    })
-}
-
-function fetchInstance (url, pattern, _Handler) {
-  const currentMatch = url.match(pattern)
-  if (!currentMatch || !currentMatch[1]) return Promise.resolve()
-  const currentId = currentMatch[1]
-  return _Handler.findFromId(currentId)
+function fetchLaundries (currentUser) {
+  return currentUser.fetchLaundries().then(actions.listLaundries)
 }
 
 /**
@@ -40,35 +20,29 @@ function fetchInstance (url, pattern, _Handler) {
  * @param {UserHandler} currentUser
  * @param {Array=} successFlash
  * @param {Array=} errorFlash
- * @param {string=} url
  * @param {string=} locale
  * @param {string=} googleApiKey
  * @param {boolean=} returningUser
  * @return {Promise}
  */
-function createInitialEvents (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en', googleApiKey = '', returningUser = false) {
+function createInitialEvents (currentUser, successFlash = [], errorFlash = [], locale = 'en', googleApiKey = '', returningUser = false) {
   let events = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
   events.push(actions.configure({locale, googleApiKey, returningUser}))
   if (!currentUser) return Promise.resolve(events)
   events.push(actions.signInUser(currentUser))
-  return Promise
-    .all([
-      fetchLaundries(currentUser, url),
-      fetchUsers(currentUser, url)
-    ])
-    .then(evts => evts.reduce((e1, e2) => e1.concat(e2), events))
+  return fetchLaundries(currentUser).then(event => events.concat(event))
 }
 
-function createInitialStore (currentUser, successFlash = [], errorFlash = [], url = '', locale = 'en', googleApiKey = '', returningUser = false) {
-  return createInitialEvents(currentUser, successFlash, errorFlash, url, locale, googleApiKey, returningUser)
+function createInitialStore (currentUser, successFlash = [], errorFlash = [], locale = 'en', googleApiKey = '', returningUser = false) {
+  return createInitialEvents(currentUser, successFlash, errorFlash, locale, googleApiKey, returningUser)
     .then((events) => {
-      const store = createStore(reducer)
+      const store = createStore(reducers)
       events.forEach((event) => store.dispatch(event))
       return store
     })
 }
 
 module.exports = {
-  createInitialStore, createInitialEvents, actions, reducer
+  createInitialStore, createInitialEvents, actions, reducers
 }

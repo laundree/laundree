@@ -57,6 +57,26 @@ class UserHandler extends Handler {
   }
 
   /**
+   *
+   * @param {string} userId
+   * @param {string} secret
+   * @returns {Promise.<{user: UserHandler=, token: TokenHandler=}>}
+   */
+  static findFromIdWithTokenSecret (userId, secret) {
+    return UserHandler
+      .findFromId(userId)
+      .then(user => {
+        if (!user) return {}
+        return user
+          .findAuthTokenFromSecret(secret)
+          .then(token => {
+            if (!token) return {}
+            return {user, token}
+          })
+      })
+  }
+
+  /**
    * Finds a user from verified email and valid password
    * @param email
    * @param password
@@ -71,6 +91,7 @@ class UserHandler extends Handler {
           .then(result => result ? user : undefined)
       })
   }
+
   /**
    * Will eventually add profile if a profile with the same provider isn't present, or
    * replace the existing profile if it is.

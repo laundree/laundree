@@ -13,7 +13,7 @@ const {Router, browserHistory, match} = require('react-router')
 const routeGenerator = require('../../react/routes')
 const io = require('socket.io-client')
 const {createStore} = require('redux')
-const reducer = require('../../redux/reducer')
+const reducers = require('../../redux/reducers')
 const sdk = require('../sdk')
 const locales = require('./../../locales')
 
@@ -22,7 +22,7 @@ const socket = io('/redux')
 function setupStore () {
   const state = window.__REDUX_STATE__
   debug('Setting up store with state', state)
-  const store = createStore(reducer, state)
+  const store = createStore(reducers, state)
 
   const dispatchAction = action => {
     debug(`Dispatching: ${action.type}`, action)

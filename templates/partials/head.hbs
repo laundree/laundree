@@ -25,7 +25,8 @@
 <link rel="stylesheet" href="/stylesheets/style.css"/>
 <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.en" defer></script>
 {{#if state}}
-    <script type="application/javascript">window.__REDUX_STATE__ = {{{state}}}</script>{{/if}}
+    <script type="application/javascript">window.__REDUX_STATE__ = {{{state}}}</script>
+{{/if}}
 <script type="application/javascript" src="/javascripts/bundle.js" defer></script>
 {{#each styles}}
     <link rel="stylesheet" href="{{this}}"/>
