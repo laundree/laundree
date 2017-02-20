@@ -86,7 +86,7 @@
     "gulp-env": "^0.4.0",
     "gulp-eslint": "^3.0.1",
     "gulp-inject-modules": "^1.0.0",
-    "gulp-mocha": "^3.0.1",
+    "gulp-mocha": "^4.0.1",
     "gulp-uglify": "^2.0.0",
     "mocha": "^3.0.2",
     "nightwatch": "^0.9.8",
