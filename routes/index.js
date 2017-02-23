@@ -6,7 +6,7 @@ const express = require('express')
 const path = require('path')
 const config = require('config')
 const setupSass = require('node-sass-middleware')
-
+const cors = require('cors')
 function fetchPseudoStaticRoutes () {
   const router = express.Router()
   router.use('/javascripts', require('./javascripts'))
@@ -31,7 +31,7 @@ function fetchRoutes () {
   router.use('/', require('./app'))
   router.use('/lang', require('./lang'))
   return require('./swagger').fetchRouter().then(route => {
-    router.use('/api', route)
+    router.use('/api', cors(), route)
     return router
   })
 }
