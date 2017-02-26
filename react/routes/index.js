@@ -25,6 +25,7 @@ const About = require('../views/About')
 const Support = require('../containers/Support')
 const Contact = require('../views/Contact')
 const UserLoader = require('../containers/UserLoader')
+const NativeApp = require('../containers/NativeApp')
 
 function adminCheck (user) {
   return user && user.role === 'admin'
@@ -98,6 +99,7 @@ function routeGenerator (store) {
       </Route>,
       <Route path='/privacy' component={Privacy}/>,
       <Route path='/terms-and-conditions' component={TermsAndConditions}/>,
+      <Route path='/native-app' component={NativeApp} />,
       <Route path='/contact'>
         <IndexRedirect to='/support'/>
       </Route>,
@@ -119,6 +121,7 @@ function routeGenerator (store) {
     </Route>,
     <Route path='/privacy' component={Privacy}/>,
     <Route path='/terms-and-conditions' component={TermsAndConditions}/>,
+    <Route path='/native-app' component={NativeApp} />,
     <Route path='/auth' component={Auth}>
       <IndexRoute component={Login}/>
       <Route path='forgot' component={Forgot}/>
