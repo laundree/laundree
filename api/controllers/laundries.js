@@ -223,7 +223,21 @@ function removeOwner (req, res) {
     .catch(api.generateErrorHandler(res))
 }
 
+function addUserFromCode (req, res) {
+  const {laundry, currentUser} = req.subjects
+  const {key} = req.swagger.params.body.value
+  laundry
+    .verifyInviteCode(key)
+    .then(result => {
+      if (!result) return api.returnError(res, 400, 'Invalid key')
+      return laundry
+        .addUser(currentUser)
+        .then(() => api.returnSuccess(res))
+    })
+    .catch(api.generateErrorHandler(res))
+}
 module.exports = {
+  addUserFromCode,
   createDemoLaundry,
   inviteUserByEmail,
   listLaundries,
