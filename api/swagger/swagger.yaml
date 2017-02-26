@@ -1014,6 +1014,45 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /laundries/{laundryId}/users/add-from-code:
+    x-swagger-router-controller: laundries
+    post:
+      operationId: addUserFromCode
+      security:
+        - userAccess: []
+      tags:
+        - Laundries
+        - Users
+      parameters:
+        - name: laundryId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - key
+            properties:
+              key:
+                type: string
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
 
   /laundries/{laundryId}/users/{userId}:
     x-swagger-router-controller: laundries

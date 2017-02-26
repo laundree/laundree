@@ -153,7 +153,9 @@ class LeaveLaundry extends React.Component {
   }
 
   removeUser () {
-    return sdk.laundry(this.props.laundry.id).removeUserFromLaundry(this.props.user.id)
+    return sdk
+      .laundry(this.props.laundry.id)
+      .removeUserFromLaundry(this.props.user.id)
   }
 
   render () {

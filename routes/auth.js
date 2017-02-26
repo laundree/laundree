@@ -27,14 +27,21 @@ router.get('/verify', (req, res) => {
   })
 })
 function findRedirect (req) {
-  return req.query.to ? decodeURIComponent(req.query.to) : '/'
+  const {mode, to} = req.query
+  switch (mode) {
+    case 'native-app':
+      return {to: `/native-app`, errorTo: `/native-app`}
+    default:
+      return {to: to ? decodeURIComponent(to) : '/'}
+  }
 }
 
 function saveTo (f) {
   return function (req) {
-    const to = findRedirect(req)
+    const {to, errorTo} = findRedirect(req)
     debug('Saving to: ', to)
     req.session.to = to
+    req.session.errorTo = errorTo
     return f.apply(null, arguments)
   }
 }
@@ -42,13 +49,14 @@ function saveTo (f) {
 function setupCallback (router, strategy) {
   router.get(`/${strategy}/callback`,
     function (req) {
-      passport.authenticate(strategy, {failureRedirect: `${req.baseUrl}?${strategy}_auth_failure=1`}).apply(null, arguments)
+      debug('Got state', req.query.state)
+      passport.authenticate(strategy, {failureRedirect: req.session.errorTo || `${req.baseUrl}?${strategy}_auth_failure=1`}).apply(null, arguments)
     },
     (req, res) => res.redirect(req.session.to))
 }
 
 router.get('/facebook', saveTo(function (req) {
-  const params = {scope: ['public_profile', 'email']}
+  const params = {scope: ['public_profile', 'email'], state: 'test'}
   if (req.query.rerequest) params.authType = 'rerequest'
   passport.authenticate('facebook', params).apply(null, arguments)
 }))
@@ -57,7 +65,8 @@ setupCallback(router, 'facebook')
 
 router.get('/google', saveTo(passport.authenticate('google', {
   accessType: 'online',
-  scope: ['openid', 'profile', 'email']
+  scope: ['openid', 'profile', 'email'],
+  state: 'test'
 })))
 
 setupCallback(router, 'google')
@@ -65,7 +74,7 @@ setupCallback(router, 'google')
 router.post('/local', function (req) {
   passport.authenticate('local', {
     failureRedirect: `${req.baseUrl}`,
-    successRedirect: findRedirect(req),
+    successRedirect: findRedirect(req).to,
     failureFlash: true
   }).apply(null, arguments)
 })
