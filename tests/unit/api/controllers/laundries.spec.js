@@ -776,7 +776,52 @@ describe('controllers', function () {
                 .expect(403)
                 .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
     })
-
+    describe('POST /api/laundries/{id}/users/add-from-key', () => {
+      let user1, token1, laundry, inviteCode
+      beforeEach(() => Promise.all([dbUtils.populateTokens(1), dbUtils.populateLaundries(1)]).then(([{user: u, token: t}, {laundry: l}]) => {
+        user1 = u
+        token1 = t
+        laundry = l
+        return laundry.createInviteCode().then(code => {
+          inviteCode = code
+        })
+      }))
+      it('should fail on not authenticated', () =>
+        request(app)
+          .post('/api/laundries/id/users/add-from-code')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403))
+      it('should fail on no laundry', () =>
+        request(app)
+          .post('/api/laundries/id/users/add-from-code')
+          .auth(user1.model.id, token1.secret)
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(404))
+      it('should fail without right key', () =>
+        request(app)
+          .post(`/api/laundries/${laundry.model.id}/users/add-from-code`)
+          .auth(user1.model.id, token1.secret)
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({key: 'lol'})
+          .expect('Content-Type', /json/)
+          .expect(400))
+      it('should succeed with key', () =>
+        request(app)
+          .post(`/api/laundries/${laundry.model.id}/users/add-from-code`)
+          .auth(user1.model.id, token1.secret)
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .send({key: inviteCode})
+          .expect(204)
+          .then(() => LaundryHandler.findFromId(laundry.model.id).then(l => {
+            Boolean(l.isUser(user1)).should.be.true
+          })))
+    })
     describe('POST /api/laundries/{id}/invite-code', () => {
       it('should fail on not authenticated', () =>
         request(app)
