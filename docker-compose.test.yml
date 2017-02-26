@@ -21,4 +21,4 @@ services:
   mongo:
     image: mongo
   selenium:
-    image: selenium/standalone-chrome
+    image: selenium/standalone-chrome:3.0.1
