@@ -29,8 +29,6 @@ function setupStore () {
     store.dispatch(action)
   }
 
-  socket.on('action', dispatchAction)
-
   socket.on('actions', actions => actions.forEach(dispatchAction))
 
   sdk.setupRedux(store, socket)
