@@ -153,15 +153,13 @@ class UserHandler extends Handler {
 
   /**
    * Verifies a calendar token
-   * @param {string} token
+   * @param {string} secret
    * @returns {Promise.<boolean>|*}
    */
-  verifyCalendarToken (token) {
+  verifyCalendarToken (secret) {
     debug('Verifying calendar token', this.model.calendarTokensReferences)
-    return this
-      ._fetchcalendarTokensReferences()
-      .then(tokens => Promise.all(tokens.map(t => t.verify(token))))
-      .then(result => result.find(r => r))
+    return TokenHandler
+      .findTokenFromSecret(secret, {_id: {$in: this.model.calendarTokensReferences}})
       .then(Boolean)
   }
 
@@ -198,24 +196,11 @@ class UserHandler extends Handler {
    * @return {Promise.<TokenHandler>}
    */
   findAuthTokenFromSecret (secret) {
-    return this
-      .fetchAuthTokens()
-      .then(tokens => tokens
-        .reduce(
-          (prev, token) =>
-            prev
-              .then((oldToken) => oldToken || token
-                .verify(secret)
-                .then((result) => result ? token : null)),
-          Promise.resolve(null)))
+    return TokenHandler.findTokenFromSecret(secret, {_id: {$in: this.model.authTokens}})
   }
 
   fetchAuthTokens () {
     return TokenHandler.find({_id: {$in: this.model.authTokens}})
-  }
-
-  _fetchcalendarTokensReferences () {
-    return TokenHandler.find({_id: {$in: this.model.calendarTokensReferences}})
   }
 
   _fetchUserTokens () {

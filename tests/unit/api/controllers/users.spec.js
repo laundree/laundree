@@ -609,7 +609,7 @@ describe('controllers', function () {
             .expect(404)
             .then(res => res.body.should.deep.equal({message: 'Not found'}))))
 
-      it('should return 403 on missing id', () =>
+      it('should return 404 on missing id', () =>
         dbUtils.populateTokens(1).then(({user, tokens}) =>
           request(app)
             .delete('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')

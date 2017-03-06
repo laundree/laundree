@@ -10,7 +10,7 @@ class TokenHandler extends Handler {
 
   constructor (model, secret) {
     super(model)
-    this.secret = secret
+    this._secret = secret
   }
 
   static find (filter, options) {
@@ -19,6 +19,26 @@ class TokenHandler extends Handler {
 
   static findFromId (id) {
     return this._findFromId(TokenModel, TokenHandler, id)
+  }
+
+  static findTokenFromSecret (secret, filter) {
+    switch (secret.substring(0, 2)) {
+      case 'v2':
+        const [, id, sec] = secret.split('.')
+        return TokenHandler
+          .find({$and: [{_id: id}, filter]})
+          .then(([token]) => {
+            if (!token) return null
+            return token.verify(sec).then(result => result
+              ? token
+              : null)
+          })
+      default:
+        return TokenHandler.find(filter)
+          .then(tokens => Promise
+            .all(tokens.map(token => token.verify(secret).then(result => result && token)))
+            .then(tokens => tokens.find(t => t) || null))
+    }
   }
 
   /**
@@ -30,18 +50,16 @@ class TokenHandler extends Handler {
    */
   static _createToken (owner, name, type) {
     return password.generateToken()
-      .then((token) => Promise.all([token, password.hashPassword(token)]))
-      .then((result) => {
-        const [token, hash] = result
-        return new TokenModel({
-          name: name,
+      .then(token => password
+        .hashPassword(token)
+        .then(hash => new TokenModel({
+          name,
           type,
-          hash: hash,
+          hash,
           owner: owner.model.id
         })
           .save()
-          .then((model) => new TokenHandler(model, token))
-      })
+          .then(model => new TokenHandler(model, token))))
   }
 
   seen () {
@@ -53,12 +71,29 @@ class TokenHandler extends Handler {
   }
 
   /**
+   * @return {string}
+   */
+  get secret () {
+    return `v2.${this.model.id}.${this._secret}`
+  }
+
+  /**
    * Verify given secret against hash
    * @param secret
    * @returns {Promise.<boolean>}
    */
   verify (secret) {
-    return password.comparePassword(secret, this.model.hash)
+    const version = secret.substring(0, 2)
+    switch (version) {
+      case 'v2':
+        const prefix = `v2.${this.model.id}.`
+        if (!secret.startsWith(prefix)) {
+          return Promise.resolve(false)
+        }
+        return password.comparePassword(secret.substr(prefix.length), this.model.hash)
+      default:
+        return password.comparePassword(secret, this.model.hash)
+    }
   }
 
   /**
@@ -81,6 +116,7 @@ class TokenHandler extends Handler {
   get restUrl () {
     return `/api/tokens/${this.model.id}`
   }
+
   toRest () {
     const UserHandler = require('./user')
     return TokenModel.populate(this.model, {path: 'owner', model: 'User'})
@@ -91,6 +127,7 @@ class TokenHandler extends Handler {
         href: this.restUrl
       }))
   }
+
   toSecretRest () {
     return this
       .toRest()
@@ -99,6 +136,7 @@ class TokenHandler extends Handler {
         return o
       })
   }
+
   toRestSummary () {
     return {id: this.model.id, name: this.model.name, href: this.restUrl}
   }
