@@ -123,13 +123,47 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return TokenHandler.findFromId(id).then((token) => {
+              return TokenHandler.findFromId(id).then(token => {
                 token.should.not.be.undefined
                 return token.toRest().then((result) => {
                   result.secret = res.body.secret
                   res.body.should.deep.equal(result)
                 })
               })
+            })))
+      it('should succeed 2', () =>
+        dbUtils.populateTokens(1).then(({user, tokens}) =>
+          request(app)
+            .post('/api/tokens')
+            .send({name: tokens[0].model.name + ' 2'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, tokens[0].secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+              const id = res.body.id
+              return TokenHandler
+                .findFromId(id)
+                .then(token => token.verify(res.body.secret))
+                .then(result => result.should.be.true)
+            })))
+      it('should succeed 3', () =>
+        dbUtils.populateTokens(1).then(({user, tokens}) =>
+          request(app)
+            .post('/api/tokens')
+            .send({name: tokens[0].model.name + ' 2'})
+            .set('Accept', 'application/json')
+            .set('Content-Type', 'application/json')
+            .auth(user.model.id, tokens[0].secret)
+            .expect('Content-Type', /json/)
+            .expect(200)
+            .then(res => {
+              const id = res.body.id
+              return TokenHandler
+                .findFromId(id)
+                .then(token => token.verify(res.body.secret.split('.')[2]))
+                .then(result => result.should.be.true)
             })))
     })
     describe('POST /api/tokens/email-password', () => {

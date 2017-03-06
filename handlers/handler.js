@@ -29,6 +29,10 @@ function buildReduxEventEmitter (_Handler) {
 function setupListener (_Handler, emitter, event, action) {
   debug(`Setting up socket with event "${event}" on "${_Handler.name}"`)
   _Handler.on(event, handler => {
+    if (!handler) {
+      debug('Handler not found, returning')
+      return
+    }
     const laundries = findLaundries(handler)
     const id = handler.model ? handler.model.id : handler
     debug(`Emitting ${_Handler.name} ${event} action`)
@@ -78,14 +82,14 @@ class Handler {
       _Handler.name,
       ['create', 'update'],
       (instance) => Promise.resolve(instance.model.id),
-      (id) => _Handler.findFromId(id))
+      id => _Handler.findFromId(id))
     linkEmitter(
       _Handler.subEmitter,
       _Handler.pubEmitter,
       _Handler.name,
       ['delete'],
       (instance) => Promise.resolve(instance.model.id),
-      (id) => Promise.resolve(id))
+      id => Promise.resolve(id))
     _Handler.on = function () {
       return _Handler.pubEmitter.on.apply(_Handler.pubEmitter, arguments)
     }
