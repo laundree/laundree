@@ -8,7 +8,6 @@ const {Input, Label, Submit, DocumentTitle} = require('./intl')
 const LocationSelector = require('./LocationSelector')
 
 class CreateLaundry extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.state.createExpanded = false

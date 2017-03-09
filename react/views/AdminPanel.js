@@ -5,7 +5,6 @@ const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 
 class Stats extends React.Component {
-
   componentDidMount () {
     sdk.updateStats()
   }
@@ -179,7 +178,6 @@ QueryList.propTypes = {
 }
 
 class LaundryList extends QueryList {
-
   renderLoading () {
     return <FormattedMessage id='admin-panel.loading'/>
   }
@@ -217,7 +215,6 @@ LaundryList.propTypes = {
 }
 
 class UserList extends QueryList {
-
   load (options) {
     return sdk.listUsers(options)
   }

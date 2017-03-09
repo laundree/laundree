@@ -7,7 +7,6 @@ const {BookingModel} = require('../models')
 const {types: {DELETE_BOOKING, UPDATE_BOOKING, CREATE_BOOKING}} = require('../redux/actions')
 
 class BookingHandler extends Handler {
-
   /**
    * Create a new booking
    * @param {MachineHandler} machine

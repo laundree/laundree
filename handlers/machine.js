@@ -9,7 +9,6 @@ const BookingHandler = require('./booking')
 const {types: {DELETE_MACHINE, UPDATE_MACHINE, CREATE_MACHINE}} = require('../redux/actions')
 
 class MachineHandler extends Handler {
-
   /**
    * Create a new machine
    * @param {LaundryHandler} laundry

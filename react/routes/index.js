@@ -54,7 +54,7 @@ function checkExistingUserGenerator (store) {
 }
 
 function checkLaundryOwnerGenerator (store) {
-  return checkGenerator(store, ({laundry, admin}, {currentUser, users}) => admin || laundry && laundry.owners.indexOf(currentUser) >= 0)
+  return checkGenerator(store, ({laundry, admin}, {currentUser, users}) => admin || (laundry && laundry.owners.indexOf(currentUser) >= 0))
 }
 
 function checkSelfGenerator (store) {

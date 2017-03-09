@@ -12,7 +12,6 @@ function resultsToFormattedAddressLookup (results) {
 }
 
 class LocationSelector extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.state.results = []

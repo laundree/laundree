@@ -140,7 +140,6 @@ LinkElement.propTypes = {
 }
 
 class LinkInvite extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {link: null}
@@ -346,7 +345,6 @@ InviteItem.contextTypes = {
 }
 
 class Users extends React.Component {
-
   renderUsers () {
     return <ul className='bigList'>
       {this.users.map(user => <li key={user.id}><UserItem

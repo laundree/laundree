@@ -11,7 +11,6 @@ const {FormattedMessage} = require('react-intl')
 const {Input, Submit, Label} = require('./intl')
 
 class SignUp extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.submitHandler = (evt) => {

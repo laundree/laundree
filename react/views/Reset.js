@@ -10,7 +10,6 @@ const {DocumentTitle, Input, Submit, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class Reset extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.submitHandler = (evt) => {

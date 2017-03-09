@@ -7,7 +7,6 @@ const {DocumentTitle, Modal, Submit, Input, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class UserNameForm extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.onSubmit = (event) => {
@@ -56,7 +55,6 @@ UserNameForm.propTypes = {
 }
 
 class UserPasswordForm extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.onSubmit = (event) => {
@@ -144,7 +142,6 @@ UserPasswordForm.propTypes = {
 }
 
 class DeleteUser extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
@@ -176,14 +173,12 @@ class DeleteUser extends React.Component {
       </div>
     </div>
   }
-
 }
 
 DeleteUser.propTypes = {
   user: React.PropTypes.object.isRequired
 }
 class UserSettings extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {}
@@ -332,7 +327,6 @@ class UserSettings extends React.Component {
           </li>)}
     </ul>
   }
-
 }
 
 UserSettings.propTypes = {

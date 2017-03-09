@@ -3,7 +3,6 @@
  */
 
 class Initializer {
-
   /**
    * @param {InitializerLibrary} initializerLibrary
    */
@@ -17,7 +16,6 @@ class Initializer {
   setup (element) {
     throw new Error('Not yet implemented.')
   }
-
 }
 
 module.exports = Initializer

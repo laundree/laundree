@@ -7,7 +7,6 @@ const {LaundryInvitationModel} = require('../models')
 const {types: {DELETE_INVITATION, UPDATE_INVITATION, CREATE_INVITATION}} = require('../redux/actions')
 
 class LaundryInvitationHandler extends Handler {
-
   constructor (model, secret) {
     super(model)
     this.secret = secret

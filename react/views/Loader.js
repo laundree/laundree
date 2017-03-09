@@ -1,7 +1,6 @@
 const React = require('react')
 
 class Loader extends React.Component {
-
   constructor (props, initState = {}) {
     super(props)
     this.state = Object.assign({}, initState, {loaded: Boolean(this.props.loaded)})

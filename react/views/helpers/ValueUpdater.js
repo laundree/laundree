@@ -5,7 +5,6 @@
 const React = require('react')
 
 class ValueUpdater extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {values: this.initialValues, sesh: 0}
