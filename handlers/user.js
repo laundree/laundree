@@ -34,7 +34,6 @@ function displayNameToName (displayName) {
  */
 
 class UserHandler extends Handler {
-
   /**
    * Find a user from given email address.
    * @param {string} email

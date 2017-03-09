@@ -55,7 +55,6 @@ TimetableHeader.propTypes = {
 }
 
 class CalendarNavigationElement extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {current: this.firstDate}
@@ -165,7 +164,6 @@ CalendarNavigationElement.propTypes = {
 }
 
 class TimeTableHeaderNav extends React.Component {
-
   get firstDate () {
     return this.props.dates[0]
   }

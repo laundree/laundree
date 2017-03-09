@@ -10,7 +10,6 @@ const {ValueUpdater} = require('./helpers')
 const {FormattedMessage} = require('react-intl')
 
 class Login extends ValueUpdater {
-
   handleNotion () {
     if (!this.props.flash.length) return null
     const {type, message} = this.props.flash[0]

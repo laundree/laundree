@@ -7,7 +7,6 @@ const {FormattedMessage} = require('react-intl')
 const LocationSelector = require('./LocationSelector')
 
 class LaundrySettingsForm extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.onSubmit = (evt) => {
@@ -93,7 +92,6 @@ LaundrySettingsForm.propTypes = {
 }
 
 class DeleteLaundry extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
@@ -134,7 +132,6 @@ class DeleteLaundry extends React.Component {
       </div>
     </div>
   }
-
 }
 
 DeleteLaundry.propTypes = {
@@ -143,7 +140,6 @@ DeleteLaundry.propTypes = {
 }
 
 class LeaveLaundry extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
@@ -176,7 +172,6 @@ class LeaveLaundry extends React.Component {
       </div>
     </div>
   }
-
 }
 
 LeaveLaundry.propTypes = {
@@ -184,7 +179,6 @@ LeaveLaundry.propTypes = {
   user: React.PropTypes.object.isRequired
 }
 class Switch extends React.Component {
-
   constructor (props) {
     super(props)
     this.onClick = () => this.props.onChange(!this.isOn)
@@ -252,7 +246,6 @@ function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
 }
 
 class BookingRules extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.timeMap = timeString => {
@@ -439,7 +432,6 @@ BookingRules.propTypes = {
 }
 
 class LaundrySettings extends React.Component {
-
   get isOwner () {
     return this.props.user.role === 'admin' || this.laundry.owners.indexOf(this.props.user.id) >= 0
   }

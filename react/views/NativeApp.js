@@ -7,7 +7,6 @@ const sdk = require('../../client/sdk')
 const uuid = require('uuid')
 
 class NativeApp extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {now: null, data: null}

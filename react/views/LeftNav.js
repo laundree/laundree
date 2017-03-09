@@ -5,7 +5,6 @@ const Loader = require('./Loader')
 const sdk = require('../../client/sdk')
 
 class LeftNav extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {expanded: false}
