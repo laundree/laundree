@@ -41,7 +41,6 @@ function setupListener (_Handler, emitter, event, action) {
 }
 
 class Handler {
-
   /**
    * @param Model
    * @param Handler

@@ -8,7 +8,6 @@ function newId () {
 }
 
 class ValidationElement extends React.Component {
-
   constructor (props) {
     super(props)
     this.initialState = {initial: true}

@@ -6,7 +6,6 @@ const {DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 class DemoButton extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {loading: false, email: '', password: ''}

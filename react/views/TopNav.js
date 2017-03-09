@@ -8,7 +8,6 @@ const LocaleSelect = require('./LocaleSelect')
 const {FormattedMessage} = require('react-intl')
 
 class TopNav extends React.Component {
-
   get laundries () {
     return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
   }

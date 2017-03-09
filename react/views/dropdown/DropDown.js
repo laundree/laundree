@@ -3,7 +3,6 @@ const DropDownTitle = require('./DropDownTitle')
 const DropDownContent = require('./DropDownContent')
 
 class DropDown extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {open: false}

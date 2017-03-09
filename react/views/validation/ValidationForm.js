@@ -1,7 +1,6 @@
 const React = require('react')
 
 class ValidationForm extends React.Component {
-
   constructor (props) {
     super(props)
     this.initialState = {initial: true, failed: false, valid: {}}

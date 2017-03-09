@@ -18,7 +18,6 @@ UserInput.propTypes = {
 }
 
 class ContactForm extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.onSubmit = (evt) => {

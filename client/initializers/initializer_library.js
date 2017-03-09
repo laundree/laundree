@@ -5,7 +5,6 @@
 const Initializer = require('./initializer')
 
 class InitializerLibrary extends Initializer {
-
   /**
    * @param {InitializerLibrary} initializerLibrary
    */
@@ -25,7 +24,6 @@ class InitializerLibrary extends Initializer {
   registerInitializer (Initializer) {
     this.initializers.push(new Initializer(this))
   }
-
 }
 
 module.exports = InitializerLibrary

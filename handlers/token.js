@@ -7,7 +7,6 @@ const {password} = require('../utils')
 const {TokenModel} = require('../models')
 
 class TokenHandler extends Handler {
-
   constructor (model, secret) {
     super(model)
     this._secret = secret
