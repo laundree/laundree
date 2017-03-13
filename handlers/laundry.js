@@ -270,7 +270,7 @@ class LaundryHandler extends Handler {
    * @return {Promise.<int>} The number of new users added
    */
   addUser (user) {
-    if (this.isUser(user)) return Promise.resolve(0)
+    if (this.isUser(user) || user.isDemo) return Promise.resolve(0)
     this.model.users.push(user.model._id)
     return this
       .save()
