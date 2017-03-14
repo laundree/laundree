@@ -153,6 +153,7 @@
     "admin-panel.no-users": "Ingen brugere fundet.",
     "admin-panel.no-laundries": "Ingen vaskerier fundet.",
     "admin-panel.title": "Administrator panel",
+    "admin-panel.show-demo": "Vis demo",
     "machines.modal.message": "Er du sikker på, at du vil slette denne maskine?",
     "machines.error.machine-name": "Indtast venligt et unikt maskine navn",
     "machines.washing-machine-name": "Vaskemaskine navn",
