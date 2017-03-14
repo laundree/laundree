@@ -49,15 +49,31 @@
     padding-right: 1em
   #LaundryList, #UserList
     .filter
+      position: relative
+      margin: 0.5em 0 1em
+      background: #5fbebe
+      +border-radius(0.2em)
       label
+        padding: 0
         max-width: none
-        padding: 0.5em 0 1em
         input
           color: #03414C
           background: #7fecec
           width: calc(100% - 1em)
           padding: 0.5em
-
+      .demoSwitch
+        padding: 0.7em
+        height: 1.6em
+        .switch
+          float: left
+        span
+          padding-top: 0
+          display: block
+          padding-left: 1em
+          font-family: "Roboto Condensed",sans-serif
+          line-height: 2em
+          height: 1.6em
+          float: left
     .nav
       text-align: center
       font-family: "Roboto Condensed", sans-serif

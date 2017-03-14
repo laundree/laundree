@@ -3,6 +3,8 @@ const {DocumentTitle} = require('./intl')
 const {Link} = require('react-router')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
+const Switch = require('./Switch')
+const debug = require('debug')('laundree.react.views.AdminPanel')
 
 class Stats extends React.Component {
   componentDidMount () {
@@ -76,9 +78,6 @@ class QueryList extends React.Component {
     super(props)
     this.state = {loaded: false, page: 0}
     this.limit = 10
-    this.onPrevClick = () => this.prev()
-    this.onNextClick = () => this.next()
-    this.onFilterUpdate = ({target: {value}}) => this.updateFilter(value)
   }
 
   updateFilter (q) {
@@ -104,11 +103,16 @@ class QueryList extends React.Component {
   }
 
   _load () {
-    return this.load({
+    const config = {
       q: this.state.q,
+      showDemo: this.state.demoOn,
       limit: this.limit,
       skip: this.limit * this.currentPage
-    }).then(() => this.setState({loaded: true, page: this.currentPage}))
+    }
+    debug('Loading', config)
+    return this
+      .load(config)
+      .then(() => this.setState({loaded: true, page: this.currentPage}))
   }
 
   get elements () {
@@ -135,6 +139,10 @@ class QueryList extends React.Component {
     return Math.max(0, Math.floor((this.props.total - 1) / this.limit))
   }
 
+  toggleDemo (on) {
+    this.setState({demoOn: on}, () => this._load())
+  }
+
   renderList () {
     if (!this.state.loaded) {
       return <div className='bigListMessage'>
@@ -143,7 +151,7 @@ class QueryList extends React.Component {
     }
     return <div>
       <div className='nav'>
-        <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={this.onPrevClick}/>
+        <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={() => this.prev()}/>
         <FormattedMessage
           id='admin-panel.page-of'
           values={{
@@ -153,22 +161,26 @@ class QueryList extends React.Component {
         />
         <span
           className={'next link' + (this.currentPage === this.totalPages ? ' inactive' : '')}
-          onClick={this.onNextClick}/>
+          onClick={() => this.next()}/>
       </div>
       <div className='filter'>
         <label>
           <input
             type='text' placeholder='Filter' value={this.state.q || ''}
-            onChange={this.onFilterUpdate}/>
+            onChange={({target: {value}}) => this.updateFilter(value)}/>
         </label>
+        <div className='demoSwitch'>
+          <Switch onChange={demoOn => this.toggleDemo(demoOn)} on={this.state.demoOn}/>
+          <FormattedMessage id='admin-panel.show-demo'/>
+        </div>
       </div>
       {this.elements.length
         ? <ul className='bigList'>
-        { this.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
-      </ul>
+          { this.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
+        </ul>
         : <div className='bigListMessage'>
-        {this.renderEmpty()}
-      </div>}
+          {this.renderEmpty()}
+        </div>}
     </div>
   }
 }
@@ -243,6 +255,7 @@ class UserList extends QueryList {
   render () {
     return <section id='UserList'>
       <FormattedMessage id='admin-panel.users' tagName='h2'/>
+
       {this.renderList()}
     </section>
   }
