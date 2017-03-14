@@ -1,7 +1,7 @@
 /**
  * Created by budde on 19/02/2017.
  */
-const React = require('React')
+const React = require('react')
 
 class Switch extends React.Component {
   constructor (props) {
