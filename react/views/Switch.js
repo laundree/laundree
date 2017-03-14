@@ -4,7 +4,6 @@
 const React = require('React')
 
 class Switch extends React.Component {
-
   constructor (props) {
     super(props)
     this.onClick = () => this.props.onChange(!this.isOn)
