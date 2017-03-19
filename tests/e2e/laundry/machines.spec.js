@@ -41,8 +41,8 @@ module.exports = {
       .waitForElementPresent('#LaundryMain .create_machine .machineForm input[type=text]', timeout)
       .setValue('#LaundryMain .create_machine .machineForm input[type=text]', name)
       .submitForm('#LaundryMain .create_machine .machineForm')
-      .waitForElementPresent('#LaundryMain .machine_list li:nth-of-type(3) ', timeout)
-    client.assert.valueContains('#LaundryMain .machine_list li:nth-of-type(3) input[type=text]', name)
+      .waitForElementPresent('#LaundryMain .machine_list li:nth-of-type(2) ', timeout)
+    client.assert.valueContains('#LaundryMain .machine_list li:nth-of-type(2) input[type=text]', name)
     client
       .end()
   }

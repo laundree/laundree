@@ -7,7 +7,7 @@ const timeout = config.get('sauceLabs.timeout')
 
 function signIn (client, username, password) {
   return client
-    .click('#TopNav a.log-in')
+    .click('#TopNav a.auth.signUp')
     .waitForElementPresent('#Auth', timeout)
     .click('#Auth .forgot div:first-of-type a')
     .waitForElementPresent('#SignIn', timeout)

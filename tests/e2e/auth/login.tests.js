@@ -51,14 +51,14 @@ module.exports = {
           .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
           .click('#TopNav .rightNav .user .dropDownContent li:last-of-type a')
           .waitForElementPresent('#Home #Logo', timeout)
-          .expect.element('#TopNav .rightNav a.log-in').text.to.match(/[lL][oO][gG] [Ii][nN]/)
+          .expect.element('#TopNav .rightNav a.auth.signUp').text.to.match(/[lL][oO][gG] [Ii][nN]/)
         client.end()
       })
   },
   'Can reset password': client => {
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
       .click('#Auth  .forgot div:last-of-type a')
       .waitForElementPresent('#ForgotPassword', timeout)
@@ -70,7 +70,7 @@ module.exports = {
   'Can not reset password': client => {
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
       .click('#Auth  .forgot div:last-of-type a')
       .waitForElementPresent('#ForgotPassword', timeout)
@@ -85,7 +85,7 @@ module.exports = {
     const name = faker.name.findName()
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth form', timeout)
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)
