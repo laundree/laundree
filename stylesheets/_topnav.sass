@@ -111,18 +111,19 @@
     .dropDownContent
       right: 1em
 
-  a.log-in
-    text-transform: uppercase
-    background: #E5954C
+  a.auth
+    &.signUp
+      text-transform: uppercase
+      background: #E5954C
+      &:hover
+        background: #f3a34e
     height: 3em
-    margin: 0.5em 1em
+    margin: 0.5em 0.25em
     line-height: 3em
-    padding: 0 3em
+    padding: 0 1.5em
     +border-radius(0.2em)
     +transition(0.1s background)
     text-decoration: none
-    &:hover
-      background: #f3a34e
 
 @media only screen and (max-width: 45em)
   #TopNav
@@ -143,9 +144,9 @@
   #TopNav
     .laundries
       max-width: 9em
-    a.log-in
-      margin: 0.5em
-      padding: 0 1em
+    a.auth
+      margin: 0.5em 0.25em
+      padding: 0 0.5em
     div.language
       .dropDownTitle svg
         margin: 1.25em 0
