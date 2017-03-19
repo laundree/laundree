@@ -37,6 +37,8 @@ module.exports = {
           .end()
       })
   },
+/*
+  Not relevant anymore
   'Can be marked returning': client => {
     client
       .url(client.launch_url)
@@ -55,6 +57,7 @@ module.exports = {
         client.end()
       })
   },
+*/
   'Can reset password': client => {
     client
       .url(client.launch_url)
