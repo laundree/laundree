@@ -26,10 +26,12 @@ module.exports = {
   },
   'Can mark machine broken': client => {
     setup(client)
-      .click('.machine_list li:last-of-type .repair svg')
-      .waitForElementPresent('.machine_list li:last-of-type .broken', timeout)
-      .click('.machine_list li:last-of-type .repair svg')
-      .waitForElementNotPresent('.machine_list li:last-of-type .broken', timeout)
+      .waitForElementPresent('.machine_list li .repair svg', timeout)
+      .click('.machine_list li .repair svg')
+      .waitForElementPresent('.machine_list li .broken', timeout)
+      .waitForElementPresent('.machine_list li .repair svg', timeout)
+      .click('.machine_list li .repair svg')
+      .waitForElementNotPresent('.machine_list li .broken', timeout)
       .end()
   },
   'Can go to machines': client => {
