@@ -31,7 +31,7 @@ module.exports = {
       .waitForElementPresent('.machine_list li .broken', timeout)
       .waitForElementPresent('.machine_list li .repair svg', timeout)
       .click('.machine_list li .repair svg')
-      .waitForElementNotPresent('.machine_list li .broken', timeout)
+      .waitForElementPresent('.machine_list li .machineForm:not(.broken)', timeout)
       .end()
   },
   'Can go to machines': client => {
