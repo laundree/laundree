@@ -68,22 +68,38 @@ function createBooking (req, res) {
           return BookingHandler
             .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate) // Find bookings that should be merged
             .then(({before, after}) => {
-              const promises = []
-              let f = fromDate
-              let t = toDate
-              if (before && from.hour + from.minute > 0) {
-                promises.push(before.deleteBooking()) // Delete booking if should be merged
-                f = before.model.from
+              if (!before || from.hour + from.minute <= 0) {
+                return {before: undefined, after, fromDate, toDate}
               }
-              if (after && to.hour < 24) {
-                promises.push(after.deleteBooking()) // Delete booking if should be merged
-                t = after.model.to
-              }
-              return Promise
-                .all(promises)
-                .then(() => machine.createBooking(req.user, f, t)) // Create booking
-                .then(booking => api.returnSuccess(res, booking.toRest()))
+              return {before, fromDate: before.model.from, after, toDate}
             })
+            .then(({after, before, fromDate, toDate}) => {
+              if (!after || to.hour >= 24) {
+                return {before, after: undefined, fromDate, toDate}
+              }
+              return {before, after, fromDate, toDate: after.model.to}
+            })
+            .then(({before, after, fromDate, toDate}) => {
+              if (!before && !after) { // If no adjacent bookings
+                return machine
+                  .createBooking(req.user, fromDate, toDate)
+              }
+              if (!before) { // If no before
+                return after
+                  .updateTime(fromDate, toDate)
+                  .then(() => after)
+              }
+              if (!after) {
+                return before
+                  .updateTime(fromDate, toDate)
+                  .then(() => before)
+              }
+              return after
+                .deleteBooking()
+                .then(() => before.updateTime(fromDate, toDate))
+                .then(() => before)
+            })
+            .then(booking => api.returnSuccess(res, booking.toRest()))
         })
     })
     .catch(api.generateErrorHandler(res))

@@ -108,8 +108,11 @@ class TopNav extends React.Component {
       </Link>
       <div className='rightNav'>
         {this.renderGlobe()}
-        <Link to={this.props.config.returningUser ? '/auth' : '/auth/sign-up'} className='log-in'>
-          <FormattedMessage id={this.props.config.returningUser ? 'topnav.login' : 'topnav.sign-up'}/>
+        <Link to='/auth' className='auth'>
+          <FormattedMessage id='topnav.login'/>
+        </Link>
+        <Link to='/auth/sign-up' className='auth signUp'>
+          <FormattedMessage id='topnav.sign-up'/>
         </Link>
       </div>
     </nav>

@@ -24,7 +24,7 @@ module.exports = {
   'Can load sign-up page': client =>
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
       .waitForElementNotPresent('#TopNav', timeout)
       .waitForElementPresent('#Auth input[name=email]', timeout)
@@ -34,7 +34,7 @@ module.exports = {
   'Can load forgot page': client =>
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
       .click('#Auth a.forgot')
       .waitForElementPresent('#ForgotPassword', timeout)
@@ -42,7 +42,7 @@ module.exports = {
   'Can load login-in page': client =>
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
       .click('#Auth div.forgot div:first-of-type a')
       .waitForElementPresent('#Auth input[name=username]', timeout)
@@ -51,7 +51,7 @@ module.exports = {
   'Can load front page from auth': client =>
     client
       .url(client.launch_url)
-      .click('#TopNav a.log-in')
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
       .click('a#Logo')
       .waitForElementPresent('#TopNav', timeout)
