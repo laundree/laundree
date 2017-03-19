@@ -90,6 +90,22 @@ class BookingHandler extends Handler {
   }
 
   /**
+   *
+   * @param {Date} from
+   * @param {Date} to
+   */
+  updateTime (from, to) {
+    this.model.from = from
+    this.model.to = to
+    return this.model
+      .save()
+      .then(() => {
+        this.emitEvent('update')
+        return this
+      })
+  }
+
+  /**
    * Delete multiple bookings without emitting events
    * @param query
    * @returns {Promise}
