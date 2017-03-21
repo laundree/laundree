@@ -24,7 +24,7 @@ module.exports = {
       .waitForElementVisible('#QrSignUp .qr-download', timeout)
       .click('#QrSignUp .qr-download')
       .pause(timeout)
-      .window_handles(function (result) {
+      .windowHandles(function (result) {
         this.assert.equal(result.value.length, 2)
       })
       .end()
