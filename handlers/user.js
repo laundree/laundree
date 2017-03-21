@@ -533,7 +533,7 @@ class UserHandler extends Handler {
           middleName: this.model.name.middleName
         },
         tokens: tokens.map(t => t.toRestSummary()),
-        photo: this.photo,
+        photo: this.photo || '',
         href: this.restUrl
       }))
   }
