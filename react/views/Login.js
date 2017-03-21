@@ -5,7 +5,6 @@ const React = require('react')
 const {DocumentTitle, Input, Submit, Label} = require('./intl')
 const {Link} = require('react-router')
 const {ValidationForm, ValidationElement} = require('./validation')
-const {USER_NOT_VERIFIED} = require('../../utils/flash')
 const {ValueUpdater} = require('./helpers')
 const {FormattedMessage} = require('react-intl')
 
@@ -13,10 +12,9 @@ class Login extends ValueUpdater {
   handleNotion () {
     if (!this.props.flash.length) return null
     const {type, message} = this.props.flash[0]
-    if (message !== USER_NOT_VERIFIED) return <div className={'notion ' + type}>{message}</div>
     return <div className={`notion ${type}`}>
       <FormattedMessage
-        id='auth.error.not-verified'
+        id={message}
         values={{
           link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link'/></Link>
         }}/>

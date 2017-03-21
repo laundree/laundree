@@ -3,25 +3,27 @@ const router = express.Router()
 const passport = require('passport')
 const UserHandler = require('../handlers').UserHandler
 const debug = require('debug')('laundree.routes.auth')
+const {INVALID_VERIFICATION_LINK, EMAIL_VERIFIED} = require('../utils/flash')
+
 router.get('/verify', (req, res) => {
   const user = req.query.user
   const token = req.query.token
   const email = req.query.email
   if (!user || !token || !email) {
-    req.flash('error', 'Invalid verification link')
+    req.flash('error', INVALID_VERIFICATION_LINK)
     return res.redirect(req.baseUrl + '/')
   }
   UserHandler.findFromId(user).then((user) => {
     if (!user) {
-      req.flash('error', 'Invalid verification link')
+      req.flash('error', INVALID_VERIFICATION_LINK)
       return res.redirect(req.baseUrl + '/')
     }
     user.verifyEmail(email, token).then((result) => {
       if (!result) {
-        req.flash('error', 'Invalid verification link')
+        req.flash('error', INVALID_VERIFICATION_LINK)
         return res.redirect(req.baseUrl + '/')
       }
-      req.flash('success', 'Your email has been verified, please login')
+      req.flash('success', EMAIL_VERIFIED)
       return res.redirect(req.baseUrl + '/')
     })
   })
