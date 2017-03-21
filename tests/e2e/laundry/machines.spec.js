@@ -20,7 +20,7 @@ module.exports = {
         return u.generateVerifyEmailToken(email)
           .then(token => u.verifyEmail(email, token.secret))
           .then(() => u.createLaundry(faker.name.findName()))
-          .then(l => l.createMachine('M1', 'wash', true))
+          .then(l => l.createMachine('M1', 'wash', false))
       })
       .then(() => done(), err => console.log(err))
   },
