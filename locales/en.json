@@ -71,6 +71,7 @@
     "auth.error.no-password": "Please enter a password",
     "auth.error.invalid-email": "Please enter a valid e-mail address",
     "auth.error.no-full-name": "Please enter your full name",
+    "auth.error.invalid-repeated-password": "Please repeat password",
     "auth.error.invalid-password": "Min. 6 characters containing at least one letter",
     "auth.error.no-email": "Please enter your e-mail address",
     "auth.error.user-not-found": "User not found",

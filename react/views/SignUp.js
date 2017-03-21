@@ -112,6 +112,18 @@ class SignUp extends ValueUpdater {
                 type='password' name='password' placeholder='general.password'/>
             </Label>
           </ValidationElement>
+          <ValidationElement
+            initial={this.state.values.password2 === undefined}
+            sesh={this.state.sesh}
+            validator={() => this.state.values.password === this.state.values.password2}
+            value={this.state.values.password2 || ''}>
+            <Label data-validate-error='auth.error.invalid-repeated-password'>
+              <Input
+                value={this.state.values.password2 || ''}
+                onChange={this.generateValueUpdater('password2')}
+                type='password' name='password' placeholder='general.repeat-password'/>
+            </Label>
+          </ValidationElement>
           <div className='accept'>
             <FormattedMessage id='auth.signup.notice' values={{
               toc: <a
