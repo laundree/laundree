@@ -52,7 +52,11 @@ class UserHandler extends Handler {
    */
   static findOrCreateFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
-    return UserHandler.findFromEmail(profile.emails[0].value).then((user) => user ? user.updateProfile(profile) : UserHandler.createUserFromProfile(profile))
+    return UserHandler
+      .findFromEmail(profile.emails[0].value)
+      .then((user) => user
+        ? user.updateProfile(profile)
+        : UserHandler.createUserFromProfile(profile))
   }
 
   /**
@@ -507,6 +511,16 @@ class UserHandler extends Handler {
     return `/api/users/${this.model.id}`
   }
 
+  get photo () {
+    const profile = this.model.latestProfile
+    const photo = profile.photos && profile.photos.length && profile.photos[0].value
+    if (!photo) return null
+    if (profile.provider !== 'google') return photo || undefined
+    const matches = photo.match(/sz=([0-9]+)$/)
+    if (!matches) return photo
+    return photo.substr(0, photo.length - matches[1].length) + '200'
+  }
+
   toRest () {
     return this.fetchAuthTokens()
       .then(tokens => ({
@@ -519,7 +533,7 @@ class UserHandler extends Handler {
           middleName: this.model.name.middleName
         },
         tokens: tokens.map(t => t.toRestSummary()),
-        photo: this.model.photo,
+        photo: this.photo,
         href: this.restUrl
       }))
   }
@@ -545,7 +559,7 @@ class UserHandler extends Handler {
   get reduxModel () {
     return {
       id: this.model.id,
-      photo: this.model.photo,
+      photo: this.photo,
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,
