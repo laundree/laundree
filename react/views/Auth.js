@@ -3,6 +3,14 @@
  */
 const React = require('react')
 const LocaleSelector = require('./LocaleSelect')
+const Forgot = require('../containers/Forgot')
+const SignUp = require('../containers/SignUp')
+const Reset = require('../containers/Reset')
+const Verification = require('../containers/Verification')
+const Login = require('../containers/Login')
+const NotFound = require('../containers/NotFound')
+
+const {Switch, Route} = require('react-router')
 
 const Auth = ({children, locale, location}) => <div>
   <nav id='AuthNav'>
@@ -10,7 +18,14 @@ const Auth = ({children, locale, location}) => <div>
   </nav>
   <main>
     <section id='Auth'>
-      {children}
+      <Switch>
+        <Route exact path='/auth/' component={Login}/>
+        <Route path='/auth/forgot' component={Forgot}/>
+        <Route path='/auth/sign-up' component={SignUp}/>
+        <Route path='/auth/reset' component={Reset}/>
+        <Route path='/auth/verification' component={Verification}/>
+        <Route component={NotFound} />
+      </Switch>
     </section>
   </main>
 </div>

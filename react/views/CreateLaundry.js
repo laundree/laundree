@@ -1,7 +1,6 @@
 const React = require('react')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
-const AdminPanel = require('../containers/AdminPanel')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const {Input, Label, Submit, DocumentTitle} = require('./intl')
@@ -24,11 +23,6 @@ class CreateLaundry extends ValueUpdater {
         .createLaundry(this.state.values.name.trim(), this.state.values.placeId)
         .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
     }
-  }
-
-  componentWillReceiveProps (nextProps) {
-    if (!nextProps.user.laundries.length) return
-    window.location = `/laundries/${nextProps.user.laundries[0]}/timetable`
   }
 
   calculateClassName () {
@@ -105,14 +99,4 @@ CreateLaundry.propTypes = {
   locale: React.PropTypes.string.isRequired
 }
 
-const CreateLaundryOrAdminPanel = ({user, googleApiKey, locale}) => user.role === 'admin'
-  ? <AdminPanel/>
-  : <CreateLaundry user={user} googleApiKey={googleApiKey} locale={locale}/>
-
-CreateLaundryOrAdminPanel.propTypes = {
-  user: React.PropTypes.object,
-  googleApiKey: React.PropTypes.string.isRequired,
-  locale: React.PropTypes.string.isRequired
-}
-
-module.exports = CreateLaundryOrAdminPanel
+module.exports = CreateLaundry

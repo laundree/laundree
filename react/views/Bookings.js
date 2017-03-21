@@ -1,6 +1,6 @@
 const React = require('react')
 const {FormattedDate} = require('react-intl')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {Modal, DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')

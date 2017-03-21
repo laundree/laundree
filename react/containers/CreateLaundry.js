@@ -3,10 +3,10 @@
  */
 
 const connect = require('react-redux').connect
-const HomeLoggedIn = require('../views/HomeLoggedIn')
+const CreateLaundry = require('../views/CreateLaundry')
 
 const mapStateToProps = ({users, currentUser, config: {googleApiKey, locale}}) => {
   return {user: users[currentUser], googleApiKey, locale}
 }
 
-module.exports = connect(mapStateToProps)(HomeLoggedIn)
+module.exports = connect(mapStateToProps)(CreateLaundry)

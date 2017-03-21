@@ -5,7 +5,7 @@
 const connect = require('react-redux').connect
 const LaundrySettings = require('../views/LaundrySettings')
 
-const mapStateToProps = ({users, currentUser, laundries, config: {locale, googleApiKey}}, {params: {laundryId}}) => {
+const mapStateToProps = ({users, currentUser, laundries, config: {locale, googleApiKey}}, {match: {params: {laundryId}}}) => {
   return {
     user: users[currentUser],
     laundries,

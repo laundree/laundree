@@ -1,5 +1,5 @@
 const React = require('react')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {ValidationElement, ValidationForm} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
