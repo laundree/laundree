@@ -9,7 +9,7 @@ const mapStateToProps = ({
   users, laundries, machines,
   currentUser, bookings, userBookings
 },
-  {params: {laundryId}}) => {
+  {match: {params: {laundryId}}}) => {
   return {
     user: users[currentUser],
     laundry: laundries[laundryId],

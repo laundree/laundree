@@ -3,7 +3,7 @@
  */
 const React = require('react')
 const {DocumentTitle, Input, Submit, Label} = require('./intl')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const {FormattedMessage} = require('react-intl')

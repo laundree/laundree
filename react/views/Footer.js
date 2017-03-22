@@ -1,6 +1,6 @@
 const React = require('react')
 const {FormattedMessage} = require('react-intl')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 
 const Footer = () => <footer>
   <ul>

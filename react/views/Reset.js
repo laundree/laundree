@@ -2,7 +2,7 @@
  * Created by budde on 11/06/16.
  */
 const React = require('react')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')

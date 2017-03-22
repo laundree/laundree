@@ -1,6 +1,6 @@
 const React = require('react')
 const {DocumentTitle} = require('./intl')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const Switch = require('./Switch')
@@ -245,7 +245,7 @@ class UserList extends QueryList {
 
   renderElement ({id, photo, displayName}) {
     return <div className='name'>
-      <Link to={`/users/${id}`}>
+      <Link to={`/users/${id}/settings`}>
         <img src={photo} className='avatar'/>
         {displayName}
       </Link>

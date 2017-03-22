@@ -28,10 +28,10 @@ function fetchRoutes () {
   router.use('/auth', require('./auth'))
   router.use('/calendar', require('./calendar'))
   router.use('/s', require('./invite-code'))
-  router.use('/', require('./app'))
   router.use('/lang', require('./lang'))
   return require('./swagger').fetchRouter().then(route => {
     router.use('/api', cors(), route)
+    router.use('/', require('./app'))
     return router
   })
 }
