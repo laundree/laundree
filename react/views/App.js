@@ -26,6 +26,7 @@ class App extends React.Component {
           <Route path='/privacy' component={Privacy}/>
           <Route path='/terms-and-conditions' component={TermsAndConditions}/>
           <Route path='/native-app' component={NativeApp}/>
+          <Route path='/laundries/:laundryId' component={BaseApp} />
           <Route path='/' component={BaseApp} />
         </Switch>
       </Provider>
