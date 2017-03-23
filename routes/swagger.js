@@ -122,7 +122,6 @@ function fetchRouter () {
         })
 
         router.use((req, res, next) => {
-          if (req.user) return next()
           passport.authenticate('basic', (err, user, info) => {
             if (err) return next(err)
             if (!user) return next()
