@@ -95,7 +95,7 @@
     "run-sequence": "^1.1.5",
     "sauce-connect-launcher": "^1.0.0",
     "selenium-standalone": "^6.0.1",
-    "sinon": "^1.17.6",
+    "sinon": "^2.0.0",
     "sinon-chai": "^2.8.0",
     "supertest": "^3.0.0",
     "supertest-as-promised": "^4.0.0",
