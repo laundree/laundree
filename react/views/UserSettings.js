@@ -5,6 +5,8 @@ const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
 const {DocumentTitle, Modal, Submit, Input, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
+const Loader = require('./Loader')
+const NotFound = require('./NotFound')
 
 class UserNameForm extends ValueUpdater {
   constructor (props) {
@@ -336,4 +338,25 @@ UserSettings.propTypes = {
   users: React.PropTypes.object
 }
 
-module.exports = UserSettings
+const UserSettingsWrapper = ({user, currentUser, laundries, users}) => {
+  if (!users[user]) {
+    return <NotFound />
+  }
+  return <UserSettings user={user} users={users} laundries={laundries} currentUser={currentUser}/>
+}
+
+UserSettingsWrapper.propTypes = UserSettings.propTypes
+
+const UserSettingsLoaderWrapper = ({user, currentUser, laundries, users}) => {
+  const cUser = users[currentUser]
+  if (cUser.role !== 'admin') {
+    return <UserSettingsWrapper user={user} users={users} laundries={laundries} currentUser={currentUser}/>
+  }
+  return <Loader loader={() => sdk.fetchUser(user)}>
+    <UserSettingsWrapper user={user} users={users} laundries={laundries} currentUser={currentUser}/>
+  </Loader>
+}
+
+UserSettingsLoaderWrapper.propTypes = UserSettings.propTypes
+
+module.exports = UserSettingsLoaderWrapper
