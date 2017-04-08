@@ -5,7 +5,7 @@
 const {BookingHandler} = require('../../handlers')
 const {api} = require('../../utils')
 
-function listBookings (req, res) {
+async function listBookings (req, res) {
   const limit = req.swagger.params.page_size.value
   const since = req.swagger.params.since.value
   const from = req.swagger.params.from.value
@@ -19,22 +19,19 @@ function listBookings (req, res) {
   }
   const {machine} = req.subjects
   filter.machine = machine.model._id
-  return BookingHandler.find(filter, {limit, sort: {_id: 1}})
-    .then((bookings) => bookings.map((booking) => booking.toRestSummary()))
-    .then((bookings) => {
-      const links = {
-        first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}`
-      }
-      if (bookings.length === limit) {
-        links.next = `/api/machines/${machine.model.id}/bookings?since=${bookings[bookings.length - 1].id}&page_size=${limit}`
-      }
-      res.links(links)
-      res.json(bookings)
-    })
-    .catch(api.generateErrorHandler(res))
+  const bookings = await BookingHandler.find(filter, {limit, sort: {_id: 1}})
+  const bookingSummaries = bookings.map(booking => booking.toRestSummary())
+  const links = {
+    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}` // TODO add from + to
+  }
+  if (bookingSummaries.length === limit) {
+    links.next = `/api/machines/${machine.model.id}/bookings?since=${bookingSummaries[bookingSummaries.length - 1].id}&page_size=${limit}` // TODO add from + to
+  }
+  res.links(links)
+  res.json(bookingSummaries)
 }
 
-function createBooking (req, res) {
+async function createBooking (req, res) {
   const {machine, laundry} = req.subjects
   if (machine.model.broken) {
     return api.returnError(res, 400, 'Machine is broken')
@@ -43,66 +40,37 @@ function createBooking (req, res) {
   if (!laundry.validateDateObject(from) || !laundry.validateDateObject(to)) {
     return api.returnError(res, 400, 'Invalid date')
   }
-  const fromDate = laundry.dateFromObject(from)
-  const toDate = laundry.dateFromObject(to)
-  if (fromDate >= toDate) return api.returnError(res, 400, 'From must be before to') // Test that from is before to
-  if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) return api.returnError(res, 400, 'Too soon') // Test that booking is after now
-  if (!laundry.checkTimeLimit(from, to)) return api.returnError(res, 400, 'Time limit violation') // Test that booking meets time limit
-  if (to.hour < 24 && !laundry.isSameDay(from, to)) return api.returnError(res, 400, 'From and to must be same day') // Test that booking isn't cross day
-  Promise
+  let fromDate = laundry.dateFromObject(from)
+  let toDate = laundry.dateFromObject(to)
+  if (fromDate >= toDate) { // Test that from is before to
+    return api.returnError(res, 400, 'From must be before to')
+  }
+  if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) { // Test that booking is after now
+    return api.returnError(res, 400, 'Too soon')
+  }
+  if (!laundry.checkTimeLimit(from, to)) { // Test that booking meets time limit
+    return api.returnError(res, 400, 'Time limit violation')
+  }
+  if (to.hour < 24 && !laundry.isSameDay(from, to)) { // Test that booking isn't cross day
+    return api.returnError(res, 400, 'From and to must be same day')
+  }
+  const [dailyResult, limitResult] = await Promise
     .all([
       laundry.checkDailyLimit(req.user, from, to), // Test that daily limit isn't violated
       laundry.checkLimit(req.user, from, to) // Test that limit isn't violated
     ])
-    .then(([dailyResult, limitResult]) => {
-      if (!dailyResult) {
-        return api.returnError(res, 400, 'Daily limit violation')
-      }
-      if (!limitResult) {
-        return api.returnError(res, 400, 'Limit violation')
-      }
-      return machine
-        .fetchBookings(fromDate, toDate)
-        .then(([booking]) => {
-          if (booking) return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl}) // Test for existing booking
-          return BookingHandler
-            .findAdjacentBookingsOfUser(req.user, machine, fromDate, toDate) // Find bookings that should be merged
-            .then(({before, after}) => {
-              if (!before || from.hour + from.minute <= 0) {
-                return {before: undefined, after, fromDate, toDate}
-              }
-              return {before, fromDate: before.model.from, after, toDate}
-            })
-            .then(({after, before, fromDate, toDate}) => {
-              if (!after || to.hour >= 24) {
-                return {before, after: undefined, fromDate, toDate}
-              }
-              return {before, after, fromDate, toDate: after.model.to}
-            })
-            .then(({before, after, fromDate, toDate}) => {
-              if (!before && !after) { // If no adjacent bookings
-                return machine
-                  .createBooking(req.user, fromDate, toDate)
-              }
-              if (!before) { // If no before
-                return after
-                  .updateTime(fromDate, toDate)
-                  .then(() => after)
-              }
-              if (!after) {
-                return before
-                  .updateTime(fromDate, toDate)
-                  .then(() => before)
-              }
-              return after
-                .deleteBooking()
-                .then(() => before.updateTime(fromDate, toDate))
-                .then(() => before)
-            })
-            .then(booking => api.returnSuccess(res, booking.toRest()))
-        })
-    })
-    .catch(api.generateErrorHandler(res))
+  if (!dailyResult) {
+    return api.returnError(res, 400, 'Daily limit violation')
+  }
+  if (!limitResult) {
+    return api.returnError(res, 400, 'Limit violation')
+  }
+  let [booking] = await machine.fetchBookings(fromDate, toDate)
+  if (booking) { // Test for existing booking
+    return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
+  }
+  const newBooking = await machine.createAndMergeBooking(req.user, fromDate, toDate)
+  return api.returnSuccess(res, newBooking.toRest())
 }
 
 function fetchBooking (req, res) {
@@ -110,16 +78,15 @@ function fetchBooking (req, res) {
   return api.returnSuccess(res, booking.toRest())
 }
 
-function deleteBooking (req, res) {
+async function deleteBooking (req, res) {
   const {booking} = req.subjects
-  booking.deleteBooking()
-    .then(() => api.returnSuccess(res))
-    .catch(api.generateErrorHandler(res))
+  await booking.deleteBooking()
+  return api.returnSuccess(res)
 }
 
 module.exports = {
-  listBookings: listBookings,
-  createBooking: createBooking,
-  fetchBooking: fetchBooking,
-  deleteBooking: deleteBooking
+  listBookings: api.wrapErrorHandler(listBookings),
+  createBooking: api.wrapErrorHandler(createBooking),
+  fetchBooking: api.wrapErrorHandler(fetchBooking),
+  deleteBooking: api.wrapErrorHandler(deleteBooking)
 }
