@@ -14,6 +14,7 @@ class MachineHandler extends Handler {
    * @param {LaundryHandler} laundry
    * @param {string} name
    * @param {string} type
+   * @param {boolean} broken
    * @returns {Promise.<MachineHandler>}
    */
   static _createMachine (laundry, name, type, broken) {
@@ -35,6 +36,52 @@ class MachineHandler extends Handler {
    */
   createBooking (owner, from, to) {
     return BookingHandler._createBooking(this, owner, from, to)
+  }
+
+  findAdjacentBookingsOfUser (user, from, to) {
+    return BookingHandler
+      .findAdjacentBookingsOfUser(user, this, from, to)
+  }
+
+  async _findAdjacentBookings (user, from, to) {
+    const [{before, after}, laundry] = await (
+      Promise.all([
+        this.findAdjacentBookingsOfUser(user, from, to),  // Find bookings that should be merged
+        this.fetchLaundry()
+      ])
+    )
+    const fromObject = laundry.dateToObject(from)
+    const toObject = laundry.dateToObject(to)
+    const result = {before, after, from, to}
+    if (!before || fromObject.hour + fromObject.minute <= 0) {
+      result.before = undefined
+    } else {
+      result.from = before.model.from
+    }
+    if (!after || toObject.hour >= 24) {
+      result.after = undefined
+    } else {
+      result.to = after.model.to
+    }
+    return result
+  }
+
+  async createAndMergeBooking (owner, from, to) {
+    const {before, after, from: fromDate, to: toDate} = await this._findAdjacentBookings(owner, from, to)
+    if (!before && !after) { // If no adjacent bookings
+      return this.createBooking(owner, fromDate, toDate)
+    }
+    if (!before) { // If no before
+      await after.updateTime(fromDate, toDate).then(() => after)
+      return after
+    }
+    if (!after) {
+      await before.updateTime(fromDate, toDate)
+      return before
+    }
+    await after.deleteBooking()
+    await before.updateTime(fromDate, toDate)
+    return before
   }
 
   fetchLaundry () {
@@ -100,7 +147,13 @@ class MachineHandler extends Handler {
   }
 
   toRest () {
-    return Promise.resolve({name: this.model.name, href: this.restUrl, id: this.model.id, type: this.model.type, broken: this.model.broken})
+    return Promise.resolve({
+      name: this.model.name,
+      href: this.restUrl,
+      id: this.model.id,
+      type: this.model.type,
+      broken: this.model.broken
+    })
   }
 
   get reduxModel () {
