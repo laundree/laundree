@@ -42,7 +42,6 @@
     "topnav.support": "Support",
     "topnav.logout": "Log ud",
     "topnav.login": "Log ind",
-  "topnav.sign-up": "Tilmeld dig",
     "topnav.manage": "Administrer din konto",
     "footer.donate": "Har du lyst til at hjælpe os med at holde serverne kørende med fuld fart? Så er du velkommen til at donere et beløb via {link}",
     "footer.donate.link": "PayPal",
@@ -153,7 +152,6 @@
     "admin-panel.no-users": "Ingen brugere fundet.",
     "admin-panel.no-laundries": "Ingen vaskerier fundet.",
     "admin-panel.title": "Administrator panel",
-    "admin-panel.show-demo": "Vis demo",
     "machines.modal.message": "Er du sikker på, at du vil slette denne maskine?",
     "machines.error.machine-name": "Indtast venligt et unikt maskine navn",
     "machines.washing-machine-name": "Vaskemaskine navn",
@@ -268,5 +266,13 @@
     "location-selector.loading-placeholder": "Henter...",
     "location-selector.drop-down.no-results": "Ingen adresser fundet",
     "location-selector.drop-down.loading": "Henter adresser",
-    "location-selector.drop-down.empty": "Skriv venligst en adresse"
+    "location-selector.drop-down.empty": "Skriv venligst en adresse",
+    "topnav.sign-up": "Tilmeld dig",
+    "auth.error.invalid-repeated-password": "Gentag dit kodeord",
+    "auth.error.user-not-found": "Bruger ikke fundet",
+    "auth.error.invalid-email-password-combination": "Ugyldig email/kodeord kombination",
+    "auth.error.user-does-not-exists": "Brugeren eksisterer ikke",
+    "auth.error.invalid-verification-link": "Ugyldig verifikations link",
+    "auth.success.email-verified": "Din adresse er verificeret. Du kan nu logge ind.",
+    "admin-panel.show-demo": "Vis demo"
 }
