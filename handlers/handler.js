@@ -115,12 +115,12 @@ class Handler {
 
   /**
    * @constructor
-   * @template T
+   * @template H
    * @param {T} model
    * @param updateActions
    */
   constructor (model, updateActions = []) {
-    if (!model) throw new Error('Model may not be undefined!')
+    if (!model) throw new Error('Model.js may not be undefined!')
     this.model = model
     this._updateActions = updateActions
   }
