@@ -15,6 +15,7 @@
 
 declare module 'base64url' {
   declare module.exports: {
-    toBuffer(base64: string): Buffer
+    toBuffer(base64: string): Buffer,
+    encode(input: string | Buffer, encoding?: string) : string
   }
 }
