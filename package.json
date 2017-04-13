@@ -95,7 +95,7 @@
     "mocha": "^3.0.2",
     "nightwatch": "^0.9.8",
     "run-sequence": "^1.1.5",
-    "sauce-connect-launcher": "^1.0.0",
+    "sauce-connect-launcher": "1.2.0",
     "selenium-standalone": "^6.0.1",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.9.0",
