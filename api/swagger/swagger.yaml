@@ -247,6 +247,46 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /users/{userId}/one-signal-player-ids:
+    x-swagger-router-controller: users
+    post:
+      description: Register a OneSignal player id
+      operationId: addOneSignalPlayerId
+      security:
+        - self: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The user to be queried
+          type: string
+        - name: body
+          in: body
+          required: true
+          schema:
+            required:
+              - playerId
+            properties:
+              playerId:
+                type: string
+      tags:
+        - Users
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /users/{userId}/start-password-reset:
     x-swagger-router-controller: users
     post:

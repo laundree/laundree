@@ -125,11 +125,10 @@ class Handler {
     this._updateActions = updateActions
   }
 
-  save () {
-    return this.model
-      .save()
-      .then(() => this.emitEvent('update'))
-      .then(() => this)
+  async save () {
+    await this.model.save()
+    await this.emitEvent('update')
+    return this
   }
 
   /**

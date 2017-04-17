@@ -110,6 +110,20 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Add one-signal player id
+   * @param playId
+   * @returns {Promise.<number>}
+   */
+  async addOneSignalPlayerId (playId) {
+    if(this.model.oneSignalPlayerIds.includes(playId)) {
+      return 0
+    }
+    this.model.oneSignalPlayerIds.push(playId)
+    await this.save()
+    return 1
+  }
+
+  /**
    * Will create a new password-reset token with 1h. expiration.
    * @return {Promise.<TokenHandler>}
    */

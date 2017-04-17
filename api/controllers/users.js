@@ -123,6 +123,13 @@ async function changeUserPassword (req, res) {
   return utils.api.returnSuccess(res)
 }
 
+async function addOneSignalPlayerId (req, res) {
+  const {user} = req.subjects
+  const {playerId} = req.swagger.params.body.value
+  await user.addOneSignalPlayerId(playerId)
+  return utils.api.returnSuccess(res)
+}
+
 function fetchUserEmails (req, res) {
   const {user} = req.subjects
   return utils.api.returnSuccess(res, user.model.emails)
@@ -139,5 +146,6 @@ module.exports = {
   deleteUser: utils.api.wrapErrorHandler(deleteUser),
   updateUser: utils.api.wrapErrorHandler(updateUser),
   changeUserPassword: utils.api.wrapErrorHandler(changeUserPassword),
-  fetchUserEmails: utils.api.wrapErrorHandler(fetchUserEmails)
+  fetchUserEmails: utils.api.wrapErrorHandler(fetchUserEmails),
+  addOneSignalPlayerId: utils.api.wrapErrorHandler(addOneSignalPlayerId)
 }
