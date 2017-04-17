@@ -42,6 +42,9 @@ class BookingHandler extends Handler {
       return
     }
     const newTime = new Date(this.model.from.getTime() - 1000 * 60 * 30)
+    if (newTime.getTime() < Date.now()) {
+      return
+    }
     this.model.oneSignalId = await createNotification(playerIds, newTime)
     return this.model.save()
   }
