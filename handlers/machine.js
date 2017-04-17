@@ -72,15 +72,15 @@ class MachineHandler extends Handler {
       return this.createBooking(owner, fromDate, toDate)
     }
     if (!before) { // If no before
-      await after.updateTime(fromDate, toDate).then(() => after)
+      await after.updateTime(owner, fromDate, toDate).then(() => after)
       return after
     }
     if (!after) {
-      await before.updateTime(fromDate, toDate)
+      await before.updateTime(owner, fromDate, toDate)
       return before
     }
     await after.deleteBooking()
-    await before.updateTime(fromDate, toDate)
+    await before.updateTime(owner, fromDate, toDate)
     return before
   }
 

@@ -5,6 +5,8 @@
 const Handler = require('./handler')
 const {BookingModel} = require('../models')
 const {types: {DELETE_BOOKING, UPDATE_BOOKING, CREATE_BOOKING}} = require('../redux/actions')
+const {createNotification, deleteNotification} = require('../utils/oneSignal')
+const {logError} = require('../utils/error')
 
 class BookingHandler extends Handler {
   /**
@@ -15,21 +17,43 @@ class BookingHandler extends Handler {
    * @param {Date} to
    * @returns {Promise.<BookingHandler>}
    */
-  static _createBooking (machine, owner, from, to) {
-    return new BookingModel({
+  static async _createBooking (machine, owner, from, to) {
+    const model = await new BookingModel({
       docVersion: 1,
       laundry: machine.model.laundry,
       machine: machine.model._id,
       owner: owner.model._id,
       from,
       to
-    })
-      .save()
-      .then((model) => new BookingHandler(model))
-      .then((booking) => {
-        booking.emitEvent('create')
-        return booking
-      })
+    }).save()
+    const booking = new BookingHandler(model)
+    booking.emitEvent('create')
+    booking._createNotification(owner.model.oneSignalPlayerIds).catch(logError)
+    return booking
+  }
+
+  async _updateNotification (playerIds) {
+    await this._cancelNotification()
+    await this._createNotification(playerIds)
+  }
+
+  async _createNotification (playerIds) {
+    if (!playerIds.length) {
+      return
+    }
+    const newTime = new Date(this.model.from.getTime() - 1000 * 60 * 30)
+    this.model.oneSignalId = await createNotification(playerIds, newTime)
+    return this.model.save()
+  }
+
+  async _cancelNotification () {
+    if (!this.model.oneSignalId) {
+      return
+    }
+    if (this.model.from.getTime() - Date.now() < 30 * 60 * 1000) {
+      return
+    }
+    return deleteNotification(this.model.oneSignalId)
   }
 
   /**
@@ -82,27 +106,28 @@ class BookingHandler extends Handler {
     return user.model._id.equals(owner)
   }
 
-  deleteBooking () {
-    return this.model.remove().then(() => {
-      this.emitEvent('delete')
-      return this
-    })
+  async deleteBooking () {
+    this._cancelNotification().catch(logError)
+    await this.model.remove()
+    this.emitEvent('delete')
+    return this
   }
 
   /**
-   *
+   * @param {UserHandler} owner
    * @param {Date} from
    * @param {Date} to
    */
-  updateTime (from, to) {
+  async updateTime (owner, from, to) {
+    const notificationsShouldBeUpdated = from.getTime() !== this.model.from.getTime()
     this.model.from = from
     this.model.to = to
-    return this.model
-      .save()
-      .then(() => {
-        this.emitEvent('update')
-        return this
-      })
+    await this.model.save()
+    if (notificationsShouldBeUpdated) {
+      this._updateNotification(owner.model.oneSignalPlayerIds)
+    }
+    this.emitEvent('update')
+    return this
   }
 
   /**

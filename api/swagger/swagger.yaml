@@ -1858,7 +1858,10 @@ definitions:
   password:
     type: string
     format: password
-    pattern: ([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])
+    pattern: '([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])'
+  uuid:
+    type: string
+    pattern: '^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$'
   name:
     type: string
     pattern: ([^\s]+)

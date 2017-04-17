@@ -40,3 +40,7 @@ mailer:
     transport: 'MAILER_SMTP_TRANSPORT'
 
 mode: 'MODE'
+
+oneSignal:
+  appId: 'ONE_SIGNAL_APP_ID'
+  restApiKey: 'ONE_SIGNAL_REST_API_KEY'

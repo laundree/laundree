@@ -11,6 +11,12 @@ calendar:
   name: 'Booking'
   ttl: 1800
 
+oneSignal:
+  appId: 'someId'
+  templateId: '2697a92d-dbcf-47c4-9541-56eb58a00375'
+  restApiKey: 'someKey'
+  enabled: true
+
 timezone: Europe/Copenhagen
 googlePlaceId: 'ChIJ-1-U7rYnS0YRzZLgw9BDh1I'
 

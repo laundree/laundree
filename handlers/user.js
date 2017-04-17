@@ -4,6 +4,7 @@
 
 const Handler = require('./handler')
 const TokenHandler = require('./token')
+const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const utils = require('../utils')
@@ -120,7 +121,15 @@ class UserHandler extends Handler {
     }
     this.model.oneSignalPlayerIds.push(playId)
     await this.save()
+    this._updateBookings().catch(utils.error.logError)
     return 1
+  }
+
+  async _updateBookings () {
+    debug('Updating bookigns with playId', this.model.oneSignalPlayerIds)
+    const bookings = await BookingHandler.find({owner: this.model.id, from: {$gte: new Date()}})
+    debug('Found bookings', bookings)
+    return Promise.all(bookings.map(booking => booking._updateNotification(this.model.oneSignalPlayerIds)))
   }
 
   /**
