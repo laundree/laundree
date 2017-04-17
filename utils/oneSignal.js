@@ -14,7 +14,7 @@ async function createNotification (playerIds, sendAfter) {
   }
   const {body: {id}} = await request
     .post(url)
-    .set('Authorization', `Bearer ${restApiKey}`)
+    .set('Authorization', `Basic ${restApiKey}`)
     .set('Content-Type', 'application/json')
     .send({
       app_id: appId,
@@ -34,7 +34,7 @@ function deleteNotification (id) {
   return request
     .delete(`${url}/${id}`)
     .query({app_id: appId})
-    .set('Authorization', `Bearer ${restApiKey}`)
+    .set('Authorization', `Basic ${restApiKey}`)
     .set('Content-Type', 'application/json')
 }
 
