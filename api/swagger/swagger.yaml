@@ -268,7 +268,7 @@ paths:
               - playerId
             properties:
               playerId:
-                type: string
+                $ref: "#/definitions/uuid"
       tags:
         - Users
       responses:
