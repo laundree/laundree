@@ -4,8 +4,6 @@ const gulp = require('gulp')
 const babel = require('gulp-babel')
 const eslint = require('gulp-eslint')
 const mocha = require('gulp-mocha')
-const istanbul = require('gulp-babel-istanbul')
-const isparta = require('isparta')
 const exec = require('child_process').exec
 const runSequence = require('run-sequence')
 const browserify = require('browserify')
@@ -22,24 +20,6 @@ gulp.task('lint', function () {
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failAfterError())
-})
-
-gulp.task('coverage:instrument', () => {
-  return gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
-    .pipe(istanbul({ // Covering files
-      instrumenter: isparta.Instrumenter,
-      includeUntested: true
-    }))
-    .pipe(istanbul.hookRequire())
-})
-gulp.task('coverage:report', () => {
-  return gulp.src(['{handlers,models,utils,api/controllers}/**/*.js'])
-    .pipe(istanbul.writeReports({
-      dir: 'coverage',
-      reportOpts: {dir: 'coverage'},
-      reporters: ['text', 'text-summary', 'lcov']
-    }))
-    .pipe(istanbul.enforceThresholds({thresholds: {global: 90}}))
 })
 
 gulp.task('coverage:send', (done) => {
@@ -210,9 +190,11 @@ gulp.task('test:e2e-local-coverage', done => {
     done)
 })
 
-gulp.task('test', (done) => runSequence('lint', 'coverage:instrument', 'test:unit', 'test:e2e', 'coverage:report', 'coverage:send', exit(done)))
+gulp.task('test', (done) => runSequence('lint', 'test:unit', 'test:e2e', exit(done)))
 
-gulp.task('test:docker', (done) => runSequence('lint', 'coverage:instrument', 'test:unit', 'test:e2e-docker', 'coverage:report', 'coverage:send', exit(done)))
+gulp.task('test:no-cov', (done) => runSequence('lint', 'test:unit', 'test:e2e', exit(done)))
+
+gulp.task('test:docker', (done) => runSequence('lint', 'test:unit', 'test:e2e-docker', exit(done)))
 
 function exit (cb) {
   return err => setTimeout(() => {
