@@ -21,11 +21,12 @@ async function listBookings (req, res) {
   filter.machine = machine.model._id
   const bookings = await BookingHandler.find(filter, {limit, sort: {_id: 1}})
   const bookingSummaries = bookings.map(booking => booking.toRestSummary())
+  const fromToQuerySegment = (from ? `&from=${from}` : '') + (to ? `&from=${to}` : '')
   const links = {
-    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}` // TODO add from + to
+    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}${fromToQuerySegment}`
   }
   if (bookingSummaries.length === limit) {
-    links.next = `/api/machines/${machine.model.id}/bookings?since=${bookingSummaries[bookingSummaries.length - 1].id}&page_size=${limit}` // TODO add from + to
+    links.next = `/api/machines/${machine.model.id}/bookings?since=${bookingSummaries[bookingSummaries.length - 1].id}&page_size=${limit}${fromToQuerySegment}`
   }
   res.links(links)
   res.json(bookingSummaries)

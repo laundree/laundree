@@ -115,7 +115,7 @@ class UserHandler extends Handler {
    * @returns {Promise.<number>}
    */
   async addOneSignalPlayerId (playId) {
-    if(this.model.oneSignalPlayerIds.includes(playId)) {
+    if (this.model.oneSignalPlayerIds.includes(playId)) {
       return 0
     }
     this.model.oneSignalPlayerIds.push(playId)

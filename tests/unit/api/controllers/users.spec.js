@@ -198,7 +198,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .expect(204)
         const newUser = await UserHandler.findFromId(user.model.id)
-        newUser.model.oneSignalPlayerIds.should.contain("someId")
+        newUser.model.oneSignalPlayerIds.should.contain('someId')
       })
       it('should not add twice', async () => {
         const {token, user} = await dbUtils.populateTokens(1)
@@ -215,7 +215,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .expect(204)
         const newUser = await UserHandler.findFromId(user.model.id)
-        newUser.model.oneSignalPlayerIds.should.contain("someId")
+        newUser.model.oneSignalPlayerIds.should.contain('someId')
         newUser.model.oneSignalPlayerIds.should.be.of.length(1)
       })
     })
