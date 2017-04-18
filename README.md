@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/laundree/laundree.png?label=ready&title=Ready)](https://waffle.io/laundree/laundree)
 # laundree
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/laundree/laundree.svg)](https://greenkeeper.io/)
