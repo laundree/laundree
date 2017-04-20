@@ -32,11 +32,6 @@ class BookingHandler extends Handler {
     return booking
   }
 
-  async _updateNotification (playerIds) {
-    await this._cancelNotification()
-    await this._createNotification(playerIds)
-  }
-
   async _createNotification (playerIds) {
     if (!playerIds.length) {
       return
@@ -123,11 +118,14 @@ class BookingHandler extends Handler {
    */
   async updateTime (owner, from, to) {
     const notificationsShouldBeUpdated = from.getTime() !== this.model.from.getTime()
+    if (notificationsShouldBeUpdated) {
+      this._cancelNotification().catch(logError)
+    }
     this.model.from = from
     this.model.to = to
     await this.model.save()
     if (notificationsShouldBeUpdated) {
-      this._updateNotification(owner.model.oneSignalPlayerIds)
+      this._createNotification(owner.model.oneSignalPlayerIds).catch(logError)
     }
     this.emitEvent('update')
     return this
