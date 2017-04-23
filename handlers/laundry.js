@@ -7,7 +7,7 @@ const UserHandler = require('./user')
 const MachineHandler = require('./machine')
 const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
-
+const error = require('../utils/error')
 const debug = require('debug')('laundree.handlers.laundry')
 const uuid = require('uuid')
 const config = require('config')
@@ -308,14 +308,13 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {Promise.<LaundryHandler>}
    */
-  removeUser (user) {
+  async removeUser (user) {
     this.model.users.pull(user.model._id)
     this.model.owners.pull(user.model._id)
+    await this.save()
+    this._deleteBookings(user).catch(error.logError)
+    await user._removeLaundry(this)
     return this
-      .save()
-      .then(() => this._deleteBookings(user))
-      .then(() => user._removeLaundry(this))
-      .then(() => this)
   }
 
   _deleteBookings (user) {
