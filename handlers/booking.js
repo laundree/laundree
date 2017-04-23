@@ -137,7 +137,7 @@ class BookingHandler extends Handler {
    * @returns {Promise}
    */
   static async deleteBookings (query = {}) {
-    const bookings = await BookingModel.find(query)
+    const bookings = await BookingHandler.find(query)
     return Promise.all(bookings.map(booking => booking.deleteBooking()))
   }
 
