@@ -274,5 +274,6 @@
     "auth.error.user-does-not-exists": "User doesn't exists",
     "auth.error.invalid-verification-link": "Invalid verification link",
     "auth.success.email-verified": "Your email has been verified, please login",
-    "admin-panel.show-demo": "Show demo"
+    "admin-panel.show-demo": "Show demo",
+    "meta.description": "Laundree is an app for booking of shared laundry facilities. You can reserve your machines from the mobile. Get started online now!"
 }
