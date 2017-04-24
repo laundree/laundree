@@ -12,6 +12,7 @@ const app = express()
 const {error} = require('./utils')
 const locale = require('locale')
 const locales = require('./locales')
+const config = require('config')
 const debug = require('debug')('laundree.app')
 
 // SETUP MORGAN
@@ -21,7 +22,11 @@ setups.morganSetup(app)
 app.use(fetchPseudoStaticRoutes())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'dist')))
-
+app.get('/robots.txt', function (req, res) {
+  res.type('text/plain')
+  const sitemapUrl = `${config.get('web.protocol')}://${config.get('web.host')}/sitemap.txt`
+  res.send(`User-agent: *\nAllow: /\nSitemap: ${sitemapUrl}`)
+})
 // SETUP SESSION
 app.use(setups.sessionSetup)
 
