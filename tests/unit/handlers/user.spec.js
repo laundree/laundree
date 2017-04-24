@@ -57,18 +57,17 @@ describe('handlers', () => {
               }))))
     })
     describe('emitEvent', () => {
-      it('should log', () => {
+      it('should log', () =>
         user.fetchEvents()
           .then(events => events.should.have.length(1))
           .then(() => user.emitEvent('update'))
           .then(() => user.fetchEvents())
-          .then(events => events.should.have.length(2))
-      })
+          .then(events => events.should.have.length(2)))
     })
 
     describe('findFromEmail', () => {
       it('should be possible to find existing profiles from email',
-        () => UserHandler.findFromEmail('bob@example.com').should.eventually.not.be.undefined)
+        () => UserHandler.findFromEmail('bob@example.com').then(user => user.should.not.be.undefined))
     })
 
     describe('updateProfile', () => {
@@ -255,6 +254,11 @@ describe('handlers', () => {
         dbUtils.populateTokens(10)
           .then(({user, tokens}) =>
             user.findAuthTokenFromSecret(tokens[9].secret)
+              .then((token) => token.model.id.should.deep.equal(tokens[9].model.id))))
+      it('should right old token find', () =>
+        dbUtils.populateTokens(10)
+          .then(({user, tokens}) =>
+            user.findAuthTokenFromSecret(tokens[9].secret.split('.')[2])
               .then((token) => token.model.id.should.deep.equal(tokens[9].model.id))))
     })
   })

@@ -5,7 +5,7 @@ const React = require('react')
 const {DocumentTitle} = require('./intl')
 const TimetableTables = require('./TimetableTables')
 const TimetableHeaders = require('./TimetableHeaders')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {FormattedDate, FormattedMessage} = require('react-intl')
 const {range} = require('../../utils/array')
 const sdk = require('../../client/sdk')
@@ -14,7 +14,6 @@ const {BaseModal} = require('./modal')
 const Loader = require('./Loader')
 
 class BookingInfo extends React.Component {
-
   constructor (props) {
     super(props)
     this.deleteHandler = () => sdk
@@ -105,7 +104,6 @@ BookingInfo.propTypes = {
 }
 
 class Timetable extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {numDays: 0, offset: 0, hoverColumn: -1, activeBooking: null}

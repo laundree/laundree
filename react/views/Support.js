@@ -4,7 +4,6 @@ const {DocumentTitle} = require('./intl')
 const {FormattedMessage} = require('react-intl')
 
 class Support extends React.Component {
-
   render () {
     const user = this.props.users[this.props.currentUser]
     return <DocumentTitle title='document-title.signup'>

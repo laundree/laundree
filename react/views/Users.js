@@ -6,7 +6,7 @@ const {FormattedMessage} = require('react-intl')
 const sdk = require('../../client/sdk')
 const Loader = require('./Loader')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {createInvitePdf} = require('../../utils/pdf')
 const request = require('superagent')
 const toBuffer = require('blob-to-buffer')
@@ -140,7 +140,6 @@ LinkElement.propTypes = {
 }
 
 class LinkInvite extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {link: null}
@@ -346,7 +345,6 @@ InviteItem.contextTypes = {
 }
 
 class Users extends React.Component {
-
   renderUsers () {
     return <ul className='bigList'>
       {this.users.map(user => <li key={user.id}><UserItem

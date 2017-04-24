@@ -5,17 +5,15 @@
 const Initializer = require('./initializer')
 const debug = require('debug')('laundree.initializers.app')
 
-const React = require('react')
 const ReactDOM = require('react-dom')
-const {IntlProvider} = require('react-intl')
-const {Provider} = require('react-redux')
-const {Router, browserHistory, match} = require('react-router')
-const routeGenerator = require('../../react/routes')
+const React = require('react')
+const {BrowserRouter} = require('react-router-dom')
+
 const io = require('socket.io-client')
 const {createStore} = require('redux')
 const reducers = require('../../redux/reducers')
 const sdk = require('../sdk')
-const locales = require('./../../locales')
+const App = require('../../react/containers/App')
 
 const socket = io('/redux')
 
@@ -40,15 +38,12 @@ class AppInitializer extends Initializer {
     const rootElement = element.querySelector('#AppRoot')
     if (!rootElement) return
     const store = setupStore()
-    match({history: browserHistory, routes: routeGenerator(store)}, (e, redirectLocation, renderProps) => {
-      const locale = store.getState().config.locale
-      ReactDOM.render(
-        <IntlProvider locale={locale} messages={locales[locale].messages}>
-          <Provider store={store}>
-            {React.createElement(Router, Object.assign({}, renderProps))}
-          </Provider>
-        </IntlProvider>, rootElement)
-    })
+    const locale = store.getState().config.locale
+    ReactDOM.render(
+      <BrowserRouter>
+        <App locale={locale} store={store} />
+      </BrowserRouter>,
+      rootElement)
   }
 }
 

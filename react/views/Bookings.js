@@ -1,6 +1,6 @@
 const React = require('react')
 const {FormattedDate} = require('react-intl')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {Modal, DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
@@ -8,7 +8,6 @@ const moment = require('moment')
 const Loader = require('./Loader')
 
 class Booking extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {showModal: false}
@@ -60,7 +59,6 @@ class Booking extends React.Component {
       </div>
     </div>
   }
-
 }
 
 Booking.propTypes = {
@@ -75,7 +73,6 @@ Booking.propTypes = {
 }
 
 class Bookings extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {showModal: false}

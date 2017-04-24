@@ -4,6 +4,7 @@
 
 const Handler = require('./handler')
 const TokenHandler = require('./token')
+const BookingHandler = require('./booking')
 const LaundryInvitationHandler = require('./laundry_invitation')
 const {UserModel} = require('../models')
 const utils = require('../utils')
@@ -34,7 +35,6 @@ function displayNameToName (displayName) {
  */
 
 class UserHandler extends Handler {
-
   /**
    * Find a user from given email address.
    * @param {string} email
@@ -53,7 +53,11 @@ class UserHandler extends Handler {
    */
   static findOrCreateFromProfile (profile) {
     if (!profile.emails || !profile.emails.length) return Promise.resolve()
-    return UserHandler.findFromEmail(profile.emails[0].value).then((user) => user ? user.updateProfile(profile) : UserHandler.createUserFromProfile(profile))
+    return UserHandler
+      .findFromEmail(profile.emails[0].value)
+      .then((user) => user
+        ? user.updateProfile(profile)
+        : UserHandler.createUserFromProfile(profile))
   }
 
   /**
@@ -107,6 +111,28 @@ class UserHandler extends Handler {
   }
 
   /**
+   * Add one-signal player id
+   * @param playId
+   * @returns {Promise.<number>}
+   */
+  async addOneSignalPlayerId (playId) {
+    if (this.model.oneSignalPlayerIds.includes(playId)) {
+      return 0
+    }
+    this.model.oneSignalPlayerIds.push(playId)
+    await this.save()
+    this._updateBookings().catch(utils.error.logError)
+    return 1
+  }
+
+  async _updateBookings () {
+    debug('Updating bookigns with playId', this.model.oneSignalPlayerIds)
+    const bookings = await BookingHandler.find({owner: this.model.id, from: {$gte: new Date()}})
+    debug('Found bookings', bookings)
+    return Promise.all(bookings.map(booking => booking._updateNotification(this.model.oneSignalPlayerIds)))
+  }
+
+  /**
    * Will create a new password-reset token with 1h. expiration.
    * @return {Promise.<TokenHandler>}
    */
@@ -153,15 +179,13 @@ class UserHandler extends Handler {
 
   /**
    * Verifies a calendar token
-   * @param {string} token
+   * @param {string} secret
    * @returns {Promise.<boolean>|*}
    */
-  verifyCalendarToken (token) {
+  verifyCalendarToken (secret) {
     debug('Verifying calendar token', this.model.calendarTokensReferences)
-    return this
-      ._fetchcalendarTokensReferences()
-      .then(tokens => Promise.all(tokens.map(t => t.verify(token))))
-      .then(result => result.find(r => r))
+    return TokenHandler
+      .findTokenFromSecret(secret, {_id: {$in: this.model.calendarTokensReferences}})
       .then(Boolean)
   }
 
@@ -198,24 +222,11 @@ class UserHandler extends Handler {
    * @return {Promise.<TokenHandler>}
    */
   findAuthTokenFromSecret (secret) {
-    return this
-      .fetchAuthTokens()
-      .then(tokens => tokens
-        .reduce(
-          (prev, token) =>
-            prev
-              .then((oldToken) => oldToken || token
-                .verify(secret)
-                .then((result) => result ? token : null)),
-          Promise.resolve(null)))
+    return TokenHandler.findTokenFromSecret(secret, {_id: {$in: this.model.authTokens}})
   }
 
   fetchAuthTokens () {
     return TokenHandler.find({_id: {$in: this.model.authTokens}})
-  }
-
-  _fetchcalendarTokensReferences () {
-    return TokenHandler.find({_id: {$in: this.model.calendarTokensReferences}})
   }
 
   _fetchUserTokens () {
@@ -523,6 +534,16 @@ class UserHandler extends Handler {
     return `/api/users/${this.model.id}`
   }
 
+  get photo () {
+    const profile = this.model.latestProfile
+    const photo = profile.photos && profile.photos.length && profile.photos[0].value
+    if (!photo) return null
+    if (profile.provider !== 'google') return photo || undefined
+    const matches = photo.match(/sz=([0-9]+)$/)
+    if (!matches) return photo
+    return photo.substr(0, photo.length - matches[1].length) + '200'
+  }
+
   toRest () {
     return this.fetchAuthTokens()
       .then(tokens => ({
@@ -535,7 +556,7 @@ class UserHandler extends Handler {
           middleName: this.model.name.middleName
         },
         tokens: tokens.map(t => t.toRestSummary()),
-        photo: this.model.photo,
+        photo: this.photo || '',
         href: this.restUrl
       }))
   }
@@ -561,7 +582,7 @@ class UserHandler extends Handler {
   get reduxModel () {
     return {
       id: this.model.id,
-      photo: this.model.photo,
+      photo: this.photo,
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,

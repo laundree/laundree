@@ -9,6 +9,9 @@ security:
   password:
     saltRounds: 1
 
+oneSignal:
+  enabled: false
+
 mailer:
   stubTransporter: true
   dryRun: false

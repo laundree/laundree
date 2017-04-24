@@ -37,8 +37,17 @@ function returnSuccess (res, result) {
     .catch(error.logError)
 }
 
+function wrapErrorHandler (func) {
+  return (req, res) => {
+    return Promise
+      .resolve(func(req, res))
+      .catch(generateErrorHandler(res))
+  }
+}
+
 module.exports = {
   generateErrorHandler,
   returnError,
-  returnSuccess
+  returnSuccess,
+  wrapErrorHandler
 }

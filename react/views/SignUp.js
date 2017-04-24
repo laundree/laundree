@@ -3,7 +3,7 @@
  */
 const React = require('react')
 const {DocumentTitle} = require('./intl')
-const {Link} = require('react-router')
+const {Link} = require('react-router-dom')
 const {ValidationForm, ValidationElement} = require('./validation')
 const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
@@ -11,7 +11,6 @@ const {FormattedMessage} = require('react-intl')
 const {Input, Submit, Label} = require('./intl')
 
 class SignUp extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.submitHandler = (evt) => {
@@ -111,6 +110,18 @@ class SignUp extends ValueUpdater {
                 value={this.state.values.password || ''}
                 onChange={this.generateValueUpdater('password')}
                 type='password' name='password' placeholder='general.password'/>
+            </Label>
+          </ValidationElement>
+          <ValidationElement
+            initial={this.state.values.password2 === undefined}
+            sesh={this.state.sesh}
+            validator={() => this.state.values.password === this.state.values.password2}
+            value={this.state.values.password2 || ''}>
+            <Label data-validate-error='auth.error.invalid-repeated-password'>
+              <Input
+                value={this.state.values.password2 || ''}
+                onChange={this.generateValueUpdater('password2')}
+                type='password' name='password' placeholder='general.repeat-password'/>
             </Label>
           </ValidationElement>
           <div className='accept'>

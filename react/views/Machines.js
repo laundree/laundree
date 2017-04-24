@@ -7,7 +7,6 @@ const {FormattedMessage} = require('react-intl')
 const Loader = require('./Loader')
 
 class MachineDropdown extends React.Component {
-
   selectGenerator (value) {
     return () => {
       this.props.onSelect(value)
@@ -56,7 +55,6 @@ MachineDropdown.propTypes = {
 }
 
 class MachineListItem extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = this.initialState
@@ -195,7 +193,6 @@ MachineListItem.propTypes = {
 }
 
 class Machines extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {}

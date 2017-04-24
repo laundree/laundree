@@ -5,9 +5,9 @@ const {ValidationForm, ValidationElement} = require('./validation')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
 const LocationSelector = require('./LocationSelector')
+const Switch = require('./Switch')
 
 class LaundrySettingsForm extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.onSubmit = (evt) => {
@@ -93,7 +93,6 @@ LaundrySettingsForm.propTypes = {
 }
 
 class DeleteLaundry extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
@@ -134,7 +133,6 @@ class DeleteLaundry extends React.Component {
       </div>
     </div>
   }
-
 }
 
 DeleteLaundry.propTypes = {
@@ -143,7 +141,6 @@ DeleteLaundry.propTypes = {
 }
 
 class LeaveLaundry extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {modalOpen: false}
@@ -176,34 +173,11 @@ class LeaveLaundry extends React.Component {
       </div>
     </div>
   }
-
 }
 
 LeaveLaundry.propTypes = {
   laundry: React.PropTypes.object.isRequired,
   user: React.PropTypes.object.isRequired
-}
-class Switch extends React.Component {
-
-  constructor (props) {
-    super(props)
-    this.onClick = () => this.props.onChange(!this.isOn)
-  }
-
-  get isOn () {
-    return Boolean(this.props.on)
-  }
-
-  render () {
-    return <div
-      onClick={this.onClick}
-      className={'switch ' + (this.isOn ? 'on' : 'off')}/>
-  }
-}
-
-Switch.propTypes = {
-  on: React.PropTypes.bool,
-  onChange: React.PropTypes.func.isRequired
 }
 
 function timeStringToMinutes (time) {
@@ -252,7 +226,6 @@ function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
 }
 
 class BookingRules extends ValueUpdater {
-
   constructor (props) {
     super(props)
     this.timeMap = timeString => {
@@ -439,7 +412,6 @@ BookingRules.propTypes = {
 }
 
 class LaundrySettings extends React.Component {
-
   get isOwner () {
     return this.props.user.role === 'admin' || this.laundry.owners.indexOf(this.props.user.id) >= 0
   }

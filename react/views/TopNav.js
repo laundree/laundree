@@ -2,13 +2,12 @@
  * Created by budde on 05/06/16.
  */
 const React = require('react')
-const {Link} = require('react-router')
+const {NavLink} = require('react-router-dom')
 const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
 const LocaleSelect = require('./LocaleSelect')
 const {FormattedMessage} = require('react-intl')
 
 class TopNav extends React.Component {
-
   get laundries () {
     return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
   }
@@ -47,20 +46,20 @@ class TopNav extends React.Component {
 
   renderUserLoggedInMenu () {
     return <nav id='TopNav'>
-      <Link to='/' className='home' activeClassName='active'>
+      <NavLink to='/' className='home' activeClassName='active'>
         <svg>
           <use xlinkHref='#SmallLogo'/>
         </svg>
-      </Link>
+      </NavLink>
       <div className='laundries'>
         {this.renderLaundries()}
       </div>
-      <Link to='/support' className='icon help' activeClassName='active'>
+      <NavLink to='/support' className='icon help' activeClassName='active'>
         <svg>
           <use xlinkHref='#LifeBuoy'/>
         </svg>
         <FormattedMessage id='topnav.support'/>
-      </Link>
+      </NavLink>
       <div className='rightNav'>
         {this.renderGlobe()}
         <DropDown className='user'>
@@ -71,9 +70,9 @@ class TopNav extends React.Component {
             <ul className='dropDownList'>
               {this.props.user.demo ? null : <li>
                   <DropDownCloser>
-                    <Link to={`/users/${this.props.user.id}`} activeClassName='active'>
+                    <NavLink to={`/users/${this.props.user.id}/settings`} activeClassName='active'>
                       <FormattedMessage id='topnav.manage'/>
-                    </Link>
+                    </NavLink>
                   </DropDownCloser>
                 </li>}
               <li>
@@ -90,28 +89,31 @@ class TopNav extends React.Component {
 
   renderNotLoggedInMenu () {
     return <nav id='TopNav'>
-      <Link to='/' className='home' activeClassName='active'>
+      <NavLink to='/' className='home' activeClassName='active'>
         <svg>
           <use xlinkHref='#SmallLogo'/>
         </svg>
-      </Link>
-      <Link to='/about' className='icon about' activeClassName='active'>
+      </NavLink>
+      <NavLink to='/about' className='icon about' activeClassName='active'>
         <svg>
           <use xlinkHref='#Info'/>
         </svg>
         <FormattedMessage id='topnav.about'/>
-      </Link>
-      <Link to='/contact' className='icon contact' activeClassName='active'>
+      </NavLink>
+      <NavLink to='/contact' className='icon contact' activeClassName='active'>
         <svg>
           <use xlinkHref='#EMail4'/>
         </svg>
         <FormattedMessage id='topnav.contact'/>
-      </Link>
+      </NavLink>
       <div className='rightNav'>
         {this.renderGlobe()}
-        <Link to={this.props.config.returningUser ? '/auth' : '/auth/sign-up'} className='log-in'>
-          <FormattedMessage id={this.props.config.returningUser ? 'topnav.login' : 'topnav.sign-up'}/>
-        </Link>
+        <NavLink to='/auth' className='auth'>
+          <FormattedMessage id='topnav.login'/>
+        </NavLink>
+        <NavLink to='/auth/sign-up' className='auth signUp'>
+          <FormattedMessage id='topnav.sign-up'/>
+        </NavLink>
       </div>
     </nav>
   }

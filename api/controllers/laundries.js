@@ -163,7 +163,7 @@ function inviteUserByEmail (req, res) {
         return mail.sendEmail({
           email,
           laundry: laundry.model.toObject(),
-          user: user.model.toObject()
+          user: {displayName: user.model.displayName, id: user.model.id}
         }, 'invite-user', email, {locale: req.locale})
       }
       if (invite) {

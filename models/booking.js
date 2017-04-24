@@ -9,6 +9,7 @@ const bookingSchema = new Schema({
   docVersion: {type: Number},
   from: {type: Date, required: true},
   to: {type: Date, required: true},
+  oneSignalId: String,
   owner: {type: Schema.Types.ObjectId, ref: 'User', required: true},
   machine: {type: Schema.Types.ObjectId, ref: 'Machine', required: true},
   laundry: {type: Schema.Types.ObjectId, ref: 'Laundry', required: true}

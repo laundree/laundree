@@ -5,8 +5,11 @@ const React = require('react')
 const {DocumentTitle} = require('./intl')
 const sdk = require('../../client/sdk')
 const {FormattedMessage} = require('react-intl')
-class DemoButton extends React.Component {
+const AdminPanel = require('../containers/AdminPanel')
+const CreateLaundry = require('../containers/CreateLaundry')
+const {Redirect} = require('react-router')
 
+class DemoButton extends React.Component {
   constructor (props) {
     super(props)
     this.state = {loading: false, email: '', password: ''}
@@ -37,7 +40,7 @@ class DemoButton extends React.Component {
   }
 }
 
-const Home = () => <DocumentTitle title='document-title.home'>
+const HomeNotLoggedIn = () => <DocumentTitle title='document-title.home'>
   <div id='Home'>
     <header>
       <div>
@@ -107,5 +110,18 @@ const Home = () => <DocumentTitle title='document-title.home'>
     </main>
   </div>
 </DocumentTitle>
+
+const Home = ({users, currentUser}) => {
+  const user = users[currentUser]
+  if (!user) return <HomeNotLoggedIn/>
+  if (user.role === 'admin') return <AdminPanel/>
+  if (!user.laundries.length) return <CreateLaundry/>
+  return <Redirect to={`/laundries/${user.laundries[0]}/timetable`}/>
+}
+
+Home.propTypes = {
+  users: React.PropTypes.object.isRequired,
+  currentUser: React.PropTypes.string
+}
 
 module.exports = Home

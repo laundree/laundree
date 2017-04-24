@@ -23,7 +23,6 @@ function isChildOf (parent, child) {
 }
 
 class TimetableTable extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = Object.assign({bookings: {}, activeBooking: null}, this._calcPosition())
@@ -298,7 +297,6 @@ TimetableTable.propTypes = {
 }
 
 class TimetableTables extends React.Component {
-
   constructor (props) {
     super(props)
     this.state = {hoverRow: -1}

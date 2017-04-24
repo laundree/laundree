@@ -18,6 +18,7 @@ const userSchema = new Schema({
   latestProvider: String,
   lastSeen: Date,
   locale: String,
+  oneSignalPlayerIds: [String],
   overrideDisplayName: String,
   authTokens: [{type: Schema.Types.ObjectId, ref: 'Token'}],
   calendarTokensReferences: [{type: Schema.Types.ObjectId, ref: 'Token'}],

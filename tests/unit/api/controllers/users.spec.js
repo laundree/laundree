@@ -170,6 +170,64 @@ describe('controllers', function () {
               .set('Accept', 'application/json')
               .expect(403)))
     })
+    describe('POST /api/users/{id}/one-signal-player-ids', () => {
+      it('should fail on auth', () =>
+        request(app)
+          .post('/api/users/asd123/one-signal-player-ids')
+          .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403))
+      it('should fail on other', async () => {
+        const {token, user} = await dbUtils.populateTokens(1)
+        const [user2] = await dbUtils.populateUsers(1)
+        await request(app)
+          .post(`/api/users/${user2.model.id}/one-signal-player-ids`)
+          .auth(user.model.id, token.secret)
+          .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(403)
+      })
+      it('should add', async () => {
+        const {token, user} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/api/users/${user.model.id}/one-signal-player-ids`)
+          .auth(user.model.id, token.secret)
+          .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
+          .set('Accept', 'application/json')
+          .expect(204)
+        const newUser = await UserHandler.findFromId(user.model.id)
+        newUser.model.oneSignalPlayerIds.should.contain('9ce14842-2832-4d7d-9c3c-917038038612')
+      })
+      it('should fail on invalid id', async () => {
+        const {token, user} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/api/users/${user.model.id}/one-signal-player-ids`)
+          .auth(user.model.id, token.secret)
+          .send({playerId: 'asd'})
+          .set('Accept', 'application/json')
+          .expect(400)
+      })
+      it('should not add twice', async () => {
+        const {token, user} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/api/users/${user.model.id}/one-signal-player-ids`)
+          .auth(user.model.id, token.secret)
+          .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
+          .set('Accept', 'application/json')
+          .expect(204)
+        await request(app)
+          .post(`/api/users/${user.model.id}/one-signal-player-ids`)
+          .auth(user.model.id, token.secret)
+          .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
+          .set('Accept', 'application/json')
+          .expect(204)
+        const newUser = await UserHandler.findFromId(user.model.id)
+        newUser.model.oneSignalPlayerIds.should.contain('9ce14842-2832-4d7d-9c3c-917038038612')
+        newUser.model.oneSignalPlayerIds.should.be.of.length(1)
+      })
+    })
 
     describe('POST /api/users/{id}/password-change', () => {
       it('should fail on auth', () =>
@@ -609,7 +667,7 @@ describe('controllers', function () {
             .expect(404)
             .then(res => res.body.should.deep.equal({message: 'Not found'}))))
 
-      it('should return 403 on missing id', () =>
+      it('should return 404 on missing id', () =>
         dbUtils.populateTokens(1).then(({user, tokens}) =>
           request(app)
             .delete('/api/users/aaaaaaaaaaaaaaaaaaaaaaaa')

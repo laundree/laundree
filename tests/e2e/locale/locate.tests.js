@@ -18,8 +18,8 @@ module.exports = {
   'Can change locale on auth': client => {
     client
       .url(client.launch_url)
-      .waitForElementPresent('#TopNav a.log-in', timeout)
-      .click('#TopNav a.log-in')
+      .waitForElementPresent('#TopNav a.auth.signUp', timeout)
+      .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#AuthNav .language .dropDownTitle', timeout)
       .click('#AuthNav .language .dropDownTitle')
       .waitForElementVisible('#AuthNav .language .dropDownContent', timeout)

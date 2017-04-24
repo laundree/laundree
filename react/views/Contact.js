@@ -4,7 +4,6 @@ const {DocumentTitle} = require('./intl')
 const {FormattedMessage, FormattedHTMLMessage} = require('react-intl')
 
 class Contact extends React.Component {
-
   render () {
     return <DocumentTitle title='document-title.contact'>
       <main id='Contact' className='topNaved'>
