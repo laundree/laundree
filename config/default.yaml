@@ -62,7 +62,7 @@ facebook:
   callbackUrl: 'https://someUrl/auth/facebook/callback'
 
 google:
-  trackingId: UA-97847799-1
+  trackingId: ''
   clientApiKey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   serverApiKey: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
   clientId: '0000000000000000000000000000000000000000000000.apps.googleusercontent.com'

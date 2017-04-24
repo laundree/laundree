@@ -5,6 +5,9 @@ opbeat:
   trackRelease: true
   enable: true
 
+google:
+  trackingId: UA-97847799-1
+
 logging:
   http:
     enabled: true
