@@ -32,6 +32,7 @@ router.use((req, res, next) => {
       res.renderHb('app.hbs', {
         html,
         title,
+        googleAnalyticsTrackingId: config.get('google.trackingId'),
         intlTitle: 'general.empty',
         state: JSON.stringify(store.getState())
       })

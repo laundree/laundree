@@ -8,11 +8,15 @@ const bodyParser = require('body-parser')
 const flash = require('connect-flash')
 const {fetchRoutes, fetchPseudoStaticRoutes} = require('./routes')
 const setups = require('./lib')
-const app = express()
 const {error} = require('./utils')
 const locale = require('locale')
 const locales = require('./locales')
+const config = require('config')
+const compression = require('compression')
 const debug = require('debug')('laundree.app')
+
+const app = express()
+app.use(compression())
 
 // SETUP MORGAN
 setups.morganSetup(app)
@@ -21,7 +25,11 @@ setups.morganSetup(app)
 app.use(fetchPseudoStaticRoutes())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(express.static(path.join(__dirname, 'dist')))
-
+app.get('/robots.txt', function (req, res) {
+  res.type('text/plain')
+  const sitemapUrl = `${config.get('web.protocol')}://${config.get('web.host')}/sitemap.txt`
+  res.send(`User-agent: *\nAllow: /\nSitemap: ${sitemapUrl}`)
+})
 // SETUP SESSION
 app.use(setups.sessionSetup)
 
@@ -36,6 +44,7 @@ app.use((req, res, next) => {
     locale = 'en'
   }
   req.locale = locale
+  res.set('Content-Language', locale)
   next()
 })
 

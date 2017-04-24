@@ -1,0 +1,6 @@
+/
+/auth
+/auth/forgot
+/auth/sign-up
+/contact
+/about
