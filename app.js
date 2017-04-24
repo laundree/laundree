@@ -36,6 +36,7 @@ app.use((req, res, next) => {
     locale = 'en'
   }
   req.locale = locale
+  res.set('Content-Language', locale)
   next()
 })
 
