@@ -25,9 +25,12 @@
 <link href='https://fonts.googleapis.com/css?family=Roboto+Condensed:300' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="/stylesheets/style.css"/>
 <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=Intl.~locale.en" defer></script>
+<script>
+    window.__GOOGLE_ANALYTICS__TRACKING_ID__ = '{{googleAnalyticsTrackingId}}'
 {{#if state}}
-    <script type="application/javascript">window.__REDUX_STATE__ = {{{state}}}</script>
+    window.__REDUX_STATE__ = {{{state}}}
 {{/if}}
+</script>
 <script type="application/javascript" src="/javascripts/bundle.js" defer></script>
 {{#each styles}}
     <link rel="stylesheet" href="{{this}}"/>
