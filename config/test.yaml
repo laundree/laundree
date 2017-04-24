@@ -8,6 +8,8 @@ logging:
 security:
   password:
     saltRounds: 1
+google:
+  trackingId: ''
 
 oneSignal:
   enabled: false
