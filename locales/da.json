@@ -274,5 +274,6 @@
     "auth.error.user-does-not-exists": "Brugeren eksisterer ikke",
     "auth.error.invalid-verification-link": "Ugyldig verifikations link",
     "auth.success.email-verified": "Din adresse er verificeret. Du kan nu logge ind.",
-    "admin-panel.show-demo": "Vis demo"
+    "admin-panel.show-demo": "Vis demo",
+    "meta.description": "Laundree er en app til bestilling og afbestilling af vasketider i fællesvaskeri. Du kan bestille dine vasketider via mobilen. Kom i gang online nu."
 }
