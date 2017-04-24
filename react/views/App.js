@@ -12,25 +12,30 @@ const NativeApp = require('../containers/NativeApp')
 const TermsAndConditions = require('../views/TermsAndConditions')
 const Privacy = require('../views/Privacy')
 const StateCheckRedirectRoute = require('../containers/StateCheckRedirectRoute')
+const GAWrapper = require('../containers/GAWrapper')
 
 class App extends React.Component {
   render () {
     return <IntlProvider locale={this.props.locale} messages={locales[this.props.locale].messages}>
       <Provider store={this.props.store}>
-        <Switch>
-          <StateCheckRedirectRoute
-            redirectTo='/'
-            test={({currentUser}) => !currentUser}
-            path='/auth'
-            component={Auth} />
-          <Route path='/privacy' component={Privacy}/>
-          <Route path='/terms-and-conditions' component={TermsAndConditions}/>
-          <Route path='/native-app' component={NativeApp}/>
-          <Route path='/laundries/:laundryId' component={BaseApp} />
-          <Route path='/' component={BaseApp} />
-        </Switch>
+        <Route children={({location}) => (
+          <GAWrapper location={location}>
+            <Switch>
+              <StateCheckRedirectRoute
+                redirectTo='/'
+                test={({currentUser}) => !currentUser}
+                path='/auth'
+                component={Auth}/>
+              <Route path='/privacy' component={Privacy}/>
+              <Route path='/terms-and-conditions' component={TermsAndConditions}/>
+              <Route path='/native-app' component={NativeApp}/>
+              <Route path='/laundries/:laundryId' component={BaseApp}/>
+              <Route path='/' component={BaseApp}/>
+            </Switch>
+          </GAWrapper>
+        )}/>
       </Provider>
-    </IntlProvider>
+    </IntlProvider >
   }
 }
 

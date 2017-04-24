@@ -14,6 +14,8 @@ const {createStore} = require('redux')
 const reducers = require('../../redux/reducers')
 const sdk = require('../sdk')
 const App = require('../../react/containers/App')
+const ReactGA = require('react-ga')
+ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
 
 const socket = io('/redux')
 
@@ -41,7 +43,7 @@ class AppInitializer extends Initializer {
     const locale = store.getState().config.locale
     ReactDOM.render(
       <BrowserRouter>
-        <App locale={locale} store={store} />
+        <App store={store} locale={locale} />
       </BrowserRouter>,
       rootElement)
   }
