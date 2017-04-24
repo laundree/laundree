@@ -8,12 +8,15 @@ const bodyParser = require('body-parser')
 const flash = require('connect-flash')
 const {fetchRoutes, fetchPseudoStaticRoutes} = require('./routes')
 const setups = require('./lib')
-const app = express()
 const {error} = require('./utils')
 const locale = require('locale')
 const locales = require('./locales')
 const config = require('config')
+const compression = require('compression')
 const debug = require('debug')('laundree.app')
+
+const app = express()
+app.use(compression())
 
 // SETUP MORGAN
 setups.morganSetup(app)

@@ -16,6 +16,7 @@
     "blob-to-buffer": "^1.2.6",
     "body-parser": "^1.16.0",
     "browserify": "^14.0.0",
+    "compression": "^1.6.2",
     "config": "^1.20.1",
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.0.2",
