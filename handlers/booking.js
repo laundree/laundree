@@ -32,6 +32,11 @@ class BookingHandler extends Handler {
     return booking
   }
 
+  async _updateNotification (playerIds) {
+    await this._cancelNotification()
+    await this._createNotification(playerIds)
+  }
+
   async _createNotification (playerIds) {
     if (!playerIds.length) {
       return
