@@ -70,8 +70,8 @@ class QrInvite extends React.Component {
       .then(buffer => this.setState({pdf: buffer, generating: false}))
   }
   generatePdfBuffer (logoBuffer, code) {
-    return new Promise((resolve, reject) => {
-      const stream = createInvitePdf(
+    return new Promise(async (resolve, reject) => {
+      const stream = await createInvitePdf(
         logoBuffer,
         this.props.laundry.id,
         code,
