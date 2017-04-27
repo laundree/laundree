@@ -1,8 +1,8 @@
 const qr = require('qr-image')
 const locales = require('../locales')
+const PdfDocument = require('pdfkit')
 
 async function createInvitePdf (logoString, laundryId, id, locale) {
-  const PdfDocument = await import('pdfkit')
   const doc = new PdfDocument({size: [2 * 240, 2 * 320]})
   const link = `https://laundree.io/s/${laundryId}/${id}`
   const logoWidth = 150

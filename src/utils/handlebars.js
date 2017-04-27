@@ -19,7 +19,7 @@ function readTemplate (path) {
 
 function render (file, context, locale) {
   debug('Rendering template ', file)
-  const p = path.resolve(__dirname, '..', 'templates', file)
+  const p = path.resolve(__dirname, '..', '..', 'templates', file)
   const template = templateCache[p]
   const messages = locales[locale].messages
   return Promise

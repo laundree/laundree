@@ -20,7 +20,7 @@ function render (data, template, locale) {
   debug('Rendering email')
   const messages = locales[locale].messages
   const t = new EmailTemplate(
-    path.join(__dirname, '..', 'templates', 'email', template))
+    path.join(__dirname, '..', '..', 'templates', 'email', template))
   return t.render(Object.assign(data, {messages}))
 }
 
