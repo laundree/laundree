@@ -33,6 +33,8 @@ function findRedirect (req) {
   switch (mode) {
     case 'native-app':
       return {to: `/native-app`, errorTo: `/native-app`}
+    case 'native-app-v2':
+      return {to: `/native-app-v2`, errorTo: `/native-app-v2`}
     default:
       return {to: to ? decodeURIComponent(to) : '/'}
   }
