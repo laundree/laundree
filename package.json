@@ -8,9 +8,7 @@
   },
   "dependencies": {
     "@google/maps": "^0.3.1",
-    "babel-preset-react": "^6.5.0",
-    "babel-preset-stage-0": "^6.24.1",
-    "babel-register": "^6.9.0",
+    "babel-loader": "^7.0.0",
     "babelify": "^7.2.0",
     "bcrypt": "^1.0.0",
     "blob-to-buffer": "^1.2.6",
@@ -70,10 +68,12 @@
     "yamljs": "^0.2.7"
   },
   "devDependencies": {
-    "babel-core": "^6.24.1",
+    "babel-cli": "^6.24.1",
     "babel-eslint": "^7.0.0",
-    "babel-loader": "^7.0.0",
-    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-polyfill": "^6.23.0",
+    "babel-preset-env": "^1.4.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-0": "^6.24.1",
     "browserify": "^14.0.0",
     "chai": "^3.5.0",
     "chai-as-promised": "^6.0.0",
@@ -111,11 +111,14 @@
     "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "webpack": "^2.4.1",
-    "webpack-chunk-hash": "^0.4.0"
+    "webpack-chunk-hash": "^0.4.0",
+    "webpack-merge": "^4.1.0"
   },
   "scripts": {
-    "test": "./node_modules/.bin/gulp test",
-    "start": "./bin/www"
+    "test": "gulp test",
+    "start": "node lib",
+    "build:babel": "babel src -d lib --copy-files",
+    "build:prod": "webpack --env=prod --progress --profile --colors --config webpack.prod.js"
   },
   "repository": {
     "type": "git",

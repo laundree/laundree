@@ -9,11 +9,10 @@ const setupSass = require('node-sass-middleware')
 const cors = require('cors')
 function fetchPseudoStaticRoutes () {
   const router = express.Router()
-  router.use('/javascripts', require('./javascripts'))
   router.use('/identicon', require('./identicon'))
   router.use(setupSass({
-    src: path.join(__dirname, '..', 'stylesheets'),
-    dest: path.join(__dirname, '..', 'dist', 'stylesheets'),
+    src: path.join(__dirname, '..', '..', 'stylesheets'),
+    dest: path.join(__dirname, '..', '..', 'dist', 'stylesheets'),
     prefix: '/stylesheets',
     outputStyle: config.get('sass.outputStyle'),
     indentedSyntax: true,

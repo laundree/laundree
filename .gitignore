@@ -38,3 +38,4 @@ config/local.yaml
 dist
 docker-compose.tmp.yml
 .DS_Store
+lib
