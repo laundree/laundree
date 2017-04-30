@@ -8,7 +8,7 @@ if [ "$TRAVIS_BRANCH" != "master" ] || [ "$TRAVIS_PULL_REQUEST" != "false" ]; th
   export CODECLIMATE_REPO_TOKEN=''
 fi
 
-docker-compose -f docker-compsoe.test.yml up -d
+docker-compose -f docker-compose.test.yml up -d
 
 docker-compose -f docker-compose.test.yml exec -T web npm test
 
