@@ -70,6 +70,7 @@
     "webpack-merge": "^4.1.0"
   },
   "devDependencies": {
+    "babel-eslint": "^7.2.3",
     "babel-register": "^6.24.1",
     "brfs": "^1.4.3",
     "chai": "^3.5.0",
@@ -80,7 +81,7 @@
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.0.0",
     "eslint-config-standard-jsx": "^4.0.0",
-    "eslint-config-standard-react": "^4.0.0",
+    "eslint-config-standard-react": "^5.0.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.0.0",
@@ -97,6 +98,7 @@
     "supertest": "^3.0.0"
   },
   "scripts": {
+    "test:lint": "eslint .",
     "test:unit": "mocha --require babel-register test/**/*.spec.js",
     "test:unit-covered": "nyc --reporter=lcov --require babel-register mocha test/**/*.spec.js",
     "start:lib": "node lib",
