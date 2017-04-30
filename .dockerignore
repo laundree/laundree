@@ -1,6 +1,10 @@
-node_modules
-dist
-config/local.yaml
-lib
-test_target
-build_output.txt
+/node_modules
+/config/local.yaml
+/dist
+/docker-compose.tmp.yml
+/.DS_Store
+/lib
+/test_target
+/.nyc_output
+/build_output.txt
+/coverage
