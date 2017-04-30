@@ -23,6 +23,6 @@ RUN chown -R laundree:laundree .
 USER laundree
 RUN git remote set-url origin https://github.com/laundree/laundree && \
     git lfs pull && \
-    ./node_modules/.bin/gulp build
+    npm run build
 CMD ["start"]
 ENTRYPOINT ["npm"]
