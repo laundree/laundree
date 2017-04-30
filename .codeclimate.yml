@@ -1,10 +1,9 @@
 ---
 exclude_paths:
-- "tests"
+- "test"
 - 'templates'
-- 'gulpfile.js'
-- 'react/**.js'
-- '**/index.js'
+- 'src/react/**.js'
+- 'src/**/index.js'
 engines:
   scss-lint:
     enabled: true
