@@ -8,6 +8,7 @@ trap finish EXIT
 export PATH="$(npm bin):$PATH"
 
 set -e
+
 npm run setup:test
 
 
