@@ -39,5 +39,5 @@ done
 sleep 5
 
 ./scripts/run-nightwatch.js
-
-exit 0
+echo $?
+echo Stopped
