@@ -2,7 +2,7 @@
  * Created by budde on 11/09/16.
  */
 
-const {assignImmutable} = require('../../../utils/object')
+const {assignImmutable} = require('../../../test_target/utils/object')
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()

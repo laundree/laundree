@@ -7,7 +7,7 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
 const {clearDb, populateLaundries} = require('../../db_utils')
-const {UserHandler, LaundryHandler} = require('../../../handlers')
+const {UserHandler, LaundryHandler} = require('../../../test_target/handlers')
 
 describe('handlers', () => {
   describe('LaundryHandler', () => {

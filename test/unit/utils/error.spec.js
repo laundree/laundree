@@ -2,7 +2,7 @@
  * Created by budde on 11/09/16.
  */
 
-const error = require('../../../utils/error')
+const error = require('../../../test_target/utils/error')
 const chai = require('chai')
 chai.use(require('sinon-chai'))
 chai.should()

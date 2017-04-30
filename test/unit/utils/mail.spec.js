@@ -2,11 +2,11 @@
  * Created by budde on 15/05/16.
  */
 
-const mail = require('../../../utils').mail
+const mail = require('../../../test_target/utils').mail
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()
-require('../../../app')
+require('../../../test_target/app')
 describe('utils', () => {
   describe('mail', () => {
     describe('sendEmail', () => {

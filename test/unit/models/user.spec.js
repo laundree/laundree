@@ -7,7 +7,7 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 chai.should()
 const clearDb = require('../../db_utils').clearDb
-const UserModel = require('../../../models').UserModel
+const UserModel = require('../../../test_target/models').UserModel
 
 describe('models', () => {
   describe('UserModel', function () {

@@ -1,11 +1,11 @@
 const request = require('supertest-as-promised')
-const app = require('../../../../app').app
+const app = require('../../../../test_target/app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {MachineHandler} = require('../../../../handlers')
+const {MachineHandler} = require('../../../../test_target/handlers')
 const dbUtils = require('../../../db_utils')
 
 describe('controllers', function () {

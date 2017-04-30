@@ -2,7 +2,7 @@
  * Created by budde on 11/09/16.
  */
 
-const array = require('../../../utils/array')
+const array = require('../../../test_target/utils/array')
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()

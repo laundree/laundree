@@ -1,5 +1,5 @@
 const request = require('supertest-as-promised')
-const app = require('../../../../app').app
+const app = require('../../../../test_target/app').app
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
