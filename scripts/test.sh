@@ -37,4 +37,6 @@ else
     codeclimate-test-reporter < coverage/lcov.info
 fi
 
+echo "Exiting..."
+
 exit 0
