@@ -25,6 +25,7 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:3000); d
     printf '.'
     sleep 1
 done
+sleep 5
 
 ./scripts/run-nightwatch.js
 
