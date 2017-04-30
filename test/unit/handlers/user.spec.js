@@ -8,7 +8,7 @@ chai.use(chaiAsPromised)
 chai.should()
 const dbUtils = require('../../db_utils')
 const clearDb = dbUtils.clearDb
-const {UserHandler, LaundryInvitationHandler, LaundryHandler} = require('../../../handlers')
+const {UserHandler, LaundryInvitationHandler, LaundryHandler} = require('../../../test_target/handlers')
 const assert = chai.assert
 
 describe('handlers', () => {

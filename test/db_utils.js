@@ -2,9 +2,9 @@
  * Created by budde on 28/04/16.
  */
 const mongoose = require('mongoose')
-const UserHandler = require('../handlers').UserHandler
+const UserHandler = require('../test_target/handlers').UserHandler
 const faker = require('faker')
-const {range} = require('../utils/array')
+const {range} = require('../test_target/utils/array')
 
 function clearDb () {
   return new Promise((resolve, reject) => {

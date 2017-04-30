@@ -1,6 +1,6 @@
 const chai = require('chai')
 chai.should()
-const {EventHandler} = require('../../../handlers')
+const {EventHandler} = require('../../../test_target/handlers')
 const dbUtils = require('../../db_utils')
 
 describe('handlers', function () {
