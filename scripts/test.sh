@@ -36,3 +36,5 @@ if [ -z "$CODECLIMATE_REPO_TOKEN" ]; then
 else
     codeclimate-test-reporter < coverage/lcov.info
 fi
+
+exit 0
