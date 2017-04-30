@@ -24,7 +24,6 @@ build/Release
 
 # Dependency directory
 # https://www.npmjs.org/doc/misc/npm-faq.html#should-i-check-my-node_modules-folder-into-git-
-node_modules
 
 # Debug log from npm
 npm-debug.log
@@ -34,11 +33,13 @@ npm-debug.log
 *.ai
 
 reports
-config/local.yaml
-dist
-docker-compose.tmp.yml
-.DS_Store
-lib
-test_target
-.nyc_output
-build_output.txt
+/node_modules
+/config/local.yaml
+/dist
+/docker-compose.tmp.yml
+/.DS_Store
+/lib
+/test_target
+/.nyc_output
+/build_output.txt
+/coverage
