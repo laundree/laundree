@@ -23,7 +23,7 @@ function setupLaundry (client, email, password) {
     .click('#CreateLaundry .expand_button button')
     .waitForElementVisible('#CreateLaundry form label > input[type=text]', timeout)
     .setValue('#CreateLaundry form label > input[type=text]', faker.company.companyName())
-    .setValue('#CreateLaundry form .locationSelector input[type=text]', faker.address.country())
+    .setValue('#CreateLaundry form .locationSelector input[type=text]', 'cuba')
     .waitForElementVisible('#CreateLaundry form .locationSelector .dropDownContent ul li span', timeout * 5)
     .click('#CreateLaundry form .locationSelector .dropDownContent ul li span')
     .submitForm('#CreateLaundry form')
