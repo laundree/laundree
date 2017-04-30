@@ -2,3 +2,5 @@ node_modules
 dist
 config/local.yaml
 lib
+test_target
+build_output.txt
