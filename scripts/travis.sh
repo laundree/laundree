@@ -10,7 +10,7 @@ fi
 
 docker-compose -f docker-compose.test.yml up -d
 
-docker-compose -f docker-compose.test.yml exec -T web ./scripts/test.sh
+docker-compose -f docker-compose.test.yml exec web bash -c 'npm test; (exit $?)'
 
 echo "Test done. Stopping..."
 
