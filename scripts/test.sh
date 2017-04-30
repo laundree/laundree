@@ -27,8 +27,10 @@ if [ -z "$SELENIUM_HOST" ] || [ "$SELENIUM_HOST" = "localhost" ]; then
     selenium-standalone start 2>/dev/null >/dev/null &
 fi
 
-npm run start:test &
-NPM_PID=$$
+if [ "$LAUNDREE_START_SERVER" != "false" ]; then
+    npm run start:test &
+fi
+
 
 until $(curl --output /dev/null --silent --head --fail http://localhost:3000); do
     printf '.'
@@ -37,8 +39,3 @@ done
 sleep 5
 
 ./scripts/run-nightwatch.js
-
-echo "Exiting..."
-kill -9 $NPM_PID
-
-exit 0
