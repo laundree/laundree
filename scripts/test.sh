@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function finish {
-    pkill -f selenium-standalone
+    pkill -f selenium-standalone || true
 }
 trap finish EXIT
 
@@ -39,5 +39,3 @@ done
 sleep 5
 
 ./scripts/run-nightwatch.js
-echo $?
-echo Stopped
