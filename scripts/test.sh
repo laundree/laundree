@@ -28,6 +28,7 @@ if [ -z "$SELENIUM_HOST" ] || [ "$SELENIUM_HOST" = "localhost" ]; then
 fi
 
 npm run start:test &
+NPM_PID=$$
 
 until $(curl --output /dev/null --silent --head --fail http://localhost:3000); do
     printf '.'
@@ -37,7 +38,7 @@ sleep 5
 
 ./scripts/run-nightwatch.js
 
-
 echo "Exiting..."
+kill -9 $NPM_PID
 
 exit 0
