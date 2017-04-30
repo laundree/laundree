@@ -20,7 +20,11 @@ if [ -z "$SELENIUM_HOST" ] || [ "$SELENIUM_HOST" = "localhost" ]; then
 fi
 
 npm run start:test-covered &
-sleep 5
+
+until $(curl --output /dev/null --silent --head --fail http://localhost:3000); do
+    printf '.'
+    sleep 1
+done
 
 ./scripts/run-nightwatch.js
 
