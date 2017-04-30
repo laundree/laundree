@@ -2,6 +2,7 @@ version: '2'
 services:
   web:
     environment:
+      - NODE_ENV=test
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URL=mongodb://mongo/test
@@ -9,13 +10,14 @@ services:
       - GOOGLE_CLIENT_API_KEY
       - GOOGLE_SERVER_API_KEY
       - NIGHTWATCH_LAUNCH_URL=http://web:3000/
+      - CODECLIMATE_REPO_TOKEN
     build: .
     links:
       - redis
       - mongo
       - selenium
-    entrypoint: './node_modules/.bin/gulp'
-    command: 'server:start'
+    entrypoint: 'npm'
+    command: 'test'
   redis:
     image: redis
   mongo:
