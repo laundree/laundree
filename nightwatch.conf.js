@@ -2,11 +2,9 @@
  * Created by budde on 31/10/2016.
  */
 
-const config = require('config')
-
 module.exports = {
   'src_folders': [
-    'tests/e2e'
+    'test/e2e'
   ],
   'output_folder': 'reports',
   'custom_commands_path': '',
@@ -22,7 +20,7 @@ module.exports = {
     }
   },
   'test_settings': {
-    'local': {
+    'default': {
       'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000/',
       'selenium_port': process.env.SELENIUM_PORT || 4444,
       'selenium_host': process.env.SELENIUM_HOST || 'localhost',
@@ -38,22 +36,6 @@ module.exports = {
             '--no-sandbox'
           ]
         }
-      }
-    },
-    'default': {
-      'launch_url': process.env.NIGHTWATCH_LAUNCH_URL || 'http://localhost:3000/',
-      'selenium_port': 80,
-      'selenium_host': 'ondemand.saucelabs.com',
-      'silent': true,
-      'screenshots': {
-        'enabled': false,
-        'path': ''
-      },
-      'username': config.get('sauceLabs.username'),
-      'access_key': config.get('sauceLabs.accessKey'),
-      'desiredCapabilities': {
-        'javascriptEnabled': true,
-        'acceptSslCerts': true
       }
     }
   }
