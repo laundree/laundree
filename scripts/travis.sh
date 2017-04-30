@@ -1,13 +1,8 @@
 #!/usr/bin/env bash
 
-function finish {
-    cat ./build_output.txt
-}
-trap finish EXIT
-
 set -e
 
-docker-compose -f docker-compose.test.yml build > ./build_output.txt
+docker-compose -f docker-compose.test.yml build > ./build_output.txt || cat ./build_output.txt
 
 docker-compose -f docker-compose.test.yml up -d
 
