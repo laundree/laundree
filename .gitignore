@@ -39,3 +39,6 @@ dist
 docker-compose.tmp.yml
 .DS_Store
 lib
+test_target
+.nyc_output
+build_output.txt
