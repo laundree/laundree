@@ -170,7 +170,7 @@ class MachineListItem extends React.Component {
           : null
         }
         {this.props.onUpdate
-          ? <div className={`repair action`}>
+          ? <div className='repair action'>
             <svg onClick={() => this.props.onUpdate({broken: !this.broken})}>
               <use xlinkHref={this.broken ? '#MediaWrenchX' : '#MediaWrenchCheck'} />
             </svg>
