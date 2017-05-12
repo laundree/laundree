@@ -1,11 +1,20 @@
-/**
- * Created by budde on 09/06/16.
- */
+// @flow
 
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
+import type { ObjectId } from 'mongoose'
 const {Schema} = mongoose
 
-const bookingSchema = new Schema({
+type Definition = {
+  docVersion: number,
+  from: Date,
+  to: Date,
+  oneSignalId: ?string,
+  owner: ObjectId,
+  machine: ObjectId,
+  laundry: ObjectId
+}
+
+const bookingSchema: Schema<Definition> = new Schema({
   docVersion: {type: Number},
   from: {type: Date, required: true},
   to: {type: Date, required: true},
@@ -20,4 +29,4 @@ bookingSchema.index({'to': 1})
 
 const BookingModel = mongoose.model('Booking', bookingSchema)
 
-module.exports = BookingModel
+export default BookingModel

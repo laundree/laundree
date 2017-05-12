@@ -1,16 +1,36 @@
-/**
- * Created by budde on 09/06/16.
- */
-
-const Handler = require('./handler')
-const {BookingModel} = require('../models')
-const {types: {DELETE_BOOKING, UPDATE_BOOKING, CREATE_BOOKING}} = require('../redux/actions')
+// @flow
+import Handler from './handler'
+import BookingModel from '../models/booking'
+import MachineHandler from './machine'
+import LaundryHandler from './laundry'
+import { types } from '../redux/actions'
+import type UserHandler from './user'
+import type { ObjectId, QueryConditions, QueryOptions } from 'mongoose'
 const {createNotification, deleteNotification} = require('../utils/oneSignal')
 const {logError} = require('../utils/error')
 
-class BookingHandler extends Handler {
+export class BookingHandler extends Handler<BookingModel, BookingHandler, *, *, *> {
+  restUrl: string
+
+  static async find (filter: QueryConditions, options?: QueryOptions): Promise<BookingHandler[]> {
+    return Handler._find(BookingModel, BookingHandler, filter, options)
+  }
+
+  constructor (model: BookingModel) {
+    super(
+      model,
+      BookingHandler,
+      m => new BookingHandler(m),
+      {
+        delete: types.DELETE_BOOKING,
+        update: types.UPDATE_BOOKING,
+        create: types.CREATE_BOOKING
+      })
+    this.restUrl = `/api/bookings/${this.model.id}`
+  }
+
   /**
-   * Create a new booking
+   * Create a new bookingm
    * @param {MachineHandler} machine
    * @param {UserHandler} owner
    * @param {Date} from
@@ -32,12 +52,12 @@ class BookingHandler extends Handler {
     return booking
   }
 
-  async _updateNotification (playerIds) {
+  async _updateNotification (playerIds: string[]) {
     await this._cancelNotification()
     await this._createNotification(playerIds)
   }
 
-  async _createNotification (playerIds) {
+  async _createNotification (playerIds: string[]) {
     if (!playerIds.length) {
       return
     }
@@ -63,21 +83,19 @@ class BookingHandler extends Handler {
    * Fetch machine
    * @return {Promise.<MachineHandler>}
    */
-  fetchMachine () {
-    const MachineHandler = require('./machine')
+  fetchMachine (): Promise<MachineHandler> {
     return MachineHandler
       .find({_id: this.model.machine})
       .then(([machine]) => machine)
   }
 
-  fetchLaundry () {
-    const LaundryHandler = require('./laundry')
+  fetchLaundry (): Promise<LaundryHandler> {
     return LaundryHandler
       .find({_id: this.model.laundry})
       .then(([laundry]) => laundry)
   }
 
-  static _fetchBookings (from, to, machineIds) {
+  static _fetchBookings (from: Date, to: Date, machineIds: ObjectId[]) {
     return BookingHandler.find({
       $or: [
         {
@@ -99,17 +117,12 @@ class BookingHandler extends Handler {
     })
   }
 
-  /**
-   * Checks if provided user is owner
-   * @param {UserHandler} user
-   * @return {boolean}
-   */
-  isOwner (user) {
+  isOwner (user: UserHandler): Promise<boolean> {
     const owner = this.model.populated('owner') || this.model.owner
     return user.model._id.equals(owner)
   }
 
-  async deleteBooking () {
+  async deleteBooking (): Promise<*> {
     this._cancelNotification().catch(logError)
     await this.model.remove()
     this.emitEvent('delete')
@@ -121,7 +134,7 @@ class BookingHandler extends Handler {
    * @param {Date} from
    * @param {Date} to
    */
-  async updateTime (owner, from, to) {
+  async updateTime (owner: UserHandler, from: Date, to: Date) {
     const notificationsShouldBeUpdated = from.getTime() !== this.model.from.getTime()
     if (notificationsShouldBeUpdated) {
       this._cancelNotification().catch(logError)
@@ -174,47 +187,11 @@ class BookingHandler extends Handler {
     return BookingHandler.find(Object.assign({}, filter, {owner: user.model._id, machine: machine.model._id}), options)
   }
 
-  toRestSummary () {
+  buildRestSummary () {
     return {id: this.model.id, href: this.restUrl}
   }
 
-  get restUrl () {
-    return `/api/bookings/${this.model.id}`
-  }
-
-  /**
-   * Array of update actions
-   * @returns {(function (handler: Handler) : Promise.<Handler>)[]}
-   */
-  get updateActions () {
-    return [
-      (booking) => {
-        const MachineHandler = require('./machine')
-        return MachineHandler
-          .find({_id: booking.model.machine})
-          .then(([machine]) => {
-            booking.model.laundry = machine.model.laundry
-            booking.model.docVersion = 1
-            return booking.model.save().then((model) => new BookingHandler(model))
-          })
-      }
-    ]
-  }
-
-  /**
-   * Create an event from the booking
-   * @returns {{start: Date, end: Date, uid, timestamp}}
-   */
-  get event () {
-    return {
-      start: this.model.from,
-      end: this.model.to,
-      uid: this.model.id,
-      timestamp: this.model.createdAt
-    }
-  }
-
-  toRest () {
+  buildRestModel () {
     return this
       .fetchLaundry()
       .then(laundry => ({
@@ -225,7 +202,7 @@ class BookingHandler extends Handler {
       }))
   }
 
-  get reduxModel () {
+  buildReduxModel () {
     return {
       id: this.model.id,
       from: this.model.from,
@@ -234,12 +211,28 @@ class BookingHandler extends Handler {
       owner: this.model.owner.toString()
     }
   }
+
+  emitEvent (event: EventType) {
+    return Handler._emitEvent(event, BookingHandler, this)
+  }
+
+  update (): Promise<void> {
+    throw new Error('Not implemented')
+  }
+
+  onDelete (cb: (id: string) => void) {
+    return Handler._onDelete(BookingHandler, cb)
+  }
+
+  onUpdate (cb: (h: BookingHandler) => void) {
+    return Handler._onUpdate(BookingHandler, cb)
+  }
+
+  onCreate (cb: (h: BookingHandler) => void) {
+    return Handler._onCreate(BookingHandler, cb)
+  }
+
+  findLaundries () {
+    return [this.model.laundry.id]
+  }
 }
-
-Handler.setupHandler(BookingHandler, BookingModel, {
-  delete: DELETE_BOOKING,
-  update: UPDATE_BOOKING,
-  create: CREATE_BOOKING
-})
-
-module.exports = BookingHandler

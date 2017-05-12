@@ -1,15 +1,12 @@
-/**
- * Created by budde on 02/06/16.
- */
 
-const Handler = require('./handler')
-const {password} = require('../utils')
-const {TokenModel} = require('../models')
+import Handler from './handler'
+import password from '../utils/password'
+import TokenModel from '../models/token'
 
 class TokenHandler extends Handler {
-  constructor (model, secret) {
+  constructor (model: TokenModel, secret: string) {
     super(model)
-    this._secret = secret
+    this.secret = secret
   }
 
   static find (filter, options) {

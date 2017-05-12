@@ -1,9 +1,8 @@
-/**
- * Created by budde on 23/06/16.
- */
+// @flow
 
-const redis = require('redis')
-const config = require('config')
+import redis from 'redis'
+import config from 'config'
+import EventEmitter from 'events'
 const createClient = () => redis.createClient({host: config.get('redis.host'), port: config.get('redis.port')})
 const pubClient = createClient()
 const subClient = createClient()
@@ -17,21 +16,22 @@ subClient.setMaxListeners(100)
  * @param {function (Object) : Promise.<string> } serialize
  * @param {function (string) : Promise.<Object>} deserialize
  */
-function linkEmitter (subEmitter, pubEmitter, name, listen, serialize, deserialize) {
+function linkEmitter<O, D> (subEmitter: EventEmitter, pubEmitter: EventEmitter, name: string, listen: string[], serialize: (O) => Promise<string>, deserialize: (string) => Promise<D>): void {
   const channelName = `eventEmitter@${name + listen.join('+')}`
-  subClient.on('message', (channel, message) => {
+  subClient.on('message', async (channel, message) => {
     if (channelName !== channel) return
     const parsedMessage = JSON.parse(message)
-    deserialize(parsedMessage.message).then((obj) => pubEmitter.emit(parsedMessage.event, obj))
+    const obj = await deserialize(parsedMessage.message)
+    pubEmitter.emit(parsedMessage.event, obj)
   })
   subClient.subscribe(channelName)
   listen.forEach((event) => subEmitter
-    .on(event, (obj) => {
-      serialize(obj).then((str) =>
-        pubClient.publish(channelName, JSON.stringify({
-          event: event,
-          message: str
-        })))
+    .on(event, async (obj) => {
+      const str = await serialize(obj)
+      pubClient.publish(channelName, JSON.stringify({
+        event: event,
+        message: str
+      }))
     }))
 }
 
