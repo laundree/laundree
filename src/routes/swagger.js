@@ -2,14 +2,19 @@
  * Created by budde on 05/05/16.
  */
 
-const path = require('path')
-const YAML = require('yamljs')
-const swaggerTools = require('swagger-tools')
-const passport = require('passport')
-const {logError} = require('../utils/error')
-const {opbeat} = require('../lib/opbeat')
-const {TokenHandler, LaundryHandler, MachineHandler, BookingHandler, LaundryInvitationHandler, UserHandler, EventHandler} = require('../handlers')
-const express = require('express')
+import path from 'path'
+import YAML from 'yamljs'
+import swaggerTools from 'swagger-tools'
+import passport from 'passport'
+import {logError} from '../utils/error'
+import {opbeat} from '../lib/opbeat'
+import TokenHandler from '../handlers/token'
+import LaundryHandler from '../handlers/laundry'
+import MachineHandler from '../handlers/machine'
+import BookingHandler from '../handlers/booking'
+import LaundryInvitationHandler from '../handlers/laundry_invitation'
+import UserHandler from '../handlers/user'
+import express from 'express'
 const router = express.Router()
 
 function generateError (message, status) {
@@ -39,6 +44,7 @@ function pullSubjects (req) {
       const subject = machine || invite || booking
       if (!subject) return subjects
       return LaundryHandler
+        .lib
         .findFromId(subject.model.laundry.toString())
         .then(laundry => Object.assign(subjects, {laundry}))
     })
@@ -52,7 +58,7 @@ function pullSubjects (req) {
 function pullSubject (req, name, _Handler) {
   if (!req.swagger.params[name]) return Promise.resolve()
   const id = req.swagger.params[name].value
-  return _Handler.findFromId(id).then(instance => {
+  return _Handler.lib.findFromId(id).then(instance => {
     if (!instance) throw generateError('Not found', 404)
     return instance
   })
@@ -73,7 +79,9 @@ function userAccess (req) {
  */
 function securityCheck (req, prerequisite, check, error) {
   return prerequisite(req).then(subjects => {
-    if (!check(subjects)) throw error
+    if (!check(subjects)) {
+      throw error
+    }
     return subjects
   })
 }
@@ -90,7 +98,7 @@ function self (req) {
 }
 
 function administrator (req) {
-  return securityCheck(req, userAccess, subjects => subjects.currentUser.isAdmin, generateError('Not allowed', 403))
+  return securityCheck(req, userAccess, subjects => subjects.currentUser.model.role === 'admin', generateError('Not allowed', 403))
 }
 
 function tokenOwner (req) {
@@ -129,7 +137,6 @@ function fetchRouter () {
             next()
           })(req, res, next)
         })
-        router.use(EventHandler.trackingMiddleware())
         router.use(middleware.swaggerSecurity({
           subjectsExists: wrapSecurity(pullSubjects),
           userAccess: wrapSecurity(userAccess),

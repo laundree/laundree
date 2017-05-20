@@ -1,14 +1,17 @@
-const request = require('supertest')
-const app = require('../../../../test_target/app').app
-const chai = require('chai')
+import request from 'supertest'
+import {app} from '../../../../test_target/app'
+import chai from 'chai'
+import LaundryHandler from '../../../../test_target/handlers/laundry'
+import LaundryInvitationHandler from '../../../../test_target/handlers/laundry_invitation'
+import UserHandler from '../../../../test_target/handlers/user'
+import BookingHandler from '../../../../test_target/handlers/booking'
+import dbUtils from '../../../db_utils'
+
+import base64UrlSafe from 'urlsafe-base64'
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {LaundryHandler, LaundryInvitationHandler, UserHandler, BookingHandler} = require('../../../../test_target/handlers')
-const dbUtils = require('../../../db_utils')
-
-const base64UrlSafe = require('urlsafe-base64')
 
 describe('controllers', function () {
   beforeEach(() => dbUtils.clearDb())
@@ -330,6 +333,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => LaundryHandler
+              .lib
               .findFromId(laundry.model.id)
               .then(laundry => laundry.toRest())
               .then((result) => res.body.should.deep.equal(result)))))
@@ -344,6 +348,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res => LaundryHandler
+              .lib
               .findFromId(laundry.model.id)
               .then(laundry => laundry.toRest())
               .then((result) => res.body.should.deep.equal(result)))))

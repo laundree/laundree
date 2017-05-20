@@ -3,7 +3,7 @@ const router = express.Router()
 const debug = require('debug')('laundree.routes.calendar')
 const ical = require('ical-generator')
 const config = require('config')
-const {UserHandler} = require('../handlers')
+const UserHandler = require('../handlers/user')
 
 router.get('/', (req, res, next) => {
   debug('Starting to create calendar link')

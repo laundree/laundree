@@ -1,6 +1,6 @@
 const faker = require('faker')
 const {timeout, signIn} = require('../../nightwatch_utils.js')
-const {UserHandler} = require('../../../test_target/handlers')
+const UserHandler = require('../../../test_target/handlers/user')
 
 let email, password
 

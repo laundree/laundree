@@ -4,7 +4,7 @@
 
 const utils = require('../../utils')
 
-const UserHandler = require('../../handlers').UserHandler
+const UserHandler = require('../../handlers/user')
 
 function getUser (req, res) {
   const {user} = req.subjects

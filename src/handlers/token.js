@@ -1,42 +1,35 @@
-/**
- * Created by budde on 02/06/16.
- */
+// @flow
 
-const Handler = require('./handler')
-const {password} = require('../utils')
-const {TokenModel} = require('../models')
+import { Handler, HandlerLibrary } from './handler'
+import { password } from '../utils'
+import TokenModel from '../models/token'
+import type { TokenType } from '../models/token'
+import UserHandler from './user'
+import type { QueryConditions } from 'mongoose'
 
-class TokenHandler extends Handler {
-  constructor (model, secret) {
-    super(model)
-    this._secret = secret
+class TokenHandlerLibrary extends HandlerLibrary {
+  constructor () {
+    super(TokenHandler, TokenModel)
   }
 
-  static find (filter, options) {
-    return this._find(TokenModel, TokenHandler, filter, options)
-  }
-
-  static findFromId (id) {
-    return this._findFromId(TokenModel, TokenHandler, id)
-  }
-
-  static findTokenFromSecret (secret, filter) {
+  async findTokenFromSecret (secret: string, filter: QueryConditions) {
     switch (secret.substring(0, 2)) {
       case 'v2':
         const [, id, sec] = secret.split('.')
-        return TokenHandler
+        const [token] = await this
           .find({$and: [{_id: id}, filter]})
-          .then(([token]) => {
-            if (!token) return null
-            return token.verify(sec).then(result => result
-              ? token
-              : null)
-          })
+        if (!token) return null
+        const result = await token.verify(sec)
+        if (!result) return null
+        return token
       default:
-        return TokenHandler.find(filter)
-          .then(tokens => Promise
-            .all(tokens.map(token => token.verify(secret).then(result => result && token)))
-            .then(tokens => tokens.find(t => t) || null))
+        const tokens = await this.find(filter)
+        const validTokens = await Promise
+          .all(tokens.map(async token => {
+            const result = await token.verify(secret)
+            return result && token
+          }))
+        return validTokens.find(t => t) || null
     }
   }
 
@@ -47,33 +40,37 @@ class TokenHandler extends Handler {
    * @param {string} type
    * @return {Promise.<TokenHandler>}
    */
-  static _createToken (owner, name, type) {
-    return password.generateToken()
-      .then(token => password
-        .hashPassword(token)
-        .then(hash => new TokenModel({
-          name,
-          type,
-          hash,
-          owner: owner.model.id
-        })
-          .save()
-          .then(model => new TokenHandler(model, token))))
-  }
-
-  seen () {
-    this.model.lastSeen = new Date()
-    return this.model.save().then((model) => {
-      this.model = model
-      return this
+  async _createToken (owner: UserHandler, name: string, type: TokenType) {
+    const token = await password.generateToken()
+    const hash = await password.hashPassword(token)
+    const model = await new TokenModel({
+      name,
+      type,
+      hash,
+      owner: owner.model.id
     })
+      .save()
+    return new TokenHandler(model, token)
   }
 
-  /**
-   * @return {string}
-   */
-  get secret () {
-    return `v2.${this.model.id}.${this._secret}`
+}
+
+export default class TokenHandler extends Handler<TokenModel, *> {
+  static lib = new TokenHandlerLibrary()
+  lib = TokenHandler.lib
+  secret: ?string
+  restUrl: string
+
+  constructor (model: TokenModel, secret?: string) {
+    super(model)
+    this.secret = secret ? `v2.${this.model.id}.${secret}` : null
+    this.restUrl = `/api/tokens/${this.model.id}`
+  }
+
+  async seen () {
+    this.model.lastSeen = new Date()
+    this.model = await this.model.save()
+    return this
   }
 
   /**
@@ -81,7 +78,7 @@ class TokenHandler extends Handler {
    * @param secret
    * @returns {Promise.<boolean>}
    */
-  verify (secret) {
+  verify (secret: string) {
     const version = secret.substring(0, 2)
     switch (version) {
       case 'v2':
@@ -99,46 +96,42 @@ class TokenHandler extends Handler {
    * Delete the token
    * @return {Promise.<TokenHandler>}
    */
-  deleteToken () {
-    return this.model.remove().then(() => this)
+  async deleteToken () {
+    await this.model.remove()
+    return this
   }
 
   /**
    * @param {UserHandler} user
    * @return {boolean}
    */
-  isOwner (user) {
-    const ownerId = this.model.populated('owner') || this.model.owner
+  isOwner (user: UserHandler) {
+    const ownerId = this.model.owner
     return user.model._id.equals(ownerId)
   }
 
-  get restUrl () {
-    return `/api/tokens/${this.model.id}`
+  fetchOwner () {
+    return UserHandler.lib.findFromId(this.model._id)
   }
 
-  toRest () {
-    const UserHandler = require('./user')
-    return TokenModel.populate(this.model, {path: 'owner', model: 'User'})
-      .then((model) => ({
-        id: model.id,
-        name: model.name,
-        owner: new UserHandler(model.owner).toRestSummary(),
-        href: this.restUrl
-      }))
+  async toRest () {
+    const owner = await this.fetchOwner()
+    return {
+      id: this.model.id,
+      name: this.model.name,
+      owner: owner.toRestSummary(),
+      href: this.restUrl,
+      secret: undefined
+    }
   }
 
-  toSecretRest () {
-    return this
-      .toRest()
-      .then(o => {
-        o.secret = this.secret
-        return o
-      })
+  async toSecretRest () {
+    const obj = await this.toRest()
+    obj.secret = this.secret
+    return obj
   }
 
   toRestSummary () {
     return {id: this.model.id, name: this.model.name, href: this.restUrl}
   }
 }
-
-module.exports = TokenHandler

@@ -4,7 +4,7 @@
 
 const chai = require('chai')
 chai.should()
-const Handler = require('../../../test_target/handlers/handler')
+const {Handler} = require('../../../test_target/handlers/handler')
 
 describe('handlers', () => {
   describe('Handler', () => {

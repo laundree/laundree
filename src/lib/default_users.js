@@ -1,7 +1,10 @@
-const config = require('config')
-const debug = require('debug')('laundree.setups.default_users')
-const {UserHandler} = require('../handlers')
-const {logError} = require('../utils/error')
+// @flow
+import config from 'config'
+import Debug from 'debug'
+import UserHandler from '../handlers/user'
+import {logError} from '../utils/error'
+
+const debug = Debug('laundree.setups.default_users')
 
 function defaultUserSetup () {
   if (config.get('mode') !== 'master') return Promise.resolve()
@@ -13,6 +16,7 @@ function defaultUserSetup () {
       .map(user => {
         const role = defaultUsers[user]
         return UserHandler
+          .lib
           .find({'profiles.emails.value': user, role: {$ne: role}})
           .then(users => Promise
             .all(users

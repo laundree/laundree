@@ -13,6 +13,8 @@ npm run setup:test
 
 npm run test:lint
 
+npm run test:flow
+
 npm run test:unit-covered
 
 nyc report
