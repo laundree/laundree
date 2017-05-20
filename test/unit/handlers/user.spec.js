@@ -1,14 +1,15 @@
-/**
- * Created by budde on 27/04/16.
- */
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import dbUtils from '../../db_utils'
+import UserHandler from '../../../test_target/handlers/user'
+import LaundryInvitationHandler from '../../../test_target/handlers/laundry_invitation'
+import LaundryHandler from '../../../test_target/handlers/laundry'
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
+const clearDb = dbUtils.clearDb
+
 chai.use(chaiAsPromised)
 chai.should()
-const dbUtils = require('../../db_utils')
-const clearDb = dbUtils.clearDb
-const {UserHandler, LaundryInvitationHandler, LaundryHandler} = require('../../../test_target/handlers')
+
 const assert = chai.assert
 
 describe('handlers', () => {
@@ -23,7 +24,7 @@ describe('handlers', () => {
     }
     let user = null
 
-    beforeEach(() => clearDb().then(() => UserHandler.createUserFromProfile(profile)).then((u) => {
+    beforeEach(() => clearDb().then(() => UserHandler.lib.createUserFromProfile(profile)).then((u) => {
       user = u
     }))
 
@@ -31,6 +32,7 @@ describe('handlers', () => {
       it('should set role', () => user.model.role.should.equal('user'))
 
       it('should set role from config', () => UserHandler
+        .lib
         .createUserFromProfile(Object.assign({}, profile, {emails: [{value: 'test-admin@example.com'}]}))
         .then(user => user.model.role.should.equal('admin')))
 
@@ -39,15 +41,18 @@ describe('handlers', () => {
           laundry
             .inviteUserByEmail('alice@example.com')
             .then(() => UserHandler
+              .lib
               .createUserFromProfile(Object.assign({}, profile, {emails: [{value: 'alice@example.com'}]}))
               .then((user) => {
                 user.model.laundries.should.have.length(1)
                 user.model.laundries[0].toString().should.equal(laundry.model.id)
                 return LaundryHandler
+                  .lib
                   .find({_id: laundry.model._id})
                   .then(([laundry]) => {
                     Boolean(laundry.isUser(user)).should.be.true
                     return LaundryInvitationHandler
+                      .lib
                       .find({email: 'alice@example.com'})
                       .then((results) => {
                         results.should.have.length(1)
@@ -56,18 +61,10 @@ describe('handlers', () => {
                   })
               }))))
     })
-    describe('emitEvent', () => {
-      it('should log', () =>
-        user.fetchEvents()
-          .then(events => events.should.have.length(1))
-          .then(() => user.emitEvent('update'))
-          .then(() => user.fetchEvents())
-          .then(events => events.should.have.length(2)))
-    })
 
     describe('findFromEmail', () => {
       it('should be possible to find existing profiles from email',
-        () => UserHandler.findFromEmail('bob@example.com').then(user => user.should.not.be.undefined))
+        () => UserHandler.lib.findFromEmail('bob@example.com').then(user => user.should.not.be.undefined))
     })
 
     describe('updateProfile', () => {
@@ -85,25 +82,25 @@ describe('handlers', () => {
     })
 
     describe('findOrCreateFromProfile', () => {
-      it('should find existing user', () => UserHandler.findOrCreateFromProfile(profile).then((u) => {
+      it('should find existing user', () => UserHandler.lib.findOrCreateFromProfile(profile).then((u) => {
         u.model.id.should.be.deep.equal(user.model.id)
       }))
 
       it('should create new user', () => {
         profile.emails[0].value = 'new@example.com'
         profile.id = '1231312312312312'
-        return UserHandler.findOrCreateFromProfile(profile).then((u) => {
+        return UserHandler.lib.findOrCreateFromProfile(profile).then((u) => {
           u.model.id.should.not.be.deep.equal(user.model.id)
         })
       })
     })
     describe('findFromId', () => {
       it('should find right',
-        () => UserHandler.findFromId(user.model.id).then((u) => u.model.id.should.equal(user.model.id)))
+        () => UserHandler.lib.findFromId(user.model.id).then((u) => u.model.id.should.equal(user.model.id)))
       it('should reject on error',
-        () => UserHandler.findFromId(user.model.id + 'asd').should.eventually.be.undefined)
+        () => UserHandler.lib.findFromId(user.model.id + 'asd').should.eventually.be.null)
       it('should reject on error',
-        () => UserHandler.findFromId('aaaaaaaaaaaaaaaaaaaa').should.eventually.be.undefined)
+        () => UserHandler.lib.findFromId('aaaaaaaaaaaaaaaaaaaa').should.eventually.be.null)
     })
 
     describe('resetPassword', () => {
@@ -122,7 +119,7 @@ describe('handlers', () => {
 
     describe('createUserWithPassword', () => {
       it('should create user', () =>
-        UserHandler.createUserWithPassword('Alice Alison', 'ali@example.com', 'password1234')
+        UserHandler.lib.createUserWithPassword('Alice Alison', 'ali@example.com', 'password1234')
           .then((user) => {
             user.model.name.familyName.should.be.equal('Alison')
             user.model.name.givenName.should.be.equal('Alice')
@@ -131,7 +128,7 @@ describe('handlers', () => {
             return user.verifyPassword('password1234').should.eventually.be.true
           }))
       it('should create user with more names', () =>
-        UserHandler.createUserWithPassword('Alice Alu   Ali Alison', 'ali@example.com', 'password1234')
+        UserHandler.lib.createUserWithPassword('Alice Alu   Ali Alison', 'ali@example.com', 'password1234')
           .then((user) => {
             user.model.name.familyName.should.be.equal('Alison')
             user.model.name.givenName.should.be.equal('Alice')

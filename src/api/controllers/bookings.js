@@ -1,16 +1,14 @@
-/**
- * Created by budde on 09/06/16.
- */
+// @flow
 
-const {BookingHandler} = require('../../handlers')
-const {api} = require('../../utils')
+import BookingHandler from '../../handlers/booking'
+import {api} from '../../utils'
 
 async function listBookings (req, res) {
   const limit = req.swagger.params.page_size.value
   const since = req.swagger.params.since.value
   const from = req.swagger.params.from.value
   const to = req.swagger.params.to.value
-  const filter = {
+  const filter : {from: *, to: *, _id?: *, machine?: *} = {
     from: {$gte: from},
     to: {$lt: to}
   }
@@ -19,11 +17,12 @@ async function listBookings (req, res) {
   }
   const {machine} = req.subjects
   filter.machine = machine.model._id
-  const bookings = await BookingHandler.find(filter, {limit, sort: {_id: 1}})
+  const bookings = await BookingHandler.lib.find(filter, {limit, sort: {_id: 1}})
   const bookingSummaries = bookings.map(booking => booking.toRestSummary())
   const fromToQuerySegment = (from ? `&from=${from}` : '') + (to ? `&from=${to}` : '')
   const links = {
-    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}${fromToQuerySegment}`
+    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}${fromToQuerySegment}`,
+    next: undefined
   }
   if (bookingSummaries.length === limit) {
     links.next = `/api/machines/${machine.model.id}/bookings?since=${bookingSummaries[bookingSummaries.length - 1].id}&page_size=${limit}${fromToQuerySegment}`

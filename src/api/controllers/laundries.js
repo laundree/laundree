@@ -1,4 +1,5 @@
-const {LaundryHandler, UserHandler} = require('../../handlers')
+const LaundryHandler = require('../../handlers/laundry')
+const UserHandler = require('../../handlers/user')
 const {api, mail} = require('../../utils')
 
 /**
@@ -16,7 +17,7 @@ function listLaundries (req, res) {
   if (since) {
     filter._id = {$gt: since}
   }
-  LaundryHandler.find(filter, {limit, sort: {_id: 1}})
+  return LaundryHandler.lib.find(filter, {limit, sort: {_id: 1}})
     .then((laundries) => laundries.map((laundry) => laundry.toRestSummary()))
     .then((laundries) => {
       const links = {
@@ -35,7 +36,8 @@ function createLaundry (req, res) {
   const {name, googlePlaceId} = req.swagger.params.body.value
   const {currentUser} = req.subjects
   if (currentUser.isDemo) return api.returnError(res, 403, 'Not allowed')
-  LaundryHandler
+  return LaundryHandler
+    .lib
     .timeZoneFromGooglePlaceId(googlePlaceId)
     .then(timezone => {
       if (!timezone) return api.returnError(res, 400, 'Invalid place-id')
@@ -51,7 +53,8 @@ function createLaundry (req, res) {
 }
 
 function createDemoLaundry (req, res) {
-  UserHandler
+  return UserHandler
+    .lib
     .createDemoUser()
     .then(({user, email, password}) => LaundryHandler
       .createDemoLaundry(user)

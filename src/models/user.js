@@ -1,14 +1,62 @@
-/**
- * Created by budde on 27/04/16.
- */
-const mongoose = require('mongoose')
+// @flow
+import mongoose from 'mongoose'
+import type { ObjectId } from 'mongoose'
+import { union } from '../utils/array'
 const Schema = mongoose.Schema
-const {union} = require('../utils/array')
 
-const userSchema = new Schema({
+export type UserRole = 'user' | 'admin'
+
+type Name = {
+  familyName?: string,
+  givenName?: string,
+  middleName?: string
+}
+
+export type Profile = {
+  provider: string,
+  id: string,
+  displayName: string,
+  name: Name,
+  emails: { value: string, type?: string }[],
+  photos?: { value: string }[]
+}
+type UserDefinition = {
+  docVersion: number,
+  role: UserRole,
+  demo: boolean,
+  oneTimePassword?: string,
+  password?: string,
+  resetPassword: {
+    token: ObjectId,
+    expire: Date
+  },
+  latestProvider?: string,
+  lastSeen?: Date,
+  locale?: string,
+  oneSignalPlayerIds: string[],
+  overrideDisplayName?: string,
+  authTokens: ObjectId[],
+  calendarTokensReferences: ObjectId[],
+  laundries: ObjectId[],
+  explicitVerifiedEmails: string[],
+  pendingExplicitEmailVerifications: {
+    email: string,
+    token: ObjectId
+  }[],
+  profiles: Profile[],
+  latestProfile: ?Profile,
+  displayName: ?string,
+  name: Name,
+  emails: string[],
+  implicitVerifiedEmails: string[],
+  verifiedEmails: string[],
+  photo: string
+}
+
+const userSchema: Schema<UserDefinition> = new Schema({
   role: {type: String, default: 'user', enum: ['user', 'admin']},
   docVersion: {type: Number},
-  demo: Boolean,
+  demo: {type: Boolean, default: false},
   oneTimePassword: {type: String},
   password: {type: String},
   resetPassword: {
@@ -106,6 +154,5 @@ userSchema
     return profile.photos[0].value
   })
 
-const UserModel = mongoose.model('User', userSchema)
+export default mongoose.model('User', userSchema)
 
-module.exports = UserModel

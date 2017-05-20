@@ -1,18 +1,171 @@
-/**
- * Created by budde on 27/04/16.
- */
+// @flow
 
-const Handler = require('./handler')
-const TokenHandler = require('./token')
-const BookingHandler = require('./booking')
-const LaundryInvitationHandler = require('./laundry_invitation')
-const {UserModel} = require('../models')
-const utils = require('../utils')
-const uuid = require('uuid')
-const {types: {UPDATE_USER}} = require('../redux/actions')
-const config = require('config')
-const debug = require('debug')('laundree.handlers.user')
+import { Handler, HandlerLibrary } from './handler'
+import TokenHandler from './token'
+import BookingHandler from './booking'
+import LaundryInvitationHandler from './laundry_invitation'
+import UserModel from '../models/user'
+import type { Profile, UserRole } from '../models/user'
+import utils from '../utils'
+import uuid from 'uuid'
+import { redux } from 'laundree-sdk'
+import config from 'config'
+import Debug from 'debug'
+import LaundryHandler from './laundry'
 
+const debug = Debug('laundree.handlers.user')
+
+class UserHandlerLibrary extends HandlerLibrary {
+
+  constructor () {
+    super(UserHandler, UserModel, {
+      update: (obj) => typeof obj === 'string' ? null : {type: redux.types.UPDATE_USER, payload: obj.reduxModel()}
+    })
+  }
+
+  /**
+   * Find a user from given email address.
+   * @param {string} email
+   * @return {Promise.<UserHandler>}
+   */
+  async findFromEmail (email: string): Promise<?UserHandler> {
+    const [user] = await this.find({'profiles.emails.value': email.toLowerCase().trim()})
+    return user
+  }
+
+  /**
+   * Find or create a user from profile.
+   * @param {Profile} profile
+   * @return {Promise.<UserHandler>}
+   */
+  async findOrCreateFromProfile (profile: Profile) {
+    if (!profile.emails || !profile.emails.length) {
+      return null
+    }
+    const user = await this.findFromEmail(profile.emails[0].value)
+    return user
+      ? user.updateProfile(profile)
+      : this.createUserFromProfile(profile)
+  }
+
+  /**
+   *
+   * @param {string} userId
+   * @param {string} secret
+   * @returns {Promise.<{user: UserHandler=, token: TokenHandler=}>}
+   */
+  async findFromIdWithTokenSecret (userId: string, secret: string): {} | { user: UserHandler, token: TokenHandler } {
+    const user = await this.findFromId(userId)
+    if (!user) {
+      return {}
+    }
+    const token = await user.findAuthTokenFromSecret(secret)
+    if (!token) {
+      return {}
+    }
+    return {user, token}
+  }
+
+  /**
+   * Finds a user from verified email and valid password
+   * @param email
+   * @param password
+   * @returns {Promise.<UserHandler>}
+   */
+  async findFromVerifiedEmailAndVerifyPassword (email: string, password: string) {
+    const user = await this.findFromEmail(email)
+    if (!user) {
+      return null
+    }
+    if (!user.isVerified(email)) {
+      return null
+    }
+    const result = await user.verifyPassword(password)
+    return result
+      ? user
+      : null
+  }
+
+  /**
+   * Create a new user from given profile.
+   * @param {Profile} profile
+   * @return {Promise.<UserHandler>}
+   */
+  async createUserFromProfile (profile: Profile) {
+    if (!profile.emails || !profile.emails.length) {
+      return null
+    }
+    const role = profile.emails.reduce((role, {value}) => role || config.get('defaultUsers')[value], null) || 'user'
+    const model = await new UserModel({
+      docVersion: 1,
+      profiles: [Object.assign({}, profile, {emails: profile.emails.map(({value}) => ({value: value.toLowerCase()}))})],
+      latestProvider: profile.provider,
+      role
+    }).save()
+    const handler = new UserHandler(model)
+    this.emitEvent('create', handler)
+    await handler.addLaundriesFromInvites()
+    return handler
+  }
+
+  /**
+   * @param {String} displayName
+   * @param {String} email
+   * @param {String} password
+   * @returns {Promise.<UserHandler>}
+   */
+  async createUserWithPassword (displayName: string, email: string, password: string) {
+    displayName = displayName.split(' ').filter((name) => name.length).join(' ')
+
+    const profile = {
+      id: email,
+      displayName: displayName,
+      name: displayNameToName(displayName),
+      provider: 'local',
+      emails: [{value: email}],
+      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
+    }
+    const [user, passwordHash] = await Promise.all([
+      this.createUserFromProfile(profile),
+      utils.password.hashPassword(password)])
+    if (!user) {
+      return null
+    }
+    user.model.password = passwordHash
+    await user.model.save()
+    return user
+  }
+
+  /**
+   * Create a demo user
+   * @returns {Promise.<{email: string, user: UserHandler, password: string}>}
+   */
+  async createDemoUser () {
+    const displayName = 'Demo user'
+    const email = `demo-user-${uuid.v4()}@laundree.io`
+    const profile = {
+      id: email,
+      displayName,
+      name: displayNameToName(displayName),
+      provider: 'local',
+      emails: [{value: email}],
+      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
+    }
+    const [user, {token, hash}] = await Promise
+      .all([
+        this.createUserFromProfile(profile),
+        utils.password.generateTokenAndHash()
+      ])
+    if (!user) {
+      return null
+    }
+    user.model.oneTimePassword = hash
+    user.model.demo = true
+    user.model.explicitVerifiedEmails.push(email)
+    await user.model.save()
+    return {password: token, user, email}
+  }
+}
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -34,67 +187,17 @@ function displayNameToName (displayName) {
  * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string=, middleName: string=, givenName: string=}, emails: {value: string, type: string=}[], photos: {value: string}[]=}} Profile
  */
 
-class UserHandler extends Handler {
-  /**
-   * Find a user from given email address.
-   * @param {string} email
-   * @return {Promise.<UserHandler>}
-   */
-  static findFromEmail (email) {
-    return UserModel.findOne({'profiles.emails.value': email.toLowerCase().trim()})
-      .exec()
-      .then((userModel) => userModel ? new UserHandler(userModel) : undefined)
-  }
+export default class UserHandler extends Handler {
+  static lib = new UserHandlerLibrary()
+  lib = UserHandler.lib
 
-  /**
-   * Find or create a user from profile.
-   * @param {Profile} profile
-   * @return {Promise.<UserHandler>}
-   */
-  static findOrCreateFromProfile (profile) {
-    if (!profile.emails || !profile.emails.length) return Promise.resolve()
-    return UserHandler
-      .findFromEmail(profile.emails[0].value)
-      .then((user) => user
-        ? user.updateProfile(profile)
-        : UserHandler.createUserFromProfile(profile))
-  }
-
-  /**
-   *
-   * @param {string} userId
-   * @param {string} secret
-   * @returns {Promise.<{user: UserHandler=, token: TokenHandler=}>}
-   */
-  static findFromIdWithTokenSecret (userId, secret) {
-    return UserHandler
-      .findFromId(userId)
-      .then(user => {
-        if (!user) return {}
-        return user
-          .findAuthTokenFromSecret(secret)
-          .then(token => {
-            if (!token) return {}
-            return {user, token}
-          })
-      })
-  }
-
-  /**
-   * Finds a user from verified email and valid password
-   * @param email
-   * @param password
-   * @returns {Promise.<UserHandler>}
-   */
-  static findFromVerifiedEmailAndVerifyPassword (email, password) {
-    return UserHandler.findFromEmail(email)
-      .then(user => {
-        if (!user) return
-        if (!user.isVerified(email)) return
-        return user.verifyPassword(password)
-          .then(result => result ? user : undefined)
-      })
-  }
+  updateActions = [
+    (user: UserHandler) => {
+      user.model.calendarTokensReferences = []
+      user.model.docVersion = 1
+      return user.model.save().then(() => new UserHandler(user.model))
+    }
+  ]
 
   /**
    * Will eventually add profile if a profile with the same provider isn't present, or
@@ -103,7 +206,7 @@ class UserHandler extends Handler {
    * @param {Profile} profile
    * @return {Promise.<UserHandler>}
    */
-  updateProfile (profile) {
+  updateProfile (profile: Profile): Promise<UserHandler> {
     this.model.profiles = this.model.profiles.filter((p) => p.provider !== profile.provider)
     this.model.profiles.push(profile)
     this.model.latestProvider = profile.provider
@@ -115,7 +218,7 @@ class UserHandler extends Handler {
    * @param playId
    * @returns {Promise.<number>}
    */
-  async addOneSignalPlayerId (playId) {
+  async addOneSignalPlayerId (playId: string) {
     if (this.model.oneSignalPlayerIds.includes(playId)) {
       return 0
     }
@@ -127,7 +230,7 @@ class UserHandler extends Handler {
 
   async _updateBookings () {
     debug('Updating bookigns with playId', this.model.oneSignalPlayerIds)
-    const bookings = await BookingHandler.find({owner: this.model.id, from: {$gte: new Date()}})
+    const bookings = await BookingHandler.lib.find({owner: this.model.id, from: {$gte: new Date()}})
     debug('Found bookings', bookings)
     return Promise.all(bookings.map(booking => booking._updateNotification(this.model.oneSignalPlayerIds)))
   }
@@ -151,15 +254,14 @@ class UserHandler extends Handler {
 
   _fetchPasswordResetToken () {
     return TokenHandler
-      .findFromId(this.model.resetPassword.token)
+      .lib.findFromId(this.model.resetPassword.token)
   }
 
-  _revokeResetToken () {
-    if (!this.model.resetPassword.token) return Promise.resolve()
-    return this._fetchPasswordResetToken().then(token => {
-      this.model.resetPassword = {}
-      return Promise.all([token.deleteToken(), this.model.save()])
-    })
+  async _revokeResetToken () {
+    if (!this.model.resetPassword.token) return
+    const token = await this._fetchPasswordResetToken()
+    this.model.resetPassword = {}
+    await Promise.all([token.deleteToken(), this.model.save()])
   }
 
   /**
@@ -182,9 +284,9 @@ class UserHandler extends Handler {
    * @param {string} secret
    * @returns {Promise.<boolean>|*}
    */
-  verifyCalendarToken (secret) {
+  verifyCalendarToken (secret: string) {
     debug('Verifying calendar token', this.model.calendarTokensReferences)
-    return TokenHandler
+    return TokenHandler.lib
       .findTokenFromSecret(secret, {_id: {$in: this.model.calendarTokensReferences}})
       .then(Boolean)
   }
@@ -201,19 +303,11 @@ class UserHandler extends Handler {
   }
 
   /**
-   * @returns {boolean}
-   */
-  get isDemo () {
-    return Boolean(this.model.demo)
-  }
-
-  /**
    * Finds the laundries owned by this user
    * @return {Promise<LaundryHandler[]>}
    */
   findOwnedLaundries () {
-    const LaundryHandler = require('./laundry')
-    return LaundryHandler.find({owners: this.model._id})
+    return LaundryHandler.lib.find({owners: this.model._id})
   }
 
   /**
@@ -221,16 +315,16 @@ class UserHandler extends Handler {
    * @param secret
    * @return {Promise.<TokenHandler>}
    */
-  findAuthTokenFromSecret (secret) {
-    return TokenHandler.findTokenFromSecret(secret, {_id: {$in: this.model.authTokens}})
+  findAuthTokenFromSecret (secret: string): Promise<?TokenHandler> {
+    return TokenHandler.lib.findTokenFromSecret(secret, {_id: {$in: this.model.authTokens}})
   }
 
   fetchAuthTokens () {
-    return TokenHandler.find({_id: {$in: this.model.authTokens}})
+    return TokenHandler.lib.find({_id: {$in: this.model.authTokens}})
   }
 
   _fetchUserTokens () {
-    return TokenHandler.find({owner: this.model._id})
+    return TokenHandler.lib.find({owner: this.model._id})
   }
 
   /**
@@ -238,28 +332,27 @@ class UserHandler extends Handler {
    * @param {string} name
    * @return {Promise.<TokenHandler>}
    */
-  generateAuthToken (name) {
-    return this._generateToken(name, 'auth')
-      .then(token => {
-        this.model.authTokens.push(token.model._id)
-        return this.model.save().then(() => token)
-      })
+  async generateAuthToken (name: string): Promise<TokenHandler> {
+    const token = await this._generateToken(name, 'auth')
+    this.model.authTokens.push(token.model._id)
+    await this.model.save()
+    return token
   }
 
-  _generateToken (name, type) {
-    return TokenHandler._createToken(this, name, type)
+  _generateToken (name: string, type: *) {
+    return TokenHandler.lib._createToken(this, name, type)
   }
 
   /**
    * Update the name of the user.
    * @param name
    */
-  updateName (name) {
+  async updateName (name: string) {
     this.model.overrideDisplayName = name
-    return this.model
+    await this.model
       .save()
-      .then(() => this.emitEvent('update'))
-      .then(() => this)
+    this.lib.emitEvent('update', this)
+    return this
   }
 
   /**
@@ -267,11 +360,10 @@ class UserHandler extends Handler {
    * @param role
    * @returns {Promise}
    */
-  updateRole (role) {
+  async updateRole (role: UserRole) {
     this.model.role = role
-    return this.model
-      .save()
-      .then(() => this.emitEvent('update'))
+    await this.model.save()
+    this.lib.emitEvent('update', this)
   }
 
   /**
@@ -281,9 +373,8 @@ class UserHandler extends Handler {
    * @param {string=} googlePlaceId
    * @return {Promise.<LaundryHandler>}
    */
-  createLaundry (name, timeZone, googlePlaceId) {
-    const LaundryHandler = require('./laundry')
-    return LaundryHandler.createLaundry(this, name, false, timeZone, googlePlaceId)
+  createLaundry (name: string, timeZone: string = '', googlePlaceId: string = '') {
+    return LaundryHandler.lib.createLaundry(this, name, false, timeZone, googlePlaceId)
   }
 
   /**
@@ -291,12 +382,12 @@ class UserHandler extends Handler {
    * @param {LaundryHandler} laundry
    * @return {Promise.<UserHandler>}
    */
-  _addLaundry (laundry) {
+  _addLaundry (laundry: LaundryHandler) {
     this.model.laundries.push(laundry.model._id)
     return this.save()
   }
 
-  _removeLaundry (laundry) {
+  _removeLaundry (laundry: LaundryHandler) {
     this.model.laundries.pull(laundry.model._id)
     return this.save()
   }
@@ -306,18 +397,15 @@ class UserHandler extends Handler {
    * @param {TokenHandler} token
    * @return {Promise.<UserHandler>}
    */
-  removeAuthToken (token) {
-    return token.deleteToken()
-      .then(() => {
-        this.model.authTokens.pull(token.model._id)
-        return this.model.save()
-      })
-      .then(() => this)
+  async removeAuthToken (token: TokenHandler) {
+    await token.deleteToken()
+    this.model.authTokens.pull(token.model._id)
+    await this.model.save()
+    return this
   }
 
   fetchLaundries () {
-    const LaundryHandler = require('./laundry')
-    return LaundryHandler.find({_id: {$in: this.model.laundries}})
+    return LaundryHandler.lib.find({_id: {$in: this.model.laundries}})
   }
 
   /**
@@ -325,16 +413,15 @@ class UserHandler extends Handler {
    * @param {string} email
    * @return {Promise.<TokenHandler>}
    */
-  generateVerifyEmailToken (email) {
+  async generateVerifyEmailToken (email: string) {
     email = email.toLowerCase()
     if (this.model.emails.indexOf(email) < 0) return Promise.resolve()
-    return this._generateToken(uuid.v4(), 'verification')
-      .then(token => {
-        const cleanTokens = this.model.pendingExplicitEmailVerifications.filter(v => v.email !== email)
-        cleanTokens.push({email: email, token: token.model._id})
-        this.model.pendingExplicitEmailVerifications = cleanTokens
-        return this.model.save().then(() => token)
-      })
+    const token = await this._generateToken(uuid.v4(), 'verification')
+    const cleanTokens = this.model.pendingExplicitEmailVerifications.filter(v => v.email !== email)
+    cleanTokens.push({email: email, token: token.model._id})
+    this.model.pendingExplicitEmailVerifications = cleanTokens
+    await this.model.save()
+    return token
   }
 
   /**
@@ -343,113 +430,33 @@ class UserHandler extends Handler {
    * @param {string} token
    * @returns {Promise.<boolean>}
    */
-  verifyEmail (email, token) {
+  async verifyEmail (email: string, token: string): Promise<boolean> {
     email = email.toLowerCase()
     const storedToken = this.model.pendingExplicitEmailVerifications.find(element => element.email === email)
-    if (!storedToken) return Promise.resolve(false)
-    return TokenHandler
-      .findFromId(storedToken.token)
-      .then(t => t.verify(token))
-      .then(result => {
-        if (!result) return false
-        this.model.pendingExplicitEmailVerifications = this.model.pendingExplicitEmailVerifications
-          .filter(element => element.email !== email)
-        this.model.explicitVerifiedEmails.push(email)
-        return this.model.save().then(() => true)
-      })
+    if (!storedToken) return false
+    const t = await TokenHandler.lib.findFromId(storedToken.token)
+    if (!t) return false
+    const result = await t.verify(token)
+    if (!result) return false
+    this.model.pendingExplicitEmailVerifications = this.model.pendingExplicitEmailVerifications
+      .filter(element => element.email !== email)
+    this.model.explicitVerifiedEmails.push(email)
+    await this.model.save()
+    return true
   }
 
-  isVerified (email) {
+  isVerified (email: string) {
     return this.model.verifiedEmails.indexOf(email.toLowerCase()) >= 0
   }
 
-  /**
-   * Create a new user from given profile.
-   * @param {Profile} profile
-   * @return {Promise.<UserHandler>}
-   */
-  static createUserFromProfile (profile) {
-    if (!profile.emails || !profile.emails.length) return Promise.resolve()
-    const role = profile.emails.reduce((role, {value}) => role || config.get('defaultUsers')[value], null) || 'user'
-    return new UserModel({
-      docVersion: 1,
-      profiles: [Object.assign({}, profile, {emails: profile.emails.map(({value}) => ({value: value.toLowerCase()}))})],
-      latestProvider: profile.provider,
-      role
-    }).save()
-      .then((model) => new UserHandler(model))
-      .then((user) => {
-        user.emitEvent('create')
-        return user.addLaundriesFromInvites().then(() => user)
-      })
+  async addLaundriesFromInvites () {
+    const invites = await LaundryInvitationHandler.lib.find({email: {$in: this.model.emails}})
+    const laundries = await LaundryHandler.lib.find({_id: {$in: invites.map(({model: {laundry}}) => laundry)}})
+    await Promise.all(laundries.map((laundry) => laundry.addUser(this)))
+    await Promise.all(invites.map((invite) => invite.markUsed()))
   }
 
-  /**
-   * @param {String} displayName
-   * @param {String} email
-   * @param {String} password
-   * @returns {Promise.<UserHandler>}
-   */
-  static createUserWithPassword (displayName, email, password) {
-    displayName = displayName.split(' ').filter((name) => name.length).join(' ')
-
-    const profile = {
-      id: email,
-      displayName: displayName,
-      name: displayNameToName(displayName),
-      provider: 'local',
-      emails: [{value: email}],
-      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
-    }
-    return Promise.all(
-      [UserHandler.createUserFromProfile(profile),
-        utils.password.hashPassword(password)])
-      .then((result) => {
-        const [user, passwordHash] = result
-        user.model.password = passwordHash
-        return user.model.save().then((model) => UserHandler.findFromId(model.id))
-      })
-  }
-
-  /**
-   * Create a demo user
-   * @returns {Promise.<{email: string, user: UserHandler, password: string}>}
-   */
-  static createDemoUser () {
-    const displayName = 'Demo user'
-    const email = `demo-user-${uuid.v4()}@laundree.io`
-    const profile = {
-      id: email,
-      displayName,
-      name: displayNameToName(displayName),
-      provider: 'local',
-      emails: [{value: email}],
-      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
-    }
-    return Promise
-      .all([
-        UserHandler.createUserFromProfile(profile),
-        utils.password.generateTokenAndHash()
-      ])
-      .then(([user, {token, hash}]) => {
-        user.model.oneTimePassword = hash
-        user.model.demo = true
-        user.model.explicitVerifiedEmails.push(email)
-        return user.model.save().then(() => ({password: token, user, email}))
-      })
-  }
-
-  addLaundriesFromInvites () {
-    const LaundryHandler = require('./laundry')
-    return LaundryInvitationHandler
-      .find({email: {$in: this.model.emails}})
-      .then((invites) => LaundryHandler
-        .find({_id: {$in: invites.map(({model: {laundry}}) => laundry)}})
-        .then((laundries) => Promise.all(laundries.map((laundry) => laundry.addUser(this))))
-        .then(() => Promise.all(invites.map((invite) => invite.markUsed()))))
-  }
-
-  resetPassword (password) {
+  resetPassword (password: string) {
     return Promise.all([
       utils.password.hashPassword(password)
         .then(hash => {
@@ -459,29 +466,26 @@ class UserHandler extends Handler {
       this._revokeResetToken()])
   }
 
-  get hasPassword () {
-    return Boolean(this.model.password)
-  }
-
   /**
    * Verifies given password.
    * @param {string} password
    * @return {Promise.<boolean>}
    */
-  verifyPassword (password) {
+  verifyPassword (password: string) {
     if (this.model.password) return utils.password.comparePassword(password, this.model.password)
     return this.verifyOneTimePassword(password)
   }
 
-  verifyOneTimePassword (password) {
-    if (!this.model.oneTimePassword) return Promise.resolve(false)
-    return utils.password
+  async verifyOneTimePassword (password: string) {
+    if (!this.model.oneTimePassword) {
+      return false
+    }
+    const result = await utils.password
       .comparePassword(password, this.model.oneTimePassword)
-      .then(result => {
-        if (!result) return result
-        this.model.oneTimePassword = undefined
-        return this.model.save().then(() => true)
-      })
+    if (!result) return result
+    this.model.oneTimePassword = undefined
+    await this.model.save()
+    return true
   }
 
   /**
@@ -489,12 +493,13 @@ class UserHandler extends Handler {
    * @param {string} token
    * @return {Promise.<boolean>}
    */
-  verifyResetPasswordToken (token) {
+  async verifyResetPasswordToken (token: string) {
     debug('Verify reset password token', token, this.model.resetPassword)
-    if (!this.model.resetPassword.token) return Promise.resolve(false)
-    if (!this.model.resetPassword.expire) return Promise.resolve(false)
-    if (new Date() > this.model.resetPassword.expire) return Promise.resolve(false)
-    return this._fetchPasswordResetToken().then(tok => tok.verify(token))
+    if (!this.model.resetPassword.token) return false
+    if (!this.model.resetPassword.expire) return false
+    if (new Date() > this.model.resetPassword.expire) return false
+    const tok = await this._fetchPasswordResetToken()
+    return tok.verify(token)
   }
 
   deleteUser () {
@@ -524,17 +529,15 @@ class UserHandler extends Handler {
    * @param {string} locale
    * @returns {Promise}
    */
-  setLocale (locale) {
+  setLocale (locale: string) {
     debug(`Setting locale of user ${this.model.displayName} to ${locale}`)
     this.model.locale = locale
     return this.save()
   }
 
-  get restUrl () {
-    return `/api/users/${this.model.id}`
-  }
+  restUrl = `/api/users/${this.model.id}`
 
-  get photo () {
+  photo () {
     const profile = this.model.latestProfile
     const photo = profile.photos && profile.photos.length && profile.photos[0].value
     if (!photo) return null
@@ -569,17 +572,7 @@ class UserHandler extends Handler {
     }
   }
 
-  get updateActions () {
-    return [
-      user => {
-        user.model.calendarTokensReferences = []
-        user.model.docVersion = 1
-        return user.model.save().then(() => new UserHandler(user.model))
-      }
-    ]
-  }
-
-  get reduxModel () {
+  reduxModel () {
     return {
       id: this.model.id,
       photo: this.photo,
@@ -587,21 +580,11 @@ class UserHandler extends Handler {
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,
       role: this.model.role,
-      demo: this.isDemo
+      demo: Boolean(this.model.demo)
     }
   }
 
-  get isAdmin () {
+  isAdmin () {
     return this.model.role === 'admin'
   }
-
-  get eventData () {
-    return {demo: this.isDemo}
-  }
 }
-
-Handler.setupHandler(UserHandler, UserModel, {
-  update: UPDATE_USER
-})
-
-module.exports = UserHandler

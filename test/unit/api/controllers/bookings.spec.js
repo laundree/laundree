@@ -1,15 +1,15 @@
-const request = require('supertest')
-const app = require('../../../../test_target/app').app
-const chai = require('chai')
-const config = require('config')
+import request from 'supertest'
+import { app } from '../../../../test_target/app'
+import chai from 'chai'
+import config from 'config'
+import BookingHandler from '../../../../test_target/handlers/booking'
+import dbUtils from '../../../db_utils'
+import moment from 'moment-timezone'
+
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {BookingHandler} = require('../../../../test_target/handlers')
-const dbUtils = require('../../../db_utils')
-
-const moment = require('moment-timezone')
 
 function createDateTomorrow (hour = 0, minute = 0, tz = config.timezone) {
   const now = moment.tz(tz).add(2, 'd')
@@ -552,8 +552,8 @@ describe('controllers', function () {
               request(app)
                 .post(`/api/machines/${machine.model.id}/bookings`)
                 .send({
-                  from: createDateTomorrow(1, 0, laundry.timezone),
-                  to: createDateTomorrow(2, 0, laundry.timezone)
+                  from: createDateTomorrow(1, 0, laundry.timezone()),
+                  to: createDateTomorrow(2, 0, laundry.timezone())
                 })
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
@@ -564,8 +564,8 @@ describe('controllers', function () {
                   const id = res.body.id
                   return BookingHandler.findFromId(id).then((machine) => {
                     machine.should.not.be.undefined
-                    res.body.from.should.deep.equal(createDateTomorrow(1, 0, laundry.timezone))
-                    res.body.to.should.deep.equal(createDateTomorrow(2, 0, laundry.timezone))
+                    res.body.from.should.deep.equal(createDateTomorrow(1, 0, laundry.timezone()))
+                    res.body.to.should.deep.equal(createDateTomorrow(2, 0, laundry.timezone()))
                     return machine.toRest().then((result) => res.body.should.deep.equal(result))
                   })
                 }))))
@@ -731,9 +731,10 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res => BookingHandler
+              .lib
               .findFromId(booking.model.id)
               .then((t) => {
-                assert(t === undefined)
+                assert(!t)
               }))))
 
       it('should fail when other user', () =>

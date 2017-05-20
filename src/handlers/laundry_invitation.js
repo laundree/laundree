@@ -1,15 +1,19 @@
-/**
- * Created by budde on 02/06/16.
- */
+// @flow
 
-const Handler = require('./handler')
-const {LaundryInvitationModel} = require('../models')
-const {types: {DELETE_INVITATION, UPDATE_INVITATION, CREATE_INVITATION}} = require('../redux/actions')
+import LaundryHandler from './laundry'
+import { Handler, HandlerLibrary } from './handler'
+import LaundryInvitationModel from '../models/laundry_invitation'
+import { redux } from 'laundree-sdk'
+import type { Invite } from 'laundree-sdk/src/redux'
 
-class LaundryInvitationHandler extends Handler {
-  constructor (model, secret) {
-    super(model)
-    this.secret = secret
+class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, *> {
+
+  constructor () {
+    super(LaundryInvitationHandler, LaundryInvitationModel, {
+      create: obj => typeof obj === 'string' ? null : {type: redux.types.CREATE_INVITATION, payload: obj.reduxModel()},
+      update: obj => typeof obj === 'string' ? null : {type: redux.types.UPDATE_INVITATION, payload: obj.reduxModel()},
+      delete: obj => typeof obj !== 'string' ? null : {type: redux.types.DELETE_INVITATION, payload: obj}
+    })
   }
 
   /**
@@ -17,13 +21,24 @@ class LaundryInvitationHandler extends Handler {
    * @param {LaundryHandler} laundry
    * @param {string} email
    */
-  static _createInvitation (laundry, email) {
-    return new LaundryInvitationModel({laundry: laundry.model._id, email: email.toLowerCase()}).save()
-      .then((model) => new LaundryInvitationHandler(model))
-      .then((invitation) => {
-        invitation.emitEvent('create')
-        return invitation
-      })
+  async _createInvitation (laundry: LaundryHandler, email: string) {
+    const model = await new LaundryInvitationModel({laundry: laundry.model._id, email: email.toLowerCase()}).save()
+    const handler = new LaundryInvitationHandler(model)
+    this.emitEvent('create', handler)
+    return handler
+  }
+
+}
+
+export default class LaundryInvitationHandler extends Handler<LaundryInvitationModel, Invite> {
+
+  static lib = new LaundryInvitationHandlerLibrary()
+  lib = LaundryInvitationHandler.lib
+  href: string
+
+  constructor (model: LaundryInvitationModel) {
+    super(model)
+    this.href = `/api/invites/${this.model.id}`
   }
 
   _deleteInvite () {
@@ -34,24 +49,18 @@ class LaundryInvitationHandler extends Handler {
     return {email: this.model.email, id: this.model.id, href: this.href}
   }
 
-  fetchLaundry () {
-    const LaundryHandler = require('./laundry')
-    return LaundryInvitationModel.populate(this.model, {path: 'laundry'})
-      .then((model) => new LaundryHandler(model.laundry))
+  async fetchLaundry () {
+    return LaundryHandler.lib.findFromId(this.model.laundry)
   }
 
-  get href () {
-    return `/api/invites/${this.model.id}`
-  }
-
-  toRest () {
-    return this.fetchLaundry()
-      .then(laundry => ({
-        email: this.model.email,
-        id: this.model.id,
-        laundry: laundry.toRestSummary(),
-        href: this.href
-      }))
+  async toRest () {
+    const laundry = await this.fetchLaundry()
+    return {
+      email: this.model.email,
+      id: this.model.id,
+      laundry: laundry.toRestSummary(),
+      href: this.href
+    }
   }
 
   markUsed () {
@@ -59,7 +68,7 @@ class LaundryInvitationHandler extends Handler {
     return this.save()
   }
 
-  get reduxModel () {
+  reduxModel () {
     return {
       used: this.model.used,
       id: this.model.id,
@@ -68,11 +77,3 @@ class LaundryInvitationHandler extends Handler {
     }
   }
 }
-
-Handler.setupHandler(LaundryInvitationHandler, LaundryInvitationModel, {
-  delete: DELETE_INVITATION,
-  update: UPDATE_INVITATION,
-  create: CREATE_INVITATION
-})
-
-module.exports = LaundryInvitationHandler

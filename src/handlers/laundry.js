@@ -1,61 +1,71 @@
-/**
- * Created by budde on 02/06/16.
- */
-const {LaundryModel} = require('../models')
-const Handler = require('./handler')
-const UserHandler = require('./user')
-const MachineHandler = require('./machine')
-const BookingHandler = require('./booking')
-const LaundryInvitationHandler = require('./laundry_invitation')
-const error = require('../utils/error')
-const debug = require('debug')('laundree.handlers.laundry')
-const uuid = require('uuid')
-const config = require('config')
-const {types: {DELETE_LAUNDRY, UPDATE_LAUNDRY, CREATE_LAUNDRY}} = require('../redux/actions')
-const moment = require('moment-timezone')
-const {generateBase64UrlSafeCode, hashPassword, comparePassword} = require('../utils/password')
-const googleMapsClient = require('@google/maps').createClient({key: config.get('google.serverApiKey')})
+// @flow
+import LaundryModel from '../models/laundry'
+import type { LaundryRules } from '../models/laundry'
+import { Handler, HandlerLibrary } from './handler'
+import UserHandler from './user'
+import type { MachineType } from '../models/machine'
+import MachineHandler from './machine'
+import BookingHandler from './booking'
+import LaundryInvitationHandler from './laundry_invitation'
+import error from '../utils/error'
+import Debug from 'debug'
+import uuid from 'uuid'
+import config from 'config'
+import { redux } from 'laundree-sdk'
+import moment from 'moment-timezone'
+import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
+import GoogleMapsClient from '@google/maps'
+
+const googleMapsClient = GoogleMapsClient.createClient({key: config.get('google.serverApiKey')})
+const debug = Debug('laundree.handlers.laundry')
 
 function objToMintues ({hour, minute}) {
   return hour * 60 + minute
 }
 
-class LaundryHandler extends Handler {
-  /**
-   * Create a new laundry.
-   * @param {UserHandler} owner
-   * @param {string} name
-   * @param {boolean} demo
-   * @param {string} timeZone
-   * @param {string} googlePlaceId
-   * @return {Promise.<LaundryHandler>}
-   */
-  static createLaundry (owner, name, demo = false, timeZone = '', googlePlaceId = '') {
-    return new LaundryModel({
+type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
+
+class LaundryHandlerLibrary extends HandlerLibrary {
+
+  constructor () {
+    super(LaundryHandler, LaundryModel, {
+      create: obj => typeof obj === 'string' ? null : {type: redux.types.CREATE_LAUNDRY, payload: obj.reduxModel()},
+      update: obj => typeof obj === 'string' ? null : {type: redux.types.UPDATE_LAUNDRY, payload: obj.reduxModel()},
+      delete: obj => typeof obj !== 'string' ? null : {type: redux.types.DELETE_LAUNDRY, payload: obj}
+    })
+  }
+
+  async createLaundry (owner: UserHandler, name: string, demo: boolean = false, timeZone: string = '', googlePlaceId: string = '') {
+    const model = await new LaundryModel({
       name,
       owners: [owner.model._id],
       users: [owner.model._id],
       timezone: timeZone,
       googlePlaceId,
       demo
-    })
-      .save()
-      .then((model) => new LaundryHandler(model))
-      .then((laundry) => {
-        laundry.emitEvent('create')
-        return owner._addLaundry(laundry).then(() => laundry)
-      })
+    }).save()
+    const laundry = new LaundryHandler(model)
+    this.emitEvent('create', laundry)
+    await owner._addLaundry(laundry)
+    return laundry
   }
 
-  static createDemoLaundry (owner) {
+  async createDemoLaundry (owner: UserHandler) {
     const name = `Demo Laundry ${uuid.v4()}`
-    return LaundryHandler
-      .createLaundry(owner, name, true)
-      .then(laundry => [{name: 'Washer', type: 'wash'}, {name: 'Dryer', type: 'dry'}]
-        .reduce((prom, {name, type}) => prom.then(() => laundry.createMachine(name, type)), Promise.resolve()))
+    const laundry = await this.createLaundry(owner, name, true)
+    const machines = [
+      {name: 'Washer', type: 'wash'},
+      {
+        name: 'Dryer',
+        type: 'dry'
+      }]
+    for (const machine of machines) {
+      await laundry.createMachine(machine.name, machine.type)
+    }
+    return laundry
   }
 
-  static timeZoneFromGooglePlaceId (placeId) {
+  timeZoneFromGooglePlaceId (placeId: string) {
     return new Promise((resolve, reject) => {
       googleMapsClient.reverseGeocode({place_id: placeId}, (err, response) => {
         if (err) return reject(err)
@@ -73,6 +83,13 @@ class LaundryHandler extends Handler {
     })
   }
 
+}
+
+class LaundryHandler extends Handler {
+  static lib = new LaundryHandlerLibrary()
+  lib = LaundryHandler.lib
+  restUrl = `/api/laundries/${this.model.id}`
+
   /**
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}
@@ -86,7 +103,7 @@ class LaundryHandler extends Handler {
       .then((users) => Promise.all(users.map((user) => user._removeLaundry(this))))
       .then(() => this.model.remove())
       .then(() => {
-        this.emitEvent('delete')
+        this.lib.emitEvent('delete', this)
         return this
       })
   }
@@ -96,9 +113,8 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {boolean}
    */
-  isUser (user) {
-    const users = this.model.populated('users') || this.model.users
-    return users.find((owner) => user.model._id.equals(owner))
+  isUser (user: UserHandler) {
+    return this.model.users.find((owner) => user.model._id.equals(owner))
   }
 
   /**
@@ -106,17 +122,8 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {boolean}
    */
-  isOwner (user) {
-    const users = this.model.populated('owners') || this.model.owners
-    return users.find((owner) => user.model._id.equals(owner))
-  }
-
-  /**
-   * Is this laundry a demo laundry
-   * @returns {boolean}
-   */
-  get isDemo () {
-    return Boolean(this.model.demo)
+  isOwner (user: UserHandler) {
+    return this.model.owners.find((owner) => user.model._id.equals(owner))
   }
 
   /**
@@ -126,11 +133,11 @@ class LaundryHandler extends Handler {
    * @param {boolean} broken
    * @return {Promise.<MachineHandler>}
    */
-  createMachine (name, type, broken) {
-    return MachineHandler._createMachine(this, name, type, broken).then((machine) => {
-      this.model.machines.push(machine.model._id)
-      return this.save().then(() => machine)
-    })
+  async createMachine (name: string, type: MachineType, broken: boolean) {
+    const machine = await MachineHandler.lib._createMachine(this, name, type, broken)
+    this.model.machines.push(machine.model._id)
+    await this.save()
+    return machine
   }
 
   /**
@@ -140,7 +147,7 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int, hour: int, minute: int}} from
    * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
    */
-  createBooking (machine, owner, from, to) {
+  createBooking (machine: MachineHandler, owner: UserHandler, from: DateTimeObject, to: DateTimeObject) {
     const fromDate = this.dateFromObject(from)
     const toDate = this.dateFromObject(to)
     return machine.createBooking(owner, fromDate, toDate)
@@ -151,8 +158,8 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int, hour: int=, minute: int=}} object
    * @return {Date}
    */
-  dateFromObject (object) {
-    const mom = moment.tz(object, this.timezone)
+  dateFromObject (object: DateTimeObject) {
+    const mom = moment.tz(object, this.timezone())
     return mom.toDate()
   }
 
@@ -160,13 +167,13 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int, hour: int, minute: int}} object
    * @returns {boolean}
    */
-  validateDateObject (object) {
-    const mom = moment.tz(object, this.timezone)
+  validateDateObject (object: DateTimeObject) {
+    const mom = moment.tz(object, this.timezone())
     return mom.isValid()
   }
 
-  _objectToMoment (object) {
-    return moment.tz(object, this.timezone)
+  _objectToMoment (object: DateTimeObject) {
+    return moment.tz(object, this.timezone())
   }
 
   /**
@@ -174,8 +181,8 @@ class LaundryHandler extends Handler {
    * @param {Date} d
    * @returns {{year: int, month: int, day: int, hour: int, minute: int}}
    */
-  dateToObject (d) {
-    const mom = moment(d).tz(this.timezone)
+  dateToObject (d: Date) {
+    const mom = moment(d).tz(this.timezone())
     return {year: mom.year(), month: mom.month(), day: mom.date(), hour: mom.hours(), minute: mom.minutes()}
   }
 
@@ -184,12 +191,10 @@ class LaundryHandler extends Handler {
    * @param {MachineHandler} machine
    * @return {Promise}
    */
-  deleteMachine (machine) {
-    return machine._deleteMachine()
-      .then(() => {
-        this.model.machines.pull(machine.model._id)
-        return this.save()
-      })
+  async deleteMachine (machine: MachineHandler) {
+    await machine._deleteMachine()
+    this.model.machines.pull(machine.model._id)
+    return this.save()
   }
 
   /**
@@ -197,12 +202,10 @@ class LaundryHandler extends Handler {
    * @param {LaundryInvitationHandler} invite
    * @return {Promise}
    */
-  deleteInvite (invite) {
-    return invite._deleteInvite()
-      .then(() => {
-        this.model.invites.pull(invite.model._id)
-        return this.save()
-      })
+  async deleteInvite (invite: LaundryInvitationHandler) {
+    await invite._deleteInvite()
+    this.model.invites.pull(invite.model._id)
+    return this.save()
   }
 
   /**
@@ -210,58 +213,25 @@ class LaundryHandler extends Handler {
    * @returns {Promise.<MachineHandler[]>}
    */
   fetchMachines () {
-    return this._fetchField(MachineHandler, 'machines')
+    return MachineHandler.lib.find({_id: this.model.machines})
   }
 
   /**
    * @returns {Promise.<LaundryInvitationHandler[]>}
    */
   fetchInvites () {
-    return this._fetchField(LaundryInvitationHandler, 'invites')
+    return LaundryInvitationHandler.lib.find({_id: this.model.invites})
   }
 
   /**
    * @returns {Promise.<UserHandler[]>}
    */
   fetchUsers () {
-    return this._fetchField(UserHandler, 'users')
+    return UserHandler.lib.find({_id: this.model.users})
   }
 
-  _fetchField (_Handler, path) {
-    return LaundryModel.populate(this.model, {path})
-      .then((m) => m[path].map((i) => new _Handler(i)))
-  }
-
-  /**
-   * @return {string[]}
-   */
-  get machineIds () {
-    return this.fetchIds('machines')
-  }
-
-  /**
-   * @return {string[]}
-   */
-  get userIds () {
-    return this.fetchIds('users')
-  }
-
-  /**
-   * @return {string[]}
-   */
-  get ownerIds () {
-    return this.fetchIds('owners')
-  }
-
-  /**
-   * @return {string[]}
-   */
-  get inviteIds () {
-    return this.fetchIds('invites')
-  }
-
-  fetchIds (field) {
-    return (this.model.populated(field) || this.model[field]).map((id) => id.toString())
+  fetchOwners () {
+    return UserHandler.lib.find({_id: this.model.owners})
   }
 
   /**
@@ -269,13 +239,12 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {Promise.<int>} The number of new users added
    */
-  addUser (user) {
-    if (this.isUser(user) || user.isDemo) return Promise.resolve(0)
+  async addUser (user: UserHandler) {
+    if (this.isUser(user) || user.model.demo) return 0
     this.model.users.push(user.model._id)
-    return this
-      .save()
-      .then(() => user._addLaundry(this))
-      .then(() => 1)
+    await this.save()
+    await user._addLaundry(this)
+    return 1
   }
 
   /**
@@ -283,14 +252,14 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {Promise.<int>} The number of owners added
    */
-  addOwner (user) {
-    return this
-      .addUser(user)
-      .then(() => {
-        if (this.isOwner(user)) return 0
-        this.model.owners.push(user.model._id)
-        return this.save().then(() => 1)
-      })
+  async addOwner (user: UserHandler) {
+    await this.addUser(user)
+    if (this.isOwner(user)) {
+      return 0
+    }
+    this.model.owners.push(user.model._id)
+    await this.save()
+    return 1
   }
 
   /**
@@ -298,7 +267,7 @@ class LaundryHandler extends Handler {
    * @param user
    * @return {Promise}
    */
-  removeOwner (user) {
+  removeOwner (user: UserHandler) {
     this.model.owners.pull(user.model._id)
     return this.save()
   }
@@ -308,7 +277,7 @@ class LaundryHandler extends Handler {
    * @param {UserHandler} user
    * @return {Promise.<LaundryHandler>}
    */
-  async removeUser (user) {
+  async removeUser (user: UserHandler) {
     this.model.users.pull(user.model._id)
     this.model.owners.pull(user.model._id)
     await this.save()
@@ -317,14 +286,14 @@ class LaundryHandler extends Handler {
     return this
   }
 
-  _deleteBookings (user) {
-    return BookingHandler.deleteBookings({
+  _deleteBookings (user: UserHandler) {
+    return BookingHandler.lib.deleteBookings({
       owner: user.model._id,
       laundry: this.model._id
     })
   }
 
-  updateLaundry ({name, timezone, rules, googlePlaceId}) {
+  updateLaundry ({name, timezone, rules, googlePlaceId}: { name?: string, timezone?: string, rules?: LaundryRules, googlePlaceId?: string }) {
     debug('Updating laundry')
     if (name) this.model.name = name
     if (timezone) this.model.timezone = timezone
@@ -340,8 +309,8 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int}} to
    * @return {BookingHandler[]}
    */
-  fetchBookings (from, to) {
-    return BookingHandler._fetchBookings(
+  fetchBookings (from: DateTimeObject, to: DateTimeObject) {
+    return BookingHandler.lib._fetchBookings(
       this.dateFromObject(from),
       this.dateFromObject(to),
       this.model.machines)
@@ -356,61 +325,58 @@ class LaundryHandler extends Handler {
    * @param {string} email
    * @return {Promise.<{user: UserHandler=, invite: LaundryInvitationHandler=}>}
    */
-  inviteUserByEmail (email) {
-    return UserHandler
-      .findFromEmail(email)
-      .then((user) => {
-        if (user) return this.addUser(user).then((num) => num ? {user} : {})
-        return LaundryInvitationHandler
-          .find({email, laundry: this.model._id})
-          .then(([invite]) => {
-            if (invite) return {}
-            return this.createInvitation(email).then(invite => ({invite}))
-          })
-      })
+  async inviteUserByEmail (email: string): {} | { user: UserHandler } | { invite: LaundryInvitationHandler } {
+    const user = await UserHandler.lib.findFromEmail(email)
+    if (user) {
+      const num = await this.addUser(user)
+      return num ? {user} : {}
+    }
+    const [i] = await LaundryInvitationHandler.lib.find({email, laundry: this.model._id})
+    if (i) return {}
+    const invite = await this.createInvitation(email)
+    return {invite}
   }
 
-  createInvitation (email) {
-    return LaundryInvitationHandler
+  async createInvitation (email: string) {
+    const invite = await LaundryInvitationHandler
+      .lib
       ._createInvitation(this, email)
-      .then((invite) => {
-        this.model.invites.push(invite.model._id)
-        return this
-          .save()
-          .then(() => invite)
-      })
+    this.model.invites.push(invite.model._id)
+    await this.save()
+    return invite
   }
 
-  toRest () {
-    const UserHandler = require('./user')
-    return LaundryModel.populate(this.model, {path: 'owners users machines invites'}).then((model) => ({
-      name: model.name,
-      id: model.id,
+  async toRest () {
+    const [owners, users, machines, invites] = await Promise.all([
+      this.fetchOwners(),
+      this.fetchUsers(),
+      this.fetchMachines(),
+      this.fetchInvites()
+    ])
+    return {
+      name: this.model.name,
+      id: this.model.id,
       href: this.restUrl,
-      owners: model.owners.map((m) => new UserHandler(m).toRestSummary()),
-      users: model.users.map((m) => new UserHandler(m).toRestSummary()),
-      machines: model.machines.map((m) => new MachineHandler(m).toRestSummary()),
-      invites: model.invites.map((m) => new LaundryInvitationHandler(m).toRestSummary())
-    }))
-  }
-
-  get restUrl () {
-    return `/api/laundries/${this.model.id}`
+      owners: owners.map(o => o.toRestSummary()),
+      users: users.map(u => u.toRestSummary()),
+      machines: machines.map(m => m.toRestSummary()),
+      invites: invites.map(i => i.toRestSummary())
+    }
   }
 
   toRestSummary () {
     return {name: this.model.name, id: this.model.id, href: this.restUrl}
   }
 
-  get timezone () {
+  timezone () {
     return this.model.timezone || config.get('timezone')
   }
 
-  get googlePlaceId () {
+  googlePlaceId () {
     return this.model.googlePlaceId || config.get('googlePlaceId')
   }
 
-  get rules () {
+  rules () {
     const obj = this.model.rules.toObject()
     if (
       Object.keys(obj.timeLimit.from).length === 0 ||
@@ -427,12 +393,11 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
    * @returns {boolean}
    */
-  checkTimeLimit (from, to) {
+  checkTimeLimit (from: DateTimeObject, to: DateTimeObject) {
     const {
       from: currentFrom,
       to: currentTo
     } = this.model.rules.timeLimit
-    if (currentFrom.hour === undefined || currentFrom.minute === undefined || currentTo.hour === undefined || currentTo.minute === undefined) return true
     return objToMintues(from) >= objToMintues(currentFrom) && objToMintues(to) <= objToMintues(currentTo)
   }
 
@@ -443,18 +408,19 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
    * @returns {boolean}
    */
-  checkDailyLimit (owner, from, to) {
-    if (this.model.rules.dailyLimit === undefined) return Promise.resolve(true)
+  async checkDailyLimit (owner: UserHandler, from: DateTimeObject, to: DateTimeObject) {
+    if (this.model.rules.dailyLimit === undefined) {
+      return true
+    }
     const {day, month, year} = from
-    return BookingHandler
-      .find({
-        laundry: this.model._id,
-        owner: owner.model._id,
-        from: {$lt: this._objectToMoment({day, month, year}).add(1, 'day').toDate()},
-        to: {$gt: this.dateFromObject({day, month, year})}
-      })
-      .then(bookings => this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from)))
-      .then(sum => sum <= this.model.rules.dailyLimit * 60)
+    const bookings = await BookingHandler.lib.find({
+      laundry: this.model._id,
+      owner: owner.model._id,
+      from: {$lt: this._objectToMoment({day, month, year, hour: 0, minute: 0}).add(1, 'day').toDate()},
+      to: {$gt: this._objectToMoment({day, month, year, hour: 0, minute: 0}).toDate}
+    })
+    const sum = this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from))
+    return sum <= this.model.rules.dailyLimit * 60
   }
 
   /**
@@ -464,19 +430,22 @@ class LaundryHandler extends Handler {
    * @param {{year: int, month: int, day: int, hour: int, minute: int}} to
    * @returns {boolean}
    */
-  checkLimit (owner, from, to) {
-    if (this.model.rules.limit === undefined) return Promise.resolve(true)
-    return BookingHandler
+  async checkLimit (owner: UserHandler, from: DateTimeObject, to: DateTimeObject) {
+    if (this.model.rules.limit === undefined) {
+      return true
+    }
+    const bookings = await BookingHandler
+      .lib
       .find({
         laundry: this.model._id,
         owner: owner.model._id,
         from: {$gt: new Date()}
       })
-      .then(bookings => this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from)))
-      .then(sum => sum <= this.model.rules.limit * 60)
+    const sum = this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from))
+    return sum <= this.model.rules.limit * 60
   }
 
-  _countBookingTimes (bookings, offset = 0) {
+  _countBookingTimes (bookings: BookingHandler[], offset: number = 0) {
     return bookings
       .map(({model: {from, to}}) => ({
         from: this.dateToObject(from),
@@ -491,8 +460,8 @@ class LaundryHandler extends Handler {
    * @param d2
    * @returns {boolean}
    */
-  isSameDay (d1, d2) {
-    return moment.tz(d1, this.timezone).format('YYYY-MM-DD') === moment.tz(d2, this.timezone).format('YYYY-MM-DD')
+  isSameDay (d1: DateTimeObject, d2: DateTimeObject) {
+    return moment.tz(d1, this.timezone()).format('YYYY-MM-DD') === moment.tz(d2, this.timezone()).format('YYYY-MM-DD')
   }
 
   /**
@@ -512,8 +481,9 @@ class LaundryHandler extends Handler {
    * @param {string} code
    * @returns {Promise.<bool>}
    */
-  verifyInviteCode (code) {
-    return Promise.all(this.model.signUpCodes.map(hash => comparePassword(code, hash))).then(results => Boolean(results.find(v => v)))
+  async verifyInviteCode (code: string) {
+    const results = await Promise.all(this.model.signUpCodes.map(hash => comparePassword(code, hash)))
+    return Boolean(results.find(v => v))
   }
 
   /**
@@ -531,34 +501,24 @@ class LaundryHandler extends Handler {
         uid,
         timestamp,
         summary,
-        url: `${config.get('web.protocol')}://${config.get('web.host')}/laundries/${this.model.id}/timetable?offsetDate=${moment.tz(start, this.timezone).format('YYYY-MM-DD')}`
+        url: `${config.get('web.protocol')}://${config.get('web.host')}/laundries/${this.model.id}/timetable?offsetDate=${moment.tz(start, this.timezone()).format('YYYY-MM-DD')}`
       })))
   }
 
-  get reduxModel () {
+  reduxModel () {
     return {
       id: this.model.id,
       name: this.model.name,
-      machines: this.machineIds,
-      users: this.userIds,
-      owners: this.ownerIds,
-      invites: this.inviteIds,
-      timezone: this.timezone,
-      googlePlaceId: this.googlePlaceId,
+      machines: this.model.machines.map(id => id.toString()),
+      users: this.model.users.map(id => id.toString()),
+      owners: this.model.owners.map(id => id.toString()),
+      invites: this.model.invites.map(id => id.toString()),
+      timezone: this.timezone(),
+      googlePlaceId: this.googlePlaceId(),
       demo: this.model.demo,
-      rules: this.rules
+      rules: this.rules()
     }
   }
-
-  get eventData () {
-    return {demo: this.isDemo}
-  }
 }
-
-Handler.setupHandler(LaundryHandler, LaundryModel, {
-  create: CREATE_LAUNDRY,
-  delete: DELETE_LAUNDRY,
-  update: UPDATE_LAUNDRY
-})
 
 module.exports = LaundryHandler

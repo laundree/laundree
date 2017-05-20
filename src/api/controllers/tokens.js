@@ -1,7 +1,8 @@
 /**
  * Created by budde on 02/06/16.
  */
-const {TokenHandler, UserHandler} = require('../../handlers')
+const TokenHandler = require('../../handlers/token')
+const UserHandler = require('../../handlers/user')
 const {api} = require('../../utils')
 
 function listTokens (req, res) {

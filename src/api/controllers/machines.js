@@ -2,8 +2,8 @@
  * Created by budde on 09/06/16.
  */
 
-const {MachineHandler} = require('../../handlers')
-const {api} = require('../../utils')
+import MachineHandler from '../../handlers/machine'
+import {api} from '../../utils'
 
 function listMachines (req, res) {
   const filter = {}
@@ -14,7 +14,7 @@ function listMachines (req, res) {
   }
   const laundry = req.subjects.laundry
   filter.laundry = laundry.model._id
-  return MachineHandler.find(filter, {limit, sort: {_id: 1}})
+  return MachineHandler.lib.find(filter, {limit, sort: {_id: 1}})
     .then((machines) => machines.map((machine) => machine.toRestSummary()))
     .then((machines) => {
       const links = {
@@ -36,6 +36,7 @@ function createMachine (req, res) {
   const broken = body.broken
   const laundry = req.subjects.laundry
   return MachineHandler
+    .lib
     .find({name: name, laundry: laundry.model._id})
     .then(([machine]) => {
       if (machine) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})

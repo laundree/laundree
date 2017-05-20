@@ -1,6 +1,6 @@
-const faker = require('faker')
-const {timeout, signIn} = require('../../nightwatch_utils.js')
-const {UserHandler} = require('../../../test_target/handlers')
+import faker from 'faker'
+import {timeout, signIn} from '../../nightwatch_utils.js'
+import UserHandler from '../../../test_target/handlers/user'
 
 let email, password, user, laundry
 

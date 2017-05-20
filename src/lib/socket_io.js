@@ -1,6 +1,10 @@
 const socketIo = require('socket.io')
 const session = require('./session')
-const {UserHandler, LaundryHandler, MachineHandler, BookingHandler, LaundryInvitationHandler} = require('../handlers')
+const UserHandler = require('../handlers/user')
+const LaundryHandler = require('../handlers/laundry')
+const MachineHandler = require('../handlers/machine')
+const BookingHandler = require('../handlers/booking')
+const LaundryInvitationHandler = require('../handlers/laundry_invitation')
 const {actions} = require('../redux')
 const {error} = require('../utils')
 const debug = require('debug')('laundree.lib.socket_io')
@@ -194,13 +198,13 @@ function setupAdminFunctions (socket) {
         MachineHandler.fetchCount()
       ])
       .then(([
-        laundryCount,
-        demoLaundryCount,
-        userCount,
-        demoUserCount,
-        bookingCount,
-        machineCount
-      ]) => ({
+               laundryCount,
+               demoLaundryCount,
+               userCount,
+               demoUserCount,
+               bookingCount,
+               machineCount
+             ]) => ({
         demoLaundryCount,
         demoUserCount,
         laundryCount,

@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const base64UrlSafe = require('urlsafe-base64')
-const {LaundryHandler} = require('../handlers')
+const LaundryHandler = require('../handlers/laundry')
 
 const notFoundError = new Error('Not found')
 notFoundError.status = 404

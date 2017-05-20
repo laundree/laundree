@@ -1,12 +1,13 @@
-const request = require('supertest')
-const app = require('../../../../test_target/app').app
-const chai = require('chai')
+import request from 'supertest'
+import {app} from '../../../../test_target/app'
+import chai from 'chai'
+import MachineHandler from '../../../../test_target/handlers/machine'
+import dbUtils from '../../../db_utils'
+
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {MachineHandler} = require('../../../../test_target/handlers')
-const dbUtils = require('../../../db_utils')
 
 describe('controllers', function () {
   this.timeout(10000)

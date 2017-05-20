@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const passport = require('passport')
-const UserHandler = require('../handlers').UserHandler
+const UserHandler = require('../handlers/user')
 const debug = require('debug')('laundree.routes.auth')
 const {INVALID_VERIFICATION_LINK, EMAIL_VERIFIED} = require('../utils/flash')
 
