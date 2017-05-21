@@ -1,46 +1,35 @@
-const React = require('react')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const {Input, Label, TextArea, Submit} = require('./intl')
+// @flow
+import React from 'react'
+import { ValidationForm, ValidationElement } from './validation'
+import { ValueUpdater } from './helpers'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
+import { Input, Label, TextArea, Submit } from './intl'
 
-const UserInput = ({user: {photo, displayName}}) => <div className='userInput'>
-  <img className='avatar' src={photo} />
+const UserInput = ({user: {photo, displayName}}: { user: User }) => <div className='userInput'>
+  <img className='avatar' src={photo}/>
   <span className='name'>{displayName}</span>
 </div>
 
-UserInput.propTypes = {
-  user: React.PropTypes.shape({
-    photo: React.PropTypes.string.isRequired,
-    displayName: React.PropTypes.string.isRequired
-  }).isRequired
-}
-
-class ContactForm extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.onSubmit = (evt) => {
-      evt.preventDefault()
-      this.submit()
-    }
+export default class ContactForm extends ValueUpdater {
+  props: { user: User }
+  onSubmit = (evt: Event) => {
+    evt.preventDefault()
+    this.submit()
   }
 
-  submit () {
+  async submit () {
     this.setState({loading: true})
     const {email, name, subject, message} = this.state.values
-    sdk
-      .contact({name: name || undefined, email: email || undefined, message, subject})
-      .then(() => this.reset({loading: false, sent: true}))
+    await sdk.api.contact.sendMessage({name: name || undefined, email: email || undefined, message, subject})
+    this.reset({loading: false, sent: true})
   }
 
-  get initialValues () {
-    return {
-      name: '',
-      subject: '',
-      message: '',
-      email: ''
-    }
+  initialValues = {
+    name: '',
+    subject: '',
+    message: '',
+    email: ''
   }
 
   renderUser () {
@@ -101,9 +90,3 @@ class ContactForm extends ValueUpdater {
     </ValidationForm>
   }
 }
-
-ContactForm.propTypes = {
-  user: React.PropTypes.object
-}
-
-module.exports = ContactForm

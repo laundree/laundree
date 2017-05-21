@@ -26,7 +26,7 @@ describe('handlers', () => {
           return booking.save().then(() => booking.updateDocument())
         })
         .then(booking => {
-          booking.docVersion.should.equal(1)
+          booking.model.docVersion.should.equal(1)
         }))
     })
     describe('fetchMachine', () => {

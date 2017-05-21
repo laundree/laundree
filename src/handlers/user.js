@@ -19,7 +19,7 @@ class UserHandlerLibrary extends HandlerLibrary {
 
   constructor () {
     super(UserHandler, UserModel, {
-      update: (obj) => typeof obj === 'string' ? null : {type: redux.types.UPDATE_USER, payload: obj.reduxModel()}
+      update: (obj) => typeof obj === 'string' ? null : {type: 'UPDATE_USER', payload: obj.reduxModel()}
     })
   }
 
@@ -261,7 +261,7 @@ export default class UserHandler extends Handler {
     if (!this.model.resetPassword.token) return
     const token = await this._fetchPasswordResetToken()
     this.model.resetPassword = {}
-    await Promise.all([token.deleteToken(), this.model.save()])
+    await Promise.all([token && token.deleteToken(), this.model.save()])
   }
 
   /**
@@ -404,7 +404,7 @@ export default class UserHandler extends Handler {
     return this
   }
 
-  fetchLaundries () {
+  fetchLaundries () : Promise<LaundryHandler[]> {
     return LaundryHandler.lib.find({_id: {$in: this.model.laundries}})
   }
 
@@ -499,6 +499,9 @@ export default class UserHandler extends Handler {
     if (!this.model.resetPassword.expire) return false
     if (new Date() > this.model.resetPassword.expire) return false
     const tok = await this._fetchPasswordResetToken()
+    if (!tok) {
+      return false
+    }
     return tok.verify(token)
   }
 
@@ -547,6 +550,18 @@ export default class UserHandler extends Handler {
     return photo.substr(0, photo.length - matches[1].length) + '200'
   }
 
+  isDemo (): boolean {
+    return this.model.demo
+  }
+
+  isAdmin (): boolean {
+    return this.model.role === 'admin'
+  }
+
+  hasPassword (): boolean {
+    return Boolean(this.model.password)
+  }
+
   toRest () {
     return this.fetchAuthTokens()
       .then(tokens => ({
@@ -559,7 +574,7 @@ export default class UserHandler extends Handler {
           middleName: this.model.name.middleName
         },
         tokens: tokens.map(t => t.toRestSummary()),
-        photo: this.photo || '',
+        photo: this.photo() || '',
         href: this.restUrl
       }))
   }
@@ -575,16 +590,12 @@ export default class UserHandler extends Handler {
   reduxModel () {
     return {
       id: this.model.id,
-      photo: this.photo,
+      photo: this.photo(),
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,
       role: this.model.role,
       demo: Boolean(this.model.demo)
     }
-  }
-
-  isAdmin () {
-    return this.model.role === 'admin'
   }
 }

@@ -1,6 +1,4 @@
-/**
- * Created by budde on 26/04/16.
- */
+// @flow
 import passport from 'passport'
 import { Strategy as FacebookStrategy } from 'passport-facebook'
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth'
@@ -17,7 +15,7 @@ import {
 
 const oauthCallback = (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
-  UserHandler.findOrCreateFromProfile(profile)
+  UserHandler.lib.findOrCreateFromProfile(profile)
     .then((user) => {
       if (user) user.seen()
       done(null, user || null, {message: USER_NOT_FOUND})
@@ -45,7 +43,7 @@ passport.use(new BasicStrategy(async (userId, password, done) => {
 
 passport.use(new LocalStrategy((username, password, done) => {
   username = username.toLowerCase()
-  UserHandler.findFromEmail(username).then(user => {
+  UserHandler.lib.findFromEmail(username).then(user => {
     if (!user) return done(null, false, {message: USER_DOES_NOT_EXISTS})
     if (!user.isVerified(username)) return done(null, false, {message: USER_NOT_VERIFIED})
     return user.verifyPassword(password).then((result) => {
@@ -61,16 +59,17 @@ passport.serializeUser((user, done) => {
 })
 
 passport.deserializeUser((user, done) => {
-  UserHandler.findFromId(user).then((user) => done(null, user || false)).catch(done)
+  UserHandler.lib.findFromId(user).then((user) => done(null, user || false)).catch(done)
 })
 
-function markLoggedIn (req, res, next) {
+function markLoggedIn (req: express$Request, res: express$Response, next: express$NextFunction) {
   if (!req.user) return next()
+  //$FlowFixMe
   req.session.returningUser = true
   next()
 }
 
-function setup (app) {
+function setup (app: express$Application) {
   app.use(passport.initialize())
   app.use(passport.session())
   app.use(markLoggedIn)

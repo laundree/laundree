@@ -6,7 +6,7 @@ const app = require('./app')
 const debug = require('debug')('laundree.server')
 const http = require('http')
 const config = require('config')
-const {socketIoSetup} = require('./lib')
+const socketIoSetup = require('./lib/socket_io')
 
 const port = normalizePort(config.get('web.port'))
 

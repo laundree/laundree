@@ -2,8 +2,6 @@
 
 import { Handler, HandlerLibrary } from './handler'
 import BookingModel from '../models/booking'
-import { redux } from 'laundree-sdk'
-import type { Booking } from 'laundree-sdk/src/redux'
 import { createNotification, deleteNotification } from '../utils/oneSignal'
 import { logError } from '../utils/error'
 import type UserHandler from './user'
@@ -15,9 +13,9 @@ class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, *> {
 
   constructor () {
     super(BookingHandler, BookingModel, {
-      create: obj => typeof obj === 'string' ? null : ({type: redux.types.CREATE_BOOKING, payload: obj.reduxModel()}),
-      update: obj => typeof obj === 'string' ? null : ({type: redux.types.UPDATE_BOOKING, payload: obj.reduxModel()}),
-      delete: obj => typeof obj !== 'string' ? null : ({type: redux.types.DELETE_BOOKING, payload: obj})
+      create: obj => typeof obj === 'string' ? null : ({type: 'CREATE_BOOKING', payload: obj.reduxModel()}),
+      update: obj => typeof obj === 'string' ? null : ({type: 'UPDATE_BOOKING', payload: obj.reduxModel()}),
+      delete: obj => typeof obj !== 'string' ? null : ({type: 'DELETE_BOOKING', payload: obj})
     })
   }
 

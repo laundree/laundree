@@ -16,11 +16,14 @@ class TokenHandlerLibrary extends HandlerLibrary {
     switch (secret.substring(0, 2)) {
       case 'v2':
         const [, id, sec] = secret.split('.')
-        const [token] = await this
-          .find({$and: [{_id: id}, filter]})
-        if (!token) return null
+        const [token] = await this.find({$and: [{_id: id}, filter]})
+        if (!token) {
+          return null
+        }
         const result = await token.verify(sec)
-        if (!result) return null
+        if (!result) {
+          return null
+        }
         return token
       default:
         const tokens = await this.find(filter)
@@ -47,7 +50,7 @@ class TokenHandlerLibrary extends HandlerLibrary {
       name,
       type,
       hash,
-      owner: owner.model.id
+      owner: owner.model._id
     })
       .save()
     return new TokenHandler(model, token)
@@ -110,25 +113,26 @@ export default class TokenHandler extends Handler<TokenModel, *> {
     return user.model._id.equals(ownerId)
   }
 
-  fetchOwner () {
-    return UserHandler.lib.findFromId(this.model._id)
+  fetchOwner (): Promise<?UserHandler> {
+    return UserHandler.lib.findFromId(this.model.owner)
   }
 
-  async toRest () {
+  async toRest (): Promise<{ id: string, name: string, owner: *, href: string }> {
     const owner = await this.fetchOwner()
+    if (!owner) {
+      throw new Error('Owner not found!')
+    }
     return {
       id: this.model.id,
       name: this.model.name,
       owner: owner.toRestSummary(),
-      href: this.restUrl,
-      secret: undefined
+      href: this.restUrl
     }
   }
 
-  async toSecretRest () {
-    const obj = await this.toRest()
-    obj.secret = this.secret
-    return obj
+  async toSecretRest (): Promise<{ id: string, name: string, owner: *, href: string, secret?: string }> {
+    const obj: { id: string, name: string, owner: *, href: string } = await this.toRest()
+    return {...obj, secret: this.secret || undefined}
   }
 
   toRestSummary () {

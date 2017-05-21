@@ -5,6 +5,8 @@
 const React = require('react')
 
 class ValueUpdater extends React.Component {
+  initialValues = {}
+
   constructor (props) {
     super(props)
     this.state = {values: this.initialValues, sesh: 0}
@@ -12,10 +14,6 @@ class ValueUpdater extends React.Component {
 
   reset (state = {}) {
     this.setState(({sesh}) => (Object.assign({values: this.initialValues, sesh: sesh + 1}, state)))
-  }
-
-  get initialValues () {
-    return {}
   }
 
   updateValue (values, state = {}) {

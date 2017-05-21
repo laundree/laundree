@@ -167,7 +167,7 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return LaundryHandler.findFromId(id).then((laundry) => {
+              return LaundryHandler.lib.findFromId(id).then((laundry) => {
                 laundry.should.not.be.undefined
                 return laundry.toRest().then((result) => res.body.should.deep.equal(result))
               })
@@ -184,9 +184,9 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return LaundryHandler.findFromId(id).then((laundry) => {
+              return LaundryHandler.lib.findFromId(id).then((laundry) => {
                 laundry.should.not.be.undefined
-                laundry.model.timezone.should.equal('America/Godthab')
+                laundry.timezone().should.equal('America/Godthab')
                 return laundry.toRest().then((result) => res.body.should.deep.equal(result))
               })
             })))
@@ -204,7 +204,7 @@ describe('controllers', function () {
             .then(res => {
               const id = res.body.id
               res.body.name.should.equal(name.trim())
-              return LaundryHandler.findFromId(id).then((laundry) => {
+              return LaundryHandler.lib.findFromId(id).then((laundry) => {
                 laundry.should.not.be.undefined
                 return laundry.toRest().then((result) => res.body.should.deep.equal(result))
               })
@@ -217,16 +217,16 @@ describe('controllers', function () {
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.findFromEmail(res.body.email).then(user => {
+        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => {
           assert(user)
-          user.isDemo.should.be.true
+          user.isDemo().should.be.true
         })))
 
       it('should create a new user with one-time password', () => request(app)
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.findFromEmail(res.body.email).then(user => user
+        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user
           .verifyPassword(res.body.password).then(result => {
             assert(result)
             return user.verifyPassword(res.body.password).should.eventually.be.false
@@ -236,7 +236,7 @@ describe('controllers', function () {
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.findFromEmail(res.body.email).then(user => {
+        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => {
           assert(user.isVerified(res.body.email))
         })))
 
@@ -244,17 +244,17 @@ describe('controllers', function () {
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(laundries => {
+        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(laundries => {
           laundries.should.have.length(1)
-          laundries[0].isDemo.should.be.true
+          laundries[0].isDemo().should.be.true
         }))))
 
       it('should create a new user with a laundry and two machines', () => request(app)
         .post('/api/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(([laundry]) => {
-          laundry.machineIds.should.have.length(2)
+        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(([laundry]) => {
+          laundry.model.machines.should.have.length(2)
         }))))
     })
 
@@ -426,6 +426,7 @@ describe('controllers', function () {
             .send({name: 'L1'})
             .expect(204)
             .then(() => LaundryHandler
+              .lib
               .findFromId(laundries[0].model.id)
               .then(laundry => laundry.model.name.should.equal('L1')))))
 
@@ -439,10 +440,11 @@ describe('controllers', function () {
             .send({name: 'L1', googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
             .expect(204)
             .then(() => LaundryHandler
+              .lib
               .findFromId(laundries[0].model.id)
               .then(laundry => {
                 laundry.model.name.should.equal('L1')
-                laundry.timezone.should.equal('America/Godthab')
+                laundry.timezone().should.equal('America/Godthab')
                 laundry.model.rules.toObject().should.deep.equal({timeLimit: {from: {}, to: {}}})
               }))))
 
@@ -456,6 +458,7 @@ describe('controllers', function () {
             .send({name: 'L1', rules: {limit: 1000}})
             .expect(204)
             .then(() => LaundryHandler
+              .lib
               .findFromId(laundries[0].model.id)
               .then(laundry => {
                 laundry.model.name.should.equal('L1')
@@ -475,6 +478,7 @@ describe('controllers', function () {
             })
             .expect(204)
             .then(() => LaundryHandler
+              .lib
               .findFromId(laundries[0].model.id)
               .then(laundry => {
                 laundry.model.name.should.equal('L1')
@@ -495,10 +499,11 @@ describe('controllers', function () {
             .send({googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
             .expect(204)
             .then(() => LaundryHandler
+              .lib
               .findFromId(laundries[0].model.id)
               .then(laundry => {
                 laundry.model.name.should.equal(laundries[0].model.name)
-                laundry.timezone.should.equal('America/Godthab')
+                laundry.timezone().should.equal('America/Godthab')
               }))))
 
       it('should succeed when administrator', () =>
@@ -514,6 +519,7 @@ describe('controllers', function () {
               .send({name})
               .expect(204)
               .then(() => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then(laundry => laundry.model.name.should.equal(name)))
           }))
@@ -539,6 +545,7 @@ describe('controllers', function () {
             .send({name: `${name}    `})
             .expect(204)
             .then(() => LaundryHandler
+              .lib
               .findFromId(laundry.model.id)
               .then(laundry => laundry.model.name.should.equal(name)))
         }))
@@ -693,6 +700,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res => LaundryInvitationHandler
+              .lib
               .find({email: 'alice@example.com', laundry: laundry.model._id})
               .then(([invitation]) => {
                 chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
@@ -708,6 +716,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res => LaundryInvitationHandler
+              .lib
               .find({email: 'alice@example.com', laundry: laundry.model._id})
               .then(([invitation]) => {
                 chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
@@ -724,6 +733,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect(204)
               .then(res => LaundryInvitationHandler
+                .lib
                 .find({email: 'alice@example.com', laundry: laundry.model._id})
                 .then((invitations) => {
                   invitations.should.have.length(1)
@@ -740,6 +750,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect(204)
               .then(res => LaundryInvitationHandler
+                .lib
                 .find({email: user.model.emails[0], laundry: laundry.model._id})
                 .then((invitations) => {
                   invitations.should.have.length(0)
@@ -757,10 +768,11 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect(204)
               .then(res => LaundryInvitationHandler
+                .lib
                 .find({email, laundry: laundry.model._id})
                 .then((invitations) => {
                   invitations.should.have.length(0)
-                  return UserHandler.findFromEmail(email)
+                  return UserHandler.lib.findFromEmail(email)
                     .then((user) => user.model.laundries[0].toString().should.equal(laundry.model.id))
                 }))
           }))
@@ -823,7 +835,7 @@ describe('controllers', function () {
           .set('Content-Type', 'application/json')
           .send({key: inviteCode})
           .expect(204)
-          .then(() => LaundryHandler.findFromId(laundry.model.id).then(l => {
+          .then(() => LaundryHandler.lib.findFromId(laundry.model.id).then(l => {
             Boolean(l.isUser(user1)).should.be.true
           })))
     })
@@ -930,6 +942,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(200)
             .then(res => LaundryHandler
+              .lib
               .findFromId(laundry.model._id)
               .then(laundry => {
                 const {key} = res.body
@@ -1007,8 +1020,9 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res => LaundryHandler
+              .lib
               .findFromId(laundries[0].model.id)
-              .then((t) => assert(t === undefined)))))
+              .then((t) => assert(!t)))))
 
       it('should succeed when administrator', () =>
         Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
@@ -1020,8 +1034,9 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundries[0].model.id)
-                .then((t) => assert(t === undefined)))))
+                .then((t) => assert(!t)))))
 
       it('should fail if demo', () =>
         dbUtils.populateLaundries(1)
@@ -1205,6 +1220,7 @@ describe('controllers', function () {
               .auth(owner.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isOwner(user)).should.be.false))))
 
@@ -1224,6 +1240,7 @@ describe('controllers', function () {
               .auth(owner.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isOwner(user)).should.be.false))))
 
@@ -1389,6 +1406,7 @@ describe('controllers', function () {
               .auth(owner.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isOwner(user)).should.be.true))))
 
@@ -1408,6 +1426,7 @@ describe('controllers', function () {
               .auth(owner.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isOwner(user)).should.be.true))))
 
@@ -1511,6 +1530,7 @@ describe('controllers', function () {
               .auth(owner.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isUser(user)).should.be.false))))
 
@@ -1530,6 +1550,7 @@ describe('controllers', function () {
               .auth(owner.model.id, token.secret)
               .expect(204)
               .then(res => LaundryHandler
+                .lib
                 .findFromId(laundry.model.id)
                 .then((laundry) => Boolean(laundry.isUser(user)).should.be.false))))
 
@@ -1563,9 +1584,10 @@ describe('controllers', function () {
           .auth(owner.model.id, token.secret)
           .expect(204)
           .then(res => BookingHandler
+            .lib
             .findFromId(booking.model._id)
             .then(booking => {
-              assert(booking === undefined, 'Booking should be undefined')
+              assert(!booking, 'Booking must not be found')
             }))))
 
       it('should succeed when removing self', () => Promise

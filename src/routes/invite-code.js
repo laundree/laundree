@@ -12,7 +12,7 @@ router.get('/:laundryId/:id', (req, res, next) => {
     return next(notFoundError)
   }
   if (!req.user) return res.redirect(`/auth?to=${encodeURIComponent(req.originalUrl)}`)
-  if (req.user.isDemo) {
+  if (req.user.isDemo()) {
     return next(notFoundError)
   }
   LaundryHandler
