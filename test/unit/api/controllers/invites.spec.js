@@ -126,7 +126,7 @@ describe('controllers', function () {
             .then(() => LaundryInvitationHandler
               .lib
               .findFromId(invite.model.id)
-              .then((t) => assert(t === undefined)))))
+              .then((t) => assert(!t)))))
 
       it('should fail when other user', () =>
         Promise

@@ -6,16 +6,14 @@ import type { MachineType } from '../models/machine'
 import BookingHandler from './booking'
 import LaundryHandler from './laundry'
 import type UserHandler from './user'
-import type { Machine } from 'laundree-sdk/src/redux'
-import { redux } from 'laundree-sdk'
 
 class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
 
   constructor () {
     super(MachineHandler, MachineModel, {
-      create: obj => typeof obj === 'string' ? null : {type: redux.types.CREATE_MACHINE, payload: obj.reduxModel()},
-      update: obj => typeof obj === 'string' ? null : {type: redux.types.UPDATE_MACHINE, payload: obj.reduxModel()},
-      delete: obj => typeof obj !== 'string' ? null : {type: redux.types.DELETE_MACHINE, payload: obj}
+      create: obj => typeof obj === 'string' ? null : {type: 'CREATE_MACHINE', payload: obj.reduxModel()},
+      update: obj => typeof obj === 'string' ? null : {type: 'UPDATE_MACHINE', payload: obj.reduxModel()},
+      delete: obj => typeof obj !== 'string' ? null : {type: 'DELETE_MACHINE', payload: obj}
     })
   }
 

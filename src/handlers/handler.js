@@ -5,7 +5,6 @@ import { linkEmitter } from '../lib/redis'
 import Debug from 'debug'
 import base64UrlSafe from 'urlsafe-base64'
 import type { ObjectId, Model, QueryOptions, QueryConditions } from 'mongoose'
-import type { Action } from 'laundree-sdk/src/redux'
 
 const debug = Debug('laundree.handlers.handler')
 
@@ -66,7 +65,7 @@ export class HandlerLibrary<ReduxModel: {}, M: Model<*>, H: Handler<M, ReduxMode
     })
   }
 
-  async findFromId (id: string) : Promise<*> {
+  async findFromId (id: string) : Promise<?H> {
     if (!regex.mongoDbId.exec(id)) {
       return null
     }
@@ -75,7 +74,7 @@ export class HandlerLibrary<ReduxModel: {}, M: Model<*>, H: Handler<M, ReduxMode
     return model && (new this._Handler(model)).updateDocument()
   }
 
-  async find (filter: QueryConditions, options: QueryOptions = {}): Promise<*> {
+  async find (filter: QueryConditions, options: QueryOptions = {}): Promise<H[]> {
     const models = await this._Model
       .find(filter, null, options)
       .exec()

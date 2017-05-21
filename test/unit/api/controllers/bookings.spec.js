@@ -519,7 +519,7 @@ describe('controllers', function () {
                 .expect('Content-Type', /json/)
                 .then(res => {
                   const id = res.body.id
-                  return BookingHandler.findFromId(id).then((machine) => {
+                  return BookingHandler.lib.findFromId(id).then((machine) => {
                     machine.should.not.be.undefined
                     return machine.toRest().then((result) => res.body.should.deep.equal(result))
                   })
@@ -537,7 +537,7 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return BookingHandler.findFromId(id).then((machine) => {
+              return BookingHandler.lib.findFromId(id).then((machine) => {
                 machine.should.not.be.undefined
                 res.body.from.should.deep.equal(createDateTomorrow(1))
                 res.body.to.should.deep.equal(createDateTomorrow(2))
@@ -562,36 +562,13 @@ describe('controllers', function () {
                 .expect(200)
                 .then(res => {
                   const id = res.body.id
-                  return BookingHandler.findFromId(id).then((machine) => {
+                  return BookingHandler.lib.findFromId(id).then((machine) => {
                     machine.should.not.be.undefined
                     res.body.from.should.deep.equal(createDateTomorrow(1, 0, laundry.timezone()))
                     res.body.to.should.deep.equal(createDateTomorrow(2, 0, laundry.timezone()))
                     return machine.toRest().then((result) => res.body.should.deep.equal(result))
                   })
                 }))))
-
-      it('should succeed and save events', () =>
-        dbUtils.populateMachines(1).then(({user, token, machine}) =>
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({from: createDateTomorrow(1), to: createDateTomorrow(2)})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {
-              const id = res.body.id
-              return BookingHandler
-                .findFromId(id)
-                .then(booking => booking.fetchEvents())
-                .then(events => {
-                  events.should.have.length(1)
-                  const [event] = events
-                  event.model.type.should.equal('create')
-                  event.model.user.toString().should.equal(user.model.id)
-                })
-            })))
 
       it('should fail on too soon booking', () =>
         dbUtils.populateMachines(1).then(({user, token, machine}) =>

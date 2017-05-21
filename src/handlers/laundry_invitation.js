@@ -3,16 +3,14 @@
 import LaundryHandler from './laundry'
 import { Handler, HandlerLibrary } from './handler'
 import LaundryInvitationModel from '../models/laundry_invitation'
-import { redux } from 'laundree-sdk'
-import type { Invite } from 'laundree-sdk/src/redux'
 
 class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, *> {
 
   constructor () {
     super(LaundryInvitationHandler, LaundryInvitationModel, {
-      create: obj => typeof obj === 'string' ? null : {type: redux.types.CREATE_INVITATION, payload: obj.reduxModel()},
-      update: obj => typeof obj === 'string' ? null : {type: redux.types.UPDATE_INVITATION, payload: obj.reduxModel()},
-      delete: obj => typeof obj !== 'string' ? null : {type: redux.types.DELETE_INVITATION, payload: obj}
+      create: obj => typeof obj === 'string' ? null : {type: 'CREATE_INVITATION', payload: obj.reduxModel()},
+      update: obj => typeof obj === 'string' ? null : {type: 'UPDATE_INVITATION', payload: obj.reduxModel()},
+      delete: obj => typeof obj !== 'string' ? null : {type: 'DELETE_INVITATION', payload: obj}
     })
   }
 

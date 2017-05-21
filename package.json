@@ -107,7 +107,7 @@
     "test:unit-covered": "nyc --reporter=lcov --require babel-register mocha test/**/*.spec.js",
     "start:lib": "node lib",
     "start:lib-covered": "nyc --reporter=lcov node lib",
-    "start:src": "babel-node src",
+    "start:src": "babel-node src --trace-warnings",
     "start:src-covered": "nyc --reporter=lcov --require babel-register node src",
     "start:test": "[ \"$LAUNDREE_TEST_TARGET\" = src ] && npm run start:src || npm run start:lib",
     "start:test-covered": "[ \"$LAUNDREE_TEST_TARGET\" = src ] && npm run start:src-covered || npm run start:lib-covered",

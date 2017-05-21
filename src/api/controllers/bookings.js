@@ -1,14 +1,14 @@
 // @flow
 
 import BookingHandler from '../../handlers/booking'
-import {api} from '../../utils'
+import { api } from '../../utils'
 
-async function listBookings (req, res) {
+async function listBookingsAsync (req, res) {
   const limit = req.swagger.params.page_size.value
   const since = req.swagger.params.since.value
   const from = req.swagger.params.from.value
   const to = req.swagger.params.to.value
-  const filter : {from: *, to: *, _id?: *, machine?: *} = {
+  const filter: { from: *, to: *, _id?: *, machine?: * } = {
     from: {$gte: from},
     to: {$lt: to}
   }
@@ -31,7 +31,7 @@ async function listBookings (req, res) {
   res.json(bookingSummaries)
 }
 
-async function createBooking (req, res) {
+async function createBookingAsync (req, res) {
   const {machine, laundry} = req.subjects
   if (machine.model.broken) {
     return api.returnError(res, 400, 'Machine is broken')
@@ -73,20 +73,18 @@ async function createBooking (req, res) {
   return api.returnSuccess(res, newBooking.toRest())
 }
 
-function fetchBooking (req, res) {
+function fetchBookingAsync (req, res) {
   const {booking} = req.subjects
   return api.returnSuccess(res, booking.toRest())
 }
 
-async function deleteBooking (req, res) {
+async function deleteBookingAsync (req, res) {
   const {booking} = req.subjects
   await booking.deleteBooking()
   return api.returnSuccess(res)
 }
 
-module.exports = {
-  listBookings: api.wrapErrorHandler(listBookings),
-  createBooking: api.wrapErrorHandler(createBooking),
-  fetchBooking: api.wrapErrorHandler(fetchBooking),
-  deleteBooking: api.wrapErrorHandler(deleteBooking)
-}
+export const listBookings = api.wrapErrorHandler(listBookingsAsync)
+export const createBooking = api.wrapErrorHandler(createBookingAsync)
+export const fetchBooking = api.wrapErrorHandler(fetchBookingAsync)
+export const deleteBooking = api.wrapErrorHandler(deleteBookingAsync)

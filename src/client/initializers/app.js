@@ -1,28 +1,27 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const Initializer = require('./initializer')
-const debug = require('debug')('laundree.initializers.app')
+import Initializer from './initializer'
+import Debug from 'debug'
+import ReactDOM from 'react-dom'
+import React from 'react'
+import { BrowserRouter } from 'react-router-dom'
+import io from 'socket.io-client'
+import { createStore } from 'redux'
+import sdk from '../sdk'
+import App from '../../react/containers/App'
+import ReactGA from 'react-ga'
+import { redux } from 'laundree-sdk'
 
-const ReactDOM = require('react-dom')
-const React = require('react')
-const {BrowserRouter} = require('react-router-dom')
-
-const io = require('socket.io-client')
-const {createStore} = require('redux')
-const reducers = require('../../redux/reducers')
-const sdk = require('../sdk')
-const App = require('../../react/containers/App')
-const ReactGA = require('react-ga')
 ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
+
+const debug = Debug('laundree.initializers.app')
 
 const socket = io('/redux')
 
 function setupStore () {
   const state = window.__REDUX_STATE__
   debug('Setting up store with state', state)
-  const store = createStore(reducers, state)
+  const store = createStore(redux.reducer, state)
 
   const dispatchAction = action => {
     debug(`Dispatching: ${action.type}`, action)
@@ -36,7 +35,7 @@ function setupStore () {
 }
 
 class AppInitializer extends Initializer {
-  setup (element) {
+  setup (element: Element) {
     const rootElement = element.querySelector('#AppRoot')
     if (!rootElement) return
     const store = setupStore()

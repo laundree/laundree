@@ -1,10 +1,7 @@
-/**
- * Created by budde on 05/05/16.
- */
+// @flow
 
-const utils = require('../../utils')
-
-const UserHandler = require('../../handlers/user')
+import utils from '../../utils'
+import UserHandler from '../../handlers/user'
 
 function getUser (req, res) {
   const {user} = req.subjects
@@ -22,9 +19,9 @@ async function listUsers (req, res) {
   if (since) {
     filter._id = {$gt: since}
   }
-  const users = await UserHandler.find(filter, {limit, sort: {_id: 1}})
+  const users = await UserHandler.lib.find(filter, {limit, sort: {_id: 1}})
   const restUsers = users.map(u => u.toRestSummary())
-  const links = {
+  const links: { first: string, next?: string } = {
     first: `/api/users?page_size=${limit}`
   }
   if (restUsers.length === limit) {
@@ -36,11 +33,11 @@ async function listUsers (req, res) {
 
 async function createUser (req, res) {
   const {email, displayName, password} = req.swagger.params.body.value
-  const user = await UserHandler.findFromEmail(email)
+  const user = await UserHandler.lib.findFromEmail(email)
   if (user) {
     return utils.api.returnError(res, 409, 'Email address already exists.', {Location: user.restUrl})
   }
-  const newUser = await UserHandler.createUserWithPassword(displayName, email, password)
+  const newUser = await UserHandler.lib.createUserWithPassword(displayName, email, password)
   return utils.api.returnSuccess(res, newUser.toRest())
 }
 
@@ -113,7 +110,7 @@ async function changeUserPassword (req, res) {
   const {currentPassword, newPassword} = req.swagger.params.body.value
   const user = req.subjects.user
   let result = true
-  if (user.hasPassword) {
+  if (user.hasPassword()) {
     result = await user.verifyPassword(currentPassword)
   }
   if (!result) {

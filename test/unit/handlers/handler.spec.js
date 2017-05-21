@@ -18,13 +18,14 @@ describe('handlers', () => {
           })
       })
       it('should update document', () => {
-        const handler = new Handler({id: 1, docVersion: 0}, [
+        const handler = new Handler({id: 1, docVersion: 0})
+        handler.updateActions = [
           (h) => {
             h.model.id = 2
             h.model.docVersion = 1
             return Promise.resolve(h)
           }
-        ])
+        ]
         return handler
           .updateDocument()
           .then(h2 => {

@@ -1,28 +1,35 @@
-const React = require('react')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const {Input, Label, Submit, DocumentTitle} = require('./intl')
-const LocationSelector = require('./LocationSelector')
+// @flow
+import React from 'react'
+import {ValidationForm, ValidationElement} from './validation'
+import {ValueUpdater} from './helpers'
+import sdk from '../../client/sdk'
+import {FormattedMessage} from 'react-intl'
+import {Input, Label, Submit, DocumentTitle} from './intl'
+import LocationSelector from './LocationSelector'
 
-class CreateLaundry extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.state.createExpanded = false
-    this.state.loading = false
-    this.state.results = []
-    this.expander = (evt) => {
+export default class CreateLaundry extends ValueUpdater {
+  props: { user: User, googleApiKey: string, locale: string }
+  state: {
+    createExpanded: boolean,
+    loading: boolean,
+    results: string[]
+  } = {
+    createExpanded: false,
+    loading: false,
+    results: []
+  }
+  expander = (evt: Event) => {
+    if (typeof evt.target.blur === 'function') {
       evt.target.blur()
-      this.setState(({createExpanded}) => ({createExpanded: !createExpanded}))
     }
-    this.onSubmit = (event) => {
-      event.preventDefault()
-      this.setState({loading: true})
-      sdk.laundry
-        .createLaundry(this.state.values.name.trim(), this.state.values.placeId)
-        .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
-    }
+    this.setState(({createExpanded}) => ({createExpanded: !createExpanded}))
+  }
+  onSubmit = (event: Event) => {
+    event.preventDefault()
+    this.setState({loading: true})
+    sdk.api.laundry
+      .createLaundry(this.state.values.name.trim(), this.state.values.placeId)
+      .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
   }
 
   calculateClassName () {
@@ -92,11 +99,3 @@ class CreateLaundry extends ValueUpdater {
     </DocumentTitle>
   }
 }
-
-CreateLaundry.propTypes = {
-  user: React.PropTypes.object,
-  googleApiKey: React.PropTypes.string.isRequired,
-  locale: React.PropTypes.string.isRequired
-}
-
-module.exports = CreateLaundry

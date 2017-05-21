@@ -54,6 +54,7 @@ describe('controllers', function () {
 
       it('should find user 2', () =>
         UserHandler
+          .lib
           .createUserWithPassword('Foo Bob Bårsen', 'foo@bar.com', 'password')
           .then(user =>
             request(app)
@@ -92,7 +93,7 @@ describe('controllers', function () {
           lastSeen: new Date('2016-09-23T06:38:33.364Z')
         })
           .save()
-          .then(u => UserHandler.findFromId(u.id))
+          .then(u => UserHandler.lib.findFromId(u.id))
           .then(user =>
             request(app)
               .get(`/api/users/${user.model.id}`)
@@ -138,7 +139,7 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .expect(204)
             .then(res =>
-              UserHandler.find({_id: user.model._id})
+              UserHandler.lib.find({_id: user.model._id})
                 .then(([user]) => {
                   user.model.displayName.should.equal('Kurt Frandsen')
                 }))))
@@ -153,7 +154,7 @@ describe('controllers', function () {
               .set('Accept', 'application/json')
               .expect(204)
               .then(res =>
-                UserHandler.find({_id: user.model._id})
+                UserHandler.lib.find({_id: user.model._id})
                   .then(([user]) => {
                     user.model.displayName.should.equal('Kurt Frandsen')
                   }))))
@@ -198,7 +199,7 @@ describe('controllers', function () {
           .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
           .set('Accept', 'application/json')
           .expect(204)
-        const newUser = await UserHandler.findFromId(user.model.id)
+        const newUser = await UserHandler.lib.findFromId(user.model.id)
         newUser.model.oneSignalPlayerIds.should.contain('9ce14842-2832-4d7d-9c3c-917038038612')
       })
       it('should fail on invalid id', async () => {
@@ -224,7 +225,7 @@ describe('controllers', function () {
           .send({playerId: '9ce14842-2832-4d7d-9c3c-917038038612'})
           .set('Accept', 'application/json')
           .expect(204)
-        const newUser = await UserHandler.findFromId(user.model.id)
+        const newUser = await UserHandler.lib.findFromId(user.model.id)
         newUser.model.oneSignalPlayerIds.should.contain('9ce14842-2832-4d7d-9c3c-917038038612')
         newUser.model.oneSignalPlayerIds.should.be.of.length(1)
       })
@@ -263,7 +264,7 @@ describe('controllers', function () {
                 .set('Accept', 'application/json')
                 .expect(204)
                 .then(res => UserHandler
-                  .find({_id: user.model._id})
+                  .lib.find({_id: user.model._id})
                   .then(([user]) => user
                     .verifyPassword('password2')
                     .then(r => Boolean(r))
@@ -279,7 +280,7 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .expect(204)
             .then(res => UserHandler
-              .find({_id: user.model._id})
+              .lib.find({_id: user.model._id})
               .then(([user]) => user
                 .verifyPassword('password2')
                 .then(r => Boolean(r))
@@ -400,7 +401,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(200)
-          .then(() => UserHandler.findFromEmail('bob@example.com').then((u) => u.should.not.be.undefined)))
+          .then(() => UserHandler.lib.findFromEmail('bob@example.com').then((u) => u.should.not.be.undefined)))
 
       it('should fail on invalid email in body', () =>
         request(app)
@@ -700,8 +701,8 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res =>
-              Promise.all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(token.model.id)])
-                .then((result) => result.should.be.deep.equal([undefined, undefined])))))
+              Promise.all([UserHandler.lib.findFromId(user.model.id), TokenHandler.lib.findFromId(token.model.id)])
+                .then((result) => result.should.be.deep.equal([null, null])))))
 
       it('should succeed when admin', () =>
         Promise.all([dbUtils.populateTokens(1), dbUtils.createAdministrator()])
@@ -713,7 +714,7 @@ describe('controllers', function () {
               .auth(admin.model.id, token.secret)
               .expect(204)
               .then(res =>
-                UserHandler.findFromId(user.model.id)
+                UserHandler.lib.findFromId(user.model.id)
                   .then((result) => chai.assert(!result)))))
 
       it('should fail on owner', () =>
@@ -739,8 +740,8 @@ describe('controllers', function () {
                   .auth(user.model.id, token.secret)
                   .expect(204)
                   .then(res => Promise
-                    .all([UserHandler.findFromId(user.model.id), TokenHandler.findFromId(token.model.id)])
-                    .then((result) => result.should.be.deep.equal([undefined, undefined])))))))
+                    .all([UserHandler.lib.findFromId(user.model.id), TokenHandler.lib.findFromId(token.model.id)])
+                    .then((result) => result.should.be.deep.equal([null, null])))))))
     })
   })
 })

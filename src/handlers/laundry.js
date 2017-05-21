@@ -11,7 +11,6 @@ import error from '../utils/error'
 import Debug from 'debug'
 import uuid from 'uuid'
 import config from 'config'
-import { redux } from 'laundree-sdk'
 import moment from 'moment-timezone'
 import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
 import GoogleMapsClient from '@google/maps'
@@ -29,9 +28,9 @@ class LaundryHandlerLibrary extends HandlerLibrary {
 
   constructor () {
     super(LaundryHandler, LaundryModel, {
-      create: obj => typeof obj === 'string' ? null : {type: redux.types.CREATE_LAUNDRY, payload: obj.reduxModel()},
-      update: obj => typeof obj === 'string' ? null : {type: redux.types.UPDATE_LAUNDRY, payload: obj.reduxModel()},
-      delete: obj => typeof obj !== 'string' ? null : {type: redux.types.DELETE_LAUNDRY, payload: obj}
+      create: obj => typeof obj === 'string' ? null : {type: 'CREATE_LAUNDRY', payload: obj.reduxModel()},
+      update: obj => typeof obj === 'string' ? null : {type: 'UPDATE_LAUNDRY', payload: obj.reduxModel()},
+      delete: obj => typeof obj !== 'string' ? null : {type: 'DELETE_LAUNDRY', payload: obj}
     })
   }
 
@@ -85,7 +84,7 @@ class LaundryHandlerLibrary extends HandlerLibrary {
 
 }
 
-class LaundryHandler extends Handler {
+export default class LaundryHandler extends Handler {
   static lib = new LaundryHandlerLibrary()
   lib = LaundryHandler.lib
   restUrl = `/api/laundries/${this.model.id}`
@@ -94,18 +93,16 @@ class LaundryHandler extends Handler {
    * Delete the Laundry
    * @return {Promise.<LaundryHandler>}
    */
-  deleteLaundry () {
-    return this.fetchMachines()
-      .then((machines) => Promise.all(machines.map((machine) => machine._deleteMachine())))
-      .then(() => this.fetchInvites())
-      .then((invites) => Promise.all(invites.map((invite) => invite._deleteInvite())))
-      .then(() => this.fetchUsers())
-      .then((users) => Promise.all(users.map((user) => user._removeLaundry(this))))
-      .then(() => this.model.remove())
-      .then(() => {
-        this.lib.emitEvent('delete', this)
-        return this
-      })
+  async deleteLaundry () {
+    const machines = await this.fetchMachines()
+    await Promise.all(machines.map((machine) => machine._deleteMachine()))
+    const invites = await this.fetchInvites()
+    await Promise.all(invites.map((invite) => invite._deleteInvite()))
+    const users = await this.fetchUsers()
+    await Promise.all(users.map((user) => user._removeLaundry(this)))
+    await this.model.remove()
+    this.lib.emitEvent('delete', this)
+    return this
   }
 
   /**
@@ -212,25 +209,25 @@ class LaundryHandler extends Handler {
    * Fetch machines
    * @returns {Promise.<MachineHandler[]>}
    */
-  fetchMachines () {
+  fetchMachines (): Promise<MachineHandler[]> {
     return MachineHandler.lib.find({_id: this.model.machines})
   }
 
   /**
    * @returns {Promise.<LaundryInvitationHandler[]>}
    */
-  fetchInvites () {
+  fetchInvites (): Promise<LaundryInvitationHandler[]> {
     return LaundryInvitationHandler.lib.find({_id: this.model.invites})
   }
 
   /**
    * @returns {Promise.<UserHandler[]>}
    */
-  fetchUsers () {
+  fetchUsers (): Promise<UserHandler[]> {
     return UserHandler.lib.find({_id: this.model.users})
   }
 
-  fetchOwners () {
+  fetchOwners (): Promise<UserHandler[]> {
     return UserHandler.lib.find({_id: this.model.owners})
   }
 
@@ -376,7 +373,11 @@ class LaundryHandler extends Handler {
     return this.model.googlePlaceId || config.get('googlePlaceId')
   }
 
-  rules () {
+  isDemo (): boolean {
+    return this.model.demo
+  }
+
+  rules (): LaundryRules {
     const obj = this.model.rules.toObject()
     if (
       Object.keys(obj.timeLimit.from).length === 0 ||
@@ -394,10 +395,14 @@ class LaundryHandler extends Handler {
    * @returns {boolean}
    */
   checkTimeLimit (from: DateTimeObject, to: DateTimeObject) {
+    const rules = this.rules()
+    if (!rules.timeLimit) {
+      return true
+    }
     const {
       from: currentFrom,
       to: currentTo
-    } = this.model.rules.timeLimit
+    } = rules.timeLimit
     return objToMintues(from) >= objToMintues(currentFrom) && objToMintues(to) <= objToMintues(currentTo)
   }
 
@@ -417,7 +422,7 @@ class LaundryHandler extends Handler {
       laundry: this.model._id,
       owner: owner.model._id,
       from: {$lt: this._objectToMoment({day, month, year, hour: 0, minute: 0}).add(1, 'day').toDate()},
-      to: {$gt: this._objectToMoment({day, month, year, hour: 0, minute: 0}).toDate}
+      to: {$gt: this._objectToMoment({day, month, year, hour: 0, minute: 0}).toDate()}
     })
     const sum = this._countBookingTimes(bookings, objToMintues(to) - objToMintues(from))
     return sum <= this.model.rules.dailyLimit * 60
@@ -520,5 +525,3 @@ class LaundryHandler extends Handler {
     }
   }
 }
-
-module.exports = LaundryHandler

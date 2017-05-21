@@ -124,7 +124,7 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return TokenHandler.findFromId(id).then(token => {
+              return TokenHandler.lib.findFromId(id).then(token => {
                 token.should.not.be.undefined
                 return token.toRest().then((result) => {
                   result.secret = res.body.secret
@@ -145,6 +145,7 @@ describe('controllers', function () {
             .then(res => {
               const id = res.body.id
               return TokenHandler
+                .lib
                 .findFromId(id)
                 .then(token => token.verify(res.body.secret))
                 .then(result => result.should.be.true)
@@ -162,6 +163,7 @@ describe('controllers', function () {
             .then(res => {
               const id = res.body.id
               return TokenHandler
+                .lib
                 .findFromId(id)
                 .then(token => token.verify(res.body.secret.split('.')[2]))
                 .then(result => result.should.be.true)
@@ -173,7 +175,7 @@ describe('controllers', function () {
       const email = faker.internet.email()
       const password = faker.internet.password()
       const tokenName = 'token1'
-      beforeEach(() => UserHandler.createUserWithPassword(name, email, password).then(u => {
+      beforeEach(() => UserHandler.lib.createUserWithPassword(name, email, password).then(u => {
         user = u
         return Promise.all([
           user.generateVerifyEmailToken(email).then(token => user.verifyEmail(email, token.secret)),
@@ -199,7 +201,7 @@ describe('controllers', function () {
         .post('/api/tokens/email-password')
         .send({email, password: password, name: 'Token 1'})
         .expect(200)
-        .then(({body}) => TokenHandler.findFromId(body.id)
+        .then(({body}) => TokenHandler.lib.findFromId(body.id)
           .then(t => t.toRest())
           .then(t => Object.assign(t, {secret: body.secret}).should.deep.equal(body))))
     })
@@ -313,8 +315,9 @@ describe('controllers', function () {
             .expect(204)
             .then(res =>
               TokenHandler
+                .lib
                 .findFromId(tokens[0].model.id)
-                .then((t) => assert(t === undefined)))))
+                .then((t) => assert(!t)))))
     })
   })
 })

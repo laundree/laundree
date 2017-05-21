@@ -98,7 +98,7 @@ function self (req) {
 }
 
 function administrator (req) {
-  return securityCheck(req, userAccess, subjects => subjects.currentUser.model.role === 'admin', generateError('Not allowed', 403))
+  return securityCheck(req, userAccess, subjects => subjects.currentUser.isAdmin() , generateError('Not allowed', 403))
 }
 
 function tokenOwner (req) {

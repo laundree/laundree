@@ -1,8 +1,8 @@
-/**
- * Created by budde on 12/04/16.
- */
+// @flow
 
-const debug = require('debug')('laundree.client')
+import s from './sdk'
+import Debug from 'debug'
+const debug = Debug('laundree.client')
 
 debug('┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴')
 
@@ -13,4 +13,4 @@ library.registerInitializer(initializers.AppInitializer)
 
 library.setup()
 
-module.exports = {sdk: require('./sdk')}
+export const sdk = s
