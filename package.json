@@ -57,8 +57,8 @@
     "redis": "^2.6.2",
     "redux": "^3.5.2",
     "redux-actions": "^2.0.1",
-    "socket.io": "^1.4.5",
-    "socket.io-client": "^1.4.5",
+    "socket.io": "^2.0.0",
+    "socket.io-client": "^2.0.0",
     "superagent": "^3.3.1",
     "swagger-tools": "^0.10.1",
     "tmp": "0.0.31",
@@ -67,7 +67,8 @@
     "uuid": "^3.0.0",
     "yamljs": "^0.2.7",
     "webpack": "^2.4.1",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "snyk": "^1.30.1"
   },
   "devDependencies": {
     "babel-eslint": "^7.2.3",
@@ -112,7 +113,9 @@
     "build": "npm run build:babel && npm run build:client",
     "build:babel": "babel src -d lib --copy-files",
     "build:client": "webpack --env=prod --progress --profile --colors --config webpack.prod.js",
-    "test": "./scripts/test.sh"
+    "test": "./scripts/test.sh",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -126,5 +129,6 @@
   "bugs": {
     "url": "https://github.com/laundree/laundree/issues"
   },
-  "homepage": "https://github.com/laundree/laundree#readme"
+  "homepage": "https://github.com/laundree/laundree#readme",
+  "snyk": true
 }
