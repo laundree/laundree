@@ -1,0 +1,26 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.7.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:ms:20170412':
+    - mongoose > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - morgan > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - socket.io > socket.io-adapter > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - socket.io > socket.io-client > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - socket.io-client > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - compression > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - swagger-tools > body-parser > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - bcrypt > node-pre-gyp > tar-pack > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - mongoose > mquery > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
+    - socket.io > socket.io-adapter > socket.io-parser > debug > ms:
+        patched: '2017-05-23T04:00:18.520Z'
