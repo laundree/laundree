@@ -1,21 +1,33 @@
-/**
- * Created by budde on 05/06/16.
- */
-const React = require('react')
-const TopNav = require('./TopNav')
-const Footer = require('./Footer')
-const {DocumentTitle} = require('./intl')
-const {Switch, Route} = require('react-router')
-const About = require('../containers/About')
-const Home = require('../containers/Home')
-const Contact = require('../containers/Contact')
-const Support = require('../containers/Support')
-const StateCheckRedirectRoute = require('../containers/StateCheckRedirectRoute')
-const NotFound = require('../containers/NotFound')
-const LeftNav = require('../containers/LeftNav')
-const UserSettings = require('../containers/UserSettings')
+// @flow
+import React from 'react'
+import TopNav from './TopNav'
+import Footer from './Footer'
+import { DocumentTitle } from './intl'
+import { Switch, Route } from 'react-router'
+import About from '../containers/About'
+import Home from '../containers/Home'
+import Contact from '../containers/Contact'
+import Support from '../containers/Support'
+import StateCheckRedirectRoute from '../containers/StateCheckRedirectRoute'
+import NotFound from '../containers/NotFound'
+import LeftNav from '../containers/LeftNav'
+import UserSettings from '../containers/UserSettings'
+import type { Location } from 'react-router'
+import type { Children } from 'react'
 
-class BaseApp extends React.Component {
+export default class BaseApp extends React.Component {
+  props: {
+    location: Location,
+    config: {
+      locale: string,
+      returningUser: boolean
+    },
+    children: Children,
+    currentLaundry: string,
+    laundries: { [string]: Laundry },
+    user: User
+  }
+
   renderContent () {
     return <Switch>
       <Route exact path='/' component={Home} />
@@ -59,20 +71,3 @@ class BaseApp extends React.Component {
     </DocumentTitle>
   }
 }
-
-BaseApp.propTypes = {
-  location: React.PropTypes.object,
-  config: React.PropTypes.shape({
-    locale: React.PropTypes.string.isRequired,
-    returningUser: React.PropTypes.bool.isRequired
-  }),
-  children: React.PropTypes.any,
-  currentLaundry: React.PropTypes.string,
-  laundries: React.PropTypes.object,
-  user: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    photo: React.PropTypes.string
-  })
-}
-
-module.exports = BaseApp

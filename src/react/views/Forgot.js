@@ -1,39 +1,37 @@
-/**
- * Created by budde on 11/06/16.
- */
-const React = require('react')
-const {DocumentTitle} = require('./intl')
-const {Link} = require('react-router-dom')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const {Input, Label, Submit} = require('./intl')
+// @flow
+import React from 'react'
+import { DocumentTitle, Input, Label, Submit } from './intl'
+import { Link } from 'react-router-dom'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
 
-class Forgot extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.submitHandler = (evt) => {
-      this.setState({loading: true})
-      evt.preventDefault()
-      return sdk.user.forgotPassword(this.state.values.email.toLowerCase())
-        .then(
-          () =>
-            this.reset({
-              loading: false,
-              notion: {
-                message: <FormattedMessage id='auth.forgot.success' />,
-                success: true
-              }
-            }),
-          () => this.setState({
+type ForgotValues = {email: string}
+type ForgotProps = {}
+type ForgotState = {loading: boolean}
+
+class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
+  submitHandler = (evt: Event) => {
+    this.setState({loading: true})
+    evt.preventDefault()
+    return sdk.api.user.forgotPassword(this.state.values.email.toLowerCase())
+      .then(
+        () =>
+          this.reset({
             loading: false,
             notion: {
-              message: <FormattedMessage id='auth.forgot.error' />,
-              success: false
+              message: <FormattedMessage id='auth.forgot.success'/>,
+              success: true
             }
-          }))
-    }
+          }),
+        () => this.setState({
+          loading: false,
+          notion: {
+            message: <FormattedMessage id='auth.forgot.error'/>,
+            success: false
+          }
+        }))
   }
 
   render () {
@@ -58,7 +56,7 @@ class Forgot extends ValueUpdater {
             value={this.state.values.email || ''}>
             <Label data-validate-error='auth.error.no-email'>
               <Input
-                onChange={this.generateValueUpdater('email')}
+                onChange={this.generateValueEventUpdater(email => ({email}))}
                 value={this.state.values.email || ''}
                 type='text' name='email'
                 placeholder='general.email-address' />
@@ -95,4 +93,4 @@ class Forgot extends ValueUpdater {
   }
 }
 
-module.exports = Forgot
+export default Forgot

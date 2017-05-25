@@ -1,15 +1,15 @@
-const React = require('react')
-const {NavLink} = require('react-router-dom')
-const {FormattedMessage} = require('react-intl')
-const Loader = require('./Loader')
-const sdk = require('../../client/sdk')
-const NotFound = require('../containers/NotFound')
-const {Route, Switch, Redirect} = require('react-router')
-const Timetable = require('../containers/Timetable')
-const Bookings = require('../containers/Bookings')
-const LaundrySettings = require('../containers/LaundrySettings')
-const Machines = require('../containers/Machines')
-const Users = require('../containers/Users')
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+import { FormattedMessage } from 'react-intl'
+import Loader from './Loader'
+import sdk from '../../client/sdk'
+import NotFound from '../containers/NotFound'
+import { Route, Switch, Redirect } from 'react-router'
+import Timetable from '../containers/Timetable'
+import Bookings from '../containers/Bookings'
+import LaundrySettings from '../containers/LaundrySettings'
+import Machines from '../containers/Machines'
+import Users from '../containers/Users'
 
 const OwnerCheckRoute = ({user, laundry, component: Component, path}) => <Route render={props => {
   if (user.role !== 'admin' && laundry.owners.indexOf(user.id) < 0) {
@@ -25,7 +25,14 @@ OwnerCheckRoute.propTypes = {
   path: Route.propTypes.path
 }
 
-class LeftNav extends React.Component {
+export default class LeftNav extends React.Component {
+
+  props: {
+    user: User,
+    laundries: { [string]: Laundry },
+    currentLaundry: string
+  }
+
   constructor (props) {
     super(props)
     this.state = {expanded: false}
@@ -156,11 +163,3 @@ class LeftNav extends React.Component {
     </Loader>
   }
 }
-
-LeftNav.propTypes = {
-  user: React.PropTypes.object.isRequired,
-  laundries: React.PropTypes.object,
-  currentLaundry: React.PropTypes.string
-}
-
-module.exports = LeftNav

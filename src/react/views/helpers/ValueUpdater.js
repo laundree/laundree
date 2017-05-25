@@ -1,42 +1,51 @@
-/**
- * Created by budde on 23/06/16.
- */
+// @flow
 
-const React = require('react')
+import React from 'react'
 
-class ValueUpdater extends React.Component {
-  initialValues = {}
+type Notion = { success: boolean, message: string | React$Element<*> }
 
-  constructor (props) {
-    super(props)
-    this.state = {values: this.initialValues, sesh: 0}
+export default class ValueUpdater<V: {}, Props, State: {}> extends React.Component<void, Props, State & { values: V, sesh: number, notion: ?Notion }> {
+  state: State & { values: V, sesh: number, notion: ?Notion } = {
+    ...this.initialState(),
+    values: this.initialValues(),
+    sesh: 0,
+    notion: null
   }
 
-  reset (state = {}) {
-    this.setState(({sesh}) => (Object.assign({values: this.initialValues, sesh: sesh + 1}, state)))
+  initialState (): State {
+    throw new Error('Not implemented!')
   }
 
-  updateValue (values, state = {}) {
-    this.setState(({values: vals}) => Object.assign({}, state, {values: Object.assign({}, vals, values)}))
+  initialValues (): V {
+    throw new Error('Not implemented!')
   }
 
-  generateValueMapper (name, map) {
-    return () => {
+  reset (state: $Shape<State & { values: V, sesh: number, notion: ?Notion }> = {}) {
+    this.setState(({sesh}) => ({...state, values: this.initialValues(), sesh: sesh + 1}))
+  }
+
+  updateValue (values: $Shape<V>, state: $Supertype<State> = {}) {
+    this.setState(({values: vals}) => ({...state, values: {...vals, values}}))
+  }
+
+  generateValueEventUpdater (m: (string, V) => $Shape<V>) {
+    return (evt: Event) => {
+      if (!evt.target || typeof evt.target.value !== 'string') {
+        throw new Error('Could not fetch value')
+      }
+      const value = evt.target.value
       this.setState(({values}) => {
-        const obj = {}
-        obj[name] = map(values[name])
-        return {values: Object.assign({}, values, obj)}
+        const newValues: $Shape<V> = m(value, values)
+        return {values: {...values, ...newValues}}
       })
     }
   }
 
-  generateValueUpdater (name, map = v => v) {
-    return evt => {
-      const value = evt.target ? evt.target.value : evt
+  generateValueUpdater<X> (map: (X, V) => $Shape<V>) {
+    return (evt: X) => {
       this.setState(({values}) => {
-        const obj = {}
-        obj[name] = map(value)
-        return {values: Object.assign({}, values, obj)}
+        const newValues: $Shape<V> = map(evt, values)
+        return {values: {...values, ...newValues}}
       })
     }
   }
@@ -49,4 +58,3 @@ class ValueUpdater extends React.Component {
   }
 }
 
-module.exports = ValueUpdater

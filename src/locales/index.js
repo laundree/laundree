@@ -1,3 +1,4 @@
+// @flow
 const en = require('./en.json')
 const da = Object.assign({}, en, require('./da.json'))
 const daLocale = require('react-intl/locale-data/da')
@@ -11,3 +12,5 @@ module.exports = {
   da: {name: 'Dansk', messages: da},
   supported: ['en', 'da']
 }
+
+export type LocaleType = 'en' | 'da'
