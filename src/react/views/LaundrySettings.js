@@ -1,23 +1,35 @@
-const React = require('react')
-const {Modal, Label, Submit, DocumentTitle} = require('./intl')
-const {ValueUpdater} = require('./helpers')
-const {ValidationForm, ValidationElement} = require('./validation')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const LocationSelector = require('./LocationSelector')
-const Switch = require('./Switch')
+// @flow
+import React from 'react'
+import { Modal, Label, Submit, DocumentTitle } from './intl'
+import ValueUpdater from './helpers/ValueUpdater'
+import { ValidationForm, ValidationElement } from './validation'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
+import LocationSelector from './LocationSelector'
+import Switch from './Switch'
+import type { LocaleType } from '../../locales'
 
-class LaundrySettingsForm extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.onSubmit = (evt) => {
-      evt.preventDefault()
-      this.setState({loading: true})
-      sdk.laundry(this.props.laundry.id)
-        .updateLaundry({name: this.state.values.name, googlePlaceId: this.state.values.place})
-        .then(() => this.setState({loading: false, notion: null}))
-        .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
-    }
+type LaundrySettingsFormValues = {
+  name: string,
+  place: string
+}
+type LaundrySettingsFormProps = {
+  laundry: Laundry,
+  googleApiKey: string,
+  locale: LocaleType
+}
+type LaundrySettingsFormState = {
+  loading: boolean
+}
+
+class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, LaundrySettingsFormProps, LaundrySettingsFormState> {
+  onSubmit = (evt: Event) => {
+    evt.preventDefault()
+    this.setState({loading: true})
+    sdk.api.laundry
+      .updateLaundry(this.props.laundry.id, {name: this.state.values.name, googlePlaceId: this.state.values.place})
+      .then(() => this.setState({loading: false, notion: null}))
+      .catch(err => this.setState({loading: false, notion: {success: false, message: this.errorToMessage(err)}}))
   }
 
   errorToMessage ({status, message}) {
@@ -31,7 +43,11 @@ class LaundrySettingsForm extends ValueUpdater {
     }
   }
 
-  get initialValues () {
+  initialState () {
+    return {loading: false}
+  }
+
+  initialValues () {
     return {
       name: this.props.laundry.name,
       place: this.props.laundry.googlePlaceId
@@ -43,20 +59,20 @@ class LaundrySettingsForm extends ValueUpdater {
     this.reset({values: {name, place: googlePlaceId}})
   }
 
-  get nameErrorMessage () {
+  nameErrorMessage () {
     return this.state.values.name.trim()
       ? 'laundry-settings.name-or-place.error.new-name'
       : 'laundry-settings.name-or-place.error.no-name'
   }
 
-  get placeErrorMessage () {
+  placeErrorMessage () {
     const placeId = this.state.values.place
     if (!placeId) return 'laundry-settings.name-or-place.error.no-place'
     if (placeId === this.props.laundry.googlePlaceId) return 'laundry-settings.name-or-place.error.new-place'
     return 'laundry-settings.name-or-place.error.valid-place'
   }
 
-  get nameErrorValues () {
+  nameErrorValues () {
     if (this.state.values.place !== this.props.laundry.googlePlaceId) return []
     return ['', this.props.laundry.name]
   }
@@ -65,18 +81,20 @@ class LaundrySettingsForm extends ValueUpdater {
     return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
       {this.renderNotion()}
       <ValidationElement sesh={this.state.sesh} value={this.state.values.name} notOneOf={this.nameErrorValues} trim>
-        <label data-validate-error={this.nameErrorMessage}>
-          <input type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')} />
+        <label data-validate-error={this.nameErrorMessage()}>
+          <input
+            type='text' value={this.state.values.name}
+            onChange={this.generateValueEventUpdater(name => ({name}))}/>
         </label>
       </ValidationElement>
       <ValidationElement
         sesh={this.state.sesh} value={this.state.values.place} nonEmpty>
-        <Label data-validate-error={this.placeErrorMessage}>
+        <Label data-validate-error={this.placeErrorMessage()}>
           <LocationSelector
             googleApiKey={this.props.googleApiKey}
             locale={this.props.locale}
             value={this.state.values.place}
-            onChange={this.generateValueUpdater('place')} />
+            onChange={this.generateValueEventUpdater(place => ({place}))}/>
         </Label>
       </ValidationElement>
       <div className='buttons'>
@@ -86,23 +104,15 @@ class LaundrySettingsForm extends ValueUpdater {
   }
 }
 
-LaundrySettingsForm.propTypes = {
-  locale: React.PropTypes.string.isRequired,
-  googleApiKey: React.PropTypes.string.isRequired,
-  laundry: React.PropTypes.object.isRequired
-}
-
 class DeleteLaundry extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {modalOpen: false}
-    this.handleDeleteClick = () => this.deleteLaundry()
-    this.handleCloseModal = () => this.setState({modalOpen: false})
-    this.handleOpenModal = () => this.setState({modalOpen: true})
-  }
+  handleDeleteClick = () => this.deleteLaundry()
+  handleCloseModal = () => this.setState({modalOpen: false})
+  handleOpenModal = () => this.setState({modalOpen: true})
+  state: { modalOpen: boolean } = {modalOpen: false}
+  props: { laundry: Laundry, user: User }
 
   deleteLaundry () {
-    return sdk.laundry(this.props.laundry.id).del()
+    return sdk.api.laundry.del(this.props.laundry.id)
   }
 
   render () {
@@ -141,18 +151,16 @@ DeleteLaundry.propTypes = {
 }
 
 class LeaveLaundry extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {modalOpen: false}
-    this.handleDeleteClick = () => this.removeUser()
-    this.handleCloseModal = () => this.setState({modalOpen: false})
-    this.handleOpenModal = () => this.setState({modalOpen: true})
-  }
+  handleDeleteClick = () => this.removeUser()
+  handleCloseModal = () => this.setState({modalOpen: false})
+  handleOpenModal = () => this.setState({modalOpen: true})
+  state = {modalOpen: false}
 
   removeUser () {
     return sdk
-      .laundry(this.props.laundry.id)
-      .removeUserFromLaundry(this.props.user.id)
+      .api
+      .laundry
+      .removeUserFromLaundry(this.props.laundry.id, this.props.user.id)
   }
 
   render () {
@@ -186,10 +194,14 @@ function timeStringToMinutes (time) {
   return obj.hour * 60 + obj.minute
 }
 
-function timeStringToObject (time) {
+function timeStringToObject (time): ?Time {
+  if (!time) return undefined
   const timeMatch = time.match(/^(\d+):(\d+)$/)
   if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return undefined
-  return {hour: parseInt(timeMatch[1]), minute: parseInt(timeMatch[2])}
+  const minute = parseInt(timeMatch[2])
+  const hour = parseInt(timeMatch[1])
+  // $FlowFixMe: Not a real problem
+  return {hour, minute}
 }
 
 function objectToTimeString ({hour, minute}) {
@@ -203,8 +215,20 @@ const bookingRulesDefaultValues = {
   limit: 100
 }
 
-function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
-  const laundryValues = {
+type BookingRulesValues = {
+  timeLimitEnable: boolean,
+  dailyLimitEnable: boolean,
+  limitEnable: boolean,
+  timeLimitFrom?: string,
+  timeLimitTo?: string,
+  dailyLimit?: number,
+  dailyLimitString?: string,
+  limit?: number,
+  limitString?: string
+}
+
+function rulesToInitialValues ({dailyLimit, limit, timeLimit}): BookingRulesValues {
+  const laundryValues: BookingRulesValues = {
     timeLimitEnable: false,
     dailyLimitEnable: false,
     limitEnable: false
@@ -222,47 +246,53 @@ function rulesToInitialValues ({dailyLimit, limit, timeLimit}) {
     laundryValues.timeLimitFrom = objectToTimeString(timeLimit.from)
     laundryValues.timeLimitTo = objectToTimeString(timeLimit.to)
   }
-  return Object.assign({}, bookingRulesDefaultValues, laundryValues)
+  return {...bookingRulesDefaultValues, ...laundryValues}
 }
 
-class BookingRules extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.timeMap = timeString => {
-      const time = timeString.match(/(\d+)(?::(\d\d))?\s*(p?)/)
-      if (!time) return '0:00'
-      const hours = Math.max(Math.min(parseInt(time[1]) + (time[3] ? 12 : 0), 24), 0)
-      const minutes = Math.max(Math.min(parseInt(time[2]) || 0, 60), 0)
-      const roundMinutes = minutes - minutes % 30
-      return `${hours}:${roundMinutes < 10 ? `0${roundMinutes}` : roundMinutes}`
-    }
-    this.numberMap = number => {
-      const int = parseInt(number)
-      return isNaN(int) ? 0 : Math.max(int, 0)
-    }
-    this.fromToValidator = ({from, to}) => timeStringToMinutes(to) > timeStringToMinutes(from)
-    this.validateValues = ({
-      timeLimitEnable,
-      dailyLimitEnable,
-      limitEnable,
-      timeLimitFrom,
-      timeLimitTo,
-      dailyLimit,
-      limit
-    }) => {
-      const values = this.initialValues
-      return timeLimitEnable !== values.timeLimitEnable ||
-        dailyLimitEnable !== values.dailyLimitEnable ||
-        limitEnable !== values.limitEnable ||
-        timeLimitFrom !== values.timeLimitFrom ||
-        timeLimitTo !== values.timeLimitTo ||
-        dailyLimit !== values.dailyLimit ||
-        limit !== values.limit
-    }
-    this.handleSubmit = evt => {
-      evt.preventDefault()
-      this.submit()
-    }
+type BookingRulesProps = {
+  laundry: Laundry
+}
+
+type BookingRulesState = {}
+
+function timeMap (timeString, def) {
+  if (!timeString) return def
+  const time = timeString.match(/(\d+)(?::(\d\d))?\s*(p?)/)
+  if (!time) return def
+  const hours = Math.max(Math.min(parseInt(time[1]) + (time[3] ? 12 : 0), 23), 0)
+  const minutes = Math.max(Math.min(parseInt(time[2]) || 0, 60), 0)
+  const roundMinutes = minutes - minutes % 30
+  return `${hours}:${roundMinutes < 10 ? `0${roundMinutes}` : roundMinutes}`
+}
+
+function numberMap (number) {
+  const int = parseInt(number)
+  return isNaN(int) ? 0 : Math.max(int, 0)
+}
+
+class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, BookingRulesState> {
+  fromToValidator = ({from, to}) => timeStringToMinutes(to) > timeStringToMinutes(from)
+  validateValues = ({
+                      timeLimitEnable,
+                      dailyLimitEnable,
+                      limitEnable,
+                      timeLimitFrom,
+                      timeLimitTo,
+                      dailyLimit,
+                      limit
+                    }) => {
+    const values = this.initialValues
+    return timeLimitEnable !== values.timeLimitEnable ||
+      dailyLimitEnable !== values.dailyLimitEnable ||
+      limitEnable !== values.limitEnable ||
+      timeLimitFrom !== values.timeLimitFrom ||
+      timeLimitTo !== values.timeLimitTo ||
+      dailyLimit !== values.dailyLimit ||
+      limit !== values.limit
+  }
+  handleSubmit = evt => {
+    evt.preventDefault()
+    this.submit()
   }
 
   compareRules ({limit, dailyLimit, timeLimit}) {
@@ -275,7 +305,7 @@ class BookingRules extends ValueUpdater {
     if (timeLimit.from.hour !== oldRules.timeLimit.from.hour) return false
     if (timeLimit.from.minute !== oldRules.timeLimit.from.minute) return false
     if (timeLimit.to.hour !== oldRules.timeLimit.to.hour) return false
-    return timeLimit.to.minute === oldRules.to.minute
+    return timeLimit.to.minute === oldRules.timeLimit.to.minute
   }
 
   componentWillReceiveProps ({laundry: {rules}}) {
@@ -284,10 +314,10 @@ class BookingRules extends ValueUpdater {
   }
 
   submit () {
-    sdk.laundry(this.props.laundry.id).updateLaundry({rules: this.rules})
+    sdk.api.laundry.updateLaundry(this.props.laundry.id, {rules: this.rules()})
   }
 
-  get rules () {
+  rules () {
     const ruleObject = {}
     if (this.state.values.limitEnable) {
       ruleObject.limit = this.state.values.limit
@@ -296,20 +326,21 @@ class BookingRules extends ValueUpdater {
       ruleObject.dailyLimit = this.state.values.dailyLimit
     }
     if (this.state.values.timeLimitEnable) {
-      ruleObject.timeLimit = {
-        from: timeStringToObject(this.state.values.timeLimitFrom),
-        to: timeStringToObject(this.state.values.timeLimitTo)
+      const from = timeStringToObject(this.state.values.timeLimitFrom)
+      const to = timeStringToObject(this.state.values.timeLimitTo)
+      if (from && to) {
+        ruleObject.timeLimit = {from, to}
       }
     }
     return ruleObject
   }
 
-  get initialValues () {
+  initialValues () {
     return rulesToInitialValues(this.props.laundry.rules)
   }
 
-  generateSwitchUpdater (name) {
-    const f = this.generateValueUpdater(name)
+  generateSwitchUpdater (name: 'limitEnable' | 'timeLimitEnable' | 'dailyLimitEnable') {
+    const f = this.generateValueUpdater(v => ({[name]: v}))
     return value => {
       if (value) return f(value)
       switch (name) {
@@ -326,7 +357,6 @@ class BookingRules extends ValueUpdater {
           this.updateValue({dailyLimit})
           break
       }
-      return f(value)
     }
   }
 
@@ -349,12 +379,12 @@ class BookingRules extends ValueUpdater {
               fromInput: <input
                 type='text'
                 value={this.state.values.timeLimitFrom}
-                onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
-                onChange={this.generateValueUpdater('timeLimitFrom')} />,
+                onBlur={this.generateValueUpdater((v, {timeLimitFrom}) => ({timeLimitFrom: timeMap(timeLimitFrom, bookingRulesDefaultValues.timeLimitFrom)}))}
+                onChange={this.generateValueEventUpdater(timeLimitFrom => ({timeLimitFrom}))}/>,
               toInput: <input
-                onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
+                onBlur={this.generateValueUpdater((v, {timeLimitTo}) => ({timeLimitTo: timeMap(timeLimitTo, bookingRulesDefaultValues.timeLimitTo)}))}
                 type='text' value={this.state.values.timeLimitTo}
-                onChange={this.generateValueUpdater('timeLimitTo')} />
+                onChange={this.generateValueEventUpdater(timeLimitTo => ({timeLimitTo}))}/>
             }}
           />
           <ValidationElement
@@ -374,9 +404,9 @@ class BookingRules extends ValueUpdater {
             id='laundry-settings.booking-rules.daily-max-hours'
             values={{
               hourInput: <input
-                onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
+                onBlur={this.generateValueUpdater((v, {dailyLimitString}) => ({dailyLimit: numberMap(dailyLimitString)}))}
                 type='text' value={this.state.values.dailyLimit}
-                onChange={this.generateValueUpdater('dailyLimit')} />,
+                onChange={this.generateValueEventUpdater(dailyLimitString => ({dailyLimitString}))}/>,
               hour: this.state.values.dailyLimit
             }} />
         </div>
@@ -393,9 +423,9 @@ class BookingRules extends ValueUpdater {
             id='laundry-settings.booking-rules.max-hours'
             values={{
               hourInput: <input
-                onBlur={this.generateValueMapper('limit', this.numberMap)}
+                onBlur={this.generateValueUpdater(({limitString}) => ({limit: numberMap(limitString)}))}
                 type='text' value={this.state.values.limit}
-                onChange={this.generateValueUpdater('limit')} />,
+                onChange={this.generateValueEventUpdater(limitString => ({limitString}))}/>,
               hour: this.state.values.limit
             }} />
         </div>
@@ -407,41 +437,46 @@ class BookingRules extends ValueUpdater {
   }
 }
 
-BookingRules.propTypes = {
-  laundry: React.PropTypes.object.isRequired
-}
-
 class LaundrySettings extends React.Component {
-  get isOwner () {
+  props: {
+    currentLaundry: string,
+    laundries: { [string]: Laundry },
+    locale: LocaleType,
+    googleApiKey: string,
+    user: User
+  }
+
+  isOwner () {
     return this.props.user.role === 'admin' || this.laundry.owners.indexOf(this.props.user.id) >= 0
   }
 
   renderOwnerSettings () {
-    if (!this.isOwner) return null
+    if (!this.isOwner()) return null
+    const laundry = this.laundry()
     return <div>
       <section id='LaundrySettingsNameOrPlace'>
-        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title' />
-        <LaundrySettingsForm laundry={this.laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale} />
+        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title'/>
+        <LaundrySettingsForm laundry={laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale}/>
       </section>
       <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title' />
-        <BookingRules laundry={this.laundry} />
+        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title'/>
+        <BookingRules laundry={laundry}/>
       </section>
       <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title' />
-        <DeleteLaundry laundry={this.laundry} user={this.props.user} />
+        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title'/>
+        <DeleteLaundry laundry={laundry} user={this.props.user}/>
       </section>
     </div>
   }
 
-  get laundry () {
+  laundry () {
     return this.props.laundries[this.props.currentLaundry]
   }
 
   renderUserSettings () {
     return <section>
-      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2' />
-      <LeaveLaundry laundry={this.laundry} user={this.props.user} />
+      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2'/>
+      <LeaveLaundry laundry={this.laundry()} user={this.props.user}/>
     </section>
   }
 
@@ -454,18 +489,6 @@ class LaundrySettings extends React.Component {
       </main>
     </DocumentTitle>
   }
-}
-
-LaundrySettings.propTypes = {
-  currentLaundry: React.PropTypes.string,
-  laundries: React.PropTypes.object,
-  locale: React.PropTypes.string.isRequired,
-  googleApiKey: React.PropTypes.string.isRequired,
-  user: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    role: React.PropTypes.string,
-    photo: React.PropTypes.string
-  })
 }
 
 module.exports = LaundrySettings

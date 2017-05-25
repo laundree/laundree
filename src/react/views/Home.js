@@ -1,29 +1,25 @@
-/**
- * Created by budde on 11/06/16.
- */
-const React = require('react')
-const {DocumentTitle} = require('./intl')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const AdminPanel = require('../containers/AdminPanel')
-const CreateLaundry = require('../containers/CreateLaundry')
-const {Redirect} = require('react-router')
+// @flow
+import React from 'react'
+import { DocumentTitle } from './intl'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
+import AdminPanel from '../containers/AdminPanel'
+import CreateLaundry from '../containers/CreateLaundry'
+import { Redirect } from 'react-router'
 
 class DemoButton extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {loading: false, email: '', password: ''}
-    this.clickHandler = () => {
-      this.setState({loading: true})
-      sdk.laundry.createDemoLaundry().then(({email, password}) => this.setState({
-        email,
-        password
-      }, () => this.ref.submit()))
-    }
-    this.refPuller = (ref) => {
-      this.ref = ref
-    }
+
+  state = {loading: false, email: '', password: ''}
+
+  clickHandler = () => {
+    this.setState({loading: true})
+    sdk.api.laundry.createDemoLaundry().then(({email, password}) => this.setState({
+      email,
+      password
+    }, () => this.ref.submit()))
   }
+
+  ref: HTMLFormElement
 
   render () {
     return <div>
@@ -32,9 +28,9 @@ class DemoButton extends React.Component {
           <use xlinkHref='#DemoMachine' />
         </svg>
       </span>
-      <form hidden ref={this.refPuller} method='post' action='/auth/local'>
-        <input type='hidden' name='username' value={this.state.email} />
-        <input type='hidden' name='password' value={this.state.password} />
+      <form hidden ref={ref => { this.ref = ref }} method='post' action='/auth/local'>
+        <input type='hidden' name='username' value={this.state.email}/>
+        <input type='hidden' name='password' value={this.state.password}/>
       </form>
     </div>
   }
@@ -111,7 +107,7 @@ const HomeNotLoggedIn = () => <DocumentTitle title='document-title.home'>
   </div>
 </DocumentTitle>
 
-const Home = ({users, currentUser}) => {
+const Home = ({users, currentUser}: { users: { [string]: User }, currentUser: string }) => {
   const user = users[currentUser]
   if (!user) return <HomeNotLoggedIn />
   if (user.role === 'admin') return <AdminPanel />
@@ -119,9 +115,4 @@ const Home = ({users, currentUser}) => {
   return <Redirect to={`/laundries/${user.laundries[0]}/timetable`} />
 }
 
-Home.propTypes = {
-  users: React.PropTypes.object.isRequired,
-  currentUser: React.PropTypes.string
-}
-
-module.exports = Home
+export default Home

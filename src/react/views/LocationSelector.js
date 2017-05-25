@@ -1,8 +1,9 @@
-const React = require('react')
-const {ValueUpdater} = require('./helpers')
-const {createClient} = require('@google/maps')
-const {Input} = require('./intl')
-const {FormattedMessage} = require('react-intl')
+// @flow
+import React from 'react'
+import ValueUpdater from './helpers/ValueUpdater'
+import { createClient } from '@google/maps'
+import { Input } from './intl'
+import { FormattedMessage } from 'react-intl'
 
 function resultsToFormattedAddressLookup (results) {
   return results.reduce((o, {place_id: placeId, formatted_address: formattedAddress}) => {
@@ -12,14 +13,15 @@ function resultsToFormattedAddressLookup (results) {
 }
 
 class LocationSelector extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.state.results = []
-    this.state.formattedAddresses = {}
-    this.lookupNo = 0
+  initialState () {
+    return {results: [], formattedAddresses: {}}
   }
 
-  get initialValues () {
+  lookupNo = 0
+  googleMapsClient = null
+  lastLookup: number
+
+  initialValues () {
     return {address: ''}
   }
 
@@ -28,7 +30,7 @@ class LocationSelector extends ValueUpdater {
     this.fetchFormattedAddress(this.props.value)
   }
 
-  handleAddressChange (event) {
+  handleAddressChange (event: Event) {
     const lookupNo = this.lookupNo++
     const value = event.target.value
     clearTimeout(this.lastLookup)

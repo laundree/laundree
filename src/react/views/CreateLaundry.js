@@ -1,23 +1,30 @@
 // @flow
 import React from 'react'
-import {ValidationForm, ValidationElement} from './validation'
-import {ValueUpdater} from './helpers'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
-import {FormattedMessage} from 'react-intl'
-import {Input, Label, Submit, DocumentTitle} from './intl'
+import { FormattedMessage } from 'react-intl'
+import { Input, Label, Submit, DocumentTitle } from './intl'
 import LocationSelector from './LocationSelector'
 
-export default class CreateLaundry extends ValueUpdater {
-  props: { user: User, googleApiKey: string, locale: string }
-  state: {
-    createExpanded: boolean,
-    loading: boolean,
-    results: string[]
-  } = {
-    createExpanded: false,
-    loading: false,
-    results: []
+type CreateLaundryProps = { user: User, googleApiKey: string, locale: string }
+type CreateLaundryState = {
+  createExpanded: boolean,
+  loading: boolean,
+  results: string[]
+}
+type CreateLaundryFormValues = { name: string, placeId: string }
+
+export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, CreateLaundryProps, CreateLaundryState> {
+
+  initialValues () {
+    return {name: '', placeId: ''}
   }
+
+  initialState () {
+    return {createExpanded: false, loading: false, results: []}
+  }
+
   expander = (evt: Event) => {
     if (typeof evt.target.blur === 'function') {
       evt.target.blur()
@@ -54,10 +61,6 @@ export default class CreateLaundry extends ValueUpdater {
     return {success: false, message}
   }
 
-  get initialValues () {
-    return {name: '', placeId: ''}
-  }
-
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
       <main id='CreateLaundry'>
@@ -70,8 +73,10 @@ export default class CreateLaundry extends ValueUpdater {
               <ValidationElement name='name' nonEmpty value={this.state.values.name}>
                 <Label data-validate-error='home.logged-in.error.invalid-laundry-name'>
                   <Input
-                    type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}
-                    placeholder='general.laundry-name' />
+                    type='text'
+                    value={this.state.values.name}
+                    onChange={this.generateValueEventUpdater((name: string) => ({name}))}
+                    placeholder='general.laundry-name'/>
                 </Label>
               </ValidationElement>
               <ValidationElement value={this.state.values.placeId} nonEmpty>
@@ -80,7 +85,7 @@ export default class CreateLaundry extends ValueUpdater {
                     locale={this.props.locale}
                     googleApiKey={this.props.googleApiKey}
                     value={this.state.values.placeId}
-                    onChange={this.generateValueUpdater('placeId')} />
+                    onChange={this.generateValueEventUpdater((placeId: string) => ({placeId}))}/>
                 </Label>
               </ValidationElement>
               <div className='buttons'>

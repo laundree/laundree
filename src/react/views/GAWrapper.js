@@ -1,7 +1,15 @@
-const ReactGA = require('react-ga')
-const React = require('react')
+// @flow
+import ReactGA from 'react-ga'
+import React from 'react'
+import type {Location} from 'react-router'
+import type {Children} from 'react'
 
 class GAWrapper extends React.Component {
+  props: {
+    currentUser: string,
+    children: Children,
+    location: Location
+  }
   log () {
     ReactGA.set({
       userId: this.props.currentUser,
@@ -23,10 +31,4 @@ class GAWrapper extends React.Component {
   }
 }
 
-GAWrapper.propTypes = {
-  currentUser: React.PropTypes.string,
-  children: React.PropTypes.any,
-  location: React.PropTypes.object
-}
-
-module.exports = GAWrapper
+export default GAWrapper

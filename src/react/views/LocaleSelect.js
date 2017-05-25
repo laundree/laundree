@@ -1,8 +1,11 @@
-const React = require('react')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const locales = require('../../locales')
+// @flow
+import React from 'react'
+import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
+import locales from '../../locales'
+import type { LocaleType } from '../../locales'
+import type { Location } from 'react-router'
 
-const LocaleSelect = props => <DropDown className='language'>
+const LocaleSelect = (props: { location: Location, locale: LocaleType }) => <DropDown className='language'>
   <DropDownTitle>
     <svg>
       <use xlinkHref='#Globe' />
@@ -20,10 +23,5 @@ const LocaleSelect = props => <DropDown className='language'>
     </ul>
   </DropDownContent>
 </DropDown>
-
-LocaleSelect.propTypes = {
-  location: React.PropTypes.object,
-  locale: React.PropTypes.string.isRequired
-}
 
 module.exports = LocaleSelect
