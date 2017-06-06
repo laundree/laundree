@@ -1,4 +1,4 @@
-// flow-typed signature: a8a37fa806e4074a0dac666b1947a80b
+// flow-typed signature: fc13d6414d366e61d479bc02eec65f01
 // flow-typed version: <<STUB>>/faker_v^4.1.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

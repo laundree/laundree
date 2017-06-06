@@ -1,4 +1,4 @@
-// flow-typed signature: 5e25359363788a17ba5820e1f90c570e
+// flow-typed signature: d7ce6536b75e785d13c31b516cb5ad7f
 // flow-typed version: <<STUB>>/nodemailer_v^4.0.1/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
-import locales from '../../locales'
+import * as locales from '../../locales'
 import type { LocaleType } from '../../locales'
 import type { Location } from 'react-router'
 
@@ -24,4 +24,4 @@ const LocaleSelect = (props: { location: Location, locale: LocaleType }) => <Dro
   </DropDownContent>
 </DropDown>
 
-module.exports = LocaleSelect
+export default LocaleSelect

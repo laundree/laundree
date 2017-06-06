@@ -1,1 +1,2 @@
-module.exports = require('./Privacy')
+import Privacy from './Privacy'
+export default Privacy

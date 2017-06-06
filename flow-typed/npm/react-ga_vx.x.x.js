@@ -1,4 +1,4 @@
-// flow-typed signature: b5ff9c2c1d10da52139022dada133303
+// flow-typed signature: e83a77331829acbd573ab45814107e4b
 // flow-typed version: <<STUB>>/react-ga_v^2.2.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

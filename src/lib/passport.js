@@ -64,7 +64,7 @@ passport.deserializeUser((user, done) => {
 
 function markLoggedIn (req: express$Request, res: express$Response, next: express$NextFunction) {
   if (!req.user) return next()
-  //$FlowFixMe
+  // $FlowFixMe We can set session...
   req.session.returningUser = true
   next()
 }

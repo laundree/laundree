@@ -1,4 +1,4 @@
-// flow-typed signature: 3ab6edbb8db8b331b42f19885579e370
+// flow-typed signature: 6e96d666972fa2a338661801f91339e9
 // flow-typed version: <<STUB>>/chai-as-promised_v^6.0.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

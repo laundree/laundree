@@ -1,4 +1,4 @@
-// flow-typed signature: 35bc3cfa91b1d8d0105d2d9ddc1b5d2f
+// flow-typed signature: b73bd1d342ef76e02b2c26ba3f2e9422
 // flow-typed version: <<STUB>>/transform-loader_v^0.2.4/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

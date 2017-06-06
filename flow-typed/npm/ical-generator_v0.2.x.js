@@ -1,5 +1,5 @@
-// flow-typed signature: 3aa913cd92382061eb7197f7c611910d
-// flow-typed version: 01bfad9dc5/ical-generator_v0.2.x/flow_>=v0.28.x
+// flow-typed signature: 27589400225304e1fa8b92df4abd88e0
+// flow-typed version: 31ce6390ac/ical-generator_v0.2.x/flow_>=v0.28.x <=v0.46.x
 
 declare module 'ical-generator' {
   declare type EventMethod = 'publish'|'request'|'apply'|'add'|'cancel'|'refresh'

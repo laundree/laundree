@@ -1,43 +1,37 @@
-/**
- * Created by budde on 11/06/16.
- */
-const React = require('react')
-const {DocumentTitle} = require('./intl')
-const {Link} = require('react-router-dom')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const {Input, Submit, Label} = require('./intl')
+// @flow
+import React from 'react'
+import { DocumentTitle, Input, Submit, Label } from './intl'
+import { Link } from 'react-router-dom'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
 
 class SignUp extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.submitHandler = (evt) => {
-      this.setState({loading: true})
-      evt.preventDefault()
-      return sdk.user.signUpUser(
-        this.state.values.name,
-        this.state.values.email,
-        this.state.values.password
-      )
-        .then(
-          () => this.reset({
-            loading: false,
-            notion: {message: <FormattedMessage id='auth.signup.success' />, success: true}
-          }),
-          err => this.setState({
-            loading: false,
-            notion: {
-              message: <FormattedMessage id={err.status === 409
-                ? 'auth.signup.error.already-exists'
-                : 'auth.signup.error'} />
-            }
-          }))
-    }
+  submitHandler = (evt: Event) => {
+    this.setState({loading: true})
+    evt.preventDefault()
+    return sdk.api.user.signUpUser(
+      this.state.values.name,
+      this.state.values.email,
+      this.state.values.password
+    )
+      .then(
+        () => this.reset({
+          loading: false,
+          notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
+        }),
+        err => this.setState({
+          loading: false,
+          notion: {
+            message: <FormattedMessage id={err.status === 409
+              ? 'auth.signup.error.already-exists'
+              : 'auth.signup.error'}/>
+          }
+        }))
   }
 
-  get query () {
+  query () {
     return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
   }
 
@@ -51,13 +45,13 @@ class SignUp extends ValueUpdater {
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={'/auth/facebook' + this.query} className='facebook'>
+          <a href={'/auth/facebook' + this.query()} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook' />
             </svg>
             <FormattedMessage id='auth.signup.method.facebook' />
           </a>
-          <a href={'/auth/google' + this.query} className='google'>
+          <a href={'/auth/google' + this.query()} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus' />
             </svg>
@@ -83,7 +77,7 @@ class SignUp extends ValueUpdater {
                 name='name'
                 placeholder='general.full-name'
                 value={this.state.values.name || ''}
-                onChange={this.generateValueUpdater('name')}
+                onChange={this.generateValueEventUpdater(name => ({name}))}
               />
             </Label>
           </ValidationElement>
@@ -96,8 +90,8 @@ class SignUp extends ValueUpdater {
               data-validate-error='auth.error.invalid-email'>
               <Input
                 value={this.state.values.email || ''}
-                onChange={this.generateValueUpdater('email')}
-                type='text' name='email' placeholder='general.email-address' />
+                onChange={this.generateValueEventUpdater(email => ({email}))}
+                type='text' name='email' placeholder='general.email-address'/>
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -108,8 +102,8 @@ class SignUp extends ValueUpdater {
             <Label data-validate-error='auth.error.invalid-password'>
               <Input
                 value={this.state.values.password || ''}
-                onChange={this.generateValueUpdater('password')}
-                type='password' name='password' placeholder='general.password' />
+                onChange={this.generateValueEventUpdater(password => ({password}))}
+                type='password' name='password' placeholder='general.password'/>
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -120,8 +114,8 @@ class SignUp extends ValueUpdater {
             <Label data-validate-error='auth.error.invalid-repeated-password'>
               <Input
                 value={this.state.values.password2 || ''}
-                onChange={this.generateValueUpdater('password2')}
-                type='password' name='password' placeholder='general.repeat-password' />
+                onChange={this.generateValueEventUpdater(password2 => ({password2}))}
+                type='password' name='password' placeholder='general.repeat-password'/>
             </Label>
           </ValidationElement>
           <div className='accept'>
@@ -146,8 +140,8 @@ class SignUp extends ValueUpdater {
               <FormattedMessage
                 id='auth.links.login'
                 values={{
-                  link: <Link to={'/auth' + this.query}>
-                    <FormattedMessage id='auth.links.login.link' />
+                  link: <Link to={'/auth' + this.query()}>
+                    <FormattedMessage id='auth.links.login.link'/>
                   </Link>
                 }} />
             </div>

@@ -1,4 +1,4 @@
-// flow-typed signature: 37ac3290bb2265744b2c432359a3a039
+// flow-typed signature: 4f99591294e013b78a1bec7f296b5a0a
 // flow-typed version: <<STUB>>/mocha_v^3.0.2/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

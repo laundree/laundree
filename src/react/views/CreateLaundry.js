@@ -6,8 +6,13 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, Submit, DocumentTitle } from './intl'
 import LocationSelector from './LocationSelector'
+import type {LocaleType} from '../../locales'
 
-type CreateLaundryProps = { user: User, googleApiKey: string, locale: string }
+type CreateLaundryProps = {
+  user: User,
+  googleApiKey: string,
+  locale: LocaleType
+}
 type CreateLaundryState = {
   createExpanded: boolean,
   loading: boolean,
@@ -61,6 +66,8 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     return {success: false, message}
   }
 
+  valueUpdaterPlaceId : (string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
+
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
       <main id='CreateLaundry'>
@@ -85,7 +92,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
                     locale={this.props.locale}
                     googleApiKey={this.props.googleApiKey}
                     value={this.state.values.placeId}
-                    onChange={this.generateValueEventUpdater((placeId: string) => ({placeId}))}/>
+                    onChange={this.valueUpdaterPlaceId}/>
                 </Label>
               </ValidationElement>
               <div className='buttons'>

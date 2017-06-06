@@ -2,7 +2,7 @@
 import React from 'react'
 import { IntlProvider } from 'react-intl'
 import { Provider } from 'react-redux'
-import locales from './../../locales'
+import * as locales from './../../locales'
 import { Route, Switch } from 'react-router'
 import Auth from '../containers/Auth'
 import BaseApp from '../containers/BaseApp'

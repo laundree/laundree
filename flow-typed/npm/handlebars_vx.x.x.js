@@ -1,4 +1,4 @@
-// flow-typed signature: 06613500f5ad8258418ca1db16d5b780
+// flow-typed signature: 0d9ea7e77be0ee9bdabb1e2773362b5e
 // flow-typed version: <<STUB>>/handlebars_v^4.0.5/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

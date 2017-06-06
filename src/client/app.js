@@ -1,14 +1,13 @@
 // @flow
 
-import Initializer from './initializer'
 import Debug from 'debug'
 import ReactDOM from 'react-dom'
 import React from 'react'
 import { BrowserRouter } from 'react-router-dom'
 import io from 'socket.io-client'
 import { createStore } from 'redux'
-import sdk from '../sdk'
-import App from '../../react/containers/App'
+import sdk from './sdk'
+import App from '../react/containers/App'
 import ReactGA from 'react-ga'
 import { redux } from 'laundree-sdk'
 
@@ -34,18 +33,16 @@ function setupStore () {
   return store
 }
 
-class AppInitializer extends Initializer {
-  setup (element: Element) {
-    const rootElement = element.querySelector('#AppRoot')
-    if (!rootElement) return
-    const store = setupStore()
-    const locale = store.getState().config.locale
-    ReactDOM.render(
-      <BrowserRouter>
-        <App store={store} locale={locale} />
-      </BrowserRouter>,
-      rootElement)
-  }
+function setup () {
+  const rootElement = document.querySelector('#AppRoot')
+  if (!rootElement) return
+  const store = setupStore()
+  const locale = store.getState().config.locale
+  ReactDOM.render(
+    <BrowserRouter>
+      <App store={store} locale={locale}/>
+    </BrowserRouter>,
+    rootElement)
 }
 
-module.exports = AppInitializer
+export default setup

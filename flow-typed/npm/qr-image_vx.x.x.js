@@ -1,4 +1,4 @@
-// flow-typed signature: 45cd7dbe1923a9a7a0e5b4e0429bc744
+// flow-typed signature: 00491ba30531ac3632fc14b2482cd4cd
 // flow-typed version: <<STUB>>/qr-image_v^3.1.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

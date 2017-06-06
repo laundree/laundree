@@ -1,14 +1,23 @@
-/**
- * Created by budde on 11/06/16.
- */
-const React = require('react')
-const {DocumentTitle, Input, Submit, Label} = require('./intl')
-const {Link} = require('react-router-dom')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const {FormattedMessage} = require('react-intl')
+// @flow
+import React from 'react'
+import { DocumentTitle, Input, Submit, Label } from './intl'
+import { Link } from 'react-router-dom'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import { FormattedMessage } from 'react-intl'
 
-class Login extends ValueUpdater {
+type LoginProps = {
+  to?: string,
+  flash: Flash[]
+}
+
+type LoginValues = {
+  email: string,
+  password: string
+}
+
+export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
+
   handleNotion () {
     if (!this.props.flash.length) return null
     const {type, message} = this.props.flash[0]
@@ -21,11 +30,12 @@ class Login extends ValueUpdater {
     </div>
   }
 
-  get query () {
+  query () {
     return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
   }
 
   render () {
+    const query = this.query()
     return <DocumentTitle title='document-title.login'>
       <div>
         <FormattedMessage tagName='h1' id='auth.login.title' />
@@ -35,13 +45,13 @@ class Login extends ValueUpdater {
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={'/auth/facebook' + this.query} className='facebook'>
+          <a href={'/auth/facebook' + query} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook' />
             </svg>
             <FormattedMessage id='auth.login.method.facebook' />
           </a>
-          <a href={'/auth/google' + this.query} className='google'>
+          <a href={'/auth/google' + query} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus' />
             </svg>
@@ -51,7 +61,7 @@ class Login extends ValueUpdater {
         <div className='or'>
           <FormattedMessage id='general.or' />
         </div>
-        <ValidationForm id='SignIn' method='post' action={'/auth/local' + this.query}>
+        <ValidationForm id='SignIn' method='post' action={'/auth/local' + query}>
           {this.handleNotion()}
           <ValidationElement email trim value={this.state.values.email || ''}>
             <Label
@@ -61,7 +71,7 @@ class Login extends ValueUpdater {
                 name='username'
                 placeholder='general.email-address'
                 value={this.state.values.email || ''}
-                onChange={this.generateValueUpdater('email')} />
+                onChange={this.generateValueEventUpdater(email => ({email}))}/>
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -72,7 +82,7 @@ class Login extends ValueUpdater {
               <Input
                 type='password' name='password' placeholder='general.password'
                 value={this.state.values.password || ''}
-                onChange={this.generateValueUpdater('password')} />
+                onChange={this.generateValueUpdater(password => ({password}))}/>
             </Label>
           </ValidationElement>
           <div className='buttons'>
@@ -120,12 +130,3 @@ class Login extends ValueUpdater {
   }
 }
 
-Login.propTypes = {
-  to: React.PropTypes.string,
-  flash: React.PropTypes.arrayOf(React.PropTypes.shape({
-    type: React.PropTypes.string.isRequired,
-    message: React.PropTypes.string.isRequired
-  })).isRequired
-}
-
-module.exports = Login

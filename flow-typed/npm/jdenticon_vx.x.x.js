@@ -1,4 +1,4 @@
-// flow-typed signature: d9685c2c85b25cce5adfc76f5648f800
+// flow-typed signature: f3e060bd75dc3cb147542742e8e03d77
 // flow-typed version: <<STUB>>/jdenticon_v^1.3.2/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

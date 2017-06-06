@@ -1,4 +1,4 @@
-// flow-typed signature: e000a973d46c5dd2bdd88a35ea225ec9
+// flow-typed signature: 167fcdbccfbfeec4d9214dc30f17e695
 // flow-typed version: <<STUB>>/@google/maps_v^0.3.1/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

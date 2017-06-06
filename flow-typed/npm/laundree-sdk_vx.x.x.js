@@ -1,4 +1,4 @@
-// flow-typed signature: 1d76e50c5b3c62e796d09d7ad5a68b1e
+// flow-typed signature: 5475aa51620715771283bccd3a798de6
 // flow-typed version: <<STUB>>/laundree-sdk_v0.0.23/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 
@@ -22,23 +22,55 @@ declare module 'laundree-sdk' {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module 'laundree-sdk/src/redux/actions' {
+declare module 'laundree-sdk/flow-typed/npm/eslint_vx.x.x' {
   declare module.exports: any;
 }
 
-declare module 'laundree-sdk/src/redux/index' {
+declare module 'laundree-sdk/flow-typed/npm/eslint-config-standard_vx.x.x' {
   declare module.exports: any;
 }
 
-declare module 'laundree-sdk/src/redux/reducers/helpers' {
+declare module 'laundree-sdk/flow-typed/npm/eslint-config-standard-flow_vx.x.x' {
   declare module.exports: any;
 }
 
-declare module 'laundree-sdk/src/redux/reducers/index' {
+declare module 'laundree-sdk/flow-typed/npm/eslint-plugin-promise_vx.x.x' {
   declare module.exports: any;
 }
 
-declare module 'laundree-sdk/src/redux/reducers/userBookings' {
+declare module 'laundree-sdk/flow-typed/npm/eslint-plugin-standard_vx.x.x' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/flow-typed/npm/flow-bin_v0.x.x' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/flow-typed/npm/redux_v3.x.x' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/flow-typed/npm/superagent_vx.x.x' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/lib/index' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/lib/redux' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/lib/sdk' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/src/index' {
+  declare module.exports: any;
+}
+
+declare module 'laundree-sdk/src/redux' {
   declare module.exports: any;
 }
 
@@ -47,26 +79,44 @@ declare module 'laundree-sdk/src/sdk' {
 }
 
 // Filename aliases
-declare module 'laundree-sdk/index' {
-  declare module.exports: $Exports<'laundree-sdk'>;
+declare module 'laundree-sdk/flow-typed/npm/eslint_vx.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/eslint_vx.x.x'>;
 }
-declare module 'laundree-sdk/index.js' {
-  declare module.exports: $Exports<'laundree-sdk'>;
+declare module 'laundree-sdk/flow-typed/npm/eslint-config-standard_vx.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/eslint-config-standard_vx.x.x'>;
 }
-declare module 'laundree-sdk/src/redux/actions.js' {
-  declare module.exports: $Exports<'laundree-sdk/src/redux/actions'>;
+declare module 'laundree-sdk/flow-typed/npm/eslint-config-standard-flow_vx.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/eslint-config-standard-flow_vx.x.x'>;
 }
-declare module 'laundree-sdk/src/redux/index.js' {
-  declare module.exports: $Exports<'laundree-sdk/src/redux/index'>;
+declare module 'laundree-sdk/flow-typed/npm/eslint-plugin-promise_vx.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/eslint-plugin-promise_vx.x.x'>;
 }
-declare module 'laundree-sdk/src/redux/reducers/helpers.js' {
-  declare module.exports: $Exports<'laundree-sdk/src/redux/reducers/helpers'>;
+declare module 'laundree-sdk/flow-typed/npm/eslint-plugin-standard_vx.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/eslint-plugin-standard_vx.x.x'>;
 }
-declare module 'laundree-sdk/src/redux/reducers/index.js' {
-  declare module.exports: $Exports<'laundree-sdk/src/redux/reducers/index'>;
+declare module 'laundree-sdk/flow-typed/npm/flow-bin_v0.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/flow-bin_v0.x.x'>;
 }
-declare module 'laundree-sdk/src/redux/reducers/userBookings.js' {
-  declare module.exports: $Exports<'laundree-sdk/src/redux/reducers/userBookings'>;
+declare module 'laundree-sdk/flow-typed/npm/redux_v3.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/redux_v3.x.x'>;
+}
+declare module 'laundree-sdk/flow-typed/npm/superagent_vx.x.x.js' {
+  declare module.exports: $Exports<'laundree-sdk/flow-typed/npm/superagent_vx.x.x'>;
+}
+declare module 'laundree-sdk/lib/index.js' {
+  declare module.exports: $Exports<'laundree-sdk/lib/index'>;
+}
+declare module 'laundree-sdk/lib/redux.js' {
+  declare module.exports: $Exports<'laundree-sdk/lib/redux'>;
+}
+declare module 'laundree-sdk/lib/sdk.js' {
+  declare module.exports: $Exports<'laundree-sdk/lib/sdk'>;
+}
+declare module 'laundree-sdk/src/index.js' {
+  declare module.exports: $Exports<'laundree-sdk/src/index'>;
+}
+declare module 'laundree-sdk/src/redux.js' {
+  declare module.exports: $Exports<'laundree-sdk/src/redux'>;
 }
 declare module 'laundree-sdk/src/sdk.js' {
   declare module.exports: $Exports<'laundree-sdk/src/sdk'>;

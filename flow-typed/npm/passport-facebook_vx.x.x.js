@@ -1,4 +1,4 @@
-// flow-typed signature: 009b937cdf3686bb2919564be4a64e10
+// flow-typed signature: 599edcb676b0bcac50f0a4c5fba48b1b
 // flow-typed version: <<STUB>>/passport-facebook_v^2.1.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

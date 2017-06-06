@@ -1,4 +1,4 @@
-// flow-typed signature: ed683a91159eaac7eaa30e297fdb437f
+// flow-typed signature: dda204174e752dff16b04336ecfcb4ce
 // flow-typed version: <<STUB>>/urlsafe-base64_v^1.0.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

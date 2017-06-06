@@ -1,4 +1,4 @@
-// flow-typed signature: fff38751fb87e6134cba2dcc8ee46951
+// flow-typed signature: 183d94611ec274eceb2d643ebdb5e6c3
 // flow-typed version: <<STUB>>/brfs_v^1.4.3/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 
