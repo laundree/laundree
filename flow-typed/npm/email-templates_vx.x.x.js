@@ -1,4 +1,4 @@
-// flow-typed signature: 630d37fd45cab4403c258d3e9e50ffaa
+// flow-typed signature: a97c2ccbb210c1872862b563d1abc782
 // flow-typed version: <<STUB>>/email-templates_v^2.3.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

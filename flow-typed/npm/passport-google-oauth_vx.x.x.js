@@ -1,4 +1,4 @@
-// flow-typed signature: 8bfd5c7b15fa482e362a9af647eb64f8
+// flow-typed signature: 3242f5d971e709c8752d82c0853c57fa
 // flow-typed version: <<STUB>>/passport-google-oauth_v^1.0.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

@@ -1,12 +1,11 @@
-/**
- * Created by budde on 26/02/2017.
- */
+// @flow
 
-const React = require('react')
-const sdk = require('../../client/sdk')
-const uuid = require('uuid')
+import React from 'react'
+import sdk from '../../client/sdk'
+import uuid from 'uuid'
 
-class NativeApp extends React.Component {
+export default class NativeApp extends React.Component {
+  props: {currentUser: string, users: {[string]: User}}
   componentDidMount () {
     if (!this.props.currentUser) {
       return
@@ -15,7 +14,7 @@ class NativeApp extends React.Component {
   }
 
   async setupToken () {
-    const {secret, owner} = await sdk.token.createToken(`app-${uuid.v4()}`)
+    const {secret, owner} = await sdk.api.token.createToken(`app-${uuid.v4()}`)
     window.location = `laundree://auth/${owner.id}/${secret}`
   }
 
@@ -23,10 +22,3 @@ class NativeApp extends React.Component {
     return null
   }
 }
-
-NativeApp.propTypes = {
-  currentUser: React.PropTypes.string,
-  users: React.PropTypes.object
-}
-
-module.exports = NativeApp

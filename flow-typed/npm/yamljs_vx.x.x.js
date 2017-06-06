@@ -1,4 +1,4 @@
-// flow-typed signature: 256b37074c80198defea50e3b2070341
+// flow-typed signature: 9a6ca2fb1c1284488f5fd9a34831b7ac
 // flow-typed version: <<STUB>>/yamljs_v^0.2.7/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

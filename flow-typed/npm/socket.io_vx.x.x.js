@@ -1,4 +1,4 @@
-// flow-typed signature: 15aa2898a971f29d7777cd7327a80026
+// flow-typed signature: f139c5877b8b0a15ddf09741af06a5ea
 // flow-typed version: <<STUB>>/socket.io_v^1.4.5/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

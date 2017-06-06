@@ -41,7 +41,7 @@ export default class ValueUpdater<V: {}, Props, State: {}> extends React.Compone
     }
   }
 
-  generateValueUpdater<X> (map: (X, V) => $Shape<V>) {
+  generateValueUpdater<X> (map: (X, V) => $Shape<V>): (X) => void {
     return (evt: X) => {
       this.setState(({values}) => {
         const newValues: $Shape<V> = map(evt, values)

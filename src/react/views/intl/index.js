@@ -21,9 +21,9 @@ function elementFactory (element, property, defaults = {}) {
 
 module.exports = {
   DocumentTitle: elementFactory(DocumentTitle, 'title'),
-  Input: elementFactory('input', 'placeholder'),
+  Input: elementFactory('input', 'placeholder' ),
   Submit: elementFactory('input', 'value', {type: 'submit'}),
   TextArea: elementFactory('textarea', 'placeholder'),
   Label: elementFactory('label', 'data-validate-error'),
-  Modal: require('./modal')
+  Modal
 }

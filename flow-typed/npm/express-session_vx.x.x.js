@@ -1,4 +1,4 @@
-// flow-typed signature: b18f462910b30ca146b95323c6275a45
+// flow-typed signature: f585e2e5c8f1a71efe44382e4b14f19d
 // flow-typed version: <<STUB>>/express-session_v^1.13.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

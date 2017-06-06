@@ -1,4 +1,4 @@
-// flow-typed signature: e3f5f114917d80c10f2e6f55f1ad4862
+// flow-typed signature: f41db930ef8b262cce40ed0d8b1cda7c
 // flow-typed version: <<STUB>>/config_v^1.20.1/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 
@@ -34,10 +34,6 @@ declare module 'config/raw' {
   declare module.exports: any;
 }
 
-declare module 'config/tools/contributors' {
-  declare module.exports: any;
-}
-
 // Filename aliases
 declare module 'config/defer.js' {
   declare module.exports: $Exports<'config/defer'>;
@@ -47,7 +43,4 @@ declare module 'config/lib/config.js' {
 }
 declare module 'config/raw.js' {
   declare module.exports: $Exports<'config/raw'>;
-}
-declare module 'config/tools/contributors.js' {
-  declare module.exports: $Exports<'config/tools/contributors'>;
 }

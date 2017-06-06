@@ -1,4 +1,4 @@
-// flow-typed signature: 5478a555fda6ced928a8aa518649cd35
+// flow-typed signature: 9506b8b667644202e2ec6cdcf22941ce
 // flow-typed version: <<STUB>>/codeclimate-test-reporter_v^0.4.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

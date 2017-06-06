@@ -1,4 +1,4 @@
-// flow-typed signature: 041db0df79142981bb74c63e7e1e7862
+// flow-typed signature: 913748eb3b38579be2eeee11f0a91f1d
 // flow-typed version: <<STUB>>/passport-http_v^0.3.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

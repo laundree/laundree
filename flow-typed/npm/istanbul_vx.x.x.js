@@ -1,4 +1,4 @@
-// flow-typed signature: f9f3d58b87146eb2291814857cf15cc6
+// flow-typed signature: 48a469e436cec0618296e25bbc2bd2a9
 // flow-typed version: <<STUB>>/istanbul_v^0.4.5/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

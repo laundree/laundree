@@ -1,4 +1,4 @@
-// flow-typed signature: ca75cb7e045a5a8f4a975ed846bcb1ca
+// flow-typed signature: 56295d61ff66d2b8a95eb90ef7838789
 // flow-typed version: <<STUB>>/superagent_v^3.3.1/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

@@ -1,4 +1,4 @@
-// flow-typed signature: 79e62d46724738c15dcaa9764d076c7f
+// flow-typed signature: 9b24b3ff8d2b22bf17c1e63f4fd3db65
 // flow-typed version: <<STUB>>/moment-timezone_v^0.5.7/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

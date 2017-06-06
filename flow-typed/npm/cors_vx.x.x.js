@@ -1,4 +1,4 @@
-// flow-typed signature: d8ceb93afc7ce1af7fceea3f873ca459
+// flow-typed signature: b34aae960be2ef2b0e670d95e7a1f622
 // flow-typed version: <<STUB>>/cors_v^2.8.1/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

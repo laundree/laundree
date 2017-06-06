@@ -1,4 +1,4 @@
-// flow-typed signature: 8a099665be0b503a3d3adda76610cf9a
+// flow-typed signature: cce947aa7a5e26ca4aa07d81ed39739e
 // flow-typed version: <<STUB>>/chunk-manifest-webpack-plugin_v^1.1.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

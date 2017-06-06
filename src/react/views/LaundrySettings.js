@@ -94,7 +94,7 @@ class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, Laundr
             googleApiKey={this.props.googleApiKey}
             locale={this.props.locale}
             value={this.state.values.place}
-            onChange={this.generateValueEventUpdater(place => ({place}))}/>
+            onChange={this.generateValueUpdater(place => ({place}))}/>
         </Label>
       </ValidationElement>
       <div className='buttons'>
@@ -437,7 +437,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
   }
 }
 
-class LaundrySettings extends React.Component {
+export default class LaundrySettings extends React.Component {
   props: {
     currentLaundry: string,
     laundries: { [string]: Laundry },
@@ -490,5 +490,3 @@ class LaundrySettings extends React.Component {
     </DocumentTitle>
   }
 }
-
-module.exports = LaundrySettings

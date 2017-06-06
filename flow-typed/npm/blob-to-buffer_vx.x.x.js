@@ -1,4 +1,4 @@
-// flow-typed signature: 7993bfb2652698170d2ab692278550c8
+// flow-typed signature: e1a560e6278a93f3775d55922e0f0d7c
 // flow-typed version: <<STUB>>/blob-to-buffer_v^1.2.6/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

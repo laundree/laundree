@@ -1,4 +1,4 @@
-// flow-typed signature: b849f8b3f07137138a4283ba3c2e925c
+// flow-typed signature: d9b6ac3c3010c992fe39ee830a7df9f5
 // flow-typed version: <<STUB>>/connect-flash_v^0.1.1/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

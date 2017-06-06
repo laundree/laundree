@@ -1,4 +1,4 @@
-// flow-typed signature: b96e111264bd3ae8e3a7097e05307c82
+// flow-typed signature: 72b56b9874e47fac6afc3c073bccc1e4
 // flow-typed version: <<STUB>>/pdfkit_v^0.8.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 

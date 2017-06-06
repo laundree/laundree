@@ -1,4 +1,4 @@
-// flow-typed signature: bea420e752760cc52af81eb5105a204a
+// flow-typed signature: 3e3711c9fe4f77255c2c0f5c205f8877
 // flow-typed version: <<STUB>>/opbeat_v^4.0.0/flow_v0.46.0
 
 /**
@@ -8,8 +8,8 @@
  *
  * Fill this stub out by replacing all the `any` types.
  *
- * Once filled out, we encourage you to share your work with the 
- * community by sending a pull request to: 
+ * Once filled out, we encourage you to share your work with the
+ * community by sending a pull request to:
  * https://github.com/flowtype/flow-typed
  */
 
