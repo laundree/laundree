@@ -43,3 +43,4 @@ reports
 /.nyc_output
 /build_output.txt
 /coverage
+laundree-secret.yml
