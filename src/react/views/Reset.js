@@ -8,15 +8,18 @@ const {ValueUpdater} = require('./helpers')
 const sdk = require('../../client/sdk')
 const {DocumentTitle, Input, Submit, Label} = require('./intl')
 const {FormattedMessage} = require('react-intl')
+const queryString = require('querystring')
 
 class Reset extends ValueUpdater {
   constructor (props) {
     super(props)
     this.submitHandler = (evt) => {
-      const {location: {query: {user, token}}} = this.props
+      const search = props.location.search && props.location.search.substr(1)
+      const {user, token} = queryString.parse(search)
       this.setState({loading: true})
       evt.preventDefault()
-      return sdk.user(user).resetPassword(token, this.state.values.password)
+      return sdk.user(user)
+        .resetPassword(token, this.state.values.password)
         .then(
           () => this.reset({
             loading: false,
@@ -88,10 +91,7 @@ class Reset extends ValueUpdater {
 
 Reset.propTypes = {
   location: React.PropTypes.shape({
-    query: React.PropTypes.shape({
-      user: React.PropTypes.string,
-      token: React.PropTypes.string
-    })
+    search: React.PropTypes.string
   })
 }
 

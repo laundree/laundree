@@ -25,7 +25,7 @@ module.exports = {
           ]
         }
       },
-      {test: /pdfkit|fontkit|unicode-properties|png-js|brotli/, loader: 'transform-loader?brfs'},
+      {test: /pdfkit|fontkit|unicode-properties|png-js|brotli|linebreak/, loader: 'transform-loader?brfs'},
       {test: /\.json$/, loader: 'json-loader'}
     ]
   }
