@@ -4,7 +4,8 @@
 
 const connect = require('react-redux').connect
 const SignUp = require('../views/SignUp')
+const queryString = require('querystring')
 
-const mapStateToProps = ({location}) => ({to: location && location.query && location.query.to})
+const mapStateToProps = ({location}) => ({to: location && location.search && queryString.parse(location.search.substr(1)).to})
 
 module.exports = connect(mapStateToProps)(SignUp)
