@@ -94,7 +94,7 @@
     "nightwatch": "^0.9.8",
     "nyc": "^11.0.2",
     "selenium-standalone": "^6.0.1",
-    "sinon": "^2.1.0",
+    "sinon": "2.3.2",
     "sinon-chai": "^2.9.0",
     "supertest": "^3.0.0"
   },
