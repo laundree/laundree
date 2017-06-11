@@ -75,7 +75,7 @@
     "babel-register": "^6.24.1",
     "brfs": "^1.4.3",
     "chai": "^4.0.2",
-    "chai-as-promised": "^6.0.0",
+    "chai-as-promised": "^7.0.0",
     "chai-things": "^0.2.0",
     "chunk-manifest-webpack-plugin": "^1.1.0",
     "codeclimate-test-reporter": "^0.5.0",
