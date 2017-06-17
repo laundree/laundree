@@ -10,6 +10,8 @@ import { error } from '../utils'
 import Debug from 'debug'
 import { opbeat } from '../lib/opbeat'
 import EventEmitter from 'events'
+import type {Action, ListInvitationsAction, ListLaundriesAction, ListUsersAction, ListMachinesAction, ListBookingsAction} from 'laundree-sdk/lib/redux'
+
 const debug = Debug('laundree.lib.socket_io')
 /**
  * Set up the socket with provided namespaces.

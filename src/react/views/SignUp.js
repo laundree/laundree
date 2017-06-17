@@ -19,14 +19,14 @@ class SignUp extends ValueUpdater {
       .then(
         () => this.reset({
           loading: false,
-          notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
+          notion: {message: <FormattedMessage id='auth.signup.success' />, success: true}
         }),
         err => this.setState({
           loading: false,
           notion: {
             message: <FormattedMessage id={err.status === 409
               ? 'auth.signup.error.already-exists'
-              : 'auth.signup.error'}/>
+              : 'auth.signup.error'} />
           }
         }))
   }
@@ -91,7 +91,7 @@ class SignUp extends ValueUpdater {
               <Input
                 value={this.state.values.email || ''}
                 onChange={this.generateValueEventUpdater(email => ({email}))}
-                type='text' name='email' placeholder='general.email-address'/>
+                type='text' name='email' placeholder='general.email-address' />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -103,7 +103,7 @@ class SignUp extends ValueUpdater {
               <Input
                 value={this.state.values.password || ''}
                 onChange={this.generateValueEventUpdater(password => ({password}))}
-                type='password' name='password' placeholder='general.password'/>
+                type='password' name='password' placeholder='general.password' />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -115,7 +115,7 @@ class SignUp extends ValueUpdater {
               <Input
                 value={this.state.values.password2 || ''}
                 onChange={this.generateValueEventUpdater(password2 => ({password2}))}
-                type='password' name='password' placeholder='general.repeat-password'/>
+                type='password' name='password' placeholder='general.repeat-password' />
             </Label>
           </ValidationElement>
           <div className='accept'>
@@ -141,7 +141,7 @@ class SignUp extends ValueUpdater {
                 id='auth.links.login'
                 values={{
                   link: <Link to={'/auth' + this.query()}>
-                    <FormattedMessage id='auth.links.login.link'/>
+                    <FormattedMessage id='auth.links.login.link' />
                   </Link>
                 }} />
             </div>

@@ -2,6 +2,7 @@
 import { createStore } from 'redux'
 import { redux } from 'laundree-sdk'
 import type UserHandler from './handlers/user'
+import type { Flash, Action, ListLaundriesAction } from 'laundree-sdk/lib/redux'
 
 function mapFlash (flashArray, type) {
   return flashArray
@@ -9,7 +10,7 @@ function mapFlash (flashArray, type) {
     .map((flash: Flash) => ({type: 'FLASH', payload: flash}))
 }
 
-async function fetchLaundries (currentUser) {
+async function fetchLaundries (currentUser) : Promise<ListLaundriesAction> {
   const laundries = await currentUser.fetchLaundries()
   return {type: 'LIST_LAUNDRIES', payload: laundries.map(l => l.reduxModel())}
 }
@@ -29,14 +30,15 @@ export function createInitialEvents (currentUser: UserHandler, successFlash: str
   events = events.concat(mapFlash(errorFlash, 'error'))
   events.push({type: 'CONFIGURE', payload: {locale, googleApiKey, returningUser}})
   if (!currentUser) return Promise.resolve(events)
-  events.push({type: 'SIGN_IN_USER', payload: currentUser.reduxModel()})
-  return fetchLaundries(currentUser).then(event => events.concat(event))
+  const signInAction: Action = {type: 'SIGN_IN_USER', payload: currentUser.reduxModel()}
+  events.push(signInAction)
+  return fetchLaundries(currentUser).then((event: Action) => events.concat(event))
 }
 
 export function createInitialStore (currentUser: UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
   return createInitialEvents(currentUser, successFlash, errorFlash, locale, googleApiKey, returningUser)
     .then((events) => {
-      const store = createStore(redux.reducer, redux.initState)
+      const store = createStore(redux.reducer)
       events.forEach((event) => store.dispatch(event))
       return store
     })

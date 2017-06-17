@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl'
 import { Input, Label, Submit, DocumentTitle } from './intl'
 import LocationSelector from './LocationSelector'
 import type {LocaleType} from '../../locales'
+import type {User} from 'laundree-sdk/lib/redux'
 
 type CreateLaundryProps = {
   user: User,
@@ -66,7 +67,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     return {success: false, message}
   }
 
-  valueUpdaterPlaceId : (string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
+  valueUpdaterPlaceId:(string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
 
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
@@ -83,7 +84,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
                     type='text'
                     value={this.state.values.name}
                     onChange={this.generateValueEventUpdater((name: string) => ({name}))}
-                    placeholder='general.laundry-name'/>
+                    placeholder='general.laundry-name' />
                 </Label>
               </ValidationElement>
               <ValidationElement value={this.state.values.placeId} nonEmpty>
@@ -92,7 +93,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
                     locale={this.props.locale}
                     googleApiKey={this.props.googleApiKey}
                     value={this.state.values.placeId}
-                    onChange={this.valueUpdaterPlaceId}/>
+                    onChange={this.valueUpdaterPlaceId} />
                 </Label>
               </ValidationElement>
               <div className='buttons'>

@@ -12,6 +12,7 @@ module.exports = {
         test: /\.js$/,
         loader: 'babel-loader',
         options: {
+          plugins: ['transform-class-properties'],
           presets: [
             'react',
             'flow',

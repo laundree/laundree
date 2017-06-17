@@ -24,7 +24,7 @@ type LocationSelectorState = {
 type LocationSelectorProps = {
   googleApiKey: string,
   locale: LocaleType,
-  onChange: (string) => void,
+  onChange:(string) => void,
   value: string
 }
 
@@ -129,7 +129,7 @@ class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSele
       </ul>
     }
     return <div className='dropDownMessage'>
-      <FormattedMessage id={this.message()}/>
+      <FormattedMessage id={this.message()} />
     </div>
   }
 

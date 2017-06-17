@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import { FormattedMessage } from 'react-intl'
+import type { Flash } from 'laundree-sdk/lib/redux'
 
 type LoginProps = {
   to?: string,
@@ -71,7 +72,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                 name='username'
                 placeholder='general.email-address'
                 value={this.state.values.email || ''}
-                onChange={this.generateValueEventUpdater(email => ({email}))}/>
+                onChange={this.generateValueEventUpdater(email => ({email}))} />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -82,7 +83,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
               <Input
                 type='password' name='password' placeholder='general.password'
                 value={this.state.values.password || ''}
-                onChange={this.generateValueUpdater(password => ({password}))}/>
+                onChange={this.generateValueUpdater(password => ({password}))} />
             </Label>
           </ValidationElement>
           <div className='buttons'>

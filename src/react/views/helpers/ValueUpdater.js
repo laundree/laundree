@@ -28,7 +28,7 @@ export default class ValueUpdater<V: {}, Props, State: {}> extends React.Compone
     this.setState(({values: vals}) => ({...state, values: {...vals, values}}))
   }
 
-  generateValueEventUpdater (m: (string, V) => $Shape<V>) {
+  generateValueEventUpdater (m:(string, V) => $Shape<V>) {
     return (evt: Event) => {
       if (!evt.target || typeof evt.target.value !== 'string') {
         throw new Error('Could not fetch value')
@@ -41,7 +41,7 @@ export default class ValueUpdater<V: {}, Props, State: {}> extends React.Compone
     }
   }
 
-  generateValueUpdater<X> (map: (X, V) => $Shape<V>): (X) => void {
+  generateValueUpdater<X> (map:(X, V) => $Shape<V>):(X) => void {
     return (evt: X) => {
       this.setState(({values}) => {
         const newValues: $Shape<V> = map(evt, values)

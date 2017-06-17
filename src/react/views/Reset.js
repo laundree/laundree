@@ -23,7 +23,7 @@ type ResetState = {
 
 export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetState> {
 
-  initialState (): State {
+  initialState (): ResetState {
     return {loading: false}
   }
 
@@ -40,11 +40,11 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
       .then(
         () => this.reset({
           loading: false,
-          notion: {message: <FormattedMessage id='auth.reset.success'/>, success: true}
+          notion: {message: <FormattedMessage id='auth.reset.success' />, success: true}
         }),
         () => this.setState({
           loading: false,
-          notion: {message: <FormattedMessage id='auth.reset.error'/>, success: false}
+          notion: {message: <FormattedMessage id='auth.reset.error' />, success: false}
         }))
   }
 

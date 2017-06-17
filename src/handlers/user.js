@@ -8,10 +8,10 @@ import UserModel from '../models/user'
 import type { Profile, UserRole } from '../models/user'
 import utils from '../utils'
 import uuid from 'uuid'
-import { redux } from 'laundree-sdk'
 import config from 'config'
 import Debug from 'debug'
 import LaundryHandler from './laundry'
+import type {User} from 'laundree-sdk/lib/redux'
 
 const debug = Debug('laundree.handlers.user')
 
@@ -187,7 +187,7 @@ function displayNameToName (displayName) {
  * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string=, middleName: string=, givenName: string=}, emails: {value: string, type: string=}[], photos: {value: string}[]=}} Profile
  */
 
-export default class UserHandler extends Handler {
+export default class UserHandler extends Handler<UserModel, User> {
   static lib = new UserHandlerLibrary()
   lib = UserHandler.lib
 
@@ -540,7 +540,7 @@ export default class UserHandler extends Handler {
 
   restUrl = `/api/users/${this.model.id}`
 
-  photo () {
+  photo (): ?string {
     const profile = this.model.latestProfile
     const photo = profile.photos && profile.photos.length && profile.photos[0].value
     if (!photo) return null
@@ -587,10 +587,10 @@ export default class UserHandler extends Handler {
     }
   }
 
-  reduxModel () {
+  reduxModel (): User {
     return {
       id: this.model.id,
-      photo: this.photo(),
+      photo: this.photo() || `/identicon/${utils.string.hash(this.model.id)}/150.svg`,
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,

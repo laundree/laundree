@@ -10,6 +10,7 @@ import sdk from './sdk'
 import App from '../react/containers/App'
 import ReactGA from 'react-ga'
 import { redux } from 'laundree-sdk'
+import type { State } from 'laundree-sdk/lib/redux'
 
 ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
 
@@ -37,10 +38,11 @@ function setup () {
   const rootElement = document.querySelector('#AppRoot')
   if (!rootElement) return
   const store = setupStore()
-  const locale = store.getState().config.locale
+  const state: State = store.getState()
+  const locale = state.config.locale || 'en'
   ReactDOM.render(
     <BrowserRouter>
-      <App store={store} locale={locale}/>
+      <App store={store} locale={locale} />
     </BrowserRouter>,
     rootElement)
 }
