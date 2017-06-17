@@ -36,13 +36,13 @@ class CreateLaundry extends ValueUpdater {
     let message
     switch (err.status) {
       case 409:
-        message = <FormattedMessage id='home.logged-in.error.duplicate'/>
+        message = <FormattedMessage id='home.logged-in.error.duplicate' />
         break
       case 500:
-        message = <FormattedMessage id='home.logged-in.error.duplicate'/>
+        message = <FormattedMessage id='home.logged-in.error.duplicate' />
         break
       default:
-        message = <FormattedMessage id='home.logged-in.error.unknown'/>
+        message = <FormattedMessage id='home.logged-in.error.unknown' />
     }
     return {success: false, message}
   }
@@ -54,9 +54,9 @@ class CreateLaundry extends ValueUpdater {
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
       <main id='CreateLaundry'>
-        <FormattedMessage id='home.logged-in.title' tagName='h1'/>
+        <FormattedMessage id='home.logged-in.title' tagName='h1' />
         <section>
-          <FormattedMessage tagName='div' id='home.logged-in.message'/>
+          <FormattedMessage tagName='div' id='home.logged-in.message' />
           <div className={this.calculateClassName()}>
             <ValidationForm className={this.state.loading ? 'blur' : ''} onSubmit={this.onSubmit}>
               {this.renderNotion()}
@@ -64,7 +64,7 @@ class CreateLaundry extends ValueUpdater {
                 <Label data-validate-error='home.logged-in.error.invalid-laundry-name'>
                   <Input
                     type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}
-                    placeholder='general.laundry-name'/>
+                    placeholder='general.laundry-name' />
                 </Label>
               </ValidationElement>
               <ValidationElement value={this.state.values.placeId} nonEmpty>
@@ -73,20 +73,20 @@ class CreateLaundry extends ValueUpdater {
                     locale={this.props.locale}
                     googleApiKey={this.props.googleApiKey}
                     value={this.state.values.placeId}
-                    onChange={this.generateValueUpdater('placeId')}/>
+                    onChange={this.generateValueUpdater('placeId')} />
                 </Label>
               </ValidationElement>
               <div className='buttons'>
-                <Submit value='general.create'/>
+                <Submit value='general.create' />
               </div>
             </ValidationForm>
             <div className='expand_button'>
               <button onClick={this.expander}>
-                <FormattedMessage id='home.logged-in.button.create'/>
+                <FormattedMessage id='home.logged-in.button.create' />
               </button>
             </div>
           </div>
-          <FormattedMessage tagName='div' id='home.logged-in.message.tenant'/>
+          <FormattedMessage tagName='div' id='home.logged-in.message.tenant' />
         </section>
       </main>
     </DocumentTitle>

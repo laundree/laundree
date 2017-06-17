@@ -5,7 +5,7 @@ const locales = require('../../locales')
 const LocaleSelect = props => <DropDown className='language'>
   <DropDownTitle>
     <svg>
-      <use xlinkHref='#Globe'/>
+      <use xlinkHref='#Globe' />
     </svg>
   </DropDownTitle>
   <DropDownContent className='right'>

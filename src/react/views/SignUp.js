@@ -24,14 +24,14 @@ class SignUp extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
+            notion: {message: <FormattedMessage id='auth.signup.success' />, success: true}
           }),
           err => this.setState({
             loading: false,
             notion: {
               message: <FormattedMessage id={err.status === 409
                 ? 'auth.signup.error.already-exists'
-                : 'auth.signup.error'}/>
+                : 'auth.signup.error'} />
             }
           }))
     }
@@ -44,28 +44,28 @@ class SignUp extends ValueUpdater {
   render () {
     return <DocumentTitle title='document-title.signup'>
       <div>
-        <FormattedMessage id='auth.signup.title' tagName='h1'/>
+        <FormattedMessage id='auth.signup.title' tagName='h1' />
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <div className='auth_alternatives'>
           <a href={'/auth/facebook' + this.query} className='facebook'>
             <svg>
-              <use xlinkHref='#Facebook'/>
+              <use xlinkHref='#Facebook' />
             </svg>
-            <FormattedMessage id='auth.signup.method.facebook'/>
+            <FormattedMessage id='auth.signup.method.facebook' />
           </a>
           <a href={'/auth/google' + this.query} className='google'>
             <svg>
-              <use xlinkHref='#GooglePlus'/>
+              <use xlinkHref='#GooglePlus' />
             </svg>
-            <FormattedMessage id='auth.signup.method.google'/>
+            <FormattedMessage id='auth.signup.method.google' />
           </a>
         </div>
         <div className='or'>
-          <FormattedMessage id='general.or'/>
+          <FormattedMessage id='general.or' />
         </div>
         <ValidationForm
           sesh={this.state.sesh}
@@ -97,7 +97,7 @@ class SignUp extends ValueUpdater {
               <Input
                 value={this.state.values.email || ''}
                 onChange={this.generateValueUpdater('email')}
-                type='text' name='email' placeholder='general.email-address'/>
+                type='text' name='email' placeholder='general.email-address' />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -109,7 +109,7 @@ class SignUp extends ValueUpdater {
               <Input
                 value={this.state.values.password || ''}
                 onChange={this.generateValueUpdater('password')}
-                type='password' name='password' placeholder='general.password'/>
+                type='password' name='password' placeholder='general.password' />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -121,7 +121,7 @@ class SignUp extends ValueUpdater {
               <Input
                 value={this.state.values.password2 || ''}
                 onChange={this.generateValueUpdater('password2')}
-                type='password' name='password' placeholder='general.repeat-password'/>
+                type='password' name='password' placeholder='general.repeat-password' />
             </Label>
           </ValidationElement>
           <div className='accept'>
@@ -129,17 +129,17 @@ class SignUp extends ValueUpdater {
               toc: <a
                 href='/terms-and-conditions'
                 target='_blank'>
-                <FormattedMessage id='general.toc'/>
+                <FormattedMessage id='general.toc' />
               </a>,
               pp: <a href='/privacy' target='_blank'>
-                <FormattedMessage id='general.privacy-policy'/>
+                <FormattedMessage id='general.privacy-policy' />
               </a>
-            }}/>
+            }} />
           </div>
           <div className='buttons'>
             <Submit
               value='general.create-account'
-              className='create'/>
+              className='create' />
           </div>
           <div className='forgot'>
             <div>
@@ -147,9 +147,9 @@ class SignUp extends ValueUpdater {
                 id='auth.links.login'
                 values={{
                   link: <Link to={'/auth' + this.query}>
-                    <FormattedMessage id='auth.links.login.link'/>
+                    <FormattedMessage id='auth.links.login.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
             <div>
               <FormattedMessage
@@ -158,9 +158,9 @@ class SignUp extends ValueUpdater {
                   link: <Link
                     to='/auth/forgot'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.forgot.link'/>
+                    <FormattedMessage id='auth.links.forgot.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
           </div>
         </ValidationForm>

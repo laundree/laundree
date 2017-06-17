@@ -22,14 +22,14 @@ class Forgot extends ValueUpdater {
             this.reset({
               loading: false,
               notion: {
-                message: <FormattedMessage id='auth.forgot.success'/>,
+                message: <FormattedMessage id='auth.forgot.success' />,
                 success: true
               }
             }),
           () => this.setState({
             loading: false,
             notion: {
-              message: <FormattedMessage id='auth.forgot.error'/>,
+              message: <FormattedMessage id='auth.forgot.error' />,
               success: false
             }
           }))
@@ -39,10 +39,10 @@ class Forgot extends ValueUpdater {
   render () {
     return <DocumentTitle title='document-title.forgot'>
       <div>
-        <FormattedMessage tagName='h1' id='auth.forgot.title'/>
+        <FormattedMessage tagName='h1' id='auth.forgot.title' />
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <ValidationForm
@@ -61,11 +61,11 @@ class Forgot extends ValueUpdater {
                 onChange={this.generateValueUpdater('email')}
                 value={this.state.values.email || ''}
                 type='text' name='email'
-                placeholder='general.email-address'/>
+                placeholder='general.email-address' />
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.reset'/>
+            <Submit value='general.reset' />
           </div>
           <div className='forgot'>
             <div>
@@ -73,9 +73,9 @@ class Forgot extends ValueUpdater {
                 id='auth.links.login3'
                 values={{
                   link: <Link to='/auth'>
-                    <FormattedMessage id='auth.links.login3.link'/>
+                    <FormattedMessage id='auth.links.login3.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
             <div>
               <FormattedMessage
@@ -84,9 +84,9 @@ class Forgot extends ValueUpdater {
                   link: <Link
                     to='/auth/sign-up'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link'/>
+                    <FormattedMessage id='auth.links.signup.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
           </div>
         </ValidationForm>

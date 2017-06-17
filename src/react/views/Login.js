@@ -16,8 +16,8 @@ class Login extends ValueUpdater {
       <FormattedMessage
         id={message}
         values={{
-          link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link'/></Link>
-        }}/>
+          link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link' /></Link>
+        }} />
     </div>
   }
 
@@ -28,28 +28,28 @@ class Login extends ValueUpdater {
   render () {
     return <DocumentTitle title='document-title.login'>
       <div>
-        <FormattedMessage tagName='h1' id='auth.login.title'/>
+        <FormattedMessage tagName='h1' id='auth.login.title' />
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <div className='auth_alternatives'>
           <a href={'/auth/facebook' + this.query} className='facebook'>
             <svg>
-              <use xlinkHref='#Facebook'/>
+              <use xlinkHref='#Facebook' />
             </svg>
-            <FormattedMessage id='auth.login.method.facebook'/>
+            <FormattedMessage id='auth.login.method.facebook' />
           </a>
           <a href={'/auth/google' + this.query} className='google'>
             <svg>
-              <use xlinkHref='#GooglePlus'/>
+              <use xlinkHref='#GooglePlus' />
             </svg>
-            <FormattedMessage id='auth.login.method.google'/>
+            <FormattedMessage id='auth.login.method.google' />
           </a>
         </div>
         <div className='or'>
-          <FormattedMessage id='general.or'/>
+          <FormattedMessage id='general.or' />
         </div>
         <ValidationForm id='SignIn' method='post' action={'/auth/local' + this.query}>
           {this.handleNotion()}
@@ -61,7 +61,7 @@ class Login extends ValueUpdater {
                 name='username'
                 placeholder='general.email-address'
                 value={this.state.values.email || ''}
-                onChange={this.generateValueUpdater('email')}/>
+                onChange={this.generateValueUpdater('email')} />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -72,11 +72,11 @@ class Login extends ValueUpdater {
               <Input
                 type='password' name='password' placeholder='general.password'
                 value={this.state.values.password || ''}
-                onChange={this.generateValueUpdater('password')}/>
+                onChange={this.generateValueUpdater('password')} />
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.login'/>
+            <Submit value='general.login' />
           </div>
           <div className='forgot'>
             <div>
@@ -86,9 +86,9 @@ class Login extends ValueUpdater {
                   link: <Link
                     to='/auth/forgot'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.forgot.link'/>
+                    <FormattedMessage id='auth.links.forgot.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
             <div>
               <FormattedMessage
@@ -97,9 +97,9 @@ class Login extends ValueUpdater {
                   link: <Link
                     to='/auth/sign-up'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link'/>
+                    <FormattedMessage id='auth.links.signup.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
           </div>
         </ValidationForm>
@@ -108,12 +108,12 @@ class Login extends ValueUpdater {
             toc: <a
               href='/terms-and-conditions'
               target='_blank'>
-              <FormattedMessage id='general.toc'/>
+              <FormattedMessage id='general.toc' />
             </a>,
             pp: <a href='/privacy' target='_blank'>
-              <FormattedMessage id='general.privacy-policy'/>
+              <FormattedMessage id='general.privacy-policy' />
             </a>
-          }}/>
+          }} />
         </div>
       </div>
     </DocumentTitle>

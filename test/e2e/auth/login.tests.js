@@ -37,27 +37,6 @@ module.exports = {
           .end()
       })
   },
-/*
-  Not relevant anymore
-  'Can be marked returning': client => {
-    client
-      .url(client.launch_url)
-    user
-      .generateVerifyEmailToken(email)
-      .then(token => user.verifyEmail(email, token.secret))
-      .then(() => {
-        signIn(client, email, password)
-          .waitForElementVisible('#CreateLaundry', timeout)
-          .click('#TopNav .rightNav .dropDown.user .dropDownTitle img')
-          .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
-          .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
-          .click('#TopNav .rightNav .user .dropDownContent li:last-of-type a')
-          .waitForElementPresent('#Home #Logo', timeout)
-          .expect.element('#TopNav .rightNav a.auth.signUp').text.to.match(/[lL][oO][gG] [Ii][nN]/)
-        client.end()
-      })
-  },
-*/
   'Can reset password': client => {
     client
       .url(client.launch_url)

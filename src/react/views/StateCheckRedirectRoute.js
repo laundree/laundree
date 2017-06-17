@@ -8,9 +8,9 @@ const StateCheckRedirectRoute = ({test, component: Component, state, redirectTo,
   <Route
     path={path}
     render={props => test(state)
-      ? <Component {...props}/>
-      : <Redirect to={redirectTo}/>
-    }/>
+      ? <Component {...props} />
+      : <Redirect to={redirectTo} />
+    } />
 )
 
 StateCheckRedirectRoute.propTypes = {
