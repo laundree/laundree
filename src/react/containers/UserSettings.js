@@ -1,12 +1,10 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const UserSettings = require('../views/UserSettings')
+import {connect} from 'react-redux'
+import UserSettings from '../views/UserSettings'
 
 const mapStateToProps = ({users, laundries, currentUser}, {match: {params: {userId}}}) => {
   return {currentUser, user: userId, users, laundries}
 }
 
-module.exports = connect(mapStateToProps)(UserSettings)
+export default connect(mapStateToProps)(UserSettings)

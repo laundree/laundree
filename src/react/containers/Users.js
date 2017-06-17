@@ -1,9 +1,7 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const Users = require('../views/Users')
+import {connect} from 'react-redux'
+import Users from '../views/Users'
 
 const mapStateToProps = ({laundries, users, invites, currentUser, config: {locale}}, {match: {params: {laundryId}}}) => {
   return {
@@ -15,4 +13,4 @@ const mapStateToProps = ({laundries, users, invites, currentUser, config: {local
   }
 }
 
-module.exports = connect(mapStateToProps)(Users)
+export default connect(mapStateToProps)(Users)

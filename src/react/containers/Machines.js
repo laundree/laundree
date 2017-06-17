@@ -1,9 +1,7 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const Machines = require('../views/Machines')
+import {connect} from 'react-redux'
+import Machines from '../views/Machines'
 
 const mapStateToProps = ({users, currentUser, laundries, machines}, {match: {params: {laundryId}}}) => {
   return {
@@ -13,5 +11,4 @@ const mapStateToProps = ({users, currentUser, laundries, machines}, {match: {par
     currentLaundry: laundryId
   }
 }
-
-module.exports = connect(mapStateToProps)(Machines)
+export default connect(mapStateToProps)(Machines)

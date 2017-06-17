@@ -7,11 +7,11 @@ import { BrowserRouter } from 'react-router-dom'
 import io from 'socket.io-client'
 import { createStore } from 'redux'
 import sdk from './sdk'
-import App from '../react/containers/App'
+import App from '../react/views/App'
 import ReactGA from 'react-ga'
 import { redux } from 'laundree-sdk'
 import type { State } from 'laundree-sdk/lib/redux'
-
+import {toLocale} from '../locales'
 ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
 
 const debug = Debug('laundree.initializers.app')
@@ -39,7 +39,7 @@ function setup () {
   if (!rootElement) return
   const store = setupStore()
   const state: State = store.getState()
-  const locale = state.config.locale || 'en'
+  const locale = toLocale(state.config.locale || '', 'en')
   ReactDOM.render(
     <BrowserRouter>
       <App store={store} locale={locale} />

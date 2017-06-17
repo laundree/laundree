@@ -1,5 +1,6 @@
-const connect = require('react-redux').connect
-const Home = require('../views/Home')
+// @flow
+import {connect} from 'react-redux'
+import Home from '../views/Home'
 
 const mapStateToProps = ({users, currentUser}) => {
   return {users, currentUser}
