@@ -25,7 +25,7 @@ class BaseModal extends React.Component {
   render () {
     if (!this.props.show) return null
     return <div className='confirmation_container'>
-      <div className='confirmation_overlay' onClick={this.props.onClose}/>
+      <div className='confirmation_overlay' onClick={this.props.onClose} />
       <div className='confirmation_box'>
         {this.renderContent() || this.props.children}
       </div>

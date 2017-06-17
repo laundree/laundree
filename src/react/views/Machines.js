@@ -18,7 +18,7 @@ class MachineDropdown extends React.Component {
     return <DropDown>
       <DropDownTitle>
         <svg>
-          <use xlinkHref={this.props.selected === 'wash' ? '#Drop' : '#Waves'}/>
+          <use xlinkHref={this.props.selected === 'wash' ? '#Drop' : '#Waves'} />
         </svg>
       </DropDownTitle>
       <DropDownContent>
@@ -27,9 +27,9 @@ class MachineDropdown extends React.Component {
             <li className={this.props.selected === 'wash' ? 'active' : ''} onClick={this.selectGenerator('wash')}>
               <span className='link'>
                 <svg>
-                  <use xlinkHref='#Drop'/>
+                  <use xlinkHref='#Drop' />
                 </svg>
-                <FormattedMessage id='machines.washing-machine'/>
+                <FormattedMessage id='machines.washing-machine' />
               </span>
             </li>
           </DropDownCloser>
@@ -37,9 +37,9 @@ class MachineDropdown extends React.Component {
             <li className={this.props.selected === 'dry' ? 'active' : ''} onClick={this.selectGenerator('dry')}>
               <span className='link'>
                 <svg>
-                  <use xlinkHref='#Waves'/>
+                  <use xlinkHref='#Waves' />
                 </svg>
-                <FormattedMessage id='machines.dryer'/>
+                <FormattedMessage id='machines.dryer' />
               </span>
             </li>
           </DropDownCloser>
@@ -147,7 +147,7 @@ class MachineListItem extends React.Component {
         className={'machineForm ' + (this.broken ? 'broken' : '')}
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
-        <MachineDropdown selected={this.selected} onSelect={this.onSelect}/>
+        <MachineDropdown selected={this.selected} onSelect={this.onSelect} />
         <ValidationElement
           sesh={this.state.sesh}
           trim
@@ -158,13 +158,13 @@ class MachineListItem extends React.Component {
               onBlur={this.onUpdateName}
               type='text'
               placeholder={this.selected === 'wash' ? 'machines.washing-machine-name' : 'machines.dryer-name'}
-              value={this.value} onChange={this.onChange}/>
+              value={this.value} onChange={this.onChange} />
           </Label>
         </ValidationElement>
         {this.props.onDelete
           ? <div className='delete action'>
             <svg onClick={this.onDelete}>
-              <use xlinkHref='#Trash'/>
+              <use xlinkHref='#Trash' />
             </svg>
           </div>
           : null
@@ -172,7 +172,7 @@ class MachineListItem extends React.Component {
         {this.props.onUpdate
           ? <div className={`repair action`}>
             <svg onClick={() => this.props.onUpdate({broken: !this.broken})}>
-              <use xlinkHref={this.broken ? '#MediaWrenchX' : '#MediaWrenchCheck'}/>
+              <use xlinkHref={this.broken ? '#MediaWrenchX' : '#MediaWrenchCheck'} />
             </svg>
           </div>
           : null }
@@ -218,7 +218,7 @@ class Machines extends React.Component {
     const laundry = this.laundry
     if (!laundry.machines.length) {
       return <div className='empty_list'>
-        <FormattedMessage id='machines.no-machines'/>
+        <FormattedMessage id='machines.no-machines' />
       </div>
     }
     return <ul className='machine_list'>
@@ -227,7 +227,7 @@ class Machines extends React.Component {
           blacklist={this.blacklist}
           machine={this.props.machines[machineId]}
           onUpdate={params => sdk.machine(machineId).updateMachine(params)}
-          onDelete={() => sdk.machine(machineId).del()}/>
+          onDelete={() => sdk.machine(machineId).del()} />
       </li>)}
     </ul>
   }
@@ -236,15 +236,15 @@ class Machines extends React.Component {
     return <DocumentTitle title='document-title.machines'>
       <Loader loader={() => this.load()}>
         <main className='naved' id='LaundryMain'>
-          <FormattedMessage id='machines.title' tagName='h1'/>
+          <FormattedMessage id='machines.title' tagName='h1' />
           {this.renderMachineList()}
           <div className='create_machine'>
-            <FormattedMessage id='machines.create-machine.title' tagName='h2'/>
+            <FormattedMessage id='machines.create-machine.title' tagName='h2' />
             <MachineListItem
               blacklist={this.blacklist}
               onSubmit={this.creator}>
               <div className='buttons'>
-                <Submit value='general.create'/>
+                <Submit value='general.create' />
               </div>
             </MachineListItem>
           </div>

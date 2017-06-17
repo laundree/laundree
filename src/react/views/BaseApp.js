@@ -18,29 +18,29 @@ const UserSettings = require('../containers/UserSettings')
 class BaseApp extends React.Component {
   renderContent () {
     return <Switch>
-      <Route exact path='/' component={Home}/>
-      <Route path='/about' component={About}/>
+      <Route exact path='/' component={Home} />
+      <Route path='/about' component={About} />
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/support'
         redirectTo={'/contact'}
-        component={Support}/>
+        component={Support} />
       <StateCheckRedirectRoute
         test={({currentUser}) => !currentUser}
         path='/contact'
         redirectTo={'/support'}
-        component={Contact}/>
+        component={Contact} />
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/laundries/:laundryId'
         redirectTo={'/auth'}
-        component={LeftNav}/>
+        component={LeftNav} />
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/users/:userId/settings'
         redirectTo={'/auth'}
-        component={UserSettings}/>
-      <Route component={NotFound}/>
+        component={UserSettings} />
+      <Route component={NotFound} />
     </Switch>
   }
 
@@ -52,7 +52,7 @@ class BaseApp extends React.Component {
           user={this.props.user}
           location={this.props.location}
           currentLaundry={this.props.currentLaundry}
-          laundries={this.props.laundries}/>
+          laundries={this.props.laundries} />
         {this.renderContent()}
         {this.props.user ? null : <Footer />}
       </div>

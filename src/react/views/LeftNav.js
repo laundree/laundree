@@ -13,10 +13,10 @@ const Users = require('../containers/Users')
 
 const OwnerCheckRoute = ({user, laundry, component: Component, path}) => <Route render={props => {
   if (user.role !== 'admin' && laundry.owners.indexOf(user.id) < 0) {
-    return <NotFound/>
+    return <NotFound />
   }
   return <Component {...props} />
-}}/>
+}} />
 
 OwnerCheckRoute.propTypes = {
   user: React.PropTypes.object.isRequired,
@@ -48,10 +48,10 @@ class LeftNav extends React.Component {
       <div className={this.state.expanded ? 'expanded_left_nav' : ''}>
         <div id='MenuExpander' onClick={this.toggleHandler}>
           <svg>
-            <use xlinkHref='#MenuLines'/>
+            <use xlinkHref='#MenuLines' />
           </svg>
           <svg className='close'>
-            <use xlinkHref='#CloseX'/>
+            <use xlinkHref='#CloseX' />
           </svg>
         </div>
         <nav id='LeftNav'>
@@ -61,9 +61,9 @@ class LeftNav extends React.Component {
                 to={'/laundries/' + this.laundry.id + '/timetable'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
-                  <use xlinkHref='#Time'/>
+                  <use xlinkHref='#Time' />
                 </svg>
-                <FormattedMessage id='leftnav.timetable'/>
+                <FormattedMessage id='leftnav.timetable' />
               </NavLink>
             </li>
             <li>
@@ -71,9 +71,9 @@ class LeftNav extends React.Component {
                 to={'/laundries/' + this.laundry.id + '/bookings'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
-                  <use xlinkHref='#List'/>
+                  <use xlinkHref='#List' />
                 </svg>
-                <FormattedMessage id='leftnav.own-bookings'/>
+                <FormattedMessage id='leftnav.own-bookings' />
               </NavLink>
             </li>
             {owner
@@ -82,9 +82,9 @@ class LeftNav extends React.Component {
                   to={'/laundries/' + this.laundry.id + '/machines'} activeClassName='active'
                   onClick={this.closeHandler}>
                   <svg>
-                    <use xlinkHref='#SimpleMachine'/>
+                    <use xlinkHref='#SimpleMachine' />
                   </svg>
-                  <FormattedMessage id='leftnav.machines'/>
+                  <FormattedMessage id='leftnav.machines' />
                 </NavLink>
               </li>
               : null}
@@ -94,23 +94,23 @@ class LeftNav extends React.Component {
                   to={'/laundries/' + this.laundry.id + '/users'} activeClassName='active'
                   onClick={this.closeHandler}>
                   <svg>
-                    <use xlinkHref='#Users'/>
+                    <use xlinkHref='#Users' />
                   </svg>
-                  <FormattedMessage id='leftnav.users'/>
+                  <FormattedMessage id='leftnav.users' />
                 </NavLink>
               </li>
               : null}
           </ul>
-          <hr/>
+          <hr />
           <ul>
             <li>
               <NavLink
                 to={'/laundries/' + this.laundry.id + '/settings'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
-                  <use xlinkHref='#Gears'/>
+                  <use xlinkHref='#Gears' />
                 </svg>
-                <FormattedMessage id='leftnav.settings'/>
+                <FormattedMessage id='leftnav.settings' />
               </NavLink>
             </li>
           </ul>
@@ -123,21 +123,21 @@ class LeftNav extends React.Component {
   renderContent () {
     return (
       <Switch>
-        <Redirect exact from='/laundries/:laundryId' to={`/laundries/${this.laundry.id}/timetable`}/>
-        <Route path='/laundries/:laundryId/timetable' component={Timetable}/>
-        <Route path='/laundries/:laundryId/bookings' component={Bookings}/>
-        <Route path='/laundries/:laundryId/settings' component={LaundrySettings}/>
+        <Redirect exact from='/laundries/:laundryId' to={`/laundries/${this.laundry.id}/timetable`} />
+        <Route path='/laundries/:laundryId/timetable' component={Timetable} />
+        <Route path='/laundries/:laundryId/bookings' component={Bookings} />
+        <Route path='/laundries/:laundryId/settings' component={LaundrySettings} />
         <OwnerCheckRoute
           user={this.props.user}
           laundry={this.laundry}
           path='/laundries/:laundryId/machines'
-          component={Machines}/>
+          component={Machines} />
         <OwnerCheckRoute
           user={this.props.user}
           laundry={this.laundry}
           path='/laundries/:laundryId/users'
-          component={Users}/>
-        <Route component={NotFound}/>
+          component={Users} />
+        <Route component={NotFound} />
       </Switch>
     )
   }

@@ -18,7 +18,7 @@ router.use((req, res, next) => {
       const context = {}
       const locale = req.locale
       const html = renderToString(<StaticRouter context={context} location={req.originalUrl}>
-        <App locale={locale} store={store}/>
+        <App locale={locale} store={store} />
       </StaticRouter>)
       if (context.url) {
         return res.redirect(302, context.url)

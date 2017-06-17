@@ -8,9 +8,9 @@ class Support extends React.Component {
     const user = this.props.users[this.props.currentUser]
     return <DocumentTitle title='document-title.signup'>
       <main id='Support' className='topNaved'>
-        <FormattedMessage tagName='h1' id='support.title'/>
-        <FormattedMessage tagName='section' id='support.message'/>
-        <ContactForm user={user.demo ? null : user}/>
+        <FormattedMessage tagName='h1' id='support.title' />
+        <FormattedMessage tagName='section' id='support.message' />
+        <ContactForm user={user.demo ? null : user} />
       </main>
     </DocumentTitle>
   }
