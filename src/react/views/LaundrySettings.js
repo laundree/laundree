@@ -23,9 +23,9 @@ class LaundrySettingsForm extends ValueUpdater {
   errorToMessage ({status, message}) {
     switch (status) {
       case 409:
-        return <FormattedMessage id='laundry-settings.name-or-place.error.duplicate'/>
+        return <FormattedMessage id='laundry-settings.name-or-place.error.duplicate' />
       case 400:
-        return <FormattedMessage id='laundry-settings.name-or-place.error.invalid-place'/>
+        return <FormattedMessage id='laundry-settings.name-or-place.error.invalid-place' />
       default:
         return message
     }
@@ -66,7 +66,7 @@ class LaundrySettingsForm extends ValueUpdater {
       {this.renderNotion()}
       <ValidationElement sesh={this.state.sesh} value={this.state.values.name} notOneOf={this.nameErrorValues} trim>
         <label data-validate-error={this.nameErrorMessage}>
-          <input type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')}/>
+          <input type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')} />
         </label>
       </ValidationElement>
       <ValidationElement
@@ -76,11 +76,11 @@ class LaundrySettingsForm extends ValueUpdater {
             googleApiKey={this.props.googleApiKey}
             locale={this.props.locale}
             value={this.state.values.place}
-            onChange={this.generateValueUpdater('place')}/>
+            onChange={this.generateValueUpdater('place')} />
         </Label>
       </ValidationElement>
       <div className='buttons'>
-        <Submit value='general.update'/>
+        <Submit value='general.update' />
       </div>
     </ValidationForm>
   }
@@ -108,7 +108,7 @@ class DeleteLaundry extends React.Component {
   render () {
     if (this.props.laundry.demo && this.props.user.role !== 'admin') {
       return <div className='text'>
-        <FormattedMessage id='laundry-settings.delete-laundry.demo'/>
+        <FormattedMessage id='laundry-settings.delete-laundry.demo' />
       </div>
     }
 
@@ -117,7 +117,7 @@ class DeleteLaundry extends React.Component {
         id='laundry-settings.delete-laundry.text'
         values={{
           nl: <br />
-        }}/>
+        }} />
       <Modal
         show={this.state.modalOpen}
         onClose={this.handleCloseModal}
@@ -125,10 +125,10 @@ class DeleteLaundry extends React.Component {
         actions={[
           {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
           {label: 'general.no', action: this.handleCloseModal}
-        ]}/>
+        ]} />
       <div className='buttonContainer'>
         <button onClick={this.handleOpenModal} className='red'>
-          <FormattedMessage id='general.delete-laundry'/>
+          <FormattedMessage id='general.delete-laundry' />
         </button>
       </div>
     </div>
@@ -157,7 +157,7 @@ class LeaveLaundry extends React.Component {
 
   render () {
     return <div className='text'>
-      <FormattedMessage id='laundry-settings.leave-laundry.text'/>
+      <FormattedMessage id='laundry-settings.leave-laundry.text' />
       <Modal
         show={this.state.modalOpen}
         onClose={this.handleCloseModal}
@@ -165,10 +165,10 @@ class LeaveLaundry extends React.Component {
         actions={[
           {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
           {label: 'general.no', action: this.handleCloseModal}
-        ]}/>
+        ]} />
       <div className='buttonContainer'>
         <button onClick={this.handleOpenModal} className='red'>
-          <FormattedMessage id='general.leave-laundry'/>
+          <FormattedMessage id='general.leave-laundry' />
         </button>
       </div>
     </div>
@@ -334,12 +334,12 @@ class BookingRules extends ValueUpdater {
     return <ValidationForm id='BookingRules' onSubmit={this.handleSubmit}>
       <ValidationElement
         validator={this.validateValues}
-        value={this.state.values}/>
+        value={this.state.values} />
       <div className='rule'>
         <ValidationElement value={this.state.values.timeLimitEnable ? 'on' : 'off'}>
           <Switch
             on={this.state.values.timeLimitEnable}
-            onChange={this.generateSwitchUpdater('timeLimitEnable')}/>
+            onChange={this.generateSwitchUpdater('timeLimitEnable')} />
         </ValidationElement>
         <div className={'ruleText ' + (this.state.values.timeLimitEnable ? 'on' : 'off')}>
           <FormattedMessage
@@ -350,23 +350,23 @@ class BookingRules extends ValueUpdater {
                 type='text'
                 value={this.state.values.timeLimitFrom}
                 onBlur={this.generateValueMapper('timeLimitFrom', this.timeMap)}
-                onChange={this.generateValueUpdater('timeLimitFrom')}/>,
+                onChange={this.generateValueUpdater('timeLimitFrom')} />,
               toInput: <input
                 onBlur={this.generateValueMapper('timeLimitTo', this.timeMap)}
                 type='text' value={this.state.values.timeLimitTo}
-                onChange={this.generateValueUpdater('timeLimitTo')}/>
+                onChange={this.generateValueUpdater('timeLimitTo')} />
             }}
           />
           <ValidationElement
             validator={this.fromToValidator}
-            value={{from: this.state.values.timeLimitFrom, to: this.state.values.timeLimitTo}}/>
+            value={{from: this.state.values.timeLimitFrom, to: this.state.values.timeLimitTo}} />
         </div>
       </div>
       <div className='rule'>
         <ValidationElement value={this.state.values.dailyLimitEnable ? 'on' : 'off'}>
           <Switch
             on={this.state.values.dailyLimitEnable}
-            onChange={this.generateSwitchUpdater('dailyLimitEnable')}/>
+            onChange={this.generateSwitchUpdater('dailyLimitEnable')} />
         </ValidationElement>
         <div className={'ruleText ' + (this.state.values.dailyLimitEnable ? 'on' : 'off')}>
           <FormattedMessage
@@ -376,16 +376,16 @@ class BookingRules extends ValueUpdater {
               hourInput: <input
                 onBlur={this.generateValueMapper('dailyLimit', this.numberMap)}
                 type='text' value={this.state.values.dailyLimit}
-                onChange={this.generateValueUpdater('dailyLimit')}/>,
+                onChange={this.generateValueUpdater('dailyLimit')} />,
               hour: this.state.values.dailyLimit
-            }}/>
+            }} />
         </div>
       </div>
       <div className='rule'>
         <ValidationElement value={this.state.values.limitEnable ? 'on' : 'off'}>
           <Switch
             on={this.state.values.limitEnable}
-            onChange={this.generateSwitchUpdater('limitEnable')}/>
+            onChange={this.generateSwitchUpdater('limitEnable')} />
         </ValidationElement>
         <div className={'ruleText ' + (this.state.values.limitEnable ? 'on' : 'off')}>
           <FormattedMessage
@@ -395,13 +395,13 @@ class BookingRules extends ValueUpdater {
               hourInput: <input
                 onBlur={this.generateValueMapper('limit', this.numberMap)}
                 type='text' value={this.state.values.limit}
-                onChange={this.generateValueUpdater('limit')}/>,
+                onChange={this.generateValueUpdater('limit')} />,
               hour: this.state.values.limit
-            }}/>
+            }} />
         </div>
       </div>
       <div className='buttonContainer'>
-        <FormattedMessage tagName='button' id='general.update'/>
+        <FormattedMessage tagName='button' id='general.update' />
       </div>
     </ValidationForm>
   }
@@ -420,16 +420,16 @@ class LaundrySettings extends React.Component {
     if (!this.isOwner) return null
     return <div>
       <section id='LaundrySettingsNameOrPlace'>
-        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title'/>
-        <LaundrySettingsForm laundry={this.laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale}/>
+        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title' />
+        <LaundrySettingsForm laundry={this.laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale} />
       </section>
       <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title'/>
-        <BookingRules laundry={this.laundry}/>
+        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title' />
+        <BookingRules laundry={this.laundry} />
       </section>
       <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title'/>
-        <DeleteLaundry laundry={this.laundry} user={this.props.user}/>
+        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title' />
+        <DeleteLaundry laundry={this.laundry} user={this.props.user} />
       </section>
     </div>
   }
@@ -440,8 +440,8 @@ class LaundrySettings extends React.Component {
 
   renderUserSettings () {
     return <section>
-      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2'/>
-      <LeaveLaundry laundry={this.laundry} user={this.props.user}/>
+      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2' />
+      <LeaveLaundry laundry={this.laundry} user={this.props.user} />
     </section>
   }
 
@@ -449,7 +449,7 @@ class LaundrySettings extends React.Component {
     if (!this.laundry) return null
     return <DocumentTitle title='document-title.laundry-settings'>
       <main className='naved' id='LaundrySettings'>
-        <FormattedMessage id='laundry-settings.title' tagName='h1'/>
+        <FormattedMessage id='laundry-settings.title' tagName='h1' />
         {this.isOwner ? this.renderOwnerSettings() : this.renderUserSettings()}
       </main>
     </DocumentTitle>

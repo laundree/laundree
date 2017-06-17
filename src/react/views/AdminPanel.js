@@ -17,37 +17,37 @@ class Stats extends React.Component {
       <li>
         <span className='value'>{realUserCount}</span>
         <span className='label'>
-          <FormattedMessage id='admin-panel.users'/>
+          <FormattedMessage id='admin-panel.users' />
         </span>
       </li>
       <li>
         <span className='value'>{demoUserCount}</span>
         <span className='label'>
-          <FormattedMessage id='admin-panel.demo-users'/>
+          <FormattedMessage id='admin-panel.demo-users' />
         </span>
       </li>
       <li>
         <span className='value'>{realLaundryCount}</span>
         <span className='label'>
-          <FormattedMessage id='admin-panel.laundries'/>
+          <FormattedMessage id='admin-panel.laundries' />
         </span>
       </li>
       <li>
         <span className='value'>{demoLaundryCount}</span>
         <span className='label'>
-          <FormattedMessage id='admin-panel.demo-laundries'/>
+          <FormattedMessage id='admin-panel.demo-laundries' />
         </span>
       </li>
       <li>
         <span className='value'>{machineCount}</span>
         <span className='label'>
-          <FormattedMessage id='admin-panel.machines'/>
+          <FormattedMessage id='admin-panel.machines' />
         </span>
       </li>
       <li>
         <span className='value'>{bookingCount}</span>
         <span className='label'>
-          <FormattedMessage id='admin-panel.bookings'/>
+          <FormattedMessage id='admin-panel.bookings' />
         </span>
       </li>
     </ul>
@@ -64,7 +64,7 @@ class Stats extends React.Component {
 
   render () {
     return <section id='Stats'>
-      <FormattedMessage id='admin-panel.stats-title' tagName='h2'/>
+      <FormattedMessage id='admin-panel.stats-title' tagName='h2' />
       {this.renderStats()}
     </section>
   }
@@ -151,7 +151,7 @@ class QueryList extends React.Component {
     }
     return <div>
       <div className='nav'>
-        <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={() => this.prev()}/>
+        <span className={'prev link' + (this.currentPage === 0 ? ' inactive' : '')} onClick={() => this.prev()} />
         <FormattedMessage
           id='admin-panel.page-of'
           values={{
@@ -161,17 +161,17 @@ class QueryList extends React.Component {
         />
         <span
           className={'next link' + (this.currentPage === this.totalPages ? ' inactive' : '')}
-          onClick={() => this.next()}/>
+          onClick={() => this.next()} />
       </div>
       <div className='filter'>
         <label>
           <input
             type='text' placeholder='Filter' value={this.state.q || ''}
-            onChange={({target: {value}}) => this.updateFilter(value)}/>
+            onChange={({target: {value}}) => this.updateFilter(value)} />
         </label>
         <div className='demoSwitch'>
-          <Switch onChange={demoOn => this.toggleDemo(demoOn)} on={this.state.demoOn}/>
-          <FormattedMessage id='admin-panel.show-demo'/>
+          <Switch onChange={demoOn => this.toggleDemo(demoOn)} on={this.state.demoOn} />
+          <FormattedMessage id='admin-panel.show-demo' />
         </div>
       </div>
       {this.elements.length
@@ -191,11 +191,11 @@ QueryList.propTypes = {
 
 class LaundryList extends QueryList {
   renderLoading () {
-    return <FormattedMessage id='admin-panel.loading'/>
+    return <FormattedMessage id='admin-panel.loading' />
   }
 
   renderEmpty () {
-    return <FormattedMessage id='admin-panel.no-laundries'/>
+    return <FormattedMessage id='admin-panel.no-laundries' />
   }
 
   get elements () {
@@ -216,7 +216,7 @@ class LaundryList extends QueryList {
 
   render () {
     return <section id='LaundryList'>
-      <FormattedMessage id='admin-panel.laundries' tagName='h2'/>
+      <FormattedMessage id='admin-panel.laundries' tagName='h2' />
       {this.renderList()}
     </section>
   }
@@ -232,11 +232,11 @@ class UserList extends QueryList {
   }
 
   renderLoading () {
-    return <FormattedMessage id='admin-panel.loading'/>
+    return <FormattedMessage id='admin-panel.loading' />
   }
 
   renderEmpty () {
-    return <FormattedMessage id='admin-panel.no-users'/>
+    return <FormattedMessage id='admin-panel.no-users' />
   }
 
   get elements () {
@@ -246,7 +246,7 @@ class UserList extends QueryList {
   renderElement ({id, photo, displayName}) {
     return <div className='name'>
       <Link to={`/users/${id}/settings`}>
-        <img src={photo} className='avatar'/>
+        <img src={photo} className='avatar' />
         {displayName}
       </Link>
     </div>
@@ -254,7 +254,7 @@ class UserList extends QueryList {
 
   render () {
     return <section id='UserList'>
-      <FormattedMessage id='admin-panel.users' tagName='h2'/>
+      <FormattedMessage id='admin-panel.users' tagName='h2' />
 
       {this.renderList()}
     </section>
@@ -268,10 +268,10 @@ UserList.propTypes = {
 const AdminPanel = ({stats, laundries, users, userList, laundryList, laundryListSize, userListSize}) => {
   return <DocumentTitle title='document-title.administrator-panel'>
     <main id='AdminPanel' className='topNaved'>
-      <FormattedMessage id='admin-panel.title' tagName='h1'/>
-      <Stats stats={stats}/>
-      <LaundryList laundries={laundryList.map(id => laundries[id])} total={laundryListSize}/>
-      <UserList users={userList.map(id => users[id])} total={userListSize}/>
+      <FormattedMessage id='admin-panel.title' tagName='h1' />
+      <Stats stats={stats} />
+      <LaundryList laundries={laundryList.map(id => laundries[id])} total={laundryListSize} />
+      <UserList users={userList.map(id => users[id])} total={userListSize} />
     </main>
   </DocumentTitle>
 }

@@ -39,7 +39,7 @@ class TimetableTable extends React.Component {
       {machines
         .map((m, i) => {
           if (m.broken) {
-            return <td key={m.id} className='broken'/>
+            return <td key={m.id} className='broken' />
           }
           const isBooked = this.isBooked(m.id, key)
           if (isBooked) {
@@ -47,7 +47,7 @@ class TimetableTable extends React.Component {
               {this.createBookingLink(isBooked)}
             </td>
           }
-          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''}/>
+          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''} />
         })}
     </tr>
   }
@@ -61,7 +61,7 @@ class TimetableTable extends React.Component {
     const mine = this.isMine(bookingId)
     return <span
       onClick={this.generateActiveChangeHandler(bookingId)}
-      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')}/>
+      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')} />
   }
 
   isMine (bookingId) {
@@ -260,9 +260,9 @@ class TimetableTable extends React.Component {
         this.ref = ref
       }}>
       <div className='overlay'>
-        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}/>
+        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}} />
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
-          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
+          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time} /> : ''}
       </div>
       <table
         ref={ref => {
@@ -352,7 +352,7 @@ class TimetableTables extends React.Component {
           laundry={this.props.laundry}
           bookings={this.props.bookings}
           times={times}
-          key={date.format('YYYY-MM-DD')}/>)}
+          key={date.format('YYYY-MM-DD')} />)}
         {timeList}
       </div>
     </section>

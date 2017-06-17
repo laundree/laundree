@@ -13,7 +13,7 @@ class TopNav extends React.Component {
   }
 
   renderGlobe () {
-    return <LocaleSelect locale={this.props.config.locale} location={this.props.location}/>
+    return <LocaleSelect locale={this.props.config.locale} location={this.props.location} />
   }
 
   renderLaundries () {
@@ -48,7 +48,7 @@ class TopNav extends React.Component {
     return <nav id='TopNav'>
       <NavLink to='/' className='home' activeClassName='active'>
         <svg>
-          <use xlinkHref='#SmallLogo'/>
+          <use xlinkHref='#SmallLogo' />
         </svg>
       </NavLink>
       <div className='laundries'>
@@ -56,28 +56,28 @@ class TopNav extends React.Component {
       </div>
       <NavLink to='/support' className='icon help' activeClassName='active'>
         <svg>
-          <use xlinkHref='#LifeBuoy'/>
+          <use xlinkHref='#LifeBuoy' />
         </svg>
-        <FormattedMessage id='topnav.support'/>
+        <FormattedMessage id='topnav.support' />
       </NavLink>
       <div className='rightNav'>
         {this.renderGlobe()}
         <DropDown className='user'>
           <DropDownTitle>
-            <img src={this.props.user.photo} className='avatar'/>
+            <img src={this.props.user.photo} className='avatar' />
           </DropDownTitle>
           <DropDownContent className='right'>
             <ul className='dropDownList'>
               {this.props.user.demo ? null : <li>
                   <DropDownCloser>
                     <NavLink to={`/users/${this.props.user.id}/settings`} activeClassName='active'>
-                      <FormattedMessage id='topnav.manage'/>
+                      <FormattedMessage id='topnav.manage' />
                     </NavLink>
                   </DropDownCloser>
                 </li>}
               <li>
                 <a href='/logout'>
-                  <FormattedMessage id='topnav.logout'/>
+                  <FormattedMessage id='topnav.logout' />
                 </a>
               </li>
             </ul>
@@ -91,28 +91,28 @@ class TopNav extends React.Component {
     return <nav id='TopNav'>
       <NavLink to='/' className='home' activeClassName='active'>
         <svg>
-          <use xlinkHref='#SmallLogo'/>
+          <use xlinkHref='#SmallLogo' />
         </svg>
       </NavLink>
       <NavLink to='/about' className='icon about' activeClassName='active'>
         <svg>
-          <use xlinkHref='#Info'/>
+          <use xlinkHref='#Info' />
         </svg>
-        <FormattedMessage id='topnav.about'/>
+        <FormattedMessage id='topnav.about' />
       </NavLink>
       <NavLink to='/contact' className='icon contact' activeClassName='active'>
         <svg>
-          <use xlinkHref='#EMail4'/>
+          <use xlinkHref='#EMail4' />
         </svg>
-        <FormattedMessage id='topnav.contact'/>
+        <FormattedMessage id='topnav.contact' />
       </NavLink>
       <div className='rightNav'>
         {this.renderGlobe()}
         <NavLink to='/auth' className='auth'>
-          <FormattedMessage id='topnav.login'/>
+          <FormattedMessage id='topnav.login' />
         </NavLink>
         <NavLink to='/auth/sign-up' className='auth signUp'>
-          <FormattedMessage id='topnav.sign-up'/>
+          <FormattedMessage id='topnav.sign-up' />
         </NavLink>
       </div>
     </nav>

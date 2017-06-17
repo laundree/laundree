@@ -23,11 +23,11 @@ class Reset extends ValueUpdater {
         .then(
           () => this.reset({
             loading: false,
-            notion: {message: <FormattedMessage id='auth.reset.success'/>, success: true}
+            notion: {message: <FormattedMessage id='auth.reset.success' />, success: true}
           }),
           () => this.setState({
             loading: false,
-            notion: {message: <FormattedMessage id='auth.reset.error'/>, success: false}
+            notion: {message: <FormattedMessage id='auth.reset.error' />, success: false}
           }))
     }
   }
@@ -40,7 +40,7 @@ class Reset extends ValueUpdater {
         </h1>
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <ValidationForm
@@ -55,11 +55,11 @@ class Reset extends ValueUpdater {
               <Input
                 onChange={this.generateValueUpdater('password')}
                 value={this.state.values.password || ''}
-                type='password' name='password' placeholder='general.new-password'/>
+                type='password' name='password' placeholder='general.new-password' />
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.reset'/>
+            <Submit value='general.reset' />
           </div>
           <div className='forgot'>
             <div>
@@ -67,9 +67,9 @@ class Reset extends ValueUpdater {
                 id='auth.links.login3'
                 values={{
                   link: <Link to='/auth'>
-                    <FormattedMessage id='auth.links.login3.link'/>
+                    <FormattedMessage id='auth.links.login3.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
             <div>
               <FormattedMessage
@@ -78,9 +78,9 @@ class Reset extends ValueUpdater {
                   link: <Link
                     to='/auth/sign-up'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link'/>
+                    <FormattedMessage id='auth.links.signup.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
           </div>
         </ValidationForm>

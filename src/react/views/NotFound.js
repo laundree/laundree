@@ -10,7 +10,7 @@ const Status = ({code, children}) => (
       staticContext.statusCode = code
     }
     return children || null
-  }}/>
+  }} />
 )
 
 Status.propTypes = {
@@ -24,7 +24,7 @@ class NotFound extends React.Component {
   }
 
   render () {
-    return <Status code={404}/>
+    return <Status code={404} />
   }
 }
 

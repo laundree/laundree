@@ -16,7 +16,7 @@ class Switch extends React.Component {
   render () {
     return <div
       onClick={this.onClick}
-      className={'switch ' + (this.isOn ? 'on' : 'off')}/>
+      className={'switch ' + (this.isOn ? 'on' : 'off')} />
   }
 }
 

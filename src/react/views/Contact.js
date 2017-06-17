@@ -7,11 +7,11 @@ class Contact extends React.Component {
   render () {
     return <DocumentTitle title='document-title.contact'>
       <main id='Contact' className='topNaved'>
-        <h1><FormattedMessage id='contact.title'/></h1>
+        <h1><FormattedMessage id='contact.title' /></h1>
         <section>
-          <FormattedHTMLMessage id='contact.message'/>
+          <FormattedHTMLMessage id='contact.message' />
         </section>
-        <ContactForm/>
+        <ContactForm />
       </main>
     </DocumentTitle>
   }

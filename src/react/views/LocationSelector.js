@@ -104,7 +104,7 @@ class LocationSelector extends ValueUpdater {
       </ul>
     }
     return <div className='dropDownMessage'>
-      <FormattedMessage id={this.message}/>
+      <FormattedMessage id={this.message} />
     </div>
   }
 
@@ -125,7 +125,7 @@ class LocationSelector extends ValueUpdater {
       onFocus={() => this.setState({focus: true})}>
       <Input
         type='text' value={this.state.values.address} onChange={evt => this.handleAddressChange(evt)}
-        placeholder={!this.state.values.address && this.props.value ? 'location-selector.loading-placeholder' : 'general.address'}/>
+        placeholder={!this.state.values.address && this.props.value ? 'location-selector.loading-placeholder' : 'general.address'} />
       <div className='dropDownContent'>
         {this.renderDropDownContent()}
       </div>

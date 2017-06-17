@@ -26,16 +26,16 @@ class App extends React.Component {
                 redirectTo='/'
                 test={({currentUser}) => !currentUser}
                 path='/auth'
-                component={Auth}/>
-              <Route path='/privacy' component={Privacy}/>
-              <Route path='/terms-and-conditions' component={TermsAndConditions}/>
-              <Route path='/native-app' component={NativeApp}/>
-              <Route path='/native-app-v2' component={NativeAppV2}/>
-              <Route path='/laundries/:laundryId' component={BaseApp}/>
-              <Route path='/' component={BaseApp}/>
+                component={Auth} />
+              <Route path='/privacy' component={Privacy} />
+              <Route path='/terms-and-conditions' component={TermsAndConditions} />
+              <Route path='/native-app' component={NativeApp} />
+              <Route path='/native-app-v2' component={NativeAppV2} />
+              <Route path='/laundries/:laundryId' component={BaseApp} />
+              <Route path='/' component={BaseApp} />
             </Switch>
           </GAWrapper>
-        )}/>
+        )} />
       </Provider>
     </IntlProvider >
   }
