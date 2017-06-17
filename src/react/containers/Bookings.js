@@ -1,9 +1,7 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const Bookings = require('../views/Bookings')
+import {connect} from 'react-redux'
+import Bookings from '../views/Bookings'
 
 const mapStateToProps = ({
   users, laundries, machines,
@@ -19,4 +17,4 @@ const mapStateToProps = ({
   }
 }
 
-module.exports = connect(mapStateToProps)(Bookings)
+export default connect(mapStateToProps)(Bookings)

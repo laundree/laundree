@@ -1,8 +1,10 @@
-const connect = require('react-redux').connect
-const NativeAppV2 = require('../views/NativeAppV2')
+// @flow
+
+import {connect} from 'react-redux'
+import NativeAppV2 from '../views/NativeAppV2'
 
 const mapStateToProps = ({currentUser, users}) => {
   return {currentUser, users}
 }
 
-module.exports = connect(mapStateToProps)(NativeAppV2)
+export default connect(mapStateToProps)(NativeAppV2)

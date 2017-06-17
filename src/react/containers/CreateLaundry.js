@@ -1,12 +1,10 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const CreateLaundry = require('../views/CreateLaundry')
+import {connect} from 'react-redux'
+import CreateLaundry from '../views/CreateLaundry'
 
 const mapStateToProps = ({users, currentUser, config: {googleApiKey, locale}}) => {
   return {user: users[currentUser], googleApiKey, locale}
 }
 
-module.exports = connect(mapStateToProps)(CreateLaundry)
+export default connect(mapStateToProps)(CreateLaundry)
