@@ -8,6 +8,7 @@ import type UserHandler from './user'
 import type { QueryOptions, QueryConditions, ObjectId } from 'mongoose'
 import MachineHandler from './machine'
 import LaundryHandler from './laundry'
+import type {Booking} from 'laundree-sdk/lib/redux'
 
 class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, *> {
 

@@ -14,3 +14,12 @@ export type LocaleType = 'en' | 'da'
 
 export const supported: LocaleType[] = ['en', 'da']
 
+export function toLocale<A> (locale: A, def: LocaleType): LocaleType {
+  switch (locale) {
+    case 'en':
+    case 'da':
+      return locale
+    default:
+      return def
+  }
+}

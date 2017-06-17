@@ -8,6 +8,8 @@ import { FormattedMessage } from 'react-intl'
 import LocationSelector from './LocationSelector'
 import Switch from './Switch'
 import type { LocaleType } from '../../locales'
+import type { Laundry, User } from 'laundree-sdk/lib/redux'
+import type { LaundryModifier, Time, Hour, Minute } from 'laundree-sdk/lib/sdk'
 
 type LaundrySettingsFormValues = {
   name: string,
@@ -84,7 +86,7 @@ class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, Laundr
         <label data-validate-error={this.nameErrorMessage()}>
           <input
             type='text' value={this.state.values.name}
-            onChange={this.generateValueEventUpdater(name => ({name}))}/>
+            onChange={this.generateValueEventUpdater(name => ({name}))} />
         </label>
       </ValidationElement>
       <ValidationElement
@@ -94,7 +96,7 @@ class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, Laundr
             googleApiKey={this.props.googleApiKey}
             locale={this.props.locale}
             value={this.state.values.place}
-            onChange={this.generateValueUpdater(place => ({place}))}/>
+            onChange={this.generateValueUpdater(place => ({place}))} />
         </Label>
       </ValidationElement>
       <div className='buttons'>
@@ -198,9 +200,10 @@ function timeStringToObject (time): ?Time {
   if (!time) return undefined
   const timeMatch = time.match(/^(\d+):(\d+)$/)
   if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return undefined
-  const minute = parseInt(timeMatch[2])
-  const hour = parseInt(timeMatch[1])
-  // $FlowFixMe: Not a real problem
+  // $FlowFixMe These are the correct format
+  const minute: Minute = parseInt(timeMatch[2])
+  // $FlowFixMe These are the correct format
+  const hour: Hour = parseInt(timeMatch[1])
   return {hour, minute}
 }
 
@@ -314,10 +317,11 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
   }
 
   submit () {
-    sdk.api.laundry.updateLaundry(this.props.laundry.id, {rules: this.rules()})
+    const modifier = this.rules()
+    sdk.api.laundry.updateLaundry(this.props.laundry.id, modifier)
   }
 
-  rules () {
+  rules (): LaundryModifier {
     const ruleObject = {}
     if (this.state.values.limitEnable) {
       ruleObject.limit = this.state.values.limit
@@ -332,7 +336,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
         ruleObject.timeLimit = {from, to}
       }
     }
-    return ruleObject
+    return {rules: ruleObject}
   }
 
   initialValues () {
@@ -380,11 +384,11 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
                 type='text'
                 value={this.state.values.timeLimitFrom}
                 onBlur={this.generateValueUpdater((v, {timeLimitFrom}) => ({timeLimitFrom: timeMap(timeLimitFrom, bookingRulesDefaultValues.timeLimitFrom)}))}
-                onChange={this.generateValueEventUpdater(timeLimitFrom => ({timeLimitFrom}))}/>,
+                onChange={this.generateValueEventUpdater(timeLimitFrom => ({timeLimitFrom}))} />,
               toInput: <input
                 onBlur={this.generateValueUpdater((v, {timeLimitTo}) => ({timeLimitTo: timeMap(timeLimitTo, bookingRulesDefaultValues.timeLimitTo)}))}
                 type='text' value={this.state.values.timeLimitTo}
-                onChange={this.generateValueEventUpdater(timeLimitTo => ({timeLimitTo}))}/>
+                onChange={this.generateValueEventUpdater(timeLimitTo => ({timeLimitTo}))} />
             }}
           />
           <ValidationElement
@@ -406,7 +410,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
               hourInput: <input
                 onBlur={this.generateValueUpdater((v, {dailyLimitString}) => ({dailyLimit: numberMap(dailyLimitString)}))}
                 type='text' value={this.state.values.dailyLimit}
-                onChange={this.generateValueEventUpdater(dailyLimitString => ({dailyLimitString}))}/>,
+                onChange={this.generateValueEventUpdater(dailyLimitString => ({dailyLimitString}))} />,
               hour: this.state.values.dailyLimit
             }} />
         </div>
@@ -425,7 +429,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
               hourInput: <input
                 onBlur={this.generateValueUpdater(({limitString}) => ({limit: numberMap(limitString)}))}
                 type='text' value={this.state.values.limit}
-                onChange={this.generateValueEventUpdater(limitString => ({limitString}))}/>,
+                onChange={this.generateValueEventUpdater(limitString => ({limitString}))} />,
               hour: this.state.values.limit
             }} />
         </div>
@@ -455,16 +459,16 @@ export default class LaundrySettings extends React.Component {
     const laundry = this.laundry()
     return <div>
       <section id='LaundrySettingsNameOrPlace'>
-        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title'/>
-        <LaundrySettingsForm laundry={laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale}/>
+        <FormattedMessage tagName='h2' id='laundry-settings.name-or-place.title' />
+        <LaundrySettingsForm laundry={laundry} googleApiKey={this.props.googleApiKey} locale={this.props.locale} />
       </section>
       <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title'/>
-        <BookingRules laundry={laundry}/>
+        <FormattedMessage tagName='h2' id='laundry-settings.booking-rules.title' />
+        <BookingRules laundry={laundry} />
       </section>
       <section>
-        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title'/>
-        <DeleteLaundry laundry={laundry} user={this.props.user}/>
+        <FormattedMessage tagName='h2' id='laundry-settings.delete-laundry.title' />
+        <DeleteLaundry laundry={laundry} user={this.props.user} />
       </section>
     </div>
   }
@@ -475,8 +479,8 @@ export default class LaundrySettings extends React.Component {
 
   renderUserSettings () {
     return <section>
-      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2'/>
-      <LeaveLaundry laundry={this.laundry()} user={this.props.user}/>
+      <FormattedMessage id='laundry-settings.leave-laundry' tagName='h2' />
+      <LeaveLaundry laundry={this.laundry()} user={this.props.user} />
     </section>
   }
 

@@ -3,6 +3,7 @@
 import LaundryHandler from './laundry'
 import { Handler, HandlerLibrary } from './handler'
 import LaundryInvitationModel from '../models/laundry_invitation'
+import type {Invite} from 'laundree-sdk/lib/redux'
 
 class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, *> {
 

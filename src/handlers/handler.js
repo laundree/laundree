@@ -5,6 +5,7 @@ import { linkEmitter } from '../lib/redis'
 import Debug from 'debug'
 import base64UrlSafe from 'urlsafe-base64'
 import type { ObjectId, Model, QueryOptions, QueryConditions } from 'mongoose'
+import type {Action} from 'laundree-sdk/lib/redux'
 
 const debug = Debug('laundree.handlers.handler')
 
@@ -110,7 +111,7 @@ function findLaundries (handler: { model: { _id: ObjectId, laundry?: ObjectId, l
   return []
 }
 
-type UpdateAction<A> = (A) => Promise<A>
+type UpdateAction<A> =(A) => Promise<A>
 
 export class Handler<M: Model<*>, ReduxModel: {}> {
   model: M

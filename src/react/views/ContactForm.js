@@ -5,9 +5,10 @@ import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, TextArea, Submit } from './intl'
+import type {User} from 'laundree-sdk/lib/redux'
 
 const UserInput = ({user: {photo, displayName}}: { user: User }) => <div className='userInput'>
-  <img className='avatar' src={photo}/>
+  <img className='avatar' src={photo} />
   <span className='name'>{displayName}</span>
 </div>
 
@@ -58,7 +59,7 @@ export default class ContactForm extends ValueUpdater<ContactFormValues, Contact
           readOnly={Boolean(this.props.user)}
           placeholder='general.name'
           type='text' value={this.state.values.name}
-          onChange={this.generateValueEventUpdater((name: string) => ({name}))}/>
+          onChange={this.generateValueEventUpdater((name: string) => ({name}))} />
       </Label>
     </ValidationElement>
   }
@@ -71,7 +72,7 @@ export default class ContactForm extends ValueUpdater<ContactFormValues, Contact
           readOnly={Boolean(this.props.user)}
           placeholder='general.email-address'
           type='text' value={this.state.values.email}
-          onChange={this.generateValueEventUpdater((email: string) => ({email}))}/>
+          onChange={this.generateValueEventUpdater((email: string) => ({email}))} />
       </Label>
     </ValidationElement>
   }
@@ -95,7 +96,7 @@ export default class ContactForm extends ValueUpdater<ContactFormValues, Contact
             placeholder='general.subject'
             type='text'
             value={this.state.values.subject}
-            onChange={this.generateValueEventUpdater(subject => ({subject}))}/>
+            onChange={this.generateValueEventUpdater(subject => ({subject}))} />
         </Label>
       </ValidationElement>
       <ValidationElement sesh={this.state.sesh} value={this.state.values.message} nonEmpty trim>
@@ -103,7 +104,7 @@ export default class ContactForm extends ValueUpdater<ContactFormValues, Contact
           <TextArea
             placeholder='general.message'
             value={this.state.values.message}
-            onChange={this.generateValueEventUpdater(message => ({message}))}/>
+            onChange={this.generateValueEventUpdater(message => ({message}))} />
         </Label>
       </ValidationElement>
       <div className='buttons'>

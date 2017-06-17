@@ -5,16 +5,16 @@ type StateCheckRedirectRouteProps<T> = {
   path: string,
   component: ReactClass<*>,
   redirectTo?: string,
-  test: (T) => boolean,
+  test:(T) => boolean,
   state: T
 }
 const StateCheckRedirectRoute = ({test, component, state, redirectTo, path}: StateCheckRedirectRouteProps<*>) => (
   <Route
     path={path}
     render={props => test(state)
-      ? <component {...props}/>
-      : <Redirect to={redirectTo}/>
-    }/>
+      ? <component {...props} />
+      : <Redirect to={redirectTo} />
+    } />
 )
 
 export default StateCheckRedirectRoute

@@ -6,6 +6,8 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import Switch from './Switch'
 import Debug from 'debug'
+import type {Stats, Laundry, User} from 'laundree-sdk/lib/redux'
+import type { ListOptions } from 'laundree-sdk/lib/sdk'
 const debug = Debug('laundree.react.views.AdminPanel')
 
 class StatsComponent extends React.Component {
@@ -174,7 +176,7 @@ class QueryList<T: { id: string }> extends React.Component<void,
         />
         <span
           className={'next link' + (this.currentPage() === this.totalPages() ? ' inactive' : '')}
-          onClick={() => this.next()}/>
+          onClick={() => this.next()} />
       </div>
       <div className='filter'>
         <label>
@@ -271,10 +273,10 @@ const AdminPanel = ({stats, laundries, users, userList, laundryList}: {
   const us: User[] = userList.map(id => users[id]).filter(u => u)
   return <DocumentTitle title='document-title.administrator-panel'>
     <main id='AdminPanel' className='topNaved'>
-      <FormattedMessage id='admin-panel.title' tagName='h1'/>
-      <StatsComponent stats={stats}/>
-      <LaundryList elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount}/>
-      <UserList elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount}/>
+      <FormattedMessage id='admin-panel.title' tagName='h1' />
+      <StatsComponent stats={stats} />
+      <LaundryList elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
+      <UserList elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
     </main>
   </DocumentTitle>
 }

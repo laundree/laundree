@@ -3,6 +3,7 @@
 import React from 'react'
 import sdk from '../../client/sdk'
 import uuid from 'uuid'
+import type {User} from 'laundree-sdk/lib/redux'
 
 export default class NativeApp extends React.Component {
   props: {currentUser: string, users: {[string]: User}}

@@ -21,14 +21,14 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
           this.reset({
             loading: false,
             notion: {
-              message: <FormattedMessage id='auth.forgot.success'/>,
+              message: <FormattedMessage id='auth.forgot.success' />,
               success: true
             }
           }),
         () => this.setState({
           loading: false,
           notion: {
-            message: <FormattedMessage id='auth.forgot.error'/>,
+            message: <FormattedMessage id='auth.forgot.error' />,
             success: false
           }
         }))

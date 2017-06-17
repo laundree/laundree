@@ -6,6 +6,7 @@ import { FormattedMessage } from 'react-intl'
 import AdminPanel from '../containers/AdminPanel'
 import CreateLaundry from '../containers/CreateLaundry'
 import { Redirect } from 'react-router'
+import type {User} from 'laundree-sdk/lib/redux'
 
 class DemoButton extends React.Component {
 
@@ -29,8 +30,8 @@ class DemoButton extends React.Component {
         </svg>
       </span>
       <form hidden ref={ref => { this.ref = ref }} method='post' action='/auth/local'>
-        <input type='hidden' name='username' value={this.state.email}/>
-        <input type='hidden' name='password' value={this.state.password}/>
+        <input type='hidden' name='username' value={this.state.email} />
+        <input type='hidden' name='password' value={this.state.password} />
       </form>
     </div>
   }

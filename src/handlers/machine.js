@@ -6,6 +6,7 @@ import type { MachineType } from '../models/machine'
 import BookingHandler from './booking'
 import LaundryHandler from './laundry'
 import type UserHandler from './user'
+import type {Machine} from 'laundree-sdk/lib/redux'
 
 class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
 

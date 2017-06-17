@@ -5,7 +5,7 @@ export default class Switch extends React.Component {
 
   props: {
     on: boolean,
-    onChange: (boolean) => void
+    onChange:(boolean) => void
   }
 
   onClick = () => this.props.onChange(!this.isOn)
@@ -17,6 +17,6 @@ export default class Switch extends React.Component {
   render () {
     return <div
       onClick={this.onClick}
-      className={'switch ' + (this.isOn() ? 'on' : 'off')}/>
+      className={'switch ' + (this.isOn() ? 'on' : 'off')} />
   }
 }

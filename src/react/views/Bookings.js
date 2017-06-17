@@ -6,6 +6,7 @@ import sdk from '../../client/sdk'
 import { FormattedMessage, FormattedDate } from 'react-intl'
 import moment from 'moment'
 import Loader from './Loader'
+import type { User, Laundry, Machine, Booking } from 'laundree-sdk/lib/redux'
 
 class BookingComponent extends React.Component {
   onCloseModal = () => this.setState({showModal: false})

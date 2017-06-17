@@ -14,6 +14,7 @@ import LeftNav from '../containers/LeftNav'
 import UserSettings from '../containers/UserSettings'
 import type { Location } from 'react-router'
 import type { Children } from 'react'
+import type { Laundry, User } from 'laundree-sdk/lib/redux'
 
 export default class BaseApp extends React.Component {
   props: {
