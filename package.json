@@ -30,7 +30,7 @@
     "handlebars": "^4.0.5",
     "ical-generator": "^0.2.9",
     "jdenticon": "^1.3.2",
-    "laundree-sdk": "0.0.23",
+    "laundree-sdk": "0.1.0",
     "locale": "^0.1.0",
     "moment": "^2.16.0",
     "moment-timezone": "^0.5.7",
