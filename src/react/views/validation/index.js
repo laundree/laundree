@@ -1,4 +1,3 @@
-module.exports = {
-  ValidationForm: require('./ValidationForm'),
-  ValidationElement: require('./ValidationElement')
-}
+// @flow
+export {default as ValidationForm} from './ValidationForm'
+export {default as ValidationElement} from './ValidationElement'

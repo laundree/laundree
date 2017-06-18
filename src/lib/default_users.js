@@ -27,4 +27,4 @@ function defaultUserSetup () {
     .catch(logError)
 }
 
-module.exports = defaultUserSetup
+export default defaultUserSetup

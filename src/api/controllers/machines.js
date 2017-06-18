@@ -1,7 +1,7 @@
 // @flow
 
 import MachineHandler from '../../handlers/machine'
-import { api } from '../../utils'
+import * as api from '../../utils/api'
 
 async function listMachinesAsync (req, res) {
   const filter = {}

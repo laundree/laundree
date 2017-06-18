@@ -25,7 +25,7 @@ async function fetchLaundries (currentUser) : Promise<ListLaundriesAction> {
  * @param {boolean=} returningUser
  * @return {Promise}
  */
-export function createInitialEvents (currentUser: UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
+export function createInitialEvents (currentUser: ?UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
   let events: Action[] = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
   events.push({type: 'CONFIGURE', payload: {locale, googleApiKey, returningUser}})
@@ -35,7 +35,7 @@ export function createInitialEvents (currentUser: UserHandler, successFlash: str
   return fetchLaundries(currentUser).then((event: Action) => events.concat(event))
 }
 
-export function createInitialStore (currentUser: UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
+export function createInitialStore (currentUser: ?UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
   return createInitialEvents(currentUser, successFlash, errorFlash, locale, googleApiKey, returningUser)
     .then((events) => {
       const store = createStore(redux.reducer)

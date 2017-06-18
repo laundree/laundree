@@ -6,6 +6,7 @@ import { Strategy as LocalStrategy } from 'passport-local'
 import { BasicStrategy } from 'passport-http'
 import UserHandler from '../handlers/user'
 import config from 'config'
+import type {Request, Response, Application} from '../types'
 import {
   INVALID_EMAIL_PASSWORD_COMBINATION,
   USER_NOT_VERIFIED,
@@ -62,17 +63,16 @@ passport.deserializeUser((user, done) => {
   UserHandler.lib.findFromId(user).then((user) => done(null, user || false)).catch(done)
 })
 
-function markLoggedIn (req: express$Request, res: express$Response, next: express$NextFunction) {
+function markLoggedIn (req: Request, res: Response, next: express$NextFunction) {
   if (!req.user) return next()
-  // $FlowFixMe We can set session...
   req.session.returningUser = true
   next()
 }
 
-function setup (app: express$Application) {
+function setup (app: Application) {
   app.use(passport.initialize())
   app.use(passport.session())
   app.use(markLoggedIn)
 }
 
-module.exports = setup
+export default setup

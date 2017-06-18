@@ -6,7 +6,9 @@ import BookingHandler from './booking'
 import LaundryInvitationHandler from './laundry_invitation'
 import UserModel from '../models/user'
 import type { Profile, UserRole } from '../models/user'
-import utils from '../utils'
+import * as str from '../utils/string'
+import * as error from '../utils/error'
+import * as pwd from '../utils/password'
 import uuid from 'uuid'
 import config from 'config'
 import Debug from 'debug'
@@ -123,11 +125,11 @@ class UserHandlerLibrary extends HandlerLibrary {
       name: displayNameToName(displayName),
       provider: 'local',
       emails: [{value: email}],
-      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
+      photos: [{value: `/identicon/${str.hash(email)}/150.svg`}]
     }
     const [user, passwordHash] = await Promise.all([
       this.createUserFromProfile(profile),
-      utils.password.hashPassword(password)])
+      pwd.hashPassword(password)])
     if (!user) {
       return null
     }
@@ -149,12 +151,12 @@ class UserHandlerLibrary extends HandlerLibrary {
       name: displayNameToName(displayName),
       provider: 'local',
       emails: [{value: email}],
-      photos: [{value: `/identicon/${utils.string.hash(email)}/150.svg`}]
+      photos: [{value: `/identicon/${str.hash(email)}/150.svg`}]
     }
     const [user, {token, hash}] = await Promise
       .all([
         this.createUserFromProfile(profile),
-        utils.password.generateTokenAndHash()
+        pwd.generateTokenAndHash()
       ])
     if (!user) {
       return null
@@ -224,7 +226,7 @@ export default class UserHandler extends Handler<UserModel, User> {
     }
     this.model.oneSignalPlayerIds.push(playId)
     await this.save()
-    this._updateBookings().catch(utils.error.logError)
+    this._updateBookings().catch(error.logError)
     return 1
   }
 
@@ -458,7 +460,7 @@ export default class UserHandler extends Handler<UserModel, User> {
 
   resetPassword (password: string) {
     return Promise.all([
-      utils.password.hashPassword(password)
+      pwd.hashPassword(password)
         .then(hash => {
           this.model.password = hash
           return this.model.save()
@@ -472,7 +474,7 @@ export default class UserHandler extends Handler<UserModel, User> {
    * @return {Promise.<boolean>}
    */
   verifyPassword (password: string) {
-    if (this.model.password) return utils.password.comparePassword(password, this.model.password)
+    if (this.model.password) return pwd.comparePassword(password, this.model.password)
     return this.verifyOneTimePassword(password)
   }
 
@@ -480,8 +482,7 @@ export default class UserHandler extends Handler<UserModel, User> {
     if (!this.model.oneTimePassword) {
       return false
     }
-    const result = await utils.password
-      .comparePassword(password, this.model.oneTimePassword)
+    const result = await pwd.comparePassword(password, this.model.oneTimePassword)
     if (!result) return result
     this.model.oneTimePassword = undefined
     await this.model.save()
@@ -590,7 +591,7 @@ export default class UserHandler extends Handler<UserModel, User> {
   reduxModel (): User {
     return {
       id: this.model.id,
-      photo: this.photo() || `/identicon/${utils.string.hash(this.model.id)}/150.svg`,
+      photo: this.photo() || `/identicon/${str.hash(this.model.id)}/150.svg`,
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
       lastSeen: this.model.lastSeen,

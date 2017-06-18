@@ -82,7 +82,7 @@ class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, Laundr
   render () {
     return <ValidationForm sesh={this.state.sesh} onSubmit={this.onSubmit} className={this.state.loading ? 'blur' : ''}>
       {this.renderNotion()}
-      <ValidationElement sesh={this.state.sesh} value={this.state.values.name} notOneOf={this.nameErrorValues} trim>
+      <ValidationElement sesh={this.state.sesh} value={this.state.values.name} notOneOf={this.nameErrorValues()} trim>
         <label data-validate-error={this.nameErrorMessage()}>
           <input
             type='text' value={this.state.values.name}
@@ -147,17 +147,15 @@ class DeleteLaundry extends React.Component {
   }
 }
 
-DeleteLaundry.propTypes = {
-  laundry: React.PropTypes.object.isRequired,
-  user: React.PropTypes.object.isRequired
-}
-
 class LeaveLaundry extends React.Component {
   handleDeleteClick = () => this.removeUser()
   handleCloseModal = () => this.setState({modalOpen: false})
   handleOpenModal = () => this.setState({modalOpen: true})
   state = {modalOpen: false}
-
+  props: {
+    laundry: Laundry,
+    user: User
+  }
   removeUser () {
     return sdk
       .api
@@ -183,11 +181,6 @@ class LeaveLaundry extends React.Component {
       </div>
     </div>
   }
-}
-
-LeaveLaundry.propTypes = {
-  laundry: React.PropTypes.object.isRequired,
-  user: React.PropTypes.object.isRequired
 }
 
 function timeStringToMinutes (time) {
@@ -366,6 +359,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
 
   render () {
     return <ValidationForm id='BookingRules' onSubmit={this.handleSubmit}>
+      <ValidationElement value={123} />
       <ValidationElement
         validator={this.validateValues}
         value={this.state.values} />
@@ -411,7 +405,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
                 onBlur={this.generateValueUpdater((v, {dailyLimitString}) => ({dailyLimit: numberMap(dailyLimitString)}))}
                 type='text' value={this.state.values.dailyLimit}
                 onChange={this.generateValueEventUpdater(dailyLimitString => ({dailyLimitString}))} />,
-              hour: this.state.values.dailyLimit
+              hour: this.state.values.dailyLimit || ''
             }} />
         </div>
       </div>
@@ -430,7 +424,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
                 onBlur={this.generateValueUpdater(({limitString}) => ({limit: numberMap(limitString)}))}
                 type='text' value={this.state.values.limit}
                 onChange={this.generateValueEventUpdater(limitString => ({limitString}))} />,
-              hour: this.state.values.limit
+              hour: this.state.values.limit || ''
             }} />
         </div>
       </div>

@@ -1,28 +1,20 @@
-const fs = require('fs')
+// @flow
+import fs from 'fs'
 
-function cbFromResolveReject (resolve, reject) {
-  return (err, data) => {
-    if (err) return reject(err)
-    return resolve(data)
-  }
-}
-
-function wrap (action, path, options) {
+export function readFile (path: string): Promise<string> {
   return new Promise((resolve, reject) => {
-    if (options) {
-      action(path, options, cbFromResolveReject(resolve, reject))
-    } else {
-      action(path, cbFromResolveReject(resolve, reject))
-    }
+    fs.readFile(path, {encoding: 'utf8'}, (err, data: string) => {
+      if (err) reject(err)
+      else resolve(data)
+    })
   })
 }
 
-function readFile (path, options) {
-  return wrap(fs.readFile, path, options)
+export function readdir (path: string): Promise<string[]> {
+  return new Promise((resolve, reject) => {
+    fs.readdir(path, (err, data) => {
+      if (err) reject(err)
+      else resolve(data)
+    })
+  })
 }
-
-function readdir (path, options) {
-  return wrap(fs.readdir, path, options)
-}
-
-module.exports = {readFile, readdir}

@@ -15,7 +15,7 @@ import GAWrapper from '../containers/GAWrapper'
 import type {LocaleType} from './../../locales'
 
 const App = (props: {locale: LocaleType, store: Store}) => {
-  return <IntlProvider locale={props.locale} messages={locales[props.locale].messages}>
+  return <IntlProvider locale={props.locale} messages={locales[props.locale]}>
     <Provider store={props.store}>
       <Route children={({location}) => (
         <GAWrapper location={location}>

@@ -1,5 +1,8 @@
-const React = require('react')
-const regex = require('../../../utils/regex')
+// @flow
+import React from 'react'
+import type { Children } from 'react'
+import * as regex from '../../../utils/regex'
+import PropTypes from 'prop-types'
 
 let id = 0
 
@@ -7,15 +10,27 @@ function newId () {
   return id++
 }
 
-class ValidationElement extends React.Component {
-  constructor (props) {
-    super(props)
-    this.initialState = {initial: true}
-    this.state = {initial: true}
-  }
+export type ValidationElementProps<V> = {
+  sesh?: number,
+  equal?: V,
+  not?: V,
+  value: V,
+  validator?: (V) => boolean,
+  children: Children,
+  notOneOf?: string[],
+  oneOf?: string[],
+  nonEmpty?: boolean,
+  email?: boolean,
+  password?: boolean
+}
 
-  handle (valid, initial = false) {
-    this.context.validation.handler(this.name, Boolean(valid), initial)
+export default class ValidationElement<V> extends React.Component<*, ValidationElementProps<V>, { initial: boolean }> {
+  initialState = {initial: true}
+  state = {initial: true}
+  id: number
+
+  handle (valid: boolean, initial: boolean = false) {
+    this.context.validation.handler(this.name(), valid, initial)
   }
 
   componentDidMount () {
@@ -28,7 +43,7 @@ class ValidationElement extends React.Component {
     this.handle(this.validate(), true)
   }
 
-  componentWillReceiveProps (props) {
+  componentWillReceiveProps (props: ValidationElementProps<V>) {
     const {sesh} = props
     const initial = sesh !== this.props.sesh
     if (initial) {
@@ -39,21 +54,24 @@ class ValidationElement extends React.Component {
     this.handle(this.validate(props), initial)
   }
 
-  get name () {
+  name () {
     return `id${this.id}`
   }
 
-  validate (props = this.props) {
-    let {value} = props
-    if (props.trim) value = value.trim()
+  validate (props: ValidationElementProps<V> = this.props): boolean {
+    const value = props.trim && typeof props.value === 'string'
+      ? props.value.trim()
+      : props.value
     if (props.equal !== undefined) return props.equal === value
     if (props.not !== undefined) return props.not !== value
     if (props.validator) return props.validator(value)
-    if (props.notOneOf) return props.notOneOf.indexOf(value) < 0
-    if (props.oneOf) return props.oneOf.indexOf(value) >= 0
-    if (props.nonEmpty) return value
-    if (props.email) return regex.email.exec(value)
-    if (props.password) return regex.password.exec(value)
+    if (typeof value === 'string') {
+      if (props.notOneOf) return props.notOneOf.indexOf(value) < 0
+      if (props.oneOf) return props.oneOf.indexOf(value) >= 0
+      if (props.nonEmpty) return Boolean(value)
+      if (props.email) return regex.email.exec(value)
+      if (props.password) return regex.password.exec(value)
+    }
     return true
   }
 
@@ -69,22 +87,5 @@ class ValidationElement extends React.Component {
 }
 
 ValidationElement.contextTypes = {
-  validation: React.PropTypes.shape({handler: React.PropTypes.func})
+  validation: PropTypes.shape({handler: PropTypes.func})
 }
-
-ValidationElement.propTypes = {
-  sesh: React.PropTypes.number,
-  children: React.PropTypes.any,
-  notOneOf: React.PropTypes.arrayOf(React.PropTypes.string),
-  oneOf: React.PropTypes.arrayOf(React.PropTypes.string),
-  equal: React.PropTypes.string,
-  not: React.PropTypes.string,
-  trim: React.PropTypes.bool,
-  nonEmpty: React.PropTypes.bool,
-  password: React.PropTypes.bool,
-  email: React.PropTypes.bool,
-  value: React.PropTypes.any.isRequired,
-  validator: React.PropTypes.func
-}
-
-module.exports = ValidationElement

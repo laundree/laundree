@@ -1,30 +1,25 @@
-const React = require('react')
+// @flow
+import React from 'react'
+import PropTypes from 'prop-types'
+import type {Children} from 'react'
 
-class DropDownCloser extends React.Component {
-  constructor (props) {
-    super(props)
-    this.generateOnClick = (fn) => (evt) => {
-      if (fn) fn(evt)
-      this.context.closeDropDown()
-    }
+export default class DropDownCloser extends React.Component<*, {children: Children}, *> {
+
+  generateOnClick = (fn: Function) => (evt: Event) => {
+    if (fn) fn(evt)
+    this.context.closeDropDown()
   }
 
-  get child () {
+  child () {
     return React.Children.only(this.props.children)
   }
 
   render () {
-    const child = this.child
-    return React.cloneElement(this.child, {onClick: this.generateOnClick(child.props.onClick)})
+    const child = this.child()
+    return React.cloneElement(child, {onClick: this.generateOnClick(child.props.onClick)})
   }
 }
 
 DropDownCloser.contextTypes = {
-  closeDropDown: React.PropTypes.func.isRequired
+  closeDropDown: PropTypes.func.isRequired
 }
-
-DropDownCloser.propTypes = {
-  children: React.PropTypes.any
-}
-
-module.exports = DropDownCloser

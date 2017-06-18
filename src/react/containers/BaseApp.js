@@ -13,4 +13,4 @@ const mapStateToProps = ({users, currentUser, laundries, config}, {location, mat
   }
 }
 
-module.exports = connect(mapStateToProps)(BaseApp)
+export default connect(mapStateToProps)(BaseApp)

@@ -1,8 +1,6 @@
-/**
- * Created by budde on 11/09/16.
- */
+// @flow
 
-function union (array1, array2) {
+export function union<A> (array1: A[], array2: A[]): A[]{
   return array1.concat(array2).reduce((arr, v) => {
     if (arr.indexOf(v) >= 0) return arr
     arr.push(v)
@@ -10,7 +8,7 @@ function union (array1, array2) {
   }, [])
 }
 
-function range (start, end) {
+export function range (start: number, end?: number): number[] {
   if (start === undefined) throw new Error('Start not given')
   if (end === undefined) {
     end = start
@@ -22,5 +20,3 @@ function range (start, end) {
   }
   return array
 }
-
-module.exports = {union, range}

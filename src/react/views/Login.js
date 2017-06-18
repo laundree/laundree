@@ -19,6 +19,14 @@ type LoginValues = {
 
 export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
 
+  initialState () {
+    return {}
+  }
+
+  initialValues () {
+    return {email: '', password: ''}
+  }
+
   handleNotion () {
     if (!this.props.flash.length) return null
     const {type, message} = this.props.flash[0]
@@ -26,8 +34,8 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
       <FormattedMessage
         id={message}
         values={{
-          link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link' /></Link>
-        }} />
+          link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link'/></Link>
+        }}/>
     </div>
   }
 
@@ -39,28 +47,28 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     const query = this.query()
     return <DocumentTitle title='document-title.login'>
       <div>
-        <FormattedMessage tagName='h1' id='auth.login.title' />
+        <FormattedMessage tagName='h1' id='auth.login.title'/>
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo' />
+            <use xlinkHref='#MediaLogo'/>
           </svg>
         </Link>
         <div className='auth_alternatives'>
           <a href={'/auth/facebook' + query} className='facebook'>
             <svg>
-              <use xlinkHref='#Facebook' />
+              <use xlinkHref='#Facebook'/>
             </svg>
-            <FormattedMessage id='auth.login.method.facebook' />
+            <FormattedMessage id='auth.login.method.facebook'/>
           </a>
           <a href={'/auth/google' + query} className='google'>
             <svg>
-              <use xlinkHref='#GooglePlus' />
+              <use xlinkHref='#GooglePlus'/>
             </svg>
-            <FormattedMessage id='auth.login.method.google' />
+            <FormattedMessage id='auth.login.method.google'/>
           </a>
         </div>
         <div className='or'>
-          <FormattedMessage id='general.or' />
+          <FormattedMessage id='general.or'/>
         </div>
         <ValidationForm id='SignIn' method='post' action={'/auth/local' + query}>
           {this.handleNotion()}
@@ -72,7 +80,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                 name='username'
                 placeholder='general.email-address'
                 value={this.state.values.email || ''}
-                onChange={this.generateValueEventUpdater(email => ({email}))} />
+                onChange={this.generateValueEventUpdater(email => ({email}))}/>
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -83,11 +91,11 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
               <Input
                 type='password' name='password' placeholder='general.password'
                 value={this.state.values.password || ''}
-                onChange={this.generateValueUpdater(password => ({password}))} />
+                onChange={this.generateValueEventUpdater(password => ({password}))}/>
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.login' />
+            <Submit value='general.login'/>
           </div>
           <div className='forgot'>
             <div>
@@ -97,9 +105,9 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                   link: <Link
                     to='/auth/forgot'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.forgot.link' />
+                    <FormattedMessage id='auth.links.forgot.link'/>
                   </Link>
-                }} />
+                }}/>
             </div>
             <div>
               <FormattedMessage
@@ -108,9 +116,9 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                   link: <Link
                     to='/auth/sign-up'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link' />
+                    <FormattedMessage id='auth.links.signup.link'/>
                   </Link>
-                }} />
+                }}/>
             </div>
           </div>
         </ValidationForm>
@@ -119,12 +127,12 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
             toc: <a
               href='/terms-and-conditions'
               target='_blank'>
-              <FormattedMessage id='general.toc' />
+              <FormattedMessage id='general.toc'/>
             </a>,
             pp: <a href='/privacy' target='_blank'>
-              <FormattedMessage id='general.privacy-policy' />
+              <FormattedMessage id='general.privacy-policy'/>
             </a>
-          }} />
+          }}/>
         </div>
       </div>
     </DocumentTitle>

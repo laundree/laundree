@@ -1,15 +1,15 @@
-/**
- * Created by budde on 11/09/16.
- */
-const config = require('config')
-const debug = require('debug')('laundree.lib.opbeat')
+// @flow
+import config from 'config'
+import Debug from 'debug'
+import os from 'os'
+import Opbeat from 'opbeat'
 
-const os = require('os')
+const debug = Debug('laundree.lib.opbeat')
 
-let opbeat
+export let opbeat
 
 if (config.get('opbeat.enable')) {
-  opbeat = require('opbeat').start({
+  opbeat = Opbeat.start({
     appId: config.get('opbeat.appId'),
     organizationId: config.get('opbeat.organizationId'),
     secretToken: config.get('opbeat.secretToken')
@@ -18,7 +18,7 @@ if (config.get('opbeat.enable')) {
   debug('Opbeat is not enabled.')
 }
 
-function trackRelease () {
+export function trackRelease () {
   if (!config.get('opbeat.trackRelease')) return Promise.resolve()
   if (!opbeat) return Promise.resolve()
   return new Promise((resolve, reject) => {
@@ -36,5 +36,3 @@ function trackRelease () {
     })
   })
 }
-
-module.exports = {opbeat, trackRelease}

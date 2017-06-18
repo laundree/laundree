@@ -1,13 +1,20 @@
-const handlebars = require('handlebars')
-const fs = require('../utils/fs')
-const path = require('path')
-const hb = require('../utils/handlebars')
-const partialsPath = path.resolve(__dirname, '..', '..', 'templates', 'partials')
-const debug = require('debug')('laundree.lib.handlebars')
+// @flow
 
-function setupRenderHb (req, res, next) {
-  res.renderHb = (file, args) => {
-    const locale = req.locale
+import handlebars from 'handlebars'
+import * as fs from '../utils/fs'
+import path from 'path'
+import * as hb from '../utils/handlebars'
+import Debug from 'debug'
+import { toLocale } from '../locales'
+import type {Request, Application} from '../types'
+
+const debug = Debug('laundree.lib.handlebars')
+
+const partialsPath = path.resolve(__dirname, '..', '..', 'templates', 'partials')
+
+function setupRenderHb (req: Request, res, next) {
+  res.renderHb = (file: string, args) => {
+    const locale = toLocale(req.locale || '', 'en')
     hb
       .render(path.join('web', file),
         args,
@@ -16,6 +23,7 @@ function setupRenderHb (req, res, next) {
   }
   next()
 }
+
 function format (context, options) {
   return new handlebars.SafeString(Object.keys(options.hash).reduce((message, key) => {
     const regexp = new RegExp(`{${key}}`, 'g')
@@ -23,7 +31,7 @@ function format (context, options) {
   }, context))
 }
 
-function setup (app) {
+export default function setup (app: Application) {
   app.use(setupRenderHb)
   handlebars.registerHelper({
     formatIntl: (context, options) => {
@@ -41,5 +49,3 @@ function setup (app) {
         return handlebars.registerPartial(file, handlebars.compile(data))
       }))))
 }
-
-module.exports = setup

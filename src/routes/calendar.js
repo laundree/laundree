@@ -1,29 +1,34 @@
-const express = require('express')
+// @flow
+import express from 'express'
+import Debug from 'debug'
+import ical from 'ical-generator'
+import config from 'config'
+import UserHandler from '../handlers/user'
+import type {Request} from '../types'
+const debug = Debug('laundree.routes.calendar')
 const router = express.Router()
-const debug = require('debug')('laundree.routes.calendar')
-const ical = require('ical-generator')
-const config = require('config')
-const UserHandler = require('../handlers/user')
 
-router.get('/', (req, res, next) => {
+router.get('/', (req: Request, res, next) => {
   debug('Starting to create calendar link')
   if (!req.user) {
     debug('User not found, aborting')
     return next()
   }
-  req.user
+  const user : UserHandler = req.user
+  user
     .generateCalendarToken()
     .then(token => {
       debug('Generated calendar token, redirecting')
-      res.redirect(`webcal://${config.get('web.host')}${req.baseUrl}/${req.user.model.id}/${token.secret}/calendar.ics`)
+      res.redirect(`webcal://${config.get('web.host')}${req.baseUrl}/${user.model.id}/${token.secret}/calendar.ics`)
     })
     .catch(next)
 })
 
-router.get('/:userId/:calendarToken/calendar.ics', (req, res, next) => {
+router.get('/:userId/:calendarToken/calendar.ics', (req: Request, res, next) => {
   const {calendarToken, userId} = req.params
   debug('Starting calendar export', calendarToken)
   UserHandler
+    .lib
     .findFromId(userId)
     .then(user => {
       if (!user) {
@@ -49,4 +54,5 @@ router.get('/:userId/:calendarToken/calendar.ics', (req, res, next) => {
     .catch(next)
 })
 
-module.exports = router
+export default router
+

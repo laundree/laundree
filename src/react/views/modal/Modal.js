@@ -1,11 +1,14 @@
-/**
- * Created by budde on 28/06/16.
- */
+// @flow
+import React from 'react'
+import BaseModal from './BaseModal'
 
-const React = require('react')
-const BaseModal = require('./BaseModal')
+export type ModalProps = {
+  message: string,
+  actions: {label: string, className: string, action: Function}[]
+}
 
-class Modal extends BaseModal {
+export default class Modal extends BaseModal<ModalProps> {
+
   renderContent () {
     const actions = this.props.actions || []
     return <div>
@@ -20,16 +23,3 @@ class Modal extends BaseModal {
     </div>
   }
 }
-
-Modal.propTypes = {
-  show: React.PropTypes.bool,
-  message: React.PropTypes.string,
-  onClose: React.PropTypes.func,
-  actions: React.PropTypes.arrayOf(React.PropTypes.shape({
-    label: React.PropTypes.string.isRequired,
-    className: React.PropTypes.string,
-    action: React.PropTypes.func
-  }))
-}
-
-module.exports = Modal

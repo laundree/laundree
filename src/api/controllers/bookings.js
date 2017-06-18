@@ -1,7 +1,7 @@
 // @flow
 
 import BookingHandler from '../../handlers/booking'
-import { api } from '../../utils'
+import * as api from '../../utils/api'
 
 async function listBookingsAsync (req, res) {
   const limit = req.swagger.params.page_size.value

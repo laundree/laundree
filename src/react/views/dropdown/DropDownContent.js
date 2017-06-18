@@ -1,11 +1,12 @@
-const React = require('react')
+// @flow
+import React from 'react'
+import type {Children} from 'react'
 
-const DropDownContent = (props) => <div
-  className={'dropDownContent ' + (props.className ? props.className : '')}>{props.children}</div>
-
-DropDownContent.propTypes = {
-  className: React.PropTypes.string,
-  children: React.PropTypes.any
+export default class DropDownContent extends React.Component<*, {className: string, children: Children}, *> {
+  render () {
+    const props = this.props
+    return (
+      <div className={'dropDownContent ' + (props.className ? props.className : '')}>{props.children}</div>
+    )
+  }
 }
-
-module.exports = DropDownContent

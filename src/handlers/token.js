@@ -1,7 +1,7 @@
 // @flow
 
 import { Handler, HandlerLibrary } from './handler'
-import { password } from '../utils'
+import * as password from '../utils/password'
 import TokenModel from '../models/token'
 import type { TokenType } from '../models/token'
 import UserHandler from './user'

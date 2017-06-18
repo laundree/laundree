@@ -6,4 +6,4 @@ const mapStateToProps = ({users, currentUser}) => {
   return {users, currentUser}
 }
 
-module.exports = connect(mapStateToProps)(Home)
+export default connect(mapStateToProps)(Home)
