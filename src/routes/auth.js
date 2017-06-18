@@ -1,11 +1,15 @@
-const express = require('express')
-const router = express.Router()
-const passport = require('passport')
-const UserHandler = require('../handlers/user')
-const debug = require('debug')('laundree.routes.auth')
-const {INVALID_VERIFICATION_LINK, EMAIL_VERIFIED} = require('../utils/flash')
+// @flow
+import express from 'express'
+import passport from 'passport'
+import UserHandler from '../handlers/user'
+import Debug from 'debug'
+import { INVALID_VERIFICATION_LINK, EMAIL_VERIFIED } from '../utils/flash'
+import type { Request, Response, Router } from '../types'
 
-router.get('/verify', (req, res) => {
+const router: Router = express.Router()
+const debug = Debug('laundree.routes.auth')
+
+router.get('/verify', (req: Request, res) => {
   const user = req.query.user
   const token = req.query.token
   const email = req.query.email
@@ -13,7 +17,7 @@ router.get('/verify', (req, res) => {
     req.flash('error', INVALID_VERIFICATION_LINK)
     return res.redirect(req.baseUrl + '/')
   }
-  UserHandler.findFromId(user).then((user) => {
+  UserHandler.lib.findFromId(user).then((user) => {
     if (!user) {
       req.flash('error', INVALID_VERIFICATION_LINK)
       return res.redirect(req.baseUrl + '/')
@@ -28,7 +32,8 @@ router.get('/verify', (req, res) => {
     })
   })
 })
-function findRedirect (req) {
+
+function findRedirect (req: Request): { to: string, errorTo?: string } {
   const {mode, to} = req.query
   switch (mode) {
     case 'native-app':
@@ -40,7 +45,7 @@ function findRedirect (req) {
   }
 }
 
-function saveTo (f) {
+function saveTo (f: (req: Request, res: Response) => void): (req: Request, res: Response) => void {
   return function (req) {
     const {to, errorTo} = findRedirect(req)
     debug('Saving to: ', to)
@@ -52,15 +57,18 @@ function saveTo (f) {
 
 function setupCallback (router, strategy) {
   router.get(`/${strategy}/callback`,
-    function (req) {
+    function (req: Request) {
       debug('Got state', req.query.state)
       passport.authenticate(strategy, {failureRedirect: req.session.errorTo || `${req.baseUrl}?${strategy}_auth_failure=1`}).apply(null, arguments)
     },
-    (req, res) => res.redirect(req.session.to))
+    (req: Request, res) => res.redirect(req.session.to || '/'))
 }
 
-router.get('/facebook', saveTo(function (req) {
-  const params = {scope: ['public_profile', 'email'], state: 'test'}
+router.get('/facebook', saveTo(function (req: Request, res) {
+  const params: { scope: string[], state: string, authType?: string } = {
+    scope: ['public_profile', 'email'],
+    state: 'test'
+  }
   if (req.query.rerequest) params.authType = 'rerequest'
   passport.authenticate('facebook', params).apply(null, arguments)
 }))
@@ -75,7 +83,7 @@ router.get('/google', saveTo(passport.authenticate('google', {
 
 setupCallback(router, 'google')
 
-router.post('/local', function (req) {
+router.post('/local', function (req: Request) {
   passport.authenticate('local', {
     failureRedirect: `${req.baseUrl}`,
     successRedirect: findRedirect(req).to,
@@ -83,4 +91,5 @@ router.post('/local', function (req) {
   }).apply(null, arguments)
 })
 
-module.exports = router
+export default router
+

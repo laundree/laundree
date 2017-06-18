@@ -1,7 +1,7 @@
 // @flow
 import TokenHandler from '../../handlers/token'
 import UserHandler from '../../handlers/user'
-import { api } from '../../utils'
+import * as api from '../../utils/api'
 
 async function listTokensAsync (req, res) {
   const filter: { owner: *, _id?: * } = {owner: req.user.model._id}

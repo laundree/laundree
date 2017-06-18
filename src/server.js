@@ -1,16 +1,15 @@
-/**
- * Module dependencies.
- */
+// @flow
 
-const app = require('./app')
-const debug = require('debug')('laundree.server')
-const http = require('http')
-const config = require('config')
-const socketIoSetup = require('./lib/socket_io')
+import app from './app'
+import Debug from 'debug'
+import http from 'http'
+import config from 'config'
+import socketIoSetup from './lib/socket_io'
 
+const debug = Debug('laundree.server')
 const port = normalizePort(config.get('web.port'))
 
-module.exports = app.promise.then((app) => {
+export default app.promise.then((app) => {
   /**
    * Get port from environment and store in Express.
    */
@@ -61,7 +60,7 @@ function onError (error) {
 
   const bind = typeof port === 'string'
     ? 'Pipe ' + port
-    : 'Port ' + port
+    : 'Port ' + port.toString()
 
   // handle specific listen errors with friendly messages
   switch (error.code) {

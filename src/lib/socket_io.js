@@ -6,7 +6,7 @@ import LaundryHandler from '../handlers/laundry'
 import MachineHandler from '../handlers/machine'
 import BookingHandler from '../handlers/booking'
 import LaundryInvitationHandler from '../handlers/laundry_invitation'
-import { error } from '../utils'
+import * as error from '../utils/error'
 import Debug from 'debug'
 import { opbeat } from '../lib/opbeat'
 import EventEmitter from 'events'
@@ -313,4 +313,4 @@ function setupUser (socket, userUpdateEmitter, u: ?UserHandler) {
   })
 }
 
-module.exports = setupSocket
+export default setupSocket

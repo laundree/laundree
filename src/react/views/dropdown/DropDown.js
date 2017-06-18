@@ -1,29 +1,30 @@
-const React = require('react')
-const DropDownTitle = require('./DropDownTitle')
-const DropDownContent = require('./DropDownContent')
+// @flow
+import React from 'react'
+import DropDownTitle from './DropDownTitle'
+import DropDownContent from './DropDownContent'
+import PropTypes from 'prop-types'
+import type {Children} from 'react'
 
-class DropDown extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {open: false}
-    this.onToggle = () => this.toggle()
-    let ref
+export default class DropDown extends React.Component<*, {className: string, children: Children}, *> {
 
-    this.refPuller = (r) => {
-      ref = r
+  state = {open: false}
+  onToggle = () => this.toggle()
+  ref: HTMLElement
+
+  refPuller = (r: HTMLElement) => {
+    this.ref = r
+  }
+  clickListener = (event: Event) => {
+    let target = event.target
+    while (target && target.classList) {
+      if (target === this.ref) return
+      target = target.parentNode || null
     }
-    this.clickListener = (event) => {
-      let target = event.target
-      while (target && target.classList) {
-        if (target === ref) return
-        target = target.parentNode
-      }
-      this.close()
-    }
-    this.escListener = (event) => {
-      if (event.keyCode !== 27) return
-      this.close()
-    }
+    this.close()
+  }
+  escListener = (event: Event) => {
+    if (event.keyCode !== 27) return
+    this.close()
   }
 
   getChildContext () {
@@ -64,12 +65,5 @@ class DropDown extends React.Component {
 }
 
 DropDown.childContextTypes = {
-  closeDropDown: React.PropTypes.func.isRequired
+  closeDropDown: PropTypes.func.isRequired
 }
-
-DropDown.propTypes = {
-  className: React.PropTypes.string,
-  children: React.PropTypes.arrayOf(React.PropTypes.element).isRequired
-}
-
-module.exports = DropDown

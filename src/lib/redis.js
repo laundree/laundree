@@ -1,13 +1,16 @@
-/**
- * Created by budde on 23/06/16.
- */
+// @flow
 
-const redis = require('redis')
-const config = require('config')
+import redis from 'redis'
+import config from 'config'
+import type EventEmitter from 'events'
+
 const createClient = () => redis.createClient({host: config.get('redis.host'), port: config.get('redis.port')})
+
 const pubClient = createClient()
 const subClient = createClient()
+
 subClient.setMaxListeners(100)
+
 /**
  * Will link provided EventEmitter to redis.
  * @param {EventEmitter} subEmitter
@@ -17,7 +20,7 @@ subClient.setMaxListeners(100)
  * @param {function (Object) : Promise.<string> } serialize
  * @param {function (string) : Promise.<Object>} deserialize
  */
-function linkEmitter (subEmitter, pubEmitter, name, listen, serialize, deserialize) {
+export function linkEmitter<A, B> (subEmitter: EventEmitter, pubEmitter: EventEmitter, name: string, listen: string[], serialize: (A) => Promise<string>, deserialize: (string) => Promise<B>) {
   const channelName = `eventEmitter@${name + listen.join('+')}`
   subClient.on('message', (channel, message) => {
     if (channelName !== channel) return
@@ -34,5 +37,3 @@ function linkEmitter (subEmitter, pubEmitter, name, listen, serialize, deseriali
         })))
     }))
 }
-
-module.exports = {linkEmitter}

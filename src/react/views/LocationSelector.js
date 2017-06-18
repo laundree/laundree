@@ -158,4 +158,4 @@ class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSele
   }
 }
 
-module.exports = LocationSelector
+export default LocationSelector

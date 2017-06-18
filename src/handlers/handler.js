@@ -1,5 +1,5 @@
 // @flow
-import { regex } from '../utils'
+import * as regex from '../utils/regex'
 import EventEmitter from 'events'
 import { linkEmitter } from '../lib/redis'
 import Debug from 'debug'

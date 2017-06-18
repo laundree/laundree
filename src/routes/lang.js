@@ -1,16 +1,21 @@
-const express = require('express')
-const router = express.Router()
-const locales = require('../locales')
-const {logError} = require('../utils/error')
+// @flow
+import express from 'express'
+import {supported} from '../locales'
+import {logError} from '../utils/error'
+import type UserHandler from '../handlers/user'
+import type {Request} from '../types'
 
-locales.supported.forEach(locale => {
-  router.get(`/${locale}`, (req, res) => {
+const router = express.Router()
+
+supported.forEach(locale => {
+  router.get(`/${locale}`, (req: Request, res) => {
     req.session.locale = locale
-    if (req.user) {
-      req.user.setLocale(locale).catch(logError)
+    const user: ?UserHandler = req.user
+    if (user) {
+      user.setLocale(locale).catch(logError)
     }
     res.redirect(req.query.r || '/')
   })
 })
+export default router
 
-module.exports = router

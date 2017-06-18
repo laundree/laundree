@@ -1,18 +1,15 @@
-/**
- * Created by budde on 13/05/16.
- */
-
-const jdenticon = require('jdenticon')
-const express = require('express')
+// @flow
+import jdenticon from 'jdenticon'
+import express from 'express'
+import { hash } from '../utils/string'
+import { StatusError } from '../utils/error'
+import type {Request} from '../types'
 const router = express.Router()
-const {string: {hash}} = require('../utils')
 
-router.get('/:id/:size.svg', (req, res, next) => {
+router.get('/:id/:size.svg', (req: Request, res, next) => {
   const size = parseInt(req.params.size)
   if (isNaN(size) || size <= 0) {
-    const error = new Error('Image not found')
-    error.status = 404
-    return next(error)
+    next(new StatusError('Image not found', 404))
   }
   res.set('Content-Type', 'image/svg+xml')
   const id = /^[0-9a-f]{11,}$/.exec(req.params.id) ? req.params.id : hash(req.params.id)
@@ -20,4 +17,4 @@ router.get('/:id/:size.svg', (req, res, next) => {
   res.send(svg)
 })
 
-module.exports = router
+export default router

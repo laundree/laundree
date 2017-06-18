@@ -1,10 +1,9 @@
-/**
- * Created by budde on 23/09/16.
- */
-const {api, mail: {sendEmail}} = require('../../utils')
-const config = require('config')
+// @flow
+import * as api from '../../utils/api'
+import { sendEmail } from '../../utils/mail'
+import config from 'config'
 
-function contact (req, res) {
+async function contactF (req, res) {
   const {message, subject, email, name} = req.swagger.params.body.value
   let template, receiver, sender, userId, senderEmail, senderName
   const user = req.user
@@ -24,10 +23,15 @@ function contact (req, res) {
     template = 'contact'
     receiver = config.get('emails.contact')
   }
-  sendEmail({message, subject, email: senderEmail, name: senderName, userId}, template, receiver, {locale: req.locale})
-    .then(() => sendEmail({message, subject, name: senderName}, 'contact-receipt', sender, {locale: req.locale}))
-    .then(() => api.returnSuccess(res))
-    .catch(api.generateErrorHandler(res))
+  await sendEmail({
+    message,
+    subject,
+    email: senderEmail,
+    name: senderName,
+    userId
+  }, template, receiver, {locale: req.locale})
+  await sendEmail({message, subject, name: senderName}, 'contact-receipt', sender, {locale: req.locale})
+  api.returnSuccess(res)
 }
 
-module.exports = {contact}
+export const contact = api.wrapErrorHandler(contactF)

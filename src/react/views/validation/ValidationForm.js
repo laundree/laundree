@@ -1,40 +1,52 @@
-const React = require('react')
+// @flow
 
-class ValidationForm extends React.Component {
-  constructor (props) {
-    super(props)
-    this.initialState = {initial: true, failed: false, valid: {}}
-    this.state = this.initialState
-    this.submitHandler = (evt) => {
-      if (!this.valid) {
-        evt.preventDefault()
-        this.setState({failed: true})
-        return
-      }
-      if (!this.props.onSubmit) return
-      this.props.onSubmit(evt)
+import React from 'react'
+import type { Children } from 'react'
+import PropTypes from 'prop-types'
+
+type ValidationFormProps = {
+  sesh: number,
+  initial: bool,
+  onSubmit: Function,
+  className: string,
+  id: string,
+  method: string,
+  action: string,
+  children: Children
+}
+
+export default class ValidationForm extends React.Component {
+  initialState = {initial: true, failed: false, valid: {}}
+  state = this.initialState
+  submitHandler = (evt: Event) => {
+    if (!this.valid()) {
+      evt.preventDefault()
+      this.setState({failed: true})
+      return
     }
+    if (!this.props.onSubmit) return
+    this.props.onSubmit(evt)
   }
 
-  componentWillReceiveProps ({sesh}) {
+  componentWillReceiveProps ({sesh}: ValidationFormProps) {
     if (sesh === this.props.sesh) return
     this.setState(this.initialState)
   }
 
   generateValidationHandler () {
-    return (name, valid, initial) => {
+    return (name: string, valid: boolean, initial: boolean) => {
       this.setState((prevState) => {
         const valids = prevState.valid
         const obj = {}
         obj[name] = valid
         const resultObj = {valid: Object.assign({}, valids, obj)}
         if (initial) return Object.assign({}, resultObj)
-        return Object.assign({initial: false}, resultObj)
+        return {...{initial: false}, ...resultObj}
       })
     }
   }
 
-  get valid () {
+  valid () {
     const valids = this.state.valid
     return Object
       .keys(valids)
@@ -42,11 +54,11 @@ class ValidationForm extends React.Component {
       .every((v) => v)
   }
 
-  get initial () {
+  initial () {
     return this.props.initial || this.state.initial
   }
 
-  get failed () {
+  failed () {
     return this.state.failed
   }
 
@@ -54,11 +66,11 @@ class ValidationForm extends React.Component {
     return {validation: {handler: this.generateValidationHandler()}}
   }
 
-  get className () {
+  className () {
     return (this.props.className || '') +
-      (this.valid ? '' : ' invalid') +
-      (this.initial ? ' initial' : '') +
-      (this.failed ? ' failed' : '')
+      (this.valid() ? '' : ' invalid') +
+      (this.initial() ? ' initial' : '') +
+      (this.failed() ? ' failed' : '')
   }
 
   render () {
@@ -67,25 +79,12 @@ class ValidationForm extends React.Component {
       id={this.props.id}
       action={this.props.action}
       method={this.props.method}
-      className={this.className}>
+      className={this.className()}>
       {this.props.children}
     </form>
   }
 }
 
 ValidationForm.childContextTypes = {
-  validation: React.PropTypes.shape({handler: React.PropTypes.func})
+  validation: PropTypes.shape({handler: PropTypes.func})
 }
-
-ValidationForm.propTypes = {
-  sesh: React.PropTypes.number,
-  initial: React.PropTypes.bool,
-  onSubmit: React.PropTypes.func,
-  className: React.PropTypes.string,
-  id: React.PropTypes.string,
-  method: React.PropTypes.string,
-  action: React.PropTypes.string,
-  children: React.PropTypes.any
-}
-
-module.exports = ValidationForm

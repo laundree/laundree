@@ -1,6 +1,7 @@
 // @flow
-const React = require('react')
-const {Route, Redirect} = require('react-router')
+import React from 'react'
+import {Route, Redirect} from 'react-router'
+
 type StateCheckRedirectRouteProps<T> = {
   path: string,
   component: ReactClass<*>,
@@ -8,13 +9,15 @@ type StateCheckRedirectRouteProps<T> = {
   test:(T) => boolean,
   state: T
 }
-const StateCheckRedirectRoute = ({test, component, state, redirectTo, path}: StateCheckRedirectRouteProps<*>) => (
-  <Route
-    path={path}
-    render={props => test(state)
-      ? <component {...props} />
-      : <Redirect to={redirectTo} />
-    } />
-)
+const StateCheckRedirectRoute = ({test, component: Component, state, redirectTo, path}: StateCheckRedirectRouteProps<*>) => {
+  return (
+    <Route
+      path={path}
+      render={props => test(state)
+        ? <Component {...props} />
+        : <Redirect to={redirectTo} />
+      } />
+  )
+}
 
 export default StateCheckRedirectRoute
