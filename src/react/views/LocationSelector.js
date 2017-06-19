@@ -17,14 +17,14 @@ type LocationSelectorState = {
   latestCompletedLookupNo?: number,
   latestLookupNo?: number,
   results: string[],
-  formattedAddresses: {[string]: string},
+  formattedAddresses: { [string]: string },
   focus: boolean
 }
 
 type LocationSelectorProps = {
   googleApiKey: string,
   locale: LocaleType,
-  onChange:(string) => void,
+  onChange: (string) => void,
   value: string
 }
 
@@ -59,7 +59,7 @@ class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSele
     if (value.trim()) {
       this.lastLookup = setTimeout(() => this.lookup(value, lookupNo), 500)
     } else {
-      state.latestCompletedLookupNo = lookupNo
+      this.setState({latestCompletedLookupNo: lookupNo})
     }
     this.updateValue({address: value}, state)
     this.props.onChange('')
@@ -129,7 +129,7 @@ class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSele
       </ul>
     }
     return <div className='dropDownMessage'>
-      <FormattedMessage id={this.message()} />
+      <FormattedMessage id={this.message()}/>
     </div>
   }
 
@@ -150,7 +150,7 @@ class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSele
       onFocus={() => this.setState({focus: true})}>
       <Input
         type='text' value={this.state.values.address} onChange={evt => this.handleAddressChange(evt)}
-        placeholder={!this.state.values.address && this.props.value ? 'location-selector.loading-placeholder' : 'general.address'} />
+        placeholder={!this.state.values.address && this.props.value ? 'location-selector.loading-placeholder' : 'general.address'}/>
       <div className='dropDownContent'>
         {this.renderDropDownContent()}
       </div>

@@ -21,11 +21,11 @@ export default class ValueUpdater<V: {}, Props, State: {}> extends React.Compone
   }
 
   reset (state: $Shape<State & { values: V, sesh: number, notion: ?Notion }> = {}) {
-    this.setState(({sesh}) => ({...state, values: this.initialValues(), sesh: sesh + 1}))
+    this.setState(({sesh}) => ({...{values: this.initialValues(), sesh: sesh + 1}, ...state}))
   }
 
   updateValue (values: $Shape<V>, state: $Supertype<State> = {}) {
-    this.setState(({values: vals}) => ({...state, values: {...vals, values}}))
+    this.setState(({values: vals}) => ({...state, values: {...vals, ...values}}))
   }
 
   generateValueEventUpdater (m:(string, V) => $Shape<V>) {

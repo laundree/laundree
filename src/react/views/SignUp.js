@@ -7,10 +7,21 @@ import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 
-class SignUp extends ValueUpdater {
+type SignUpState = {
+  loading: boolean
+}
+
+type SignUpValues = {
+  name: string,
+  email: string,
+  password: string,
+  password2: string
+}
+
+class SignUp extends ValueUpdater<SignUpValues, *, SignUpState> {
 
   initialState () {
-    return {}
+    return {loading: false}
   }
 
   initialValues () {
@@ -33,6 +44,7 @@ class SignUp extends ValueUpdater {
         err => this.setState({
           loading: false,
           notion: {
+            success: false,
             message: <FormattedMessage id={err.status === 409
               ? 'auth.signup.error.already-exists'
               : 'auth.signup.error'}/>
@@ -118,13 +130,13 @@ class SignUp extends ValueUpdater {
           <ValidationElement
             initial={this.state.values.password2 === undefined}
             sesh={this.state.sesh}
-            validator={() => this.state.values.password === this.state.values.password2}
+            validator={() => this.state.values.password === this.state.values.password2 && this.state.values.password2}
             value={this.state.values.password2 || ''}>
             <Label data-validate-error='auth.error.invalid-repeated-password'>
               <Input
                 value={this.state.values.password2 || ''}
                 onChange={this.generateValueEventUpdater(password2 => ({password2}))}
-                type='password' name='password' placeholder='general.repeat-password'/>
+                type='password' name='password2' placeholder='general.repeat-password'/>
             </Label>
           </ValidationElement>
           <div className='accept'>
