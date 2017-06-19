@@ -192,7 +192,7 @@ async function createInviteCodeAsync (req, res) {
   const key = await laundry.createInviteCode()
   api.returnSuccess(res, {
     key,
-    href: `https://laundree.io/s/${laundry.shortId}/${key}`
+    href: `https://laundree.io/s/${laundry.shortId()}/${key}`
   })
 }
 

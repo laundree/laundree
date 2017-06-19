@@ -8,10 +8,10 @@ export default class Switch extends React.Component {
     onChange:(boolean) => void
   }
 
-  onClick = () => this.props.onChange(!this.isOn)
+  onClick = () => this.props.onChange(!this.isOn())
 
   isOn () {
-    return Boolean(this.props.on)
+    return this.props.on
   }
 
   render () {

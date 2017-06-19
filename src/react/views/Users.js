@@ -26,6 +26,10 @@ class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry 
     return {email: ''}
   }
 
+  initialState () {
+    return {}
+  }
+
   render () {
     if (this.props.laundry.demo) {
       return <div className='text'>
@@ -43,7 +47,7 @@ class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry 
             data-validate-error='users.error.invalid-email'>
             <Input
               placeholder='general.email-address'
-              type='text' onChange={this.generateValueUpdater(email => ({email}))}
+              type='text' onChange={this.generateValueEventUpdater(email => ({email}))}
               value={this.state.values.email}/>
           </Label>
         </ValidationElement>

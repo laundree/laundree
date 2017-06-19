@@ -120,7 +120,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
         <Label data-validate-error='user-settings.change-password.invalid-password'>
           <Input
             value={this.state.values.newPassword}
-            onChange={this.generateValueUpdater(newPassword => ({newPassword}))}
+            onChange={this.generateValueEventUpdater(newPassword => ({newPassword}))}
             type='password' placeholder='general.new-password' />
         </Label>
       </ValidationElement>
@@ -131,7 +131,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
         <Label data-validate-error='user-settings.change-password.password-match'>
           <Input
             value={this.state.values.newPasswordRepeat}
-            onChange={this.generateValueUpdater(newPasswordRepeat => ({newPasswordRepeat}))}
+            onChange={this.generateValueEventUpdater(newPasswordRepeat => ({newPasswordRepeat}))}
             type='password' placeholder='general.repeat-password' />
         </Label>
       </ValidationElement>
