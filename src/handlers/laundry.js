@@ -14,6 +14,7 @@ import config from 'config'
 import moment from 'moment-timezone'
 import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
 import GoogleMapsClient from '@google/maps'
+import type {EventOption as CalEvent} from 'ical-generator'
 
 const googleMapsClient = GoogleMapsClient.createClient({key: config.get('google.serverApiKey')})
 const debug = Debug('laundree.handlers.laundry')
@@ -495,7 +496,7 @@ export default class LaundryHandler extends Handler {
    * Lists bookings as events
    * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string}[]>}
    */
-  generateEvents () {
+  generateEvents (): Promise<CalEvent[]> {
     return this
       .fetchMachines()
       .then(machines => Promise.all(machines.map(m => m.generateEvents())))

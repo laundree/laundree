@@ -14,6 +14,7 @@ import config from 'config'
 import Debug from 'debug'
 import LaundryHandler from './laundry'
 import type {User} from 'laundree-sdk/lib/redux'
+import type {EventOption as CalEvent} from 'ical-generator'
 
 const debug = Debug('laundree.handlers.user')
 
@@ -297,7 +298,7 @@ export default class UserHandler extends Handler<UserModel, User> {
    * Lists bookings as events
    * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, url: string, summary: string}[]>}
    */
-  generateEvents () {
+  generateEvents (): Promise<CalEvent[]> {
     return this
       .fetchLaundries()
       .then(laundries => Promise.all(laundries.map(l => l.generateEvents())))

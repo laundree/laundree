@@ -235,7 +235,7 @@ class TimetableTable extends React.Component {
     this.hover({x: -1, y: -1})
   }
 
-  handleMouseOut () {
+  handleMouseOut (evt: *) {
     this.reset()
   }
 

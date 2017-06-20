@@ -13,7 +13,7 @@ import Machines from '../containers/Machines'
 import Users from '../containers/Users'
 import type { User, Laundry } from 'laundree-sdk/lib/redux'
 
-const OwnerCheckRoute = ({user, laundry, render, path}: {user: User, laundry: Laundry, render: () => React$Element<*>, path: string}) => (
+const OwnerCheckRoute = ({user, laundry, render, path}: {user: User, laundry: Laundry, render: (props: *) => React$Element<*>, path: string}) => (
   <Route path={path} render={props => {
     if (user.role !== 'admin' && laundry.owners.indexOf(user.id) < 0) {
       return <NotFound />
