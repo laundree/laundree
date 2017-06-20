@@ -1,6 +1,6 @@
 // @flow
 
-export function union<A> (array1: A[], array2: A[]): A[]{
+export function union<A> (array1: A[], array2: A[]): A[] {
   return array1.concat(array2).reduce((arr, v) => {
     if (arr.indexOf(v) >= 0) return arr
     arr.push(v)

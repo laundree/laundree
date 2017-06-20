@@ -24,7 +24,7 @@ type LocationSelectorState = {
 type LocationSelectorProps = {
   googleApiKey: string,
   locale: LocaleType,
-  onChange: (string) => void,
+  onChange: (s: string) => void,
   value: string
 }
 
