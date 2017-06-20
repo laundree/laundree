@@ -13,7 +13,7 @@ import BookingHandler from '../handlers/booking'
 import LaundryInvitationHandler from '../handlers/laundry_invitation'
 import UserHandler from '../handlers/user'
 import express from 'express'
-import type {Request} from '../types'
+import type { Request } from '../types'
 
 const router = express.Router()
 
@@ -114,42 +114,45 @@ function bookingCreator (req) {
 export function fetchRouter () {
   return new Promise((resolve) => {
     YAML.load(path.join(__dirname, '..', 'api', 'swagger', 'swagger.yaml'),
-      (result) => swaggerTools.initializeMiddleware(result, (middleware) => {
-        router.use(middleware.swaggerMetadata())
-        router.use((req: Request, res, next) => {
-          if (!opbeat) return next()
-          if (!req.swagger || !req.swagger.apiPath) return next()
-          opbeat.setTransactionName(`${req.method} ${req.swagger.apiPath}`)
-          next()
-        })
-
-        router.use((req: Request, res, next) => {
-          passport.authenticate('basic', (err, user, info) => {
-            if (err) return next(err)
-            if (!user) return next()
-            req.user = user
+      (result) => {
+        result.basePath = '/'
+        swaggerTools.initializeMiddleware(result, (middleware) => {
+          router.use(middleware.swaggerMetadata())
+          router.use((req: Request, res, next) => {
+            if (!opbeat) return next()
+            if (!req.swagger || !req.swagger.apiPath) return next()
+            opbeat.setTransactionName(`${req.method} ${req.swagger.apiPath}`)
             next()
-          })(req, res, next)
+          })
+
+          router.use((req: Request, res, next) => {
+            passport.authenticate('basic', (err, user, info) => {
+              if (err) return next(err)
+              if (!user) return next()
+              req.user = user
+              next()
+            })(req, res, next)
+          })
+          router.use(middleware.swaggerSecurity({
+            subjectsExists: wrapSecurity(pullSubjects),
+            userAccess: wrapSecurity(userAccess),
+            self: wrapSecurity(self),
+            administrator: wrapSecurity(administrator),
+            tokenOwner: wrapSecurity(tokenOwner),
+            laundryOwner: wrapSecurity(laundryOwner),
+            laundryUser: wrapSecurity(laundryUser),
+            bookingCreator: wrapSecurity(bookingCreator)
+          }))
+          router.use(middleware.swaggerValidator({validateResponse: true}))
+          router.use(middleware.swaggerRouter({controllers: path.join(__dirname, '..', 'api', 'controllers')}))
+          router.use((err, req: Request, res, next) => {
+            const status = (typeof err.status === 'number' && err.status) || res.statusCode || 500
+            res.status(status)
+            if (status === 500) logError(err)
+            res.json({message: err.message})
+          })
+          resolve(router)
         })
-        router.use(middleware.swaggerSecurity({
-          subjectsExists: wrapSecurity(pullSubjects),
-          userAccess: wrapSecurity(userAccess),
-          self: wrapSecurity(self),
-          administrator: wrapSecurity(administrator),
-          tokenOwner: wrapSecurity(tokenOwner),
-          laundryOwner: wrapSecurity(laundryOwner),
-          laundryUser: wrapSecurity(laundryUser),
-          bookingCreator: wrapSecurity(bookingCreator)
-        }))
-        router.use(middleware.swaggerValidator({validateResponse: true}))
-        router.use(middleware.swaggerRouter({controllers: path.join(__dirname, '..', 'api', 'controllers')}))
-        router.use((err, req: Request, res, next) => {
-          const status = (typeof err.status === 'number' && err.status) || 500
-          res.status(status)
-          if (res.statusCode === 500) logError(err)
-          res.json({message: err.message})
-        })
-        resolve(router)
-      }))
+      })
   })
 }

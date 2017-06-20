@@ -1,5 +1,5 @@
 import request from 'supertest'
-import { app } from '../../../../test_target/app'
+import { app, promise } from '../../../../test_target/app'
 import chai from 'chai'
 import config from 'config'
 import BookingHandler from '../../../../test_target/handlers/booking'
@@ -31,27 +31,29 @@ describe('controllers', function () {
   describe('bookings', function () {
     this.timeout(5000)
     describe('GET /api/machines/{id}/bookings', () => {
-      it('should fail on not authenticated', () =>
-        dbUtils.populateMachines(1).then(({machine}) => request(app)
+      it('should fail on not authenticated', async () => {
+        const {machine} = await dbUtils.populateMachines(1)
+        await request(await promise)
           .get(`/api/machines/${machine.model.id}/bookings`)
           .set('Accept', 'application/json')
           .expect(403)
-          .expect('Content-Type', /json/)))
+          .expect('Content-Type', /json/)
+      })
 
-      it('should limit output size', () =>
-        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) =>
-          request(app)
-            .get(`/api/machines/${machine.model.id}/bookings`)
-            .set('Accept', 'application/json')
-            .query({from: 0, to: Date.now()})
-            .auth(user.model.id, token.secret)
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .then(res => {
-              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
+      it('should limit output size', async () => {
+        const {user, token, machine, bookings} = await dbUtils.populateBookings(50)
+
+        const res = await request(app)
+          .get(`/api/machines/${machine.model.id}/bookings`)
+          .set('Accept', 'application/json')
+          .query({from: 0, to: Date.now()})
+          .auth(user.model.id, token.secret)
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+        const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
+        res.body.should.deep.equal(arr)
+      })
 
       it('should query range', () =>
         dbUtils.populateBookings(50).then(({user, token, machine, bookings}) =>
@@ -173,15 +175,17 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(400)))
 
-      it('should fail on invalid date', () =>
-        dbUtils.populateBookings(1).then(({user, token, machine}) =>
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({from: {}, to: createDateTomorrow()})
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(400)))
+      it('should fail on invalid date', async () => {
+        const {user, token, machine} = await dbUtils.populateBookings(1)
+        const result = await request(app)
+          .post(`/api/machines/${machine.model.id}/bookings`)
+          .send({from: {}, to: createDateTomorrow()})
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(400)
+        result.body.should.deep.equal({message: 'Request validation failed: Parameter (body) failed schema validation'})
+      })
 
       it('should fail on invalid to', () =>
         dbUtils.populateBookings(1).then(({user, token, machine, bookings}) =>
