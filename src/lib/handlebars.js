@@ -43,7 +43,7 @@ export default function setup (app: Application) {
   })
   return fs.readdir(partialsPath)
     .then(files => Promise.all(files.map(file => fs
-      .readFile(path.resolve(partialsPath, file), 'utf8')
+      .readFile(path.resolve(partialsPath, file))
       .then(data => {
         debug(`Registered partial ${file}`)
         return handlebars.registerPartial(file, handlebars.compile(data))

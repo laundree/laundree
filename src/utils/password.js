@@ -11,8 +11,8 @@ import base64UrlSafe from 'urlsafe-base64'
  * @return {Promise.<string>}
  */
 export function hashPassword (password: string, saltRounds?: number): Promise<string> {
-  saltRounds = saltRounds || config.get('security.password.saltRounds')
-  return new Promise((resolve, reject) => bcrypt.genSalt(saltRounds, (err, salt) => {
+  const certainSaltRounds: number = saltRounds || config.get('security.password.saltRounds')
+  return new Promise((resolve, reject) => bcrypt.genSalt(certainSaltRounds, (err, salt) => {
     if (err) return reject(err)
     bcrypt.hash(password, salt, (err, hash) => {
       if (err) return reject(err)

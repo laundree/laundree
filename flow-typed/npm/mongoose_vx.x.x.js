@@ -19,7 +19,7 @@ declare class mongoose$VirtualSpec {
 declare class mongoose$Schema<Definition> {
   constructor (definition: mongoose$SchemaDefinition, options: mongoose$SchemaOptions): void;
   static Types: mongoose$SchemaTypes;
-  index({ [string]: number }): void;
+  index({ [string]: number }, options?: {unique?: boolean}): void;
   virtual(key: $Keys<Definition>): mongoose$VirtualSpec
 }
 

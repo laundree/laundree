@@ -2,6 +2,7 @@
 import type { Request as Req, Response as Res, Application as App, Router as R } from 'express'
 import type UserHandler from './handlers/user'
 import type { LocaleType } from './locales'
+import type { FlashType } from './utils/flash'
 
 type CustomRequestAddendum = {
   user: ?UserHandler,
@@ -16,7 +17,7 @@ type CustomRequestAddendum = {
     locale?: LocaleType
   },
   logout: () => void,
-  flash: (type: string) => string[]
+  flash: (type: 'success' | 'error', type: ?FlashType) => string[]
 }
 
 type CustomResponseAddendum = {
