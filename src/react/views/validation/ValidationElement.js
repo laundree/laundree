@@ -15,7 +15,7 @@ export type ValidationElementProps<V> = {
   equal?: V,
   not?: V,
   value: V,
-  validator?: (V) => boolean,
+  validator?: (v: V) => boolean,
   children: Children,
   notOneOf?: string[],
   oneOf?: string[],
