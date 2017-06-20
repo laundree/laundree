@@ -23,7 +23,7 @@ import type { Response, Request, Application } from './types'
 const debug = Debug('laundree.app')
 connectMongoose()
 
-const app: Application = express()
+export const app: Application = express()
 app.use(compression())
 
 // SETUP FLASH
@@ -67,44 +67,41 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 
-export default {
-  app,
-  promise: fetchRoutes().then(routes => {
-    app.use('/', routes)
-    app.get('/err', (req: Request, res, next) => {
-      next(new Error('This is a test error'))
-    })
-
-    app.use(function (req: Request, res, next) {
-      next(new error.StatusError('Not found', 404))
-    })
-    app.use((err, req: Request, res, next) => {
-      const status = (err && err.status) || 500
-      switch (status) {
-        case 404:
-          res.status(404)
-          res.renderHb('error-404.hbs', {
-            intlTitle: 'document-title.not-found', styles: ['/stylesheets/error.css']
-          })
-          break
-        default:
-          next(err)
-      }
-    })
-
-    if (opbeat) app.use(opbeat.middleware.express())
-
-    app.use((err, req: Request, res, next) => {
-      const status = (typeof err.status === 'number' && err.status) || 500
-      res.status(status)
-      error.logError(err)
-      res.renderHb('error-500.hbs', {
-        message: err.message,
-        intlTitle: 'document-title.internal-error',
-        styles: ['/stylesheets/error.css']
-      })
-    })
-    trackRelease()
-    return app
+export const promise = fetchRoutes().then(routes => {
+  app.use('/', routes)
+  app.get('/err', (req: Request, res, next) => {
+    next(new Error('This is a test error'))
   })
-}
+
+  app.use(function (req: Request, res, next) {
+    next(new error.StatusError('Not found', 404))
+  })
+  app.use((err, req: Request, res, next) => {
+    const status = (err && err.status) || 500
+    switch (status) {
+      case 404:
+        res.status(404)
+        res.renderHb('error-404.hbs', {
+          intlTitle: 'document-title.not-found', styles: ['/stylesheets/error.css']
+        })
+        break
+      default:
+        next(err)
+    }
+  })
+
+  if (opbeat) app.use(opbeat.middleware.express())
+
+  app.use((err, req: Request, res, next) => {
+    const status = (typeof err.status === 'number' && err.status) || 500
+    res.status(status)
+    error.logError(err)
+    res.renderHb('error-500.hbs', {
+      message: err.message,
+      intlTitle: 'document-title.internal-error',
+      styles: ['/stylesheets/error.css']
+    })
+  })
+  trackRelease()
+  return app
+})

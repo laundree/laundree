@@ -12,10 +12,8 @@ import calendar from './calendar'
 import inviteCode from './invite-code'
 import lang from './lang'
 import app from './app'
+import webpack from './webpack'
 import {fetchRouter} from './swagger'
-import webpackMiddleware from 'webpack-dev-middleware'
-import webpack from 'webpack'
-import conf from '../../webpack.dev'
 
 export function fetchPseudoStaticRoutes () {
   const router = express.Router()
@@ -28,11 +26,7 @@ export function fetchPseudoStaticRoutes () {
     indentedSyntax: true,
     sourceMap: true
   }))
-  if (process.env.NODE_ENV !== 'production') { // TODO only do on dev
-    router.use(webpackMiddleware(webpack(conf), {
-      publicPath: '/javascripts/'
-    }))
-  }
+  router.use(webpack)
   return router
 }
 
@@ -44,7 +38,7 @@ export function fetchRoutes () {
   router.use('/s', inviteCode)
   router.use('/lang', lang)
   return fetchRouter().then(route => {
-    router.use('/', cors(), route)
+    router.use('/api', cors(), route)
     router.use('/', app)
     return router
   })
