@@ -8,3 +8,6 @@ test_target
 .nyc_output
 build_output.txt
 coverage
+gcloud-credentials.json
+credentials.tar.gz
+credentials.tar.gz.enc
