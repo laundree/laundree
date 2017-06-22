@@ -25,7 +25,7 @@ data:
   mongoUrl: "mongodb://mongo/laundree-beta"
   opbeatAppId: '2843b6b20b'
   opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
-  googleClientId: '1098336985149-t3unnf4fj7c6rm6eogerpo6dnr433si6.apps.googleusercontent.com'
+  googleClientId: '1098336985149-rm2accpmlkfchc5176m3shv1o9rjk3ks.apps.googleusercontent.com'
   googleCallbackUrl: 'https://beta.laundree.io/auth/google/callback'
-  facebookAppId: '1044245498966904'
+  facebookAppId: '112049622744375'
   facebookCallbackUrl: 'https://beta.laundree.io/auth/facebook/callback'
