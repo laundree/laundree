@@ -107,6 +107,7 @@
     "test:lint": "eslint .",
     "test:unit": "mocha --require babel-register test/**/*.spec.js",
     "test:unit-covered": "nyc --reporter=lcov --require babel-register mocha test/**/*.spec.js",
+    "test:nightwatch": "babel-node scripts/run-nightwatch.js",
     "start:lib": "node lib",
     "start:lib-covered": "nyc --reporter=lcov node lib",
     "start:src": "babel-node src --trace-warnings",
