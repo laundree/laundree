@@ -1,8 +1,12 @@
 /**
  * Created by budde on 31/10/2016.
  */
-const faker = require('faker')
-const config = require('config')
+import connectMongoose from '../test_target/lib/mongoose'
+import faker from 'faker'
+import config from 'config'
+
+connectMongoose()
+
 const timeout = config.get('sauceLabs.timeout')
 
 function signIn (client, username, password) {

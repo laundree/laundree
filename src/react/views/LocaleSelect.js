@@ -17,7 +17,7 @@ const LocaleSelect = (props: { location: Location, locale: LocaleType }) => <Dro
         <DropDownCloser>
           <a
             href={`/lang/${l}?r=${encodeURIComponent(props.location.pathname)}`}
-            className='link'>{locales[l].name}</a>
+            className='link'>{locales.names[l]}</a>
         </DropDownCloser>
       </li>)}
     </ul>
