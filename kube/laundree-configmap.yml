@@ -27,5 +27,5 @@ data:
   opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
   googleClientId: '1098336985149-rm2accpmlkfchc5176m3shv1o9rjk3ks.apps.googleusercontent.com'
   googleCallbackUrl: 'https://beta.laundree.io/auth/google/callback'
-  facebookAppId: '112049622744375'
+  facebookAppId: '233065037208325'
   facebookCallbackUrl: 'https://beta.laundree.io/auth/facebook/callback'
