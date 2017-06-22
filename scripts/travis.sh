@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+if [ "$TRAVIS_BRANCH" = "beta" ]; then
+  echo "Skipping tests on beta"
+  exit 0
+fi
+
 set -e
 
 docker-compose -f docker-compose.test.yml build
