@@ -38,23 +38,35 @@ spec:
                 name: laundree-${BRANCH}
                 key: host
           - name: FACEBOOK_APP_ID
-            value: '1044245498966904'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: facebookAppId
           - name: 'FACEBOOK_APP_SECRET'
             valueFrom:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: facebookAppSecret
           - name: 'FACEBOOK_CALLBACK_URL'
-            value: 'https://laundree.io/auth/facebook/callback'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: facebookCallbackUrl
           - name: 'GOOGLE_CALLBACK_URL'
-            value: 'https://laundree.io/auth/google/callback'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: googleCallbackUrl
           - name: 'GOOGLE_CLIENT_API_KEY'
             valueFrom:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: googleClientApiKey
           - name: 'GOOGLE_CLIENT_ID'
-            value: '1098336985149-t3unnf4fj7c6rm6eogerpo6dnr433si6.apps.googleusercontent.com'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: googleClientId
           - name: 'GOOGLE_CLIENT_SECRET'
             valueFrom:
               secretKeyRef:
