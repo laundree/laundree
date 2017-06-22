@@ -11,7 +11,6 @@ module.exports = {
     user = await UserHandler
       .lib
       .createUserWithPassword(faker.name.findName(), email, password)
-    console.log('User created')
     const token = await user.generateVerifyEmailToken(email)
     await user.verifyEmail(email, token.secret)
     done()
