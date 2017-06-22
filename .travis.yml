@@ -4,6 +4,7 @@ cache:
   directories:
   - node_modules
   - public/videos
+  - ~/google-cloud-sdk
 env:
   global:
   - secure: YcZTCqPR2u9xi76hGaJtkR2zrF7y6QBXwxXYTQXLFjaxst75udDYQE1SHLuB/83sXyvLQIlApJ8tdJTO4Q/diPiRLXHyxy8s9GKBsEVlhB9fqFMFk3nQ6P9ydtEiEXE0krTuaCyWuBE6ulL9H6AAY9EWKmbWD00i7HInO1whuHsugu8BPk946KYq3uL1OIRx8rpLSc3OMoCQFOkyrwY/LdrMWSeECTxZA+qJHs34mobFlWtjDWipfJ1zzk+l83boLKoJ0+5tB8kc/cR2v4v9C8A2kMfY+R6lBQ+gz3zOMVlIR8/TXcwB0nBu8+VAT7qhr6Xzlns/3BcuC6nEjeQR1+gcPXGLg6RHgsQuT0uEf/E/oJO1f61iWGpZRIdnNvmJQrqj9DhaG0MMbSV2nz37jYotwFYDfP4ulLI+DjKkJa7glXJ8MNhOjJt58HA+2GHfDXgBfZ1IKV9+qCC3GZASvfOiKO+H5zUDrd/CFyOZQx/8ibs7fcLrQHq3GAkRXBQqwIjlLHmyHVddV+eA2AyClDdgcWzOxPnKS1jr8HuXCx2M6v1JrRxqy1b2qBeRKqBWisKo0O67hAqGQ4f2/OkdBu76CLePvrHiIuX8SEUneUdjhX2JZcpyiOFKLAHOPxBgKi9XXCm1eKAPHbekVI4Tzv2EhC5ta1W/t6IBvjucNs4=
@@ -16,9 +17,17 @@ env:
 services:
 - docker
 script:
-- "./scripts/travis.sh"
+- ./scripts/travis.sh
 deploy:
   provider: script
-  script: "./scripts/deploy.sh"
+  script: ./scripts/deploy.sh
   on:
     branch: master
+before_install:
+- openssl aes-256-cbc -K $encrypted_3c0236424301_key -iv $encrypted_3c0236424301_iv
+  -in credentials.tar.gz.enc -out credentials.tar.gz -d
+- if [ ! -d ~/google-cloud-sdk ]; then
+     curl https://sdk.cloud.google.com | bash;
+  fi
+- tar -xzf credentials.tar.gz
+- gcloud auth activate-service-account --key-file client-secret.json
