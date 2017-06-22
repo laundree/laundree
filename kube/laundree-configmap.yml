@@ -7,6 +7,8 @@ metadata:
 data:
   host: laundree.io
   mongoUrl: "mongodb://mongo/laundree"
+  opbeatAppId: '71392cdc57'
+  opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
 
 ---
 
@@ -17,4 +19,5 @@ metadata:
 data:
   host: beta.laundree.io
   mongoUrl: "mongodb://mongo/laundree-beta"
-
+  opbeatAppId: '2843b6b20b'
+  opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
