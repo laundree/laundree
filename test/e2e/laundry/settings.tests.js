@@ -16,7 +16,7 @@ module.exports = {
   'beforeEach': (client, done) => {
     email = faker.internet.email()
     password = faker.internet.password()
-    UserHandler.createUserWithPassword(faker.name.findName(), email, password)
+    UserHandler.lib.createUserWithPassword(faker.name.findName(), email, password)
       .then(u => {
         return u.generateVerifyEmailToken(email)
           .then(token => u.verifyEmail(email, token.secret))
