@@ -2,18 +2,18 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: laundree
+  name: laundree-${BRANCH}
 spec:
   replicas: 2
   template:
     metadata:
       labels:
-        app: laundree
+        app: laundree-${BRANCH}
     spec:
       containers:
       # [START web]
       - name: laundree
-        image: laundree/laundree
+        image: laundree/laundree:${TAG}
         readinessProbe:
           httpGet:
             path: /
@@ -28,13 +28,21 @@ spec:
           - name: 'NODE_ENV'
             value: 'production'
           - name: 'MONGO_URL'
-            value: 'mongodb://mongo/laundree'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: mongoUrl
+          - name: 'HOST'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: host
           - name: FACEBOOK_APP_ID
             value: '1044245498966904'
           - name: 'FACEBOOK_APP_SECRET'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: facebookAppSecret
           - name: 'FACEBOOK_CALLBACK_URL'
             value: 'https://laundree.io/auth/facebook/callback'
@@ -43,31 +51,31 @@ spec:
           - name: 'GOOGLE_CLIENT_API_KEY'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: googleClientApiKey
           - name: 'GOOGLE_CLIENT_ID'
             value: '1098336985149-t3unnf4fj7c6rm6eogerpo6dnr433si6.apps.googleusercontent.com'
           - name: 'GOOGLE_CLIENT_SECRET'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: googleClientSecret
           - name: 'GOOGLE_SERVER_API_KEY'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: googleServerApiKey
           - name: 'MAILER_SMTP_TRANSPORT'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: mailerSmtpTransport
           - name: 'ONE_SIGNAL_APP_ID'
             value: '390e23c3-658b-46cd-83ee-2fdead3211af'
           - name: 'ONE_SIGNAL_REST_API_KEY'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: oneSignalRestApiKey
           - name: 'OPBEAT_APP_ID'
             value: '71392cdc57'
@@ -78,12 +86,12 @@ spec:
           - name: 'OPBEAT_SECRET_TOKEN'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: opbeatSecretToken
           - name: 'SESSION_SECRET'
             valueFrom:
               secretKeyRef:
-                name: laundree
+                name: laundree-${BRANCH}
                 key: sessionSecret
         ports:
           - containerPort: 3000
@@ -92,9 +100,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: laundree
+  name: laundree-${BRANCH}
   labels:
-    app: laundree
+    app: laundree-${BRANCH}
 spec:
   type: NodePort
   ports:
@@ -103,4 +111,4 @@ spec:
     protocol: TCP
     name: http
   selector:
-    app: laundree
+    app: laundree-${BRANCH}
