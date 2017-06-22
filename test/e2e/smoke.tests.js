@@ -1,7 +1,7 @@
 /**
  * Created by budde on 31/10/2016.
  */
-const {timeout} = require('../nightwatch_utils.js')
+import {timeout} from '../nightwatch_utils.js'
 
 module.exports = {
   'Can load front page': client =>

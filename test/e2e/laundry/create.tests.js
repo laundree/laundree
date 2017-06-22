@@ -9,6 +9,7 @@ module.exports = {
     email = faker.internet.email()
     password = faker.internet.password()
     UserHandler
+      .lib
       .createUserWithPassword(faker.name.findName(), email, password)
       .then(u => {
         user = u
