@@ -7,7 +7,14 @@ const debug = Debug('laundree.models')
 
 mongoose.Promise = Promise
 
+let started = false
+
 export default function connectMongoose () {
+  if (started) {
+    debug('Mongoose already connected...')
+    return
+  }
+  started = true
   mongoose.connect(config.get('mongo.url'))
 
   mongoose.connection.on('connected', () => debug('Mongoose connected'))
