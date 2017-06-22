@@ -1,6 +1,6 @@
 // @flow
 
-import app from './app'
+import {promise} from './app'
 import Debug from 'debug'
 import http from 'http'
 import config from 'config'
@@ -9,7 +9,7 @@ import socketIoSetup from './lib/socket_io'
 const debug = Debug('laundree.server')
 const port = normalizePort(config.get('web.port'))
 
-export default app.promise.then((app) => {
+export default promise.then((app) => {
   /**
    * Get port from environment and store in Express.
    */
