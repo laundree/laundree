@@ -1,5 +1,6 @@
 web:
   port: 'PORT'
+  host: 'HOST'
 
 redis:
   host: 'REDIS_HOST'
