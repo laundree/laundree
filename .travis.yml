@@ -30,4 +30,4 @@ before_install:
   > ~/gcloud.sh && chmod +x ~/gcloud.sh && ~/gcloud.sh --install-dir=${HOME} --disable-prompts;
   fi
 - tar -xzf credentials.tar.gz
-- gcloud auth activate-service-account --key-file gcloud-credentials.json
+- ~/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file gcloud-credentials.json
