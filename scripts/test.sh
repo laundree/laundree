@@ -45,4 +45,4 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:3000); d
 done
 sleep 5
 
-./scripts/run-nightwatch.js
+npm run test:nightwatch
