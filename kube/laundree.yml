@@ -78,11 +78,15 @@ spec:
                 name: laundree-${BRANCH}
                 key: oneSignalRestApiKey
           - name: 'OPBEAT_APP_ID'
-            value: '71392cdc57'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatAppId
           - name: 'OPBEAT_ORGANIZATION_ID'
-            value: '269d8b7d5eca44c2bb850e06a5316184'
-          - name: 'OPBEAT_SECRET_TOKEN'
-            value: '269d8b7d5eca44c2bb850e06a5316184'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatOrgId
           - name: 'OPBEAT_SECRET_TOKEN'
             valueFrom:
               secretKeyRef:
