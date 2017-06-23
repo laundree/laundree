@@ -1,15 +1,21 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const React = require('react')
-const {FormattedDate, FormattedMessage} = require('react-intl')
-const string = require('../../utils/string')
-const moment = require('moment-timezone')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const {Link} = require('react-router-dom')
+import React from 'react'
+import { FormattedDate, FormattedMessage } from 'react-intl'
+import * as string from '../../utils/string'
+import moment from 'moment-timezone'
+import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
+import { Link } from 'react-router-dom'
+import type { Laundry, Machine } from 'laundree-sdk/lib/redux'
 
-const TimetableHeader = (props) => {
+type TimetableHeaderProps = {
+  hoverColumn: number,
+  laundry: Laundry,
+  date: moment,
+  machines: { [string]: Machine }
+}
+
+const TimetableHeader = (props: TimetableHeaderProps) => {
   const machines = props.laundry.machines
     .map(id => props.machines[id])
     .filter(m => m)
@@ -30,8 +36,8 @@ const TimetableHeader = (props) => {
               <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}/>
             </svg>
             {machine.broken ? <svg className='broken'>
-                <use xlinkHref='#CloseX'/>
-              </svg> : null}
+              <use xlinkHref='#CloseX'/>
+            </svg> : null}
           </td>)}
       </tr>
       <tr className='labels'>
@@ -47,18 +53,14 @@ const TimetableHeader = (props) => {
     </table>
   </div>
 }
-TimetableHeader.propTypes = {
-  hoverColumn: React.PropTypes.number,
-  laundry: React.PropTypes.object.isRequired,
-  date: React.PropTypes.object.isRequired,
-  machines: React.PropTypes.object.isRequired
-}
 
 class CalendarNavigationElement extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {current: this.firstDate}
+  props: {
+    laundry: Laundry,
+    dates: moment[]
+
   }
+  state = {current: this.firstDate}
 
   week (mom = moment()) {
     return [
@@ -91,7 +93,7 @@ class CalendarNavigationElement extends React.Component {
     return this._monthBuilder(firstDay, firstDay)
   }
 
-  get header () {
+  header () {
     return <thead>
     <tr>
       {this.week().map(d => <th key={d.unix()}><FormattedDate weekday='narrow' value={d.toDate()}/></th>)}
@@ -102,16 +104,16 @@ class CalendarNavigationElement extends React.Component {
   generateClassName (now, day) {
     const otherMonth = this.state.current.month() !== day.month()
     const today = now.isSame(day, 'day')
-    const active = day.isSameOrBefore(this.lastDate) && day.isSameOrAfter(this.firstDate)
+    const active = day.isSameOrBefore(this.lastDate()) && day.isSameOrAfter(this.firstDate())
     const hover = this.state.hover && day.isSameOrAfter(this.state.hover.start) && day.isSameOrBefore(this.state.hover.end) ? 'hover' : ''
     return `${otherMonth ? 'otherMonth' : ''} ${today ? 'today' : ''} ${active ? 'active' : ''} ${hover ? 'hover' : ''}`
   }
 
-  get firstDate () {
+  firstDate () {
     return this.props.dates[0]
   }
 
-  get lastDate () {
+  lastDate () {
     return this.props.dates[this.props.dates.length - 1]
   }
 
@@ -149,7 +151,7 @@ class CalendarNavigationElement extends React.Component {
           onClick={() => this.setState(({current}) => ({current: current.clone().add(1, 'month')}))}/>
       </nav>
       <table onMouseOut={() => this.setState({hover: null})}>
-        {this.header}
+        {this.header()}
         <DropDownCloser>
           {this.renderMonth()}
         </DropDownCloser>
@@ -158,26 +160,26 @@ class CalendarNavigationElement extends React.Component {
   }
 }
 
-CalendarNavigationElement.propTypes = {
-  laundry: React.PropTypes.object.isRequired,
-  dates: React.PropTypes.arrayOf(React.PropTypes.objectOf(moment)).isRequired
-}
-
 class TimeTableHeaderNav extends React.Component {
-  get firstDate () {
+  props: {
+    laundry: Laundry,
+    dates: moment[]
+  }
+
+  firstDate () {
     return this.props.dates[0]
   }
 
-  get lastDate () {
+  lastDate () {
     return this.props.dates[this.props.dates.length - 1]
   }
 
-  get yesterday () {
-    return this.firstDate.clone().subtract(1, 'd')
+  yesterday () {
+    return this.firstDate().clone().subtract(1, 'd')
   }
 
-  get tomorrow () {
-    return this.firstDate.clone().add(1, 'd')
+  tomorrow () {
+    return this.firstDate().clone().add(1, 'd')
   }
 
   renderTitle () {
@@ -188,7 +190,7 @@ class TimeTableHeaderNav extends React.Component {
         </svg>
         <FormattedDate
           weekday='short' month='numeric' day='numeric'
-          value={this.firstDate}/>
+          value={this.firstDate()}/>
       </div>
     }
 
@@ -201,10 +203,10 @@ class TimeTableHeaderNav extends React.Component {
         values={{
           fromDate: <FormattedDate
             weekday='short' month='numeric' day='numeric'
-            value={new Date(this.firstDate.format('YYYY-MM-DD'))}/>,
+            value={new Date(this.firstDate().format('YYYY-MM-DD'))}/>,
           toDate: <FormattedDate
             weekday='short' month='numeric' day='numeric'
-            value={new Date(this.lastDate.format('YYYY-MM-DD'))}/>
+            value={new Date(this.lastDate().format('YYYY-MM-DD'))}/>
         }}
       />
     </div>
@@ -214,7 +216,7 @@ class TimeTableHeaderNav extends React.Component {
     if (this.props.dates.length === 0) return null
     return <div className='timeTableHeaderNav'>
       <Link
-        to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday.format('YYYY-MM-DD')}`}
+        to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.yesterday().format('YYYY-MM-DD')}`}
         className='arrow left'/>
       <DropDown>
         <DropDownTitle>{this.renderTitle()}</DropDownTitle>
@@ -225,18 +227,13 @@ class TimeTableHeaderNav extends React.Component {
         </DropDownContent>
       </DropDown>
       <Link
-        to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow.format('YYYY-MM-DD')}`}
+        to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${this.tomorrow().format('YYYY-MM-DD')}`}
         className='arrow right'/>
     </div>
   }
 }
 
-TimeTableHeaderNav.propTypes = {
-  laundry: React.PropTypes.object,
-  dates: React.PropTypes.array.isRequired
-}
-
-const TimetableHeaders = (props) => {
+const TimetableHeaders = (props: { hoverColumn: number, laundry: Laundry, dates: moment[], machines: { [string]: Machine } }) => {
   const now = moment.tz(props.laundry.timezone)
   return <header
     className={props.dates.length && props.dates[0].isSameOrBefore(now, 'd') ? 'today' : undefined}>
@@ -255,11 +252,4 @@ const TimetableHeaders = (props) => {
   </header>
 }
 
-TimetableHeaders.propTypes = {
-  hoverColumn: React.PropTypes.number,
-  laundry: React.PropTypes.object.isRequired,
-  dates: React.PropTypes.array.isRequired,
-  machines: React.PropTypes.object.isRequired
-}
-
-module.exports = TimetableHeaders
+export default TimetableHeaders

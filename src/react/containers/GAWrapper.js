@@ -1,12 +1,10 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const GAWrapper = require('../views/GAWrapper')
+import {connect} from 'react-redux'
+import GAWrapper from '../views/GAWrapper'
 
 const mapStateToProps = ({currentUser}, {location}) => {
   return {currentUser, location}
 }
 
-module.exports = connect(mapStateToProps)(GAWrapper)
+export default connect(mapStateToProps)(GAWrapper)

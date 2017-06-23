@@ -1,20 +1,19 @@
-const faker = require('faker')
-const {timeout, setupLaundry} = require('../../nightwatch_utils.js')
-const {UserHandler} = require('../../../test_target/handlers')
+import faker from 'faker'
+import { timeout, setupLaundry } from '../../nightwatch_utils.js'
+import UserHandler from '../../../test_target/handlers/user'
 
 let email, password, user
 
 module.exports = {
-  'beforeEach': (client, done) => {
+  'beforeEach': async (client, done) => {
     email = faker.internet.email()
     password = faker.internet.password()
-    UserHandler
+    user = await UserHandler
+      .lib
       .createUserWithPassword(faker.name.findName(), email, password)
-      .then(u => {
-        user = u
-        return user.generateVerifyEmailToken(email).then(token => user.verifyEmail(email, token.secret))
-      })
-      .then(() => done())
+    const token = await user.generateVerifyEmailToken(email)
+    await user.verifyEmail(email, token.secret)
+    done()
   },
   'Can create invite PDF': client => {
     setupLaundry(client, email, password)

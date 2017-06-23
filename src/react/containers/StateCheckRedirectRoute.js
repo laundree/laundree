@@ -1,8 +1,10 @@
-const connect = require('react-redux').connect
-const StateCheckRedirectRoute = require('../views/StateCheckRedirectRoute')
+// @flow
+
+import {connect} from 'react-redux'
+import StateCheckRedirectRoute from '../views/StateCheckRedirectRoute'
 
 const mapStateToProps = (state, props) => {
   return Object.assign({state}, props)
 }
 
-module.exports = connect(mapStateToProps)(StateCheckRedirectRoute)
+export default connect(mapStateToProps)(StateCheckRedirectRoute)

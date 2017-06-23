@@ -1,116 +1,119 @@
-const React = require('react')
-const {NavLink} = require('react-router-dom')
-const {FormattedMessage} = require('react-intl')
-const Loader = require('./Loader')
-const sdk = require('../../client/sdk')
-const NotFound = require('../containers/NotFound')
-const {Route, Switch, Redirect} = require('react-router')
-const Timetable = require('../containers/Timetable')
-const Bookings = require('../containers/Bookings')
-const LaundrySettings = require('../containers/LaundrySettings')
-const Machines = require('../containers/Machines')
-const Users = require('../containers/Users')
+// @flow
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+import { FormattedMessage } from 'react-intl'
+import Loader from './Loader'
+import sdk from '../../client/sdk'
+import NotFound from '../views/NotFound'
+import { Route, Switch, Redirect } from 'react-router'
+import Timetable from '../containers/Timetable'
+import Bookings from '../containers/Bookings'
+import LaundrySettings from '../containers/LaundrySettings'
+import Machines from '../containers/Machines'
+import Users from '../containers/Users'
+import type { User, Laundry } from 'laundree-sdk/lib/redux'
 
-const OwnerCheckRoute = ({user, laundry, component: Component, path}) => <Route render={props => {
-  if (user.role !== 'admin' && laundry.owners.indexOf(user.id) < 0) {
-    return <NotFound/>
-  }
-  return <Component {...props} />
-}}/>
+const OwnerCheckRoute = ({user, laundry, render, path}: {user: User, laundry: Laundry, render: (props: *) => React$Element<*>, path: string}) => (
+  <Route path={path} render={props => {
+    if (user.role !== 'admin' && laundry.owners.indexOf(user.id) < 0) {
+      return <NotFound />
+    }
+    return render(props)
+  }} />)
 
-OwnerCheckRoute.propTypes = {
-  user: React.PropTypes.object.isRequired,
-  laundry: React.PropTypes.object.isRequired,
-  component: Route.propTypes.component,
-  path: Route.propTypes.path
-}
+export default class LeftNav extends React.Component {
 
-class LeftNav extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {expanded: false}
-    this.toggleHandler = () => this.setState(({expanded}) => ({expanded: !expanded}))
-    this.closeHandler = () => this.setState({expanded: false})
+  props: {
+    user: User,
+    laundries: { [string]: Laundry },
+    currentLaundry: string
   }
 
-  get isOwner () {
-    return this.props.user.role === 'admin' || this.laundry.owners.indexOf(this.props.user.id) >= 0
+  state = {expanded: false}
+
+  toggleHandler = () => this.setState(({expanded}) => ({expanded: !expanded}))
+
+  closeHandler = () => this.setState({expanded: false})
+
+  isOwner () {
+    return this.props.user.role === 'admin' || this.laundry().owners.indexOf(this.props.user.id) >= 0
   }
 
-  get laundry () {
+  laundry () {
     return this.props.laundries[this.props.currentLaundry]
   }
 
   renderNav () {
-    if (!this.laundry) return null
-    const owner = this.isOwner
+    const laundry = this.laundry()
+    if (!laundry) return null
+    const owner = this.isOwner()
     return <div>
       <div className={this.state.expanded ? 'expanded_left_nav' : ''}>
         <div id='MenuExpander' onClick={this.toggleHandler}>
           <svg>
-            <use xlinkHref='#MenuLines'/>
+            <use xlinkHref='#MenuLines' />
           </svg>
           <svg className='close'>
-            <use xlinkHref='#CloseX'/>
+            <use xlinkHref='#CloseX' />
           </svg>
         </div>
         <nav id='LeftNav'>
           <ul>
             <li>
               <NavLink
-                to={'/laundries/' + this.laundry.id + '/timetable'} activeClassName='active'
+                to={'/laundries/' + laundry.id + '/timetable'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
-                  <use xlinkHref='#Time'/>
+                  <use xlinkHref='#Time' />
                 </svg>
-                <FormattedMessage id='leftnav.timetable'/>
+                <FormattedMessage id='leftnav.timetable' />
               </NavLink>
             </li>
             <li>
               <NavLink
-                to={'/laundries/' + this.laundry.id + '/bookings'} activeClassName='active'
+                to={'/laundries/' + laundry.id + '/bookings'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
-                  <use xlinkHref='#List'/>
+                  <use xlinkHref='#List' />
                 </svg>
-                <FormattedMessage id='leftnav.own-bookings'/>
+                <FormattedMessage id='leftnav.own-bookings' />
               </NavLink>
             </li>
             {owner
               ? <li>
                 <NavLink
-                  to={'/laundries/' + this.laundry.id + '/machines'} activeClassName='active'
+                  to={'/laundries/' + laundry.id + '/machines'} activeClassName='active'
                   onClick={this.closeHandler}>
                   <svg>
-                    <use xlinkHref='#SimpleMachine'/>
+                    <use xlinkHref='#SimpleMachine' />
                   </svg>
-                  <FormattedMessage id='leftnav.machines'/>
+                  <FormattedMessage id='leftnav.machines' />
                 </NavLink>
               </li>
               : null}
             {owner
               ? <li>
                 <NavLink
-                  to={'/laundries/' + this.laundry.id + '/users'} activeClassName='active'
+                  to={'/laundries/' + laundry.id + '/users'} activeClassName='active'
                   onClick={this.closeHandler}>
                   <svg>
-                    <use xlinkHref='#Users'/>
+                    <use xlinkHref='#Users' />
                   </svg>
-                  <FormattedMessage id='leftnav.users'/>
+                  <FormattedMessage id='leftnav.users' />
                 </NavLink>
               </li>
               : null}
           </ul>
-          <hr/>
+          <hr />
           <ul>
             <li>
               <NavLink
-                to={'/laundries/' + this.laundry.id + '/settings'} activeClassName='active'
+                to={'/laundries/' + laundry.id + '/settings'} activeClassName='active'
                 onClick={this.closeHandler}>
                 <svg>
-                  <use xlinkHref='#Gears'/>
+                  <use xlinkHref='#Gears' />
                 </svg>
-                <FormattedMessage id='leftnav.settings'/>
+                <FormattedMessage id='leftnav.settings' />
               </NavLink>
             </li>
           </ul>
@@ -121,23 +124,24 @@ class LeftNav extends React.Component {
   }
 
   renderContent () {
+    const laundry = this.laundry()
     return (
       <Switch>
-        <Redirect exact from='/laundries/:laundryId' to={`/laundries/${this.laundry.id}/timetable`}/>
-        <Route path='/laundries/:laundryId/timetable' component={Timetable}/>
-        <Route path='/laundries/:laundryId/bookings' component={Bookings}/>
-        <Route path='/laundries/:laundryId/settings' component={LaundrySettings}/>
+        <Redirect exact from='/laundries/:laundryId' to={`/laundries/${this.laundry().id}/timetable`} />
+        <Route path='/laundries/:laundryId/timetable' component={Timetable} />
+        <Route path='/laundries/:laundryId/bookings' component={Bookings} />
+        <Route path='/laundries/:laundryId/settings' component={LaundrySettings} />
         <OwnerCheckRoute
           user={this.props.user}
-          laundry={this.laundry}
-          path='/laundries/:laundryId/machines'
-          component={Machines}/>
+          laundry={laundry}
+          render={props => <Machines {...props} />}
+          path='/laundries/:laundryId/machines' />
         <OwnerCheckRoute
           user={this.props.user}
-          laundry={this.laundry}
-          path='/laundries/:laundryId/users'
-          component={Users}/>
-        <Route component={NotFound}/>
+          laundry={laundry}
+          render={props => <Users {...props} />}
+          path='/laundries/:laundryId/users' />
+        <Route component={NotFound} />
       </Switch>
     )
   }
@@ -151,16 +155,8 @@ class LeftNav extends React.Component {
     if (this.props.user.role !== 'admin' && this.props.user.laundries.indexOf(this.props.currentLaundry) < 0) {
       return <NotFound />
     }
-    return <Loader loader={() => this.load()} loaded={this.laundry}>
+    return <Loader loader={() => this.load()} loaded={Boolean(this.laundry())}>
       {this.renderNav()}
     </Loader>
   }
 }
-
-LeftNav.propTypes = {
-  user: React.PropTypes.object.isRequired,
-  laundries: React.PropTypes.object,
-  currentLaundry: React.PropTypes.string
-}
-
-module.exports = LeftNav

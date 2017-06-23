@@ -1,10 +1,31 @@
-/**
- * Created by budde on 02/06/16.
- */
-const mongoose = require('mongoose')
+// @flow
+import mongoose from 'mongoose'
+import type { ObjectId } from 'mongoose'
 const {Schema} = mongoose
 
-const laundrySchema = new Schema({
+export type LaundryRules = {
+  limit?: number,
+  dailyLimit?: number,
+  timeLimit?: {
+    from: { hour: number, minute: number },
+    to: { hour: number, minute: number }
+  }
+}
+
+type LaundryDefinition = {
+  name: string,
+  machines: ObjectId[],
+  owners: ObjectId[],
+  users: ObjectId[],
+  invites: ObjectId[],
+  demo: boolean,
+  rules: LaundryRules,
+  googlePlaceId?: string,
+  timezone?: string,
+  signUpCodes: string[]
+}
+
+const laundrySchema: Schema<LaundryDefinition> = new Schema({
   name: {type: String, unique: true, trim: true, required: true},
   machines: [{type: Schema.Types.ObjectId, ref: 'Machine'}],
   owners: [{type: Schema.Types.ObjectId, ref: 'User'}],
@@ -27,6 +48,4 @@ const laundrySchema = new Schema({
 laundrySchema.index({'name': 1})
 laundrySchema.index({'users': 1})
 
-const LaundryModel = mongoose.model('Laundry', laundrySchema)
-
-module.exports = LaundryModel
+export default mongoose.model('Laundry', laundrySchema)

@@ -1,17 +1,18 @@
-const crypto = require('crypto')
+// @flow
+
+import crypto from 'crypto'
 
 /**
  * Returns corresponding short name
- * @param {string} name
  */
-function shortName (name) {
-  return name.toLocaleLowerCase().trim().match(/(^(.)| ([^\s])|[0-9])/g).map((m) => m.trim()).join('').toLocaleUpperCase()
+export function shortName (name: string) {
+  return (name
+    .toLocaleLowerCase()
+    .trim()
+    .match(/(^(.)| ([^\s])|[0-9])/g) || [])
+    .map((m) => m.trim()).join('').toLocaleUpperCase()
 }
 
-function hash (str) {
+export function hash (str: string): string {
   return crypto.createHash('md5').update(str).digest('hex')
-}
-
-module.exports = {
-  shortName, hash
 }

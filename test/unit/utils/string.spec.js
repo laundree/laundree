@@ -1,7 +1,7 @@
 /**
  * Created by budde on 06/07/16.
  */
-const {string} = require('../../../test_target/utils')
+const string = require('../../../test_target/utils/string')
 const chai = require('chai')
 chai.use(require('chai-as-promised'))
 chai.should()

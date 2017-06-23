@@ -1,15 +1,15 @@
-const request = require('supertest')
-const app = require('../../../../test_target/app').app
-const chai = require('chai')
-const config = require('config')
+import request from 'supertest'
+import { app, promise } from '../../../../test_target/app'
+import chai from 'chai'
+import config from 'config'
+import BookingHandler from '../../../../test_target/handlers/booking'
+import dbUtils from '../../../db_utils'
+import moment from 'moment-timezone'
+
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {BookingHandler} = require('../../../../test_target/handlers')
-const dbUtils = require('../../../db_utils')
-
-const moment = require('moment-timezone')
 
 function createDateTomorrow (hour = 0, minute = 0, tz = config.timezone) {
   const now = moment.tz(tz).add(2, 'd')
@@ -31,27 +31,29 @@ describe('controllers', function () {
   describe('bookings', function () {
     this.timeout(5000)
     describe('GET /api/machines/{id}/bookings', () => {
-      it('should fail on not authenticated', () =>
-        dbUtils.populateMachines(1).then(({machine}) => request(app)
+      it('should fail on not authenticated', async () => {
+        const {machine} = await dbUtils.populateMachines(1)
+        await request(await promise)
           .get(`/api/machines/${machine.model.id}/bookings`)
           .set('Accept', 'application/json')
           .expect(403)
-          .expect('Content-Type', /json/)))
+          .expect('Content-Type', /json/)
+      })
 
-      it('should limit output size', () =>
-        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) =>
-          request(app)
-            .get(`/api/machines/${machine.model.id}/bookings`)
-            .set('Accept', 'application/json')
-            .query({from: 0, to: Date.now()})
-            .auth(user.model.id, token.secret)
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .then(res => {
-              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
+      it('should limit output size', async () => {
+        const {user, token, machine, bookings} = await dbUtils.populateBookings(50)
+
+        const res = await request(app)
+          .get(`/api/machines/${machine.model.id}/bookings`)
+          .set('Accept', 'application/json')
+          .query({from: 0, to: Date.now()})
+          .auth(user.model.id, token.secret)
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+        const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
+        res.body.should.deep.equal(arr)
+      })
 
       it('should query range', () =>
         dbUtils.populateBookings(50).then(({user, token, machine, bookings}) =>
@@ -173,15 +175,17 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(400)))
 
-      it('should fail on invalid date', () =>
-        dbUtils.populateBookings(1).then(({user, token, machine}) =>
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({from: {}, to: createDateTomorrow()})
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(400)))
+      it('should fail on invalid date', async () => {
+        const {user, token, machine} = await dbUtils.populateBookings(1)
+        const result = await request(app)
+          .post(`/api/machines/${machine.model.id}/bookings`)
+          .send({from: {}, to: createDateTomorrow()})
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(400)
+        result.body.should.deep.equal({message: 'Request validation failed: Parameter (body) failed schema validation'})
+      })
 
       it('should fail on invalid to', () =>
         dbUtils.populateBookings(1).then(({user, token, machine, bookings}) =>
@@ -519,7 +523,7 @@ describe('controllers', function () {
                 .expect('Content-Type', /json/)
                 .then(res => {
                   const id = res.body.id
-                  return BookingHandler.findFromId(id).then((machine) => {
+                  return BookingHandler.lib.findFromId(id).then((machine) => {
                     machine.should.not.be.undefined
                     return machine.toRest().then((result) => res.body.should.deep.equal(result))
                   })
@@ -537,7 +541,7 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return BookingHandler.findFromId(id).then((machine) => {
+              return BookingHandler.lib.findFromId(id).then((machine) => {
                 machine.should.not.be.undefined
                 res.body.from.should.deep.equal(createDateTomorrow(1))
                 res.body.to.should.deep.equal(createDateTomorrow(2))
@@ -552,8 +556,8 @@ describe('controllers', function () {
               request(app)
                 .post(`/api/machines/${machine.model.id}/bookings`)
                 .send({
-                  from: createDateTomorrow(1, 0, laundry.timezone),
-                  to: createDateTomorrow(2, 0, laundry.timezone)
+                  from: createDateTomorrow(1, 0, laundry.timezone()),
+                  to: createDateTomorrow(2, 0, laundry.timezone())
                 })
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
@@ -562,36 +566,13 @@ describe('controllers', function () {
                 .expect(200)
                 .then(res => {
                   const id = res.body.id
-                  return BookingHandler.findFromId(id).then((machine) => {
+                  return BookingHandler.lib.findFromId(id).then((machine) => {
                     machine.should.not.be.undefined
-                    res.body.from.should.deep.equal(createDateTomorrow(1, 0, laundry.timezone))
-                    res.body.to.should.deep.equal(createDateTomorrow(2, 0, laundry.timezone))
+                    res.body.from.should.deep.equal(createDateTomorrow(1, 0, laundry.timezone()))
+                    res.body.to.should.deep.equal(createDateTomorrow(2, 0, laundry.timezone()))
                     return machine.toRest().then((result) => res.body.should.deep.equal(result))
                   })
                 }))))
-
-      it('should succeed and save events', () =>
-        dbUtils.populateMachines(1).then(({user, token, machine}) =>
-          request(app)
-            .post(`/api/machines/${machine.model.id}/bookings`)
-            .send({from: createDateTomorrow(1), to: createDateTomorrow(2)})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {
-              const id = res.body.id
-              return BookingHandler
-                .findFromId(id)
-                .then(booking => booking.fetchEvents())
-                .then(events => {
-                  events.should.have.length(1)
-                  const [event] = events
-                  event.model.type.should.equal('create')
-                  event.model.user.toString().should.equal(user.model.id)
-                })
-            })))
 
       it('should fail on too soon booking', () =>
         dbUtils.populateMachines(1).then(({user, token, machine}) =>
@@ -731,9 +712,10 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res => BookingHandler
+              .lib
               .findFromId(booking.model.id)
               .then((t) => {
-                assert(t === undefined)
+                assert(!t)
               }))))
 
       it('should fail when other user', () =>

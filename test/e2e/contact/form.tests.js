@@ -2,8 +2,8 @@
  * Created by budde on 05/11/2016.
  */
 
-const faker = require('faker')
-const {timeout} = require('../../nightwatch_utils.js')
+import faker from 'faker'
+import {timeout} from '../../nightwatch_utils.js'
 
 module.exports = {
   'Can load contact page': client =>

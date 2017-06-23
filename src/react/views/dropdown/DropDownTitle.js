@@ -1,10 +1,12 @@
-const React = require('react')
+// @flow
+import React from 'react'
+import type {Children} from 'react'
 
-const DropDownTitle = (props) => <div className='dropDownTitle' onClick={props.onClick}>{props.children}</div>
-
-DropDownTitle.propTypes = {
-  onClick: React.PropTypes.func,
-  children: React.PropTypes.any
+export default class DropDownTitle extends React.Component<*, {onClick: Function, children: Children}, *> {
+  render () {
+    const props = this.props
+    return (
+      <div className='dropDownTitle' onClick={props.onClick}>{props.children}</div>
+    )
+  }
 }
-
-module.exports = DropDownTitle

@@ -1,0 +1,31 @@
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: laundree-master
+data:
+  host: laundree.io
+  mongoUrl: "mongodb://mongo/laundree"
+  opbeatAppId: '71392cdc57'
+  opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
+  facebookAppId: '1044245498966904'
+  facebookCallbackUrl: 'https://laundree.io/auth/facebook/callback'
+  googleClientId: '1098336985149-t3unnf4fj7c6rm6eogerpo6dnr433si6.apps.googleusercontent.com'
+  googleCallbackUrl: 'https://laundree.io/auth/google/callback'
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: laundree-beta
+data:
+  host: beta.laundree.io
+  mongoUrl: "mongodb://mongo/laundree-beta"
+  opbeatAppId: '2843b6b20b'
+  opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
+  googleClientId: '1098336985149-rm2accpmlkfchc5176m3shv1o9rjk3ks.apps.googleusercontent.com'
+  googleCallbackUrl: 'https://beta.laundree.io/auth/google/callback'
+  facebookAppId: '233065037208325'
+  facebookCallbackUrl: 'https://beta.laundree.io/auth/facebook/callback'

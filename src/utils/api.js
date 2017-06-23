@@ -1,16 +1,15 @@
-/**
- * Created by budde on 15/05/16.
- */
+// @flow
+import * as error from './error'
+import type {Response, Request} from '../types'
 
-const error = require('./error')
-
-function generateErrorHandler (res) {
-  return err => {
+export function generateErrorHandler (res: Response) {
+  return (err: Error) => {
     error.logError(err)
-    res.statusCode = 500
+    res.status(500)
     res.json({message: 'Internal server error'})
   }
 }
+
 /**
  * Return an error.
  * @param res
@@ -18,36 +17,30 @@ function generateErrorHandler (res) {
  * @param {string} message
  * @param {Object=} headers
  */
-function returnError (res, statusCode, message, headers = {}) {
-  res.statusCode = statusCode
+export function returnError (res: Response, statusCode: number, message: string, headers: { [string]: string } = {}) {
+  res.status(statusCode)
   Object.keys(headers).forEach((header) => res.set(header, headers[header]))
   res.json({message: message})
 }
+
 /**
  * Return success
  * @param res
  * @param {(Promise|Object)=} result
  * @returns {number|*}
  */
-function returnSuccess (res, result) {
-  res.statusCode = result ? 200 : 204
+export function returnSuccess<X> (res: Response, result: Promise<X> | X) {
+  res.status(result ? 200 : 204)
   if (!result) return res.end()
   Promise.resolve(result)
     .then(result => res.json(result))
     .catch(error.logError)
 }
 
-function wrapErrorHandler (func) {
-  return (req, res) => {
+export function wrapErrorHandler<A: Request, B: Response, C> (func: (req: A, res: B) => Promise<C> | C) {
+  return (req: A, res: B) => {
     return Promise
       .resolve(func(req, res))
       .catch(generateErrorHandler(res))
   }
-}
-
-module.exports = {
-  generateErrorHandler,
-  returnError,
-  returnSuccess,
-  wrapErrorHandler
 }

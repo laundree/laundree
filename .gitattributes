@@ -1,4 +1,0 @@
-public/videos/v.mp4 filter=lfs diff=lfs merge=lfs -text
-public/videos/v.ogv filter=lfs diff=lfs merge=lfs -text
-public/videos/v.webm filter=lfs diff=lfs merge=lfs -text
-public/videos/v.mov filter=lfs diff=lfs merge=lfs -text

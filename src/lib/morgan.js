@@ -1,13 +1,10 @@
-/**
- * Created by budde on 15/05/16.
- */
+// @flow
 
-const config = require('config')
-const logger = require('morgan')
+import config from 'config'
+import logger from 'morgan'
+import type {Application} from '../types'
 
-function setup (app) {
+export default function setup (app: Application) {
   if (!config.get('logging.http.enabled')) return
   app.use(logger(config.get('logging.http.format')))
 }
-
-module.exports = setup

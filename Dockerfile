@@ -17,12 +17,11 @@ ENV PORT=3000 \
 ARG NODE_ENV
 EXPOSE 3000
 ADD package.json package.json
-RUN npm install
+RUN npm install --silent
 ADD . .
 RUN chown -R laundree:laundree .
 USER laundree
 RUN git remote set-url origin https://github.com/laundree/laundree && \
-    git lfs pull && \
     npm run build
 CMD ["start"]
 ENTRYPOINT ["npm"]

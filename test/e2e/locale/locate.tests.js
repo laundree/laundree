@@ -1,7 +1,7 @@
 /**
  * Created by budde on 01/12/2016.
  */
-const {timeout} = require('../../nightwatch_utils.js')
+import {timeout} from '../../nightwatch_utils.js'
 
 module.exports = {
   'Can change locale on home page': client => {

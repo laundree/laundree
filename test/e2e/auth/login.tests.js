@@ -2,22 +2,20 @@
  * Created by budde on 06/11/2016.
  */
 
-const faker = require('faker')
-const {timeout, signIn} = require('../../nightwatch_utils.js')
-const {UserHandler} = require('../../../test_target/handlers')
+import faker from 'faker'
+import { timeout, signIn } from '../../nightwatch_utils.js'
+import UserHandler from '../../../test_target/handlers/user'
 
 let email, password, user
 
 module.exports = {
-  'before': (client, done) => {
+  'before': async (client, done) => {
     email = faker.internet.email()
     password = faker.internet.password()
-    UserHandler
+    user = await UserHandler
+      .lib
       .createUserWithPassword(faker.name.findName(), email, password)
-      .then(u => {
-        user = u
-        done()
-      })
+    done()
   },
   'Can not login un-verified': client => {
     signIn(client.url(client.launch_url), email, password)
@@ -37,27 +35,6 @@ module.exports = {
           .end()
       })
   },
-/*
-  Not relevant anymore
-  'Can be marked returning': client => {
-    client
-      .url(client.launch_url)
-    user
-      .generateVerifyEmailToken(email)
-      .then(token => user.verifyEmail(email, token.secret))
-      .then(() => {
-        signIn(client, email, password)
-          .waitForElementVisible('#CreateLaundry', timeout)
-          .click('#TopNav .rightNav .dropDown.user .dropDownTitle img')
-          .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
-          .waitForElementVisible('#TopNav .rightNav .user .dropDownContent', timeout)
-          .click('#TopNav .rightNav .user .dropDownContent li:last-of-type a')
-          .waitForElementPresent('#Home #Logo', timeout)
-          .expect.element('#TopNav .rightNav a.auth.signUp').text.to.match(/[lL][oO][gG] [Ii][nN]/)
-        client.end()
-      })
-  },
-*/
   'Can reset password': client => {
     client
       .url(client.launch_url)
@@ -93,11 +70,13 @@ module.exports = {
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)
       .setValue('#Auth form label:nth-of-type(3) input', password)
+      .setValue('#Auth form label:nth-of-type(4) input', password)
       .submitForm('#Auth form')
       .waitForElementVisible('#Auth form .notion.success', timeout)
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)
       .setValue('#Auth form label:nth-of-type(3) input', password)
+      .setValue('#Auth form label:nth-of-type(4) input', password)
       .submitForm('#Auth form')
       .waitForElementVisible('#Auth form .notion.error', timeout)
     client.expect.element('#Auth form .error.notion').text.to.contain('A user with this email already exists')

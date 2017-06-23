@@ -1,8 +1,9 @@
-const connect = require('react-redux').connect
-const Home = require('../views/Home')
+// @flow
+import {connect} from 'react-redux'
+import Home from '../views/Home'
 
 const mapStateToProps = ({users, currentUser}) => {
   return {users, currentUser}
 }
 
-module.exports = connect(mapStateToProps)(Home)
+export default connect(mapStateToProps)(Home)

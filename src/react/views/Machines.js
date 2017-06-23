@@ -1,12 +1,19 @@
-const React = require('react')
-const {ValidationElement, ValidationForm} = require('./validation')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const Loader = require('./Loader')
+// @flow
+import React from 'react'
+import type {Children} from 'react'
+import { ValidationElement, ValidationForm } from './validation'
+import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
+import { DocumentTitle, Modal, Label, Input, Submit } from './intl'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
+import Loader from './Loader'
+import type { Machine, Laundry, User } from 'laundree-sdk/lib/redux'
 
 class MachineDropdown extends React.Component {
+  props: {
+    onSelect: Function,
+    selected: string
+  }
   selectGenerator (value) {
     return () => {
       this.props.onSelect(value)
@@ -49,48 +56,53 @@ class MachineDropdown extends React.Component {
   }
 }
 
-MachineDropdown.propTypes = {
-  onSelect: React.PropTypes.func.isRequired,
-  selected: React.PropTypes.string
+type MachineListItemProps = {
+  onSubmit: Function,
+  onDelete: Function,
+  onRepair: Function,
+  onUpdate: Function,
+  machine?: Machine,
+  blacklist: string[],
+  children: Children
 }
 
-class MachineListItem extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = this.initialState
+type MachineListItemState = { sesh: number, value: string, selected: 'wash' | 'dry', initial: boolean, broken: boolean, showModal: boolean }
 
-    this.onSelect = (selected) => {
-      if (this.props.machine) this.props.onUpdate({type: selected})
-      this.setState({selected})
-    }
+class MachineListItem extends React.Component<*, MachineListItemProps, MachineListItemState> {
 
-    this.onChange = evt => this.setState({value: evt.target.value, initial: false})
+  state = this.initialState()
 
-    this.onSubmit = evt => {
-      evt.preventDefault()
-      if (this.props.machine) return this.onUpdateName()
-      this.props
-        .onSubmit(this.selected, this.value, this.broken)
-        .then(() => this.reset())
-    }
+  onSelect = (selected) => {
+    if (this.props.machine) this.props.onUpdate({type: selected})
+    this.setState({selected})
+  }
 
-    this.onUpdateName = () => {
-      if (!this.props.machine || !this.changed || this.blacklist.indexOf(this.state.value.trim()) >= 0) return
-      this.props.onUpdate({name: this.state.value})
-    }
+  onChange = evt => this.setState({value: evt.target.value, initial: false})
 
-    this.onCloseModal = () => this.setState({showModal: false})
+  onSubmit = evt => {
+    evt.preventDefault()
+    if (this.props.machine) return this.onUpdateName()
+    this.props
+      .onSubmit(this.selected(), this.value(), this.broken())
+      .then(() => this.reset())
+  }
 
-    this.onDelete = () => this.setState({showModal: true})
+  onUpdateName = () => {
+    if (!this.props.machine || !this.changed() || this.blacklist().indexOf(this.state.value.trim()) >= 0) return
+    this.props.onUpdate({name: this.state.value})
+  }
 
-    this.onDeleteModal = () => {
-      this.onCloseModal()
-      this.props.onDelete()
-    }
+  onCloseModal = () => this.setState({showModal: false})
+
+  onDelete = () => this.setState({showModal: true})
+
+  onDeleteModal = () => {
+    this.onCloseModal()
+    this.props.onDelete()
   }
 
   reset () {
-    this.setState(({sesh}) => Object.assign({}, this.initialState, {sesh: sesh + 1}))
+    this.setState(({sesh}) => Object.assign({}, this.initialState(), {sesh: sesh + 1}))
   }
 
   componentWillReceiveProps ({machine}) {
@@ -98,9 +110,20 @@ class MachineListItem extends React.Component {
     this.setState({value: machine.name, selected: machine.type})
   }
 
-  get initialState () {
-    if (!this.props.machine) return {sesh: 0, value: '', selected: 'wash', initial: true, broken: false}
+  initialState () {
+    if (!this.props.machine) {
+      return {
+        sesh: 0,
+        value: '',
+        selected: 'wash',
+        initial: true,
+        broken: false,
+        showModal: false
+      }
+    }
     return {
+      sesh: 0,
+      showModal: false,
       value: this.props.machine.name,
       selected: this.props.machine.type,
       broken: this.props.machine.broken,
@@ -108,27 +131,30 @@ class MachineListItem extends React.Component {
     }
   }
 
-  get selected () {
+  selected () {
     if (!this.state.selected) return 'wash'
     return this.state.selected
   }
 
-  get value () {
+  value () {
     return this.state.value
   }
 
-  get broken () {
+  broken () {
     return Boolean(this.props.machine && this.props.machine.broken)
   }
 
-  get changed () {
+  changed () {
     if (!this.props.machine) return false
     return this.props.machine.name !== this.state.value.trim()
   }
 
-  get blacklist () {
+  blacklist () {
     let blacklist = this.props.blacklist
-    if (this.props.machine) blacklist = blacklist.filter((name) => name !== this.props.machine.name)
+    const machine = this.props.machine
+    if (machine) {
+      blacklist = blacklist.filter((name) => name !== machine.name)
+    }
     return blacklist.concat([''])
   }
 
@@ -144,21 +170,21 @@ class MachineListItem extends React.Component {
       />
       <ValidationForm
         sesh={this.state.sesh}
-        className={'machineForm ' + (this.broken ? 'broken' : '')}
+        className={'machineForm ' + (this.broken() ? 'broken' : '')}
         onSubmit={this.onSubmit}
         initial={this.state.initial}>
-        <MachineDropdown selected={this.selected} onSelect={this.onSelect}/>
+        <MachineDropdown selected={this.selected()} onSelect={this.onSelect}/>
         <ValidationElement
           sesh={this.state.sesh}
           trim
-          notOneOf={this.blacklist}
-          value={this.value} initial={this.state.initial}>
+          notOneOf={this.blacklist()}
+          value={this.value()} initial={this.state.initial}>
           <Label data-validate-error='machines.error.machine-name'>
             <Input
               onBlur={this.onUpdateName}
               type='text'
-              placeholder={this.selected === 'wash' ? 'machines.washing-machine-name' : 'machines.dryer-name'}
-              value={this.value} onChange={this.onChange}/>
+              placeholder={this.selected() === 'wash' ? 'machines.washing-machine-name' : 'machines.dryer-name'}
+              value={this.value()} onChange={this.onChange}/>
           </Label>
         </ValidationElement>
         {this.props.onDelete
@@ -170,36 +196,30 @@ class MachineListItem extends React.Component {
           : null
         }
         {this.props.onUpdate
-          ? <div className={`repair action`}>
-            <svg onClick={() => this.props.onUpdate({broken: !this.broken})}>
-              <use xlinkHref={this.broken ? '#MediaWrenchX' : '#MediaWrenchCheck'}/>
+          ? <div className='repair action'>
+            <svg onClick={() => this.props.onUpdate({broken: !this.broken()})}>
+              <use xlinkHref={this.broken() ? '#MediaWrenchX' : '#MediaWrenchCheck'}/>
             </svg>
           </div>
-          : null }
+          : null}
         {this.props.children}
       </ValidationForm>
     </div>
   }
 }
 
-MachineListItem.propTypes = {
-  onSubmit: React.PropTypes.func,
-  onDelete: React.PropTypes.func,
-  onRepair: React.PropTypes.func,
-  onUpdate: React.PropTypes.func,
-  children: React.PropTypes.any,
-  machine: React.PropTypes.object,
-  blacklist: React.PropTypes.array
-}
-
 class Machines extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {}
-    this.creator = (type, name, broken) => sdk.laundry(this.props.currentLaundry).createMachine(name, type, broken)
-  }
+  state = {}
+  props: {
+    currentLaundry: string,
+    user: User,
+    machines: { [string]: Machine },
+    laundries: { [string]: Laundry }
 
-  get laundry () {
+  }
+  creator = (type: 'wash' | 'dry', name: string, broken: boolean) => sdk.api.laundry.createMachine(this.props.currentLaundry, name, type, broken)
+
+  laundry () {
     return this.props.laundries[this.props.currentLaundry]
   }
 
@@ -207,15 +227,15 @@ class Machines extends React.Component {
     return sdk.listMachines(this.props.currentLaundry)
   }
 
-  get blacklist () {
-    return this.laundry.machines
+  blacklist () {
+    return this.laundry().machines
       .map((id) => this.props.machines[id])
       .filter((m) => m)
       .map((m) => m.name)
   }
 
   renderMachineList () {
-    const laundry = this.laundry
+    const laundry = this.laundry()
     if (!laundry.machines.length) {
       return <div className='empty_list'>
         <FormattedMessage id='machines.no-machines'/>
@@ -224,10 +244,12 @@ class Machines extends React.Component {
     return <ul className='machine_list'>
       {laundry.machines.map((machineId) => <li key={machineId}>
         <MachineListItem
-          blacklist={this.blacklist}
+          onSubmit={() => {}}
+          onRepair={() => {}}
+          blacklist={this.blacklist()}
           machine={this.props.machines[machineId]}
-          onUpdate={params => sdk.machine(machineId).updateMachine(params)}
-          onDelete={() => sdk.machine(machineId).del()}/>
+          onUpdate={params => sdk.api.machine.updateMachine(machineId, params)}
+          onDelete={() => sdk.api.machine.del(machineId)}/>
       </li>)}
     </ul>
   }
@@ -241,7 +263,10 @@ class Machines extends React.Component {
           <div className='create_machine'>
             <FormattedMessage id='machines.create-machine.title' tagName='h2'/>
             <MachineListItem
-              blacklist={this.blacklist}
+              onRepair={() => {}}
+              onUpdate={() => {}}
+              onDelete={() => {}}
+              blacklist={this.blacklist()}
               onSubmit={this.creator}>
               <div className='buttons'>
                 <Submit value='general.create'/>
@@ -254,14 +279,4 @@ class Machines extends React.Component {
   }
 }
 
-Machines.propTypes = {
-  currentLaundry: React.PropTypes.string,
-  laundries: React.PropTypes.object,
-  machines: React.PropTypes.object,
-  user: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    photo: React.PropTypes.string
-  })
-}
-
-module.exports = Machines
+export default Machines

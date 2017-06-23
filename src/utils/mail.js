@@ -1,13 +1,17 @@
-/**
- * Created by budde on 07/05/16.
- */
+// @flow
 
-const path = require('path')
-const {EmailTemplate} = require('email-templates')
-const {createTransport} = require('nodemailer')
-const config = require('config')
-const debug = require('debug')('laundree.utils.mail')
-const locales = require('../locales')
+import path from 'path'
+import { EmailTemplate } from 'email-templates'
+import { createTransport } from 'nodemailer'
+import config from 'config'
+import Debug from 'debug'
+import { locales } from '../locales'
+import type { LocaleType } from '../locales'
+import nodeMailerStub from 'nodemailer-stub-transport'
+
+const debug = Debug('laundree.utils.mail')
+
+type MailContent = { html: string, text: string, subject: string }
 
 /**
  * Render a template
@@ -16,16 +20,20 @@ const locales = require('../locales')
  * @param {string} locale
  * @return {Promise.<{html:string, text: string, subject:string}>}
  */
-function render (data, template, locale) {
+export function render (data: Object, template: string, locale: LocaleType): Promise<MailContent> {
   debug('Rendering email')
-  const messages = locales[locale].messages
+  const messages = locales[locale]
   const t = new EmailTemplate(
     path.join(__dirname, '..', '..', 'templates', 'email', template))
-  return t.render(Object.assign(data, {messages}))
+  return t.render({...data, messages})
 }
 
-const standardTransporter = config.get('mailer.stubTransporter')
-  ? createTransport(require('nodemailer-stub-transport')())
+type TransporterOptions = { from: string, to: string } & MailContent
+
+type Transporter = { sendMail: (options: TransporterOptions, callback: (err: ?Error, data: ?Object) => void) => void }
+
+const standardTransporter: Transporter = config.get('mailer.stubTransporter')
+  ? createTransport(nodeMailerStub())
   : createTransport(config.get('mailer.smtp.transport'))
 
 /**
@@ -36,7 +44,7 @@ const standardTransporter = config.get('mailer.stubTransporter')
  * @param transporter
  * @return {Promise}
  */
-function sendRenderedEmail (to, content, from, transporter) {
+export function sendRenderedEmail (to: string, content: MailContent, from: string, transporter: Transporter) {
   const options = {
     from,
     to,
@@ -65,13 +73,7 @@ function sendRenderedEmail (to, content, from, transporter) {
  * @param transporter=
  * @returns {Promise}
  */
-function sendEmail (data, template, to, {locale = 'en', from = config.get('emails.from'), transporter = standardTransporter} = {}) {
+export function sendEmail (data: Object, template: string, to: string, {locale = 'en', from = config.get('emails.from'), transporter = standardTransporter}: { locale?: LocaleType, from?: string, transporter?: Transporter } = {}) {
   debug(`Sending email to ${to}`)
   return render(data, template, locale).then((rendered) => sendRenderedEmail(to, rendered, from, transporter))
-}
-
-module.exports = {
-  render,
-  sendRenderedEmail,
-  sendEmail
 }

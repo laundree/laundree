@@ -1,8 +1,13 @@
 #!/usr/bin/env bash
 
+if [ "$TRAVIS_BRANCH" = "beta" ]; then
+  echo "Skipping tests on beta"
+  exit 0
+fi
+
 set -e
 
-docker-compose -f docker-compose.test.yml build > ./build_output.txt || cat ./build_output.txt
+docker-compose -f docker-compose.test.yml build
 
 if [ "$TRAVIS_BRANCH" != "master" ] || [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
   export CODECLIMATE_REPO_TOKEN=''

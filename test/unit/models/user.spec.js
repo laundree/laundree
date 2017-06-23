@@ -2,12 +2,13 @@
  * Created by budde on 06/05/16.
  */
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
+import chai from 'chai'
+import chaiAsPromised from 'chai-as-promised'
+import {clearDb} from '../../db_utils'
+import UserModel from '../../../test_target/models/user'
+
 chai.use(chaiAsPromised)
 chai.should()
-const clearDb = require('../../db_utils').clearDb
-const UserModel = require('../../../test_target/models').UserModel
 
 describe('models', () => {
   describe('UserModel', function () {

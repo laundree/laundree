@@ -1,13 +1,19 @@
-const React = require('react')
+// @flow
 
-class BaseModal extends React.Component {
-  constructor (props) {
-    super(props)
-    this.escListener = (event) => {
-      if (!this.props.onClose) return
-      if (event.keyCode !== 27) return
-      this.props.onClose()
-    }
+import React from 'react'
+import type {Children} from 'react'
+
+type BaseModalProps = {
+  show: boolean,
+  onClose: Function,
+  children: Children
+}
+
+export default class BaseModal<P> extends React.Component<*, P & BaseModalProps, *> {
+  escListener = (event: Event) => {
+    if (!this.props.onClose) return
+    if (event.keyCode !== 27) return
+    this.props.onClose()
   }
 
   componentWillUnmount () {
@@ -18,7 +24,7 @@ class BaseModal extends React.Component {
     document.addEventListener('keyup', this.escListener)
   }
 
-  renderContent () {
+  renderContent () : ?React$Element<*> {
     return null
   }
 
@@ -32,11 +38,3 @@ class BaseModal extends React.Component {
     </div>
   }
 }
-
-BaseModal.propTypes = {
-  show: React.PropTypes.bool,
-  onClose: React.PropTypes.func,
-  children: React.PropTypes.any
-}
-
-module.exports = BaseModal

@@ -44,3 +44,5 @@ reports
 /build_output.txt
 /coverage
 laundree-secret.yml
+gcloud-credentials.json
+credentials.tar.gz

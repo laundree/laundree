@@ -2,7 +2,7 @@
  * Created by budde on 06/05/16.
  */
 
-const password = require('../../../test_target/utils').password
+const password = require('../../../test_target/utils/password')
 
 const chai = require('chai')
 chai.use(require('chai-as-promised'))

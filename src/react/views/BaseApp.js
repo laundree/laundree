@@ -1,46 +1,59 @@
-/**
- * Created by budde on 05/06/16.
- */
-const React = require('react')
-const TopNav = require('./TopNav')
-const Footer = require('./Footer')
-const {DocumentTitle} = require('./intl')
-const {Switch, Route} = require('react-router')
-const About = require('../containers/About')
-const Home = require('../containers/Home')
-const Contact = require('../containers/Contact')
-const Support = require('../containers/Support')
-const StateCheckRedirectRoute = require('../containers/StateCheckRedirectRoute')
-const NotFound = require('../containers/NotFound')
-const LeftNav = require('../containers/LeftNav')
-const UserSettings = require('../containers/UserSettings')
+// @flow
+import React from 'react'
+import TopNav from './TopNav'
+import Footer from './Footer'
+import { DocumentTitle } from './intl'
+import { Switch, Route } from 'react-router'
+import About from '../views/About'
+import Home from '../containers/Home'
+import Contact from '../views/Contact'
+import Support from '../containers/Support'
+import StateCheckRedirectRoute from '../containers/StateCheckRedirectRoute'
+import NotFound from '../views/NotFound'
+import LeftNav from '../containers/LeftNav'
+import UserSettings from '../containers/UserSettings'
+import type { Location } from 'react-router'
+import type { Children } from 'react'
+import type { Laundry, User } from 'laundree-sdk/lib/redux'
 
-class BaseApp extends React.Component {
+export default class BaseApp extends React.Component {
+  props: {
+    location: Location,
+    config: {
+      locale: string,
+      returningUser: boolean
+    },
+    children: Children,
+    currentLaundry: string,
+    laundries: { [string]: Laundry },
+    user: User
+  }
+
   renderContent () {
     return <Switch>
-      <Route exact path='/' component={Home}/>
-      <Route path='/about' component={About}/>
+      <Route exact path='/' component={Home} />
+      <Route path='/about' component={About} />
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/support'
         redirectTo={'/contact'}
-        component={Support}/>
+        component={Support} />
       <StateCheckRedirectRoute
         test={({currentUser}) => !currentUser}
         path='/contact'
         redirectTo={'/support'}
-        component={Contact}/>
+        component={Contact} />
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/laundries/:laundryId'
         redirectTo={'/auth'}
-        component={LeftNav}/>
+        component={LeftNav} />
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/users/:userId/settings'
         redirectTo={'/auth'}
-        component={UserSettings}/>
-      <Route component={NotFound}/>
+        component={UserSettings} />
+      <Route component={NotFound} />
     </Switch>
   }
 
@@ -52,27 +65,10 @@ class BaseApp extends React.Component {
           user={this.props.user}
           location={this.props.location}
           currentLaundry={this.props.currentLaundry}
-          laundries={this.props.laundries}/>
+          laundries={this.props.laundries} />
         {this.renderContent()}
         {this.props.user ? null : <Footer />}
       </div>
     </DocumentTitle>
   }
 }
-
-BaseApp.propTypes = {
-  location: React.PropTypes.object,
-  config: React.PropTypes.shape({
-    locale: React.PropTypes.string.isRequired,
-    returningUser: React.PropTypes.bool.isRequired
-  }),
-  children: React.PropTypes.any,
-  currentLaundry: React.PropTypes.string,
-  laundries: React.PropTypes.object,
-  user: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    photo: React.PropTypes.string
-  })
-}
-
-module.exports = BaseApp

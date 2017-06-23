@@ -1,10 +1,14 @@
-const React = require('react')
+// @flow
+import React from 'react'
+import type { Children } from 'react'
 
-class Loader extends React.Component {
-  constructor (props, initState = {}) {
-    super(props)
-    this.state = Object.assign({}, initState, {loaded: Boolean(this.props.loaded)})
-  }
+export default class Loader extends React.Component<void, {
+  children?: Children,
+  loader: Function,
+  loaded?: boolean
+}, { loaded: boolean }> {
+
+  state: { loaded: boolean } = {loaded: Boolean(this.props.loaded)}
 
   componentDidMount () {
     if (this.state.loaded) return
@@ -19,11 +23,3 @@ class Loader extends React.Component {
     </div>
   }
 }
-
-Loader.propTypes = {
-  children: React.PropTypes.any,
-  loader: React.PropTypes.func.isRequired,
-  loaded: React.PropTypes.any
-}
-
-module.exports = Loader

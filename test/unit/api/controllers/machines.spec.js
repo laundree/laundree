@@ -1,12 +1,13 @@
-const request = require('supertest')
-const app = require('../../../../test_target/app').app
-const chai = require('chai')
+import request from 'supertest'
+import {app} from '../../../../test_target/app'
+import chai from 'chai'
+import MachineHandler from '../../../../test_target/handlers/machine'
+import dbUtils from '../../../db_utils'
+
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()
 const assert = chai.assert
-const {MachineHandler} = require('../../../../test_target/handlers')
-const dbUtils = require('../../../db_utils')
 
 describe('controllers', function () {
   this.timeout(10000)
@@ -224,7 +225,7 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return MachineHandler.findFromId(id).then((machine) => {
+              return MachineHandler.lib.findFromId(id).then((machine) => {
                 machine.should.not.be.undefined
                 return machine.toRest().then((result) => res.body.should.deep.equal(result))
               })
@@ -242,7 +243,7 @@ describe('controllers', function () {
             .expect(200)
             .then(res => {
               const id = res.body.id
-              return MachineHandler.findFromId(id).then((machine) => {
+              return MachineHandler.lib.findFromId(id).then((machine) => {
                 machine.should.not.be.undefined
                 return machine.toRest().then((result) => res.body.should.deep.equal(result))
               })
@@ -350,7 +351,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(200)
-            .then(res => MachineHandler.findFromId(machine.model.id).then((m) => {
+            .then(res => MachineHandler.lib.findFromId(machine.model.id).then((m) => {
               m.model.name.should.equal(machine.model.name + ' 2')
               m.model.type.should.equal('dry')
               return m.toRest().then((rest) => {
@@ -367,7 +368,7 @@ describe('controllers', function () {
             .auth(admin.model.id, admintoken.secret)
             .expect('Content-Type', /json/)
             .expect(200)
-            .then(res => MachineHandler.findFromId(machine.model.id).then((m) => {
+            .then(res => MachineHandler.lib.findFromId(machine.model.id).then((m) => {
               m.model.name.should.equal(machine.model.name + ' 2')
               m.model.type.should.equal('dry')
               return m.toRest().then((rest) => {
@@ -508,8 +509,8 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect(204)
             .then(res => MachineHandler
-              .findFromId(machine.model.id)
-              .then((t) => assert(t === undefined)))))
+              .lib.findFromId(machine.model.id)
+              .then((t) => assert(!t)))))
 
       it('should succeed when admin', () =>
         dbUtils.populateMachines(1).then(({machine}) =>
@@ -520,8 +521,8 @@ describe('controllers', function () {
             .auth(admin.model.id, admintoken.secret)
             .expect(204)
             .then(res => MachineHandler
-              .findFromId(machine.model.id)
-              .then((t) => assert(t === undefined)))))
+              .lib.findFromId(machine.model.id)
+              .then((t) => assert(!t)))))
 
       it('should fail when only user', () =>
         dbUtils.populateTokens(1).then(({user, token}) =>

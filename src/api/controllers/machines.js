@@ -1,11 +1,9 @@
-/**
- * Created by budde on 09/06/16.
- */
+// @flow
 
-const {MachineHandler} = require('../../handlers')
-const {api} = require('../../utils')
+import MachineHandler from '../../handlers/machine'
+import * as api from '../../utils/api'
 
-function listMachines (req, res) {
+async function listMachinesAsync (req, res) {
   const filter = {}
   const limit = req.swagger.params.page_size.value
   const since = req.swagger.params.since.value
@@ -14,68 +12,63 @@ function listMachines (req, res) {
   }
   const laundry = req.subjects.laundry
   filter.laundry = laundry.model._id
-  return MachineHandler.find(filter, {limit, sort: {_id: 1}})
-    .then((machines) => machines.map((machine) => machine.toRestSummary()))
-    .then((machines) => {
-      const links = {
-        first: `/api/laundries/${laundry.model.id}/machines?page_size=${limit}`
-      }
-      if (machines.length === limit) {
-        links.next = `/api/laundries/${laundry.model.id}/machines?since=${machines[machines.length - 1].id}&page_size=${limit}`
-      }
-      res.links(links)
-      res.json(machines)
-    })
-    .catch(api.generateErrorHandler(res))
+  const machines = await MachineHandler.lib.find(filter, {limit, sort: {_id: 1}})
+  const summarizedMachines = machines.map((machine) => machine.toRestSummary())
+  const links: { first: string, next?: string } = {
+    first: `/api/laundries/${laundry.model.id}/machines?page_size=${limit}`
+  }
+  if (summarizedMachines.length === limit) {
+    links.next = `/api/laundries/${laundry.model.id}/machines?since=${summarizedMachines[summarizedMachines.length - 1].id}&page_size=${limit}`
+  }
+  res.links(links)
+  res.json(summarizedMachines)
 }
 
-function createMachine (req, res) {
+async function createMachineAsync (req, res) {
   const body = req.swagger.params.body.value
   const name = body.name.trim()
   const type = body.type
   const broken = body.broken
   const laundry = req.subjects.laundry
-  return MachineHandler
+  const [m] = await MachineHandler
+    .lib
     .find({name: name, laundry: laundry.model._id})
-    .then(([machine]) => {
-      if (machine) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
-      return laundry.createMachine(name, type, broken)
-        .then((machine) => api.returnSuccess(res, machine.toRest()))
-    })
-    .catch(api.generateErrorHandler(res))
+  if (m) {
+    return api.returnError(res, 409, 'Machine already exists', {Location: m.restUrl})
+  }
+  const machine = await laundry.createMachine(name, type, broken)
+  api.returnSuccess(res, machine.toRest())
 }
 
-function fetchMachine (req, res) {
+function fetchMachineAsync (req, res) {
   const machine = req.subjects.machine
   api.returnSuccess(res, machine.toRest())
 }
 
-function deleteMachine (req, res) {
+async function deleteMachineAsync (req, res) {
   const machine = req.subjects.machine
-  req.subjects.laundry.deleteMachine(machine)
-    .then(() => api.returnSuccess(res))
-    .catch(api.generateErrorHandler(res))
+  await req.subjects.laundry.deleteMachine(machine)
+  api.returnSuccess(res)
 }
 
-function updateMachine (req, res) {
+async function updateMachineAsync (req, res) {
   const body = req.swagger.params.body.value
   const name = body.name ? body.name.trim() : undefined
   const type = body.type
   const broken = body.broken
   const {machine, laundry} = req.subjects
-  return MachineHandler
+  const [m] = await MachineHandler
+    .lib
     .find({name, laundry: laundry.model._id})
-    .then(([m]) => {
-      if (m && m.model.id !== machine.model.id) return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
-      machine.update({name, type, broken}).then(() => api.returnSuccess(res, machine.toRest()))
-    })
-    .catch(api.generateErrorHandler(res))
+  if (m && m.model.id !== machine.model.id) {
+    return api.returnError(res, 409, 'Machine already exists', {Location: machine.restUrl})
+  }
+  await machine.update({name, type, broken})
+  api.returnSuccess(res, machine.toRest())
 }
 
-module.exports = {
-  listMachines,
-  createMachine,
-  fetchMachine,
-  deleteMachine,
-  updateMachine
-}
+export const listMachines = api.wrapErrorHandler(listMachinesAsync)
+export const createMachine = api.wrapErrorHandler(createMachineAsync)
+export const fetchMachine = api.wrapErrorHandler(fetchMachineAsync)
+export const deleteMachine = api.wrapErrorHandler(deleteMachineAsync)
+export const updateMachine = api.wrapErrorHandler(updateMachineAsync)

@@ -1,31 +1,34 @@
-/**
- * Created by budde on 05/06/16.
- */
-const express = require('express')
-const router = express.Router()
-const React = require('react')
-const {renderToString} = require('react-dom/server')
-const {StaticRouter} = require('react-router')
-const {createInitialStore} = require('../redux')
-const utils = require('../utils')
-const DocumentTitle = require('react-document-title')
-const config = require('config')
-const App = require('../react/containers/App')
+// @flow
+import express from 'express'
+import React from 'react'
+import { renderToString } from 'react-dom/server'
+import { StaticRouter } from 'react-router'
+import { createInitialStore } from '../redux'
+import * as error from '../utils/error'
+import DocumentTitle from 'react-document-title'
+import config from 'config'
+import App from '../react/views/App'
+import type { Request, Router } from '../types'
 
-router.use((req, res, next) => {
-  createInitialStore(req.user, req.flash('success'), req.flash('error'), req.locale, config.get('google.clientApiKey'), req.session.returningUser)
+const router: Router = express.Router()
+
+router.use((req: Request, res, next) => {
+  const user = req.user
+  const locale = req.locale
+  const successFlash = req.flash('success')
+  const failureFlash = req.flash('error')
+  const returningUser = req.session.returningUser
+  createInitialStore(user, successFlash, failureFlash, locale, config.get('google.clientApiKey'), returningUser)
     .then(store => {
       const context = {}
-      const locale = req.locale
       const html = renderToString(<StaticRouter context={context} location={req.originalUrl}>
-        <App locale={locale} store={store}/>
+        <App locale={locale || 'en'} store={store}/>
       </StaticRouter>)
       if (context.url) {
         return res.redirect(302, context.url)
       }
       if (context.statusCode === 404) {
-        const err = new Error('Not found')
-        err.status = 404
+        const err = new error.StatusError('Not found', 404)
         return next(err)
       }
       const title = DocumentTitle.rewind()
@@ -37,7 +40,7 @@ router.use((req, res, next) => {
         state: JSON.stringify(store.getState())
       })
     })
-    .catch(utils.error.logError)
+    .catch(error.logError)
 })
 
-module.exports = router
+export default router

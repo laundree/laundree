@@ -1,13 +1,11 @@
-/**
- * Created by budde on 27/04/16.
- */
-
-const express = require('express')
+// @flow
+import express from 'express'
+import type {Request} from '../types'
 const router = express.Router()
 
-router.get('/', function (req, res) {
+router.get('/', function (req: Request, res) {
   req.logout()
   res.redirect('/')
 })
 
-module.exports = router
+export default router

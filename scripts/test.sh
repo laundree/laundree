@@ -9,9 +9,14 @@ export PATH="$(npm bin):$PATH"
 
 set -e
 
+echo "Setting up tests"
 npm run setup:test
 
+echo "Linting"
 npm run test:lint
+
+echo "Flow"
+npm run test:flow
 
 npm run test:unit-covered
 
@@ -40,4 +45,4 @@ until $(curl --output /dev/null --silent --head --fail http://localhost:3000); d
 done
 sleep 5
 
-./scripts/run-nightwatch.js
+npm run test:nightwatch

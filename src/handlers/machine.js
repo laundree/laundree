@@ -1,30 +1,40 @@
-/**
- * Created by budde on 09/06/16.
- */
+// @flow
 
-const Handler = require('./handler')
-const {MachineModel} = require('../models')
-const BookingHandler = require('./booking')
+import { Handler, HandlerLibrary } from './handler'
+import MachineModel from '../models/machine'
+import type { MachineType } from '../models/machine'
+import BookingHandler from './booking'
+import LaundryHandler from './laundry'
+import type UserHandler from './user'
+import type {Machine} from 'laundree-sdk/lib/redux'
 
-const {types: {DELETE_MACHINE, UPDATE_MACHINE, CREATE_MACHINE}} = require('../redux/actions')
+class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
 
-class MachineHandler extends Handler {
-  /**
-   * Create a new machine
-   * @param {LaundryHandler} laundry
-   * @param {string} name
-   * @param {string} type
-   * @param {boolean} broken
-   * @returns {Promise.<MachineHandler>}
-   */
-  static _createMachine (laundry, name, type, broken) {
-    const model = new MachineModel({laundry: laundry.model._id, name, type, broken})
-    return model.save()
-      .then((model) => new MachineHandler(model))
-      .then((machine) => {
-        machine.emitEvent('create')
-        return machine
-      })
+  constructor () {
+    super(MachineHandler, MachineModel, {
+      create: obj => typeof obj === 'string' ? null : {type: 'CREATE_MACHINE', payload: obj.reduxModel()},
+      update: obj => typeof obj === 'string' ? null : {type: 'UPDATE_MACHINE', payload: obj.reduxModel()},
+      delete: obj => typeof obj !== 'string' ? null : {type: 'DELETE_MACHINE', payload: obj}
+    })
+  }
+
+  async _createMachine (laundry: LaundryHandler, name: string, type: MachineType, broken: boolean) {
+    const model = await new MachineModel({laundry: laundry.model._id, name, type, broken}).save()
+    const machine = new MachineHandler(model)
+    this.emitEvent('create', machine)
+    return machine
+  }
+
+}
+
+export default class MachineHandler extends Handler {
+  static lib = new MachineHandlerLibrary()
+  lib = MachineHandler.lib
+  restUrl: string
+
+  constructor (model: MachineModel) {
+    super(model)
+    this.restUrl = `/machines/${this.model.id}`
   }
 
   /**
@@ -34,16 +44,15 @@ class MachineHandler extends Handler {
    * @param {Date} to
    * @return {Promise.<BookingHandler>}
    */
-  createBooking (owner, from, to) {
-    return BookingHandler._createBooking(this, owner, from, to)
+  createBooking (owner: UserHandler, from: Date, to: Date) {
+    return BookingHandler.lib._createBooking(this, owner, from, to)
   }
 
-  findAdjacentBookingsOfUser (user, from, to) {
-    return BookingHandler
-      .findAdjacentBookingsOfUser(user, this, from, to)
+  findAdjacentBookingsOfUser (user: UserHandler, from: Date, to: Date) {
+    return BookingHandler.lib.findAdjacentBookingsOfUser(user, this, from, to)
   }
 
-  async _findAdjacentBookings (user, from, to) {
+  async _findAdjacentBookings (user: UserHandler, from: Date, to: Date) {
     const [{before, after}, laundry] = await (
       Promise.all([
         this.findAdjacentBookingsOfUser(user, from, to),  // Find bookings that should be merged
@@ -66,37 +75,35 @@ class MachineHandler extends Handler {
     return result
   }
 
-  async createAndMergeBooking (owner, from, to) {
+  async createAndMergeBooking (owner: UserHandler, from: Date, to: Date) {
     const {before, after, from: fromDate, to: toDate} = await this._findAdjacentBookings(owner, from, to)
-    if (!before && !after) { // If no adjacent bookings
-      return this.createBooking(owner, fromDate, toDate)
-    }
-    if (!before) { // If no before
-      await after.updateTime(owner, fromDate, toDate).then(() => after)
-      return after
-    }
-    if (!after) {
+    if (before && after) { // If no adjacent bookings
+      await after.deleteBooking()
       await before.updateTime(owner, fromDate, toDate)
       return before
     }
-    await after.deleteBooking()
-    await before.updateTime(owner, fromDate, toDate)
-    return before
+    if (after) { // If no before
+      await after.updateTime(owner, fromDate, toDate).then(() => after)
+      return after
+    }
+    if (before) {
+      await before.updateTime(owner, fromDate, toDate)
+      return before
+    }
+    return this.createBooking(owner, fromDate, toDate)
   }
 
   fetchLaundry () {
-    const LaundryHandler = require('./laundry')
-    return LaundryHandler.find({_id: this.model.laundry}).then(([laundry]) => laundry)
+    return LaundryHandler.lib.find({_id: this.model.laundry}).then(([laundry]) => laundry)
   }
 
-  update ({name, type, broken}) {
+  async update ({name, type, broken}: { name?: string, type?: MachineType, broken?: boolean }) {
     if (name) this.model.name = name
     if (type) this.model.type = type
     if (broken !== undefined) this.model.broken = broken
-    return this.model.save().then(() => {
-      this.emitEvent('update')
-      return this
-    })
+    await this.model.save()
+    this.lib.emitEvent('update', this)
+    return this
   }
 
   /**
@@ -106,57 +113,51 @@ class MachineHandler extends Handler {
    * @param {Date} to
    * @return {BookingHandler[]}
    */
-  fetchBookings (from, to) {
-    return BookingHandler._fetchBookings(from, to, [this.model._id])
+  fetchBookings (from: Date, to: Date) {
+    return BookingHandler.lib._fetchBookings(from, to, [this.model._id])
   }
 
-  _deleteMachine () {
-    return BookingHandler
+  async _deleteMachine () {
+    const bookings = await BookingHandler
+      .lib
       .find({machine: this.model._id})
-      .then((bookings) => Promise
-        .all(bookings.map((booking) => booking.deleteBooking())))
-      .then(() => this.model.remove())
-      .then(() => {
-        this.emitEvent('delete')
-        return this
-      })
+    await Promise.all(bookings.map((booking) => booking.deleteBooking()))
+    await this.model.remove()
+    this.lib.emitEvent('delete', this)
+    return this
   }
 
   /**
    * Lists bookings as events
    * @returns {Promise.<{start: Date, end: Date, uid: string, timestamp: Date, summary: string}[]>}
    */
-  generateEvents () {
-    return BookingHandler.find({machine: this.model._id})
-      .then(bookings => bookings.map(booking => booking.event))
-      .then(bookings => bookings.map(({start, end, uid, timestamp}) => ({
-        start,
-        end,
-        uid,
-        timestamp,
-        summary: this.model.name
-      })))
-  }
-
-  get restUrl () {
-    return `/machines/${this.model.id}`
+  async generateEvents () {
+    const bookings = await BookingHandler.lib.find({machine: this.model._id})
+    const bookingEvents = bookings.map((booking: BookingHandler) => booking.event())
+    return bookingEvents.map(({start, end, uid, timestamp}) => ({
+      start,
+      end,
+      uid,
+      timestamp,
+      summary: this.model.name
+    }))
   }
 
   toRestSummary () {
     return {name: this.model.name, href: this.restUrl, id: this.model.id}
   }
 
-  toRest () {
-    return Promise.resolve({
+  async toRest () {
+    return {
       name: this.model.name,
       href: this.restUrl,
       id: this.model.id,
       type: this.model.type,
       broken: this.model.broken
-    })
+    }
   }
 
-  get reduxModel () {
+  reduxModel () {
     return {
       id: this.model.id,
       type: this.model.type,
@@ -165,11 +166,3 @@ class MachineHandler extends Handler {
     }
   }
 }
-
-Handler.setupHandler(MachineHandler, MachineModel, {
-  delete: DELETE_MACHINE,
-  update: UPDATE_MACHINE,
-  create: CREATE_MACHINE
-})
-
-module.exports = MachineHandler

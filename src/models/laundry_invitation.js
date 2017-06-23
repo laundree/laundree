@@ -1,10 +1,15 @@
-/**
- * Created by budde on 27/04/16.
- */
-const mongoose = require('mongoose')
+// @flow
+import mongoose from 'mongoose'
+import type {ObjectId} from 'mongoose'
 const Schema = mongoose.Schema
 
-const laundryInvitationSchema = new Schema({
+type LaundryInvitationDefinition = {
+  email: string,
+  used: boolean,
+  laundry: ObjectId
+}
+
+const laundryInvitationSchema: Schema<LaundryInvitationDefinition> = new Schema({
   email: {type: String, required: true},
   used: {type: Boolean, default: false},
   laundry: {type: Schema.Types.ObjectId, ref: 'Laundry', required: true}
@@ -12,6 +17,4 @@ const laundryInvitationSchema = new Schema({
 
 laundryInvitationSchema.index({email: 1})
 
-const LaundryInvitationModel = mongoose.model('LaundryInvitation', laundryInvitationSchema)
-
-module.exports = LaundryInvitationModel
+export default mongoose.model('LaundryInvitation', laundryInvitationSchema)

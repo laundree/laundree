@@ -1,8 +1,10 @@
-const React = require('react')
-const {ValueUpdater} = require('./helpers')
-const {createClient} = require('@google/maps')
-const {Input} = require('./intl')
-const {FormattedMessage} = require('react-intl')
+// @flow
+import React from 'react'
+import ValueUpdater from './helpers/ValueUpdater'
+import { createClient } from '@google/maps'
+import { Input } from './intl'
+import { FormattedMessage } from 'react-intl'
+import type { LocaleType } from '../../locales'
 
 function resultsToFormattedAddressLookup (results) {
   return results.reduce((o, {place_id: placeId, formatted_address: formattedAddress}) => {
@@ -11,15 +13,36 @@ function resultsToFormattedAddressLookup (results) {
   }, {})
 }
 
-class LocationSelector extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.state.results = []
-    this.state.formattedAddresses = {}
-    this.lookupNo = 0
+type LocationSelectorState = {
+  latestCompletedLookupNo?: number,
+  latestLookupNo?: number,
+  results: string[],
+  formattedAddresses: { [string]: string },
+  focus: boolean
+}
+
+type LocationSelectorProps = {
+  googleApiKey: string,
+  locale: LocaleType,
+  onChange: (s: string) => void,
+  value: string
+}
+
+type LocationSelectorValues = {
+  address: string
+}
+
+class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSelectorProps, LocationSelectorState> {
+  initialState () {
+    return {results: [], formattedAddresses: {}, focus: false}
   }
 
-  get initialValues () {
+  lookupNo = 0
+  googleMapsClient = null
+  lastLookup: number
+  fetching: ?string
+
+  initialValues () {
     return {address: ''}
   }
 
@@ -28,21 +51,24 @@ class LocationSelector extends ValueUpdater {
     this.fetchFormattedAddress(this.props.value)
   }
 
-  handleAddressChange (event) {
+  handleAddressChange (event: Event) {
     const lookupNo = this.lookupNo++
-    const value = event.target.value
+    const value = (event.target && typeof event.target.value === 'string' && event.target.value) || ''
     clearTimeout(this.lastLookup)
-    let state = {results: [], latestLookupNo: lookupNo}
+    let state: $Shape<LocationSelectorState> = {results: [], latestLookupNo: lookupNo}
     if (value.trim()) {
       this.lastLookup = setTimeout(() => this.lookup(value, lookupNo), 500)
     } else {
-      state.latestCompletedLookupNo = lookupNo
+      this.setState({latestCompletedLookupNo: lookupNo})
     }
     this.updateValue({address: value}, state)
     this.props.onChange('')
   }
 
-  lookup (address, lookupNo) {
+  lookup (address: string, lookupNo: number) {
+    if (!this.googleMapsClient) {
+      throw new Error('Google maps client not created')
+    }
     this.googleMapsClient.geocode({address, language: this.props.locale}, (err, response) => {
       if (err) return
       const {json, status} = response
@@ -55,11 +81,14 @@ class LocationSelector extends ValueUpdater {
     })
   }
 
-  componentWillReceiveProps ({value}) {
+  componentWillReceiveProps ({value}: LocationSelectorProps) {
     this.fetchFormattedAddress(value)
   }
 
-  fetchFormattedAddress (placeId) {
+  fetchFormattedAddress (placeId: string) {
+    if (!this.googleMapsClient) {
+      throw new Error('Google maps client is not initialized')
+    }
     if (!placeId) return
     const cachedAddress = this.state.formattedAddresses[placeId]
     if (cachedAddress) {
@@ -82,11 +111,7 @@ class LocationSelector extends ValueUpdater {
     })
   }
 
-  get open () {
-    return this.state.focus
-  }
-
-  updatePlace (placeId) {
+  updatePlace (placeId: string) {
     this.props.onChange(placeId)
   }
 
@@ -104,11 +129,11 @@ class LocationSelector extends ValueUpdater {
       </ul>
     }
     return <div className='dropDownMessage'>
-      <FormattedMessage id={this.message}/>
+      <FormattedMessage id={this.message()}/>
     </div>
   }
 
-  get message () {
+  message () {
     if (this.state.latestCompletedLookupNo !== this.state.latestLookupNo) {
       return 'location-selector.drop-down.loading'
     }
@@ -120,7 +145,7 @@ class LocationSelector extends ValueUpdater {
 
   render () {
     return <div
-      className={`locationSelector dropDown ${this.open ? 'open' : ''}`}
+      className={`locationSelector dropDown ${this.state.focus ? 'open' : ''}`}
       onBlur={() => this.setState({focus: false})}
       onFocus={() => this.setState({focus: true})}>
       <Input
@@ -133,11 +158,4 @@ class LocationSelector extends ValueUpdater {
   }
 }
 
-LocationSelector.propTypes = {
-  googleApiKey: React.PropTypes.string.isRequired,
-  locale: React.PropTypes.string.isRequired,
-  onChange: React.PropTypes.func.isRequired,
-  value: React.PropTypes.string.isRequired
-}
-
-module.exports = LocationSelector
+export default LocationSelector

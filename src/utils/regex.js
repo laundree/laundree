@@ -1,10 +1,6 @@
-/**
- * Created by budde on 22/04/16.
- */
+// @flow
 
-module.exports = {
-  nonEmpty: /./,
-  email: /.+@.+\.(.+){2,}/,
-  password: /([a-z].{5,}|.[a-z].{4,}|.{2,}[a-z].{3,}|.{3,}[a-z].{2,}|.{4,}[a-z].|.{5,}[a-z])/i,
-  mongoDbId: /^(.{12}|[a-f0-9]{24})$/
-}
+export const nonEmpty = /./
+export const email = /.+@.+\.(.+){2,}/
+export const password = /([a-z].{5,}|.[a-z].{4,}|.{2,}[a-z].{3,}|.{3,}[a-z].{2,}|.{4,}[a-z].|.{5,}[a-z])/i
+export const mongoDbId = /^(.{12}|[a-f0-9]{24})$/

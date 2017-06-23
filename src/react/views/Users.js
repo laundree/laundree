@@ -1,25 +1,33 @@
-const React = require('react')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const {DocumentTitle, Modal, Label, Input, Submit} = require('./intl')
-const {FormattedMessage} = require('react-intl')
-const sdk = require('../../client/sdk')
-const Loader = require('./Loader')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const {Link} = require('react-router-dom')
-const {createInvitePdf} = require('../../utils/pdf')
-const request = require('superagent')
-const toBuffer = require('blob-to-buffer')
+// @flow
+import React from 'react'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import { DocumentTitle, Modal, Label, Input, Submit } from './intl'
+import { FormattedMessage } from 'react-intl'
+import sdk from '../../client/sdk'
+import Loader from './Loader'
+import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
+import { Link } from 'react-router-dom'
+import { createInvitePdf } from '../../utils/pdf'
+import request from 'superagent'
+import toBuffer from 'blob-to-buffer'
+import type { Laundry, User, Invite } from 'laundree-sdk/lib/redux'
+import type { LocaleType } from '../../locales'
 
-class InviteUserForm extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.submitHandler = (evt) => {
-      evt.preventDefault()
-      return sdk.laundry(this.props.laundry.id)
-        .inviteUserByEmail(this.state.values.email)
-        .then(() => this.reset())
-    }
+class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry }, {}> {
+  submitHandler = async (evt: Event) => {
+    evt.preventDefault()
+    await sdk.api.laundry
+      .inviteUserByEmail(this.props.laundry.id, this.state.values.email)
+    this.reset()
+  }
+
+  initialValues () {
+    return {email: ''}
+  }
+
+  initialState () {
+    return {}
   }
 
   render () {
@@ -34,14 +42,13 @@ class InviteUserForm extends ValueUpdater {
       <div>
         <ValidationElement
           sesh={this.state.sesh}
-          initial={this.state.values.email === undefined}
-          value={this.state.values.email || ''} email trim>
+          value={this.state.values.email} email trim>
           <Label
             data-validate-error='users.error.invalid-email'>
             <Input
               placeholder='general.email-address'
-              type='text' onChange={this.generateValueUpdater('email')}
-              value={this.state.values.email || ''}/>
+              type='text' onChange={this.generateValueEventUpdater(email => ({email}))}
+              value={this.state.values.email}/>
           </Label>
         </ValidationElement>
       </div>
@@ -52,23 +59,22 @@ class InviteUserForm extends ValueUpdater {
   }
 }
 
-InviteUserForm.propTypes = {
-  laundry: React.PropTypes.object.isRequired
-}
-
 class QrInvite extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {}
+  state = {}
+  props: {
+    laundry: Laundry,
+    locale: LocaleType
   }
+
   generatePdf () {
     if (this.state.generating) return
     this.setState({generating: true})
     Promise
-      .all([sdk.laundry(this.props.laundry.id).createInviteCode(), this.fetchLogo()])
+      .all([sdk.api.laundry.createInviteCode(this.props.laundry.id), this.fetchLogo()])
       .then(([{key}, logoBuffer]) => this.generatePdfBuffer(logoBuffer, key))
       .then(buffer => this.setState({pdf: buffer, generating: false}))
   }
+
   generatePdfBuffer (logoBuffer, code) {
     return new Promise(async (resolve, reject) => {
       const stream = await createInvitePdf(
@@ -82,6 +88,7 @@ class QrInvite extends React.Component {
       stream.on('error', reject)
     })
   }
+
   fetchLogo () {
     return request
       .get('/images/logo.png')
@@ -91,31 +98,33 @@ class QrInvite extends React.Component {
         resolve(buffer)
       })))
   }
+
   generateLink () {
     if (!this.state.pdf) {
       return <button
         className={'pdfLink' + (this.state.generating ? 'inactive' : '')}
         onClick={() => this.generatePdf()}>
-            {this.state.generating
-              ? <FormattedMessage id='general.generating'/>
-              : <FormattedMessage id='users.qr-signup.generate-code'/> }
-              </button>
+        {this.state.generating
+          ? <FormattedMessage id='general.generating'/>
+          : <FormattedMessage id='users.qr-signup.generate-code'/>}
+      </button>
     }
     return <a
       className='button red qr-download'
       href={`data:application/pdf;base64,${this.state.pdf.toString('base64')}`} target='_blank'>
-        <svg>
-          <use xlinkHref='#MediaDownload' />
-        </svg>
-        <FormattedMessage id='users.qr-signup.download'/>
-      </a>
+      <svg>
+        <use xlinkHref='#MediaDownload'/>
+      </svg>
+      <FormattedMessage id='users.qr-signup.download'/>
+    </a>
   }
+
   render () {
     return <div id='QrSignUp'>
       <FormattedMessage
         id='users.qr-signup.message'
         values={{
-          nl: <br />
+          nl: <br/>
         }}/>
       <div className={'linkContainer buttonContainer' + (this.state.generating ? ' generating' : '')}>
         {this.generateLink()}
@@ -124,32 +133,23 @@ class QrInvite extends React.Component {
   }
 }
 
-QrInvite.propTypes = {
-  laundry: React.PropTypes.object.isRequired,
-  locale: React.PropTypes.string.isRequired
-}
-
 class LinkElement extends React.Component {
+  props: { link: string }
+
   render () {
     return <div className='link'>{this.props.link}</div>
   }
 }
 
-LinkElement.propTypes = {
-  link: React.PropTypes.string.isRequired
-}
-
 class LinkInvite extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {link: null}
-  }
+  state: { link: ?string } = {link: null}
+  props: { laundry: Laundry }
 
   generateLink () {
     if (this.state.generating) return
     this.setState({generating: true})
-    sdk.laundry(this.props.laundry.id)
-      .createInviteCode()
+    sdk.api.laundry
+      .createInviteCode(this.props.laundry.id)
       .then(({href}) => this.setState({link: href, generating: false}))
   }
 
@@ -160,14 +160,14 @@ class LinkInvite extends React.Component {
     return <button onClick={() => this.generateLink()} className={this.state.generating ? 'inactive' : ''}>
       {this.state.generating
         ? <FormattedMessage id='general.generating'/>
-        : <FormattedMessage id='users.invite-form-link.button'/> }
+        : <FormattedMessage id='users.invite-form-link.button'/>}
     </button>
   }
 
   render () {
     return <div id='UserLinkSignUp'>
       <FormattedMessage id='users.invite-form-link.text' values={{
-        nl: <br />
+        nl: <br/>
       }}/>
       <div className={'linkContainer buttonContainer ' + (this.state.generating ? 'generating' : '')}>
         {this.renderLink()}
@@ -176,37 +176,32 @@ class LinkInvite extends React.Component {
   }
 }
 
-LinkInvite.propTypes = {
-  laundry: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    owners: React.PropTypes.array
-  }).isRequired
-}
-
 class UserItem extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {showModal: false}
-    this.onShowModal = () => this.setState({showModal: true})
-    this.onCloseModal = () => this.setState({showModal: false})
-    this.handleDelete = () => sdk.laundry(this.props.laundry.id).removeUserFromLaundry(this.props.user.id)
+  props: {
+    user: User,
+    laundry: Laundry,
+    currentUser: User
   }
+  state = {showModal: false}
+  onShowModal = () => this.setState({showModal: true})
+  onCloseModal = () => this.setState({showModal: false})
+  handleDelete = () => sdk.api.laundry.removeUserFromLaundry(this.props.laundry.id, this.props.user.id)
 
   makeOwner () {
-    sdk.laundry(this.props.laundry.id).addOwner(this.props.user.id)
+    sdk.api.laundry.addOwner(this.props.laundry.id, this.props.user.id)
   }
 
   makeUser () {
-    sdk.laundry(this.props.laundry.id).removeOwner(this.props.user.id)
+    sdk.api.laundry.removeOwner(this.props.laundry.id, this.props.user.id)
   }
 
-  get isCurrentUser () {
+  isCurrentUser () {
     return this.props.user.id === this.props.currentUser.id
   }
 
   renderRole () {
-    const isOwner = this.isOwner
-    if (this.isCurrentUser || (isOwner && this.props.laundry.owners.length === 1)) {
+    const isOwner = this.isOwner()
+    if (this.isCurrentUser() || (isOwner && this.props.laundry.owners.length === 1)) {
       return <span className='owner'><FormattedMessage id='users.owner'/></span>
     }
     return <DropDown>
@@ -233,7 +228,7 @@ class UserItem extends React.Component {
   }
 
   renderDelete () {
-    if (this.isOwner) return null
+    if (this.isOwner()) return null
     return <div className='delete action'>
       <svg onClick={this.onShowModal}>
         <use xlinkHref='#Trash'/>
@@ -241,12 +236,12 @@ class UserItem extends React.Component {
     </div>
   }
 
-  get isOwner () {
+  isOwner () {
     return this.props.laundry.owners.indexOf(this.props.user.id) >= 0
   }
 
   renderName () {
-    if (!this.addUserLink) return this.props.user.displayName
+    if (!this.addUserLink()) return this.props.user.displayName
     return <Link to={`/users/${this.props.user.id}/settings`}>
       {this.props.user.displayName}
     </Link>
@@ -254,7 +249,7 @@ class UserItem extends React.Component {
 
   renderAvatar () {
     const avatarImage = <img className='avatar' src={this.props.user.photo}/>
-    if (!this.addUserLink) return avatarImage
+    if (!this.addUserLink()) return avatarImage
     return <Link to={`/users/${this.props.user.id}/settings`}>
       {avatarImage}
     </Link>
@@ -281,33 +276,20 @@ class UserItem extends React.Component {
     </div>
   }
 
-  get addUserLink () {
+  addUserLink () {
     return this.props.user.id === this.props.currentUser.id || this.props.currentUser.role === 'admin'
   }
 }
 
-UserItem.propTypes = {
-  user: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    photo: React.PropTypes.string,
-    displayName: React.PropTypes.string
-  }).isRequired,
-  laundry: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    owners: React.PropTypes.array
-  }).isRequired,
-  currentUser: React.PropTypes.object.isRequired
-}
-
 class InviteItem extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {showModal: false}
-    this.onShowModal = () => this.setState({showModal: true})
-    this.onCloseModal = () => this.setState({showModal: false})
-    this.handleDelete = () => sdk.invite(this.props.invite.id).del()
-  }
 
+  state = {showModal: false}
+  onShowModal = () => this.setState({showModal: true})
+  onCloseModal = () => this.setState({showModal: false})
+  handleDelete = () => sdk.api.invite.del(this.props.invite.id)
+  props: {
+    invite: Invite
+  }
   render () {
     return <div>
       <Modal
@@ -331,27 +313,21 @@ class InviteItem extends React.Component {
   }
 }
 
-InviteItem.propTypes = {
-  invite: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    email: React.PropTypes.string
-  }).isRequired
-}
-
-InviteItem.contextTypes = {
-  actions: React.PropTypes.shape({
-    deleteInvite: React.PropTypes.func
-  })
-}
-
-class Users extends React.Component {
+export default class Users extends React.Component {
+  props: {
+    locale: LocaleType,
+    invites: {[string]: Invite},
+    users: {[string]: User},
+    laundry: Laundry,
+    currentUser: string
+  }
   renderUsers () {
     return <ul className='bigList'>
-      {this.users.map(user => <li key={user.id}><UserItem
+      {this.users().map(user => <li key={user.id}><UserItem
         user={user}
-        currentUser={this.currentUser}
+        currentUser={this.currentUser()}
         laundry={this.props.laundry}/></li>)}
-      {this.invites.map(invite => <li key={invite.id}><InviteItem invite={invite}/></li>)}
+      {this.invites().map(invite => <li key={invite.id}><InviteItem invite={invite}/></li>)}
     </ul>
   }
 
@@ -359,15 +335,15 @@ class Users extends React.Component {
     return sdk.listUsersAndInvites(this.props.laundry.id)
   }
 
-  get users () {
+  users () {
     return this.props.laundry.users.map(id => this.props.users[id]).filter(u => u)
   }
 
-  get invites () {
+  invites () {
     return this.props.laundry.invites.map((id) => this.props.invites[id]).filter((i) => i).filter(({used}) => !used)
   }
 
-  get currentUser () {
+  currentUser () {
     return this.props.users[this.props.currentUser]
   }
 
@@ -398,13 +374,3 @@ class Users extends React.Component {
     </DocumentTitle>
   }
 }
-
-Users.propTypes = {
-  locale: React.PropTypes.string.isRequired,
-  invites: React.PropTypes.object,
-  users: React.PropTypes.object,
-  laundry: React.PropTypes.object,
-  currentUser: React.PropTypes.string.isRequired
-}
-
-module.exports = Users

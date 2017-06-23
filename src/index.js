@@ -1,1 +1,3 @@
-require('./server').then((start) => start())
+// @flow
+import serverPromise from './server'
+serverPromise.then(start => start())

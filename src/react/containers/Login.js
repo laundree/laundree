@@ -1,11 +1,9 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const Login = require('../views/Login')
-const queryString = require('querystring')
+import {connect} from 'react-redux'
+import Login from '../views/Login'
+import queryString from 'querystring'
 
 const mapStateToProps = ({flash}, {location}) => ({flash, to: location && location.search && queryString.parse(location.search.substr(1)).to})
 
-module.exports = connect(mapStateToProps)(Login)
+export default connect(mapStateToProps)(Login)

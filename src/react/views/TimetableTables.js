@@ -1,10 +1,9 @@
-/**
- * Created by budde on 28/05/16.
- */
-const React = require('react')
-const {range} = require('../../utils/array')
-const sdk = require('../../client/sdk')
-const moment = require('moment-timezone')
+// @flow
+import React from 'react'
+import { range } from '../../utils/array'
+import sdk from '../../client/sdk'
+import moment from 'moment-timezone'
+import type { Machine, Laundry, Booking } from 'laundree-sdk/lib/redux'
 
 function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
@@ -22,12 +21,32 @@ function isChildOf (parent, child) {
   return isChildOf(parent, child.parentNode)
 }
 
+type TimetableTableProps = {
+  currentUser: string,
+  onHoverColumn: Function,
+  machines: { [string]: Machine },
+  laundry: Laundry,
+  bookings: { [string]: Booking },
+  activeBooking: ?string,
+  onActiveChange: Function,
+  offsetDate: string,
+  date: moment,
+  onHoverRow: Function,
+  hoverRow: number,
+  hoverColumn: number,
+  times: number[]
+}
+
 class TimetableTable extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = Object.assign({bookings: {}, activeBooking: null}, this._calcPosition())
-    this.firstBooking = false
-  }
+
+  props: TimetableTableProps
+  firstBooking = false
+  state = {...this._calcPosition(), bookings: {}, activeBooking: null}
+  _interval: number
+  bodyListener: Function
+  bodyRef: HTMLElement
+  ref: HTMLElement
+  tableRef: HTMLTableElement
 
   _row (key, tooLate) {
     const machines = this.props.laundry.machines
@@ -39,7 +58,7 @@ class TimetableTable extends React.Component {
       {machines
         .map((m, i) => {
           if (m.broken) {
-            return <td key={m.id} className='broken'/>
+            return <td key={m.id} className='broken' />
           }
           const isBooked = this.isBooked(m.id, key)
           if (isBooked) {
@@ -47,7 +66,7 @@ class TimetableTable extends React.Component {
               {this.createBookingLink(isBooked)}
             </td>
           }
-          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''}/>
+          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''} />
         })}
     </tr>
   }
@@ -61,7 +80,7 @@ class TimetableTable extends React.Component {
     const mine = this.isMine(bookingId)
     return <span
       onClick={this.generateActiveChangeHandler(bookingId)}
-      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')}/>
+      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')} />
   }
 
   isMine (bookingId) {
@@ -201,7 +220,7 @@ class TimetableTable extends React.Component {
       .map(x => {
         const machine = this.props.machines[this.props.laundry.machines[x]]
         if (machine.broken) return
-        return sdk.machine(machine.id).createBooking(this.posToDate(min), this.posToDate(maxExclusive))
+        return sdk.api.machine.createBooking(machine.id, this.posToDate(min), this.posToDate(maxExclusive))
       }))
   }
 
@@ -216,7 +235,7 @@ class TimetableTable extends React.Component {
     this.hover({x: -1, y: -1})
   }
 
-  handleMouseOut () {
+  handleMouseOut (evt: *) {
     this.reset()
   }
 
@@ -260,9 +279,9 @@ class TimetableTable extends React.Component {
         this.ref = ref
       }}>
       <div className='overlay'>
-        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}/>
+        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}} />
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
-          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
+          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time} /> : ''}
       </div>
       <table
         ref={ref => {
@@ -280,29 +299,22 @@ class TimetableTable extends React.Component {
   }
 }
 
-TimetableTable.propTypes = {
-  currentUser: React.PropTypes.string.isRequired,
-  onHoverColumn: React.PropTypes.func.isRequired,
-  machines: React.PropTypes.object.isRequired,
-  laundry: React.PropTypes.object.isRequired,
-  bookings: React.PropTypes.object.isRequired,
-  activeBooking: React.PropTypes.string,
-  onActiveChange: React.PropTypes.func,
-  offsetDate: React.PropTypes.string,
-  date: React.PropTypes.object.isRequired,
-  onHoverRow: React.PropTypes.func.isRequired,
-  hoverRow: React.PropTypes.number.isRequired,
-  hoverColumn: React.PropTypes.number.isRequired,
-  times: React.PropTypes.arrayOf(React.PropTypes.number).isRequired
-}
-
-class TimetableTables extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {hoverRow: -1}
+export default class TimetableTables extends React.Component {
+  state = {hoverRow: -1}
+  props: {
+    onActiveChange: Function,
+    currentUser: string,
+    activeBooking: ?string,
+    offsetDate: string,
+    onHoverColumn: Function,
+    hoverColumn: number,
+    dates: moment[],
+    laundry: Laundry,
+    machines: {[string]: Machine},
+    bookings: {[string]: Booking}
   }
 
-  componentWillReceiveProps ({dates, laundry: {id}}) {
+  componentWillReceiveProps ({dates, laundry: {id}}: {dates: moment[], laundry: Laundry}) {
     const oldDates = this.props.dates
     if (dates.length === oldDates.length && oldDates.every((d, i) => d.isSame(dates[i], 'd'))) return
     const firstDate = dates[0]
@@ -319,7 +331,7 @@ class TimetableTables extends React.Component {
     })
   }
 
-  get times () {
+  times () {
     if (!this.props.laundry.rules.timeLimit) return range(48)
     const {hour: fromHour, minute: fromMinute} = this.props.laundry.rules.timeLimit.from
     const {hour: toHour, minute: toMinute} = this.props.laundry.rules.timeLimit.to
@@ -329,7 +341,7 @@ class TimetableTables extends React.Component {
   }
 
   render () {
-    const times = this.times
+    const times = this.times()
     const halfStart = times[0] % 2
     const hours = (halfStart ? times : times.slice(2)).filter(i => (i + 1) % 2).map(i => i / 2)
     const timeList = <ul className={'times' + (halfStart ? ' half' : '')}>
@@ -352,24 +364,9 @@ class TimetableTables extends React.Component {
           laundry={this.props.laundry}
           bookings={this.props.bookings}
           times={times}
-          key={date.format('YYYY-MM-DD')}/>)}
+          key={date.format('YYYY-MM-DD')} />)}
         {timeList}
       </div>
     </section>
   }
 }
-
-TimetableTables.propTypes = {
-  onActiveChange: React.PropTypes.func,
-  currentUser: React.PropTypes.string.isRequired,
-  activeBooking: React.PropTypes.string,
-  offsetDate: React.PropTypes.string,
-  onHoverColumn: React.PropTypes.func.isRequired,
-  hoverColumn: React.PropTypes.number.isRequired,
-  dates: React.PropTypes.array.isRequired,
-  laundry: React.PropTypes.object.isRequired,
-  machines: React.PropTypes.object.isRequired,
-  bookings: React.PropTypes.object.isRequired
-}
-
-module.exports = TimetableTables

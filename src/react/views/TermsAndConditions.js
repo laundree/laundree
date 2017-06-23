@@ -1,1 +1,4 @@
-module.exports = require('./Privacy')
+// @flow
+
+import Privacy from './Privacy'
+export default Privacy

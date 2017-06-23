@@ -1,20 +1,20 @@
-const React = require('react')
-const ContactForm = require('./ContactForm')
-const {DocumentTitle} = require('./intl')
-const {FormattedMessage, FormattedHTMLMessage} = require('react-intl')
+// @flow
 
-class Contact extends React.Component {
+import React from 'react'
+import ContactForm from './ContactForm'
+import {DocumentTitle} from './intl'
+import {FormattedMessage, FormattedHTMLMessage} from 'react-intl'
+
+export default class Contact extends React.Component {
   render () {
     return <DocumentTitle title='document-title.contact'>
       <main id='Contact' className='topNaved'>
-        <h1><FormattedMessage id='contact.title'/></h1>
+        <h1><FormattedMessage id='contact.title' /></h1>
         <section>
-          <FormattedHTMLMessage id='contact.message'/>
+          <FormattedHTMLMessage id='contact.message' />
         </section>
-        <ContactForm/>
+        <ContactForm />
       </main>
     </DocumentTitle>
   }
 }
-
-module.exports = Contact

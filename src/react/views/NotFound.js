@@ -1,31 +1,24 @@
-/**
- * Created by budde on 21/03/2017.
- */
-const React = require('react')
-const {Route} = require('react-router')
+// @flow
+import React from 'react'
+import type {Children} from 'react'
+import {Route} from 'react-router'
 
-const Status = ({code, children}) => (
+const Status = ({code, children}: {code: number, children?: Children}) => (
+  // $FlowFixMe this is present...
   <Route render={({staticContext}) => {
     if (staticContext) {
       staticContext.statusCode = code
     }
     return children || null
-  }}/>
+  }} />
 )
 
-Status.propTypes = {
-  code: React.PropTypes.number.isRequired,
-  children: React.PropTypes.any
-}
-
-class NotFound extends React.Component {
+export default class NotFound extends React.Component {
   componentDidMount () {
     window.location.reload()
   }
 
   render () {
-    return <Status code={404}/>
+    return <Status code={404} />
   }
 }
-
-module.exports = NotFound
