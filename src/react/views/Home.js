@@ -56,11 +56,11 @@ const HomeNotLoggedIn = () => <DocumentTitle title='document-title.home'>
         </div>
       </div>
       <div>
-        <video loop='loop' autoPlay preload='meta' poster='/videos/v.png'>
-          <source src='/videos/v.mp4' type='video/mp4' />
-          <source src='/videos/v.mov' type='video/mov' />
-          <source src='/videos/v.webm' type='video/webm' />
-          <source src='/videos/v.ogv' type='video/ogg' />
+        <video loop='loop' autoPlay preload='meta' poster='https://storage.googleapis.com/laundree-videos/v.png'>
+          <source src='https://storage.googleapis.com/laundree-videos/v.mp4' type='video/mp4' />
+          <source src='https://storage.googleapis.com/laundree-videos/videos/v.mov' type='video/mov' />
+          <source src='https://storage.googleapis.com/laundree-videos/videos/v.webm' type='video/webm' />
+          <source src='https://storage.googleapis.com/laundree-videos/videos/v.ogv' type='video/ogg' />
         </video>
       </div>
     </header>
