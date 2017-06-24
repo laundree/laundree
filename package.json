@@ -81,7 +81,7 @@
     "chai-as-promised": "^7.0.0",
     "chai-things": "^0.2.0",
     "codeclimate-test-reporter": "^0.5.0",
-    "eslint": "^3.19.0",
+    "eslint": "^4.1.0",
     "eslint-config-standard": "^10.0.0",
     "eslint-config-standard-flow": "^1.0.1",
     "eslint-config-standard-jsx": "^4.0.0",
