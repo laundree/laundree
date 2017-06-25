@@ -1,14 +1,16 @@
-const fs = require('../utils/fs')
-const path = require('path')
-const handlebars = require('handlebars')
+// @flow
+import {readFile} from '../utils/fs'
+import path from 'path'
+import handlebars from 'handlebars'
+import Debug from 'debug'
+import {locales} from '../locales'
+import type { LocaleType } from '../locales'
+const debug = Debug('laundree.utils.handlebars')
 const templateCache = {}
-const debug = require('debug')('laundree.utils.handlebars')
-const locales = require('../locales')
 
 function readTemplate (path) {
   debug('Template not cached, reading template')
-  return fs
-    .readFile(path, 'utf8')
+  return readFile(path)
     .then(source => {
       const template = handlebars.compile(source)
       templateCache[path] = template
@@ -17,16 +19,14 @@ function readTemplate (path) {
     })
 }
 
-function render (file, context, locale) {
+export function render (file: string, context: Object, locale: LocaleType) {
   debug('Rendering template ', file)
   const p = path.resolve(__dirname, '..', '..', 'templates', file)
   const template = templateCache[p]
-  const messages = locales[locale].messages
+  const messages = locales[locale]
   return Promise
     .resolve(template || readTemplate(p))
     .then(template => {
       return template(Object.assign(context, {messages}))
     })
 }
-
-module.exports = {render}

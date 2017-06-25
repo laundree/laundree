@@ -1,26 +1,28 @@
-const React = require('react')
-const {Link} = require('react-router-dom')
-const {ValidationElement, ValidationForm} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {DocumentTitle, Modal, Submit, Input, Label} = require('./intl')
-const {FormattedMessage} = require('react-intl')
-const Loader = require('./Loader')
-const NotFound = require('./NotFound')
+// @flow
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { ValidationElement, ValidationForm } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import sdk from '../../client/sdk'
+import { DocumentTitle, Modal, Submit, Input, Label } from './intl'
+import { FormattedMessage } from 'react-intl'
+import Loader from './Loader'
+import NotFound from './NotFound'
+import type { User, Laundry } from 'laundree-sdk/lib/redux'
 
-class UserNameForm extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.onSubmit = (event) => {
-      this.setState({loading: true})
-      event.preventDefault()
-      sdk.user(this.props.user.id)
-        .updateName(this.state.values.displayName)
-        .then(() => this.setState({loading: false}))
-    }
+class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User }, { loading: boolean }> {
+  onSubmit = async (event) => {
+    this.setState({loading: true})
+    event.preventDefault()
+    await sdk.api.user.updateName(this.props.user.id, this.state.values.displayName)
+    this.setState({loading: false})
   }
 
-  get initialValues () {
+  initialState () {
+    return {loading: false}
+  }
+
+  initialValues () {
     return {displayName: this.props.user.displayName}
   }
 
@@ -38,11 +40,11 @@ class UserNameForm extends ValueUpdater {
         nonEmpty
         sesh={this.state.sesh}
         trim
-        value={this.state.values.displayName || ''}>
+        value={this.state.values.displayName}>
         <label>
           <input
-            onChange={this.generateValueUpdater('displayName')}
-            type='text' value={this.state.values.displayName || ''} />
+            onChange={this.generateValueEventUpdater(displayName => ({displayName}))}
+            type='text' value={this.state.values.displayName} />
         </label>
       </ValidationElement>
       <div className='buttons'>
@@ -52,45 +54,46 @@ class UserNameForm extends ValueUpdater {
   }
 }
 
-UserNameForm.propTypes = {
-  user: React.PropTypes.object.isRequired
-}
+class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPassword: string, newPasswordRepeat: string }, { user: User }, { loading: boolean }> {
 
-class UserPasswordForm extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.onSubmit = (event) => {
-      this.setState({loading: true})
-      event.preventDefault()
-      sdk.user(this.props.user.id)
-        .changePassword(
+  onSubmit = async (event) => {
+    this.setState({loading: true})
+    event.preventDefault()
+    try {
+      await sdk.api.user
+        .changePassword(this.props.user.id,
           this.state.values.currentPassword,
           this.state.values.newPassword)
-        .then(
-          () => this.reset({
-            loading: false,
-            notion: {
-              message: <FormattedMessage id='user-settings.change-password.success' />,
-              success: true
-            }
-          }),
-          (err) => this.setState({
-            loading: false,
-            notion: {
-              message: <FormattedMessage id={err.status === 403
-                ? 'user-settings.change-password.error.invalid'
-                : 'user-settings.change-password.error'} />
-            }
-          }))
+      this.reset({
+        loading: false,
+        notion: {
+          message: <FormattedMessage id='user-settings.change-password.success' />,
+          success: true
+        }
+      })
+    } catch (err) {
+      this.setState({
+        loading: false,
+        notion: {
+          success: false,
+          message: <FormattedMessage id={err.status === 403
+            ? 'user-settings.change-password.error.invalid'
+            : 'user-settings.change-password.error'} />
+        }
+      })
     }
   }
 
-  get initialValues () {
+  initialValues () {
     return {
       currentPassword: '',
       newPassword: '',
       newPasswordRepeat: ''
     }
+  }
+
+  initialState () {
+    return {loading: false}
   }
 
   render () {
@@ -106,7 +109,7 @@ class UserPasswordForm extends ValueUpdater {
         <Label data-validate-error='user-settings.change-password.invalid-password'>
           <Input
             value={this.state.values.currentPassword}
-            onChange={this.generateValueUpdater('currentPassword')}
+            onChange={this.generateValueEventUpdater(currentPassword => ({currentPassword}))}
             type='password' placeholder='general.current-password' />
         </Label>
       </ValidationElement>
@@ -117,7 +120,7 @@ class UserPasswordForm extends ValueUpdater {
         <Label data-validate-error='user-settings.change-password.invalid-password'>
           <Input
             value={this.state.values.newPassword}
-            onChange={this.generateValueUpdater('newPassword')}
+            onChange={this.generateValueEventUpdater(newPassword => ({newPassword}))}
             type='password' placeholder='general.new-password' />
         </Label>
       </ValidationElement>
@@ -128,7 +131,7 @@ class UserPasswordForm extends ValueUpdater {
         <Label data-validate-error='user-settings.change-password.password-match'>
           <Input
             value={this.state.values.newPasswordRepeat}
-            onChange={this.generateValueUpdater('newPasswordRepeat')}
+            onChange={this.generateValueEventUpdater(newPasswordRepeat => ({newPasswordRepeat}))}
             type='password' placeholder='general.repeat-password' />
         </Label>
       </ValidationElement>
@@ -139,23 +142,16 @@ class UserPasswordForm extends ValueUpdater {
   }
 }
 
-UserPasswordForm.propTypes = {
-  user: React.PropTypes.object.isRequired
-}
-
 class DeleteUser extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {modalOpen: false}
-    this.handleDeleteClick = () => this.deleteUser()
-    this.handleCloseModal = () => this.setState({modalOpen: false})
-    this.handleOpenModal = () => this.setState({modalOpen: true})
-  }
+  state = {modalOpen: false}
+  props: { user: User }
+  handleDeleteClick = () => this.deleteUser()
+  handleCloseModal = () => this.setState({modalOpen: false})
+  handleOpenModal = () => this.setState({modalOpen: true})
 
-  deleteUser () {
-    return sdk.user(this.props.user.id).del().then(() => {
-      window.location = '/'
-    })
+  async deleteUser () {
+    await sdk.api.user.del(this.props.user.id)
+    window.location = '/'
   }
 
   render () {
@@ -177,50 +173,54 @@ class DeleteUser extends React.Component {
   }
 }
 
-DeleteUser.propTypes = {
-  user: React.PropTypes.object.isRequired
+type UserSettingsProps = {
+  currentUser: string,
+  user: string,
+  laundries: { [string]: Laundry },
+  users: { [string]: User }
 }
+
 class UserSettings extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {}
-    this.onLoadClick = () => {
-      if (this.state.loading) return
-      this.setState({loading: true})
-      sdk.user(this.props.user).listEmails().then(emails => this.setState({loading: false, emails}))
-    }
+
+  props: UserSettingsProps
+  state = {}
+  onLoadClick = async () => {
+    if (this.state.loading) return
+    this.setState({loading: true})
+    const emails = await sdk.api.user.listEmails(this.props.user)
+    this.setState({loading: false, emails})
   }
 
   renderPassword () {
-    if (this.isAdmin && !this.isSelf) return null
+    if (this.isAdmin() && !this.isSelf()) return null
     return <section>
       <FormattedMessage id='user-settings.change-password.title' tagName='h2' />
-      <UserPasswordForm user={this.user} />
+      <UserPasswordForm user={this.user()} />
     </section>
   }
 
-  get isSelf () {
+  isSelf () {
     return this.props.user === this.props.currentUser
   }
 
-  get user () {
+  user () {
     return this.props.users[this.props.user]
   }
 
-  get currentUser () {
+  currentUser () {
     return this.props.users[this.props.currentUser]
   }
 
-  get isAdmin () {
-    return this.currentUser.role === 'admin'
+  isAdmin () {
+    return this.currentUser().role === 'admin'
   }
 
-  get laundries () {
-    return this.user.laundries.map(l => this.props.laundries[l]).filter(l => l)
+  laundries () {
+    return this.user().laundries.map(l => this.props.laundries[l]).filter(l => l)
   }
 
-  get isOwner () {
-    return this.laundries.find(l => l.owners.find(i => i === this.props.user))
+  isOwner () {
+    return this.laundries().find(l => l.owners.find(i => i === this.props.user))
   }
 
   renderDelete () {
@@ -231,7 +231,7 @@ class UserSettings extends React.Component {
   }
 
   renderDeleteText () {
-    if (this.isOwner) {
+    if (this.isOwner()) {
       return <div className='text'>
         <FormattedMessage
           values={{nl: <br />}}
@@ -242,7 +242,7 @@ class UserSettings extends React.Component {
       <FormattedMessage
         values={{nl: <br />}}
         id='user-settings.delete-account.message.user' />
-      <DeleteUser user={this.user} />
+      <DeleteUser user={this.user()} />
     </div>
   }
 
@@ -267,7 +267,7 @@ class UserSettings extends React.Component {
   }
 
   renderEmails () {
-    if (!this.isAdmin && !this.isSelf) return
+    if (!this.isAdmin() && !this.isSelf()) return
     return <section>
       <FormattedMessage id='user-settings.email-addresses.title' tagName='h2' />
       <div className='text'>
@@ -289,7 +289,7 @@ class UserSettings extends React.Component {
   }
 
   render () {
-    const user = this.user
+    const user = this.user()
     return <DocumentTitle title='document-title.profile-settings'>
       <main className='topNaved' id='Settings'>
         <FormattedMessage tagName='h1' id='user-settings.title' />
@@ -331,32 +331,23 @@ class UserSettings extends React.Component {
   }
 }
 
-UserSettings.propTypes = {
-  currentUser: React.PropTypes.string,
-  user: React.PropTypes.string,
-  laundries: React.PropTypes.object,
-  users: React.PropTypes.object
-}
-
-const UserSettingsWrapper = ({user, currentUser, laundries, users}) => {
-  if (!users[user]) {
+const UserSettingsWrapper = (props: UserSettingsProps) => {
+  if (!props.users[props.user]) {
     return <NotFound />
   }
-  return <UserSettings user={user} users={users} laundries={laundries} currentUser={currentUser} />
+  return <UserSettings {...props} />
 }
 
 UserSettingsWrapper.propTypes = UserSettings.propTypes
 
-const UserSettingsLoaderWrapper = ({user, currentUser, laundries, users}) => {
-  const cUser = users[currentUser]
+const UserSettingsLoaderWrapper = (props: UserSettingsProps) => {
+  const cUser = props.users[props.currentUser]
   if (cUser.role !== 'admin') {
-    return <UserSettingsWrapper user={user} users={users} laundries={laundries} currentUser={currentUser} />
+    return <UserSettingsWrapper {...props} />
   }
-  return <Loader loader={() => sdk.fetchUser(user)}>
-    <UserSettingsWrapper user={user} users={users} laundries={laundries} currentUser={currentUser} />
+  return <Loader loader={() => sdk.fetchUser(props.user)}>
+    <UserSettingsWrapper {...props} />
   </Loader>
 }
 
-UserSettingsLoaderWrapper.propTypes = UserSettings.propTypes
-
-module.exports = UserSettingsLoaderWrapper
+export default UserSettingsLoaderWrapper

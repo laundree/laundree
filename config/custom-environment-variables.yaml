@@ -1,5 +1,6 @@
 web:
   port: 'PORT'
+  host: 'HOST'
 
 redis:
   host: 'REDIS_HOST'
@@ -19,6 +20,7 @@ facebook:
   callbackUrl: 'FACEBOOK_CALLBACK_URL'
 
 google:
+  trackingId: 'GOOGLE_TRACKING_ID'
   clientApiKey: 'GOOGLE_CLIENT_API_KEY'
   serverApiKey: 'GOOGLE_SERVER_API_KEY'
   clientId: 'GOOGLE_CLIENT_ID'

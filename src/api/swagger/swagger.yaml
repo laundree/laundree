@@ -4,7 +4,7 @@ info:
   title: Laundree App
 
 host: laundree.io
-
+basePath: '/api'
 schemes:
   - https
 

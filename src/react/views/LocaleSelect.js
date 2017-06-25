@@ -1,29 +1,29 @@
-const React = require('react')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const locales = require('../../locales')
+// @flow
+import React from 'react'
+import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
+import * as locales from '../../locales'
+import type { LocaleType } from '../../locales'
+import type { Location } from 'react-router'
 
-const LocaleSelect = props => <DropDown className='language'>
-  <DropDownTitle>
-    <svg>
-      <use xlinkHref='#Globe' />
-    </svg>
-  </DropDownTitle>
-  <DropDownContent className='right'>
-    <ul className='dropDownList'>
-      {locales.supported.map(l => <li key={l} className={props.locale === l ? 'active' : ''}>
-        <DropDownCloser>
-          <a
-            href={`/lang/${l}?r=${encodeURIComponent(props.location.pathname)}`}
-            className='link'>{locales[l].name}</a>
-        </DropDownCloser>
-      </li>)}
-    </ul>
-  </DropDownContent>
-</DropDown>
+const LocaleSelect = (props: { location: Location, locale: LocaleType }) => (
+  <DropDown className='language'>
+    <DropDownTitle>
+      <svg>
+        <use xlinkHref='#Globe'/>
+      </svg>
+    </DropDownTitle>
+    <DropDownContent className='right'>
+      <ul className='dropDownList'>
+        {locales.supported.map(l => <li key={l} className={props.locale === l ? 'active' : ''}>
+          <DropDownCloser>
+            <a
+              href={`/lang/${l}?r=${encodeURIComponent(props.location.pathname)}`}
+              className='link'>{locales.names[l]}</a>
+          </DropDownCloser>
+        </li>)}
+      </ul>
+    </DropDownContent>
+  </DropDown>
+)
 
-LocaleSelect.propTypes = {
-  location: React.PropTypes.object,
-  locale: React.PropTypes.string.isRequired
-}
-
-module.exports = LocaleSelect
+export default LocaleSelect

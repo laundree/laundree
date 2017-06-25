@@ -1,6 +1,6 @@
-const faker = require('faker')
-const {timeout, signIn} = require('../../nightwatch_utils.js')
-const {UserHandler} = require('../../../test_target/handlers')
+import faker from 'faker'
+import {timeout, signIn} from '../../nightwatch_utils.js'
+import UserHandler from '../../../test_target/handlers/user'
 
 let email, password
 
@@ -15,7 +15,7 @@ module.exports = {
   'beforeEach': (client, done) => {
     email = faker.internet.email()
     password = faker.internet.password()
-    UserHandler.createUserWithPassword(faker.name.findName(), email, password)
+    UserHandler.lib.createUserWithPassword(faker.name.findName(), email, password)
       .then(u => {
         return u.generateVerifyEmailToken(email)
           .then(token => u.verifyEmail(email, token.secret))

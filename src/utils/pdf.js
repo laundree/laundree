@@ -1,8 +1,10 @@
-const qr = require('qr-image')
-const locales = require('../locales')
-const PdfDocument = require('pdfkit')
+// @flow
+import type { LocaleType } from '../locales'
+import qr from 'qr-image'
+import {locales} from '../locales'
+import PdfDocument from 'pdfkit'
 
-async function createInvitePdf (logoString, laundryId, id, locale) {
+export async function createInvitePdf (logoString: string, laundryId: string, id: string, locale: LocaleType) {
   const doc = new PdfDocument({size: [2 * 240, 2 * 320]})
   const link = `https://laundree.io/s/${laundryId}/${id}`
   const logoWidth = 150
@@ -11,9 +13,9 @@ async function createInvitePdf (logoString, laundryId, id, locale) {
     .image(logoString, logoX, 40, {width: logoWidth})
     .fontSize(13)
     .moveDown(6)
-    .text(locales[locale].messages['pdf.invite.text.1'], {align: 'justify'})
+    .text(locales[locale]['pdf.invite.text.1'], {align: 'justify'})
     .moveDown()
-    .text(locales[locale].messages['pdf.invite.text.2'])
+    .text(locales[locale]['pdf.invite.text.2'])
   const svgOrigWith = 87.8
   const newWidth = 175
   const translateX = (doc.page.width - newWidth) / 2
@@ -35,9 +37,8 @@ async function createInvitePdf (logoString, laundryId, id, locale) {
     .fill('#4388a3')
     .restore()
     .moveDown(18)
-    .text(locales[locale].messages['pdf.invite.text.3'])
+    .text(locales[locale]['pdf.invite.text.3'])
     .end()
   return doc
 }
 
-module.exports = {createInvitePdf}

@@ -1,23 +1,35 @@
-/**
- * Created by budde on 05/06/16.
- */
-const React = require('react')
-const {NavLink} = require('react-router-dom')
-const {DropDown, DropDownTitle, DropDownContent, DropDownCloser} = require('./dropdown')
-const LocaleSelect = require('./LocaleSelect')
-const {FormattedMessage} = require('react-intl')
+// @flow
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
+import LocaleSelect from './LocaleSelect'
+import { FormattedMessage } from 'react-intl'
+import type { User, Config, Laundry } from 'laundree-sdk/lib/redux'
+import type { Location } from 'react-router'
+import {toLocale} from '../../locales'
 
-class TopNav extends React.Component {
-  get laundries () {
-    return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
+export default class TopNav extends React.Component {
+
+  props: {
+    user: User,
+    location: Location,
+    currentLaundry: string,
+    config: Config,
+    laundries: { [string]: Laundry }
   }
 
+  laundries () {
+    return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
+  }
+  locale () {
+    return toLocale(this.props.config.locale || '', 'en')
+  }
   renderGlobe () {
-    return <LocaleSelect locale={this.props.config.locale} location={this.props.location} />
+    return <LocaleSelect locale={this.locale()} location={this.props.location}/>
   }
 
   renderLaundries () {
-    const laundries = this.laundries
+    const laundries = this.laundries()
     const currentLaundry = this.props.laundries[this.props.currentLaundry]
     if (!currentLaundry) return null
     switch (laundries.length) {
@@ -69,12 +81,12 @@ class TopNav extends React.Component {
           <DropDownContent className='right'>
             <ul className='dropDownList'>
               {this.props.user.demo ? null : <li>
-                  <DropDownCloser>
-                    <NavLink to={`/users/${this.props.user.id}/settings`} activeClassName='active'>
-                      <FormattedMessage id='topnav.manage' />
-                    </NavLink>
-                  </DropDownCloser>
-                </li>}
+                <DropDownCloser>
+                  <NavLink to={`/users/${this.props.user.id}/settings`} activeClassName='active'>
+                    <FormattedMessage id='topnav.manage'/>
+                  </NavLink>
+                </DropDownCloser>
+              </li>}
               <li>
                 <a href='/logout'>
                   <FormattedMessage id='topnav.logout' />
@@ -122,20 +134,3 @@ class TopNav extends React.Component {
     return this.props.user ? this.renderUserLoggedInMenu() : this.renderNotLoggedInMenu()
   }
 }
-TopNav.propTypes = {
-  user: React.PropTypes.shape({
-    id: React.PropTypes.string,
-    photo: React.PropTypes.string,
-    demo: React.PropTypes.boolean,
-    laundries: React.PropTypes.arrayOf(React.PropTypes.string)
-  }),
-  location: React.PropTypes.object,
-  currentLaundry: React.PropTypes.string,
-  config: React.PropTypes.shape({
-    locale: React.PropTypes.string.isRequired,
-    returningUser: React.PropTypes.bool.isRequired
-  }),
-  laundries: React.PropTypes.object
-}
-
-module.exports = TopNav

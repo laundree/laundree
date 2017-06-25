@@ -2,7 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: laundree-buddes
+  name: buddes-dk
   annotations:
     ingress.kubernetes.io/affinity: "cookie"
     ingress.kubernetes.io/session-cookie-name: "route"
@@ -13,11 +13,106 @@ spec:
   tls:
   - hosts:
     - buddes.dk
-    secretName: buddes-tls
+    secretName: buddes-dk-tls
   rules:
   - host: buddes.dk
     http:
       paths:
         - backend:
-            serviceName: laundree
+            serviceName: redirect
+            servicePort: 80
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: laundree-dk
+  annotations:
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "md5"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - laundree.dk
+    secretName: laundree-dk-tls
+  rules:
+  - host: laundree.dk
+    http:
+      paths:
+        - backend:
+            serviceName: redirect
+            servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: www-laundree-dk
+  annotations:
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "md5"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - www.laundree.dk
+    secretName: www-laundree-dk-tls
+  rules:
+  - host: www.laundree.dk
+    http:
+      paths:
+        - backend:
+            serviceName: redirect
+            servicePort: 80
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: www-laundree-io
+  annotations:
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "md5"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - www.laundree.io
+    secretName: www-laundree-io-tls
+  rules:
+  - host: www.laundree.io
+    http:
+      paths:
+        - backend:
+            serviceName: redirect
+            servicePort: 80
+
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: beta-laundree-io
+  annotations:
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "md5"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - beta.laundree.io
+    secretName: beta-laundree-io-tls
+  rules:
+  - host: beta.laundree.io
+    http:
+      paths:
+        - backend:
+            serviceName: laundree-beta
             servicePort: 3000

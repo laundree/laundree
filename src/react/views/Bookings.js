@@ -1,19 +1,22 @@
-const React = require('react')
-const {FormattedDate} = require('react-intl')
-const {Link} = require('react-router-dom')
-const {Modal, DocumentTitle} = require('./intl')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const moment = require('moment')
-const Loader = require('./Loader')
+// @flow
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { Modal, DocumentTitle } from './intl'
+import sdk from '../../client/sdk'
+import { FormattedMessage, FormattedDate } from 'react-intl'
+import moment from 'moment'
+import Loader from './Loader'
+import type { User, Laundry, Machine, Booking } from 'laundree-sdk/lib/redux'
 
-class Booking extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {showModal: false}
-    this.onCloseModal = () => this.setState({showModal: false})
-    this.onDeleteModal = () => sdk.booking(this.props.booking.id).del()
-    this.onDeleteClick = () => this.setState({showModal: true})
+class BookingComponent extends React.Component {
+  onCloseModal = () => this.setState({showModal: false})
+  onDeleteModal = () => sdk.api.booking.del(this.props.booking.id)
+  onDeleteClick = () => this.setState({showModal: true})
+  state: { showModal: boolean } = {showModal: false}
+  props: {
+    laundry: Laundry,
+    machine: Machine,
+    booking: Booking
   }
 
   render () {
@@ -61,23 +64,16 @@ class Booking extends React.Component {
   }
 }
 
-Booking.propTypes = {
-  laundry: React.PropTypes.object.isRequired,
-  machine: React.PropTypes.object.isRequired,
-  booking: React.PropTypes.shape({
-    id: React.PropTypes.Sting,
-    from: React.PropTypes.string,
-    to: React.PropTypes.string,
-    machine: React.PropTypes.string
-  }).isRequired
-}
-
-class Bookings extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {showModal: false}
-    this.onCloseModal = () => this.setState({showModal: false})
+export default class Bookings extends React.Component {
+  state: { showModal: boolean } = {showModal: false}
+  props: {
+    laundry: Laundry,
+    user: User,
+    userBookings: string[],
+    bookings: { [string]: Booking },
+    machines: { [string]: Machine }
   }
+  onCloseModal = () => this.setState({showModal: false})
 
   renderBookings () {
     if (!this.props.userBookings) return null
@@ -92,13 +88,13 @@ class Bookings extends React.Component {
     </ul>
   }
 
-  renderBooking (booking) {
+  renderBooking (booking: Booking) {
     const machine = this.props.machines[booking.machine]
     if (!machine || machine.broken) {
       return null
     }
     return <li key={booking.id}>
-      <Booking
+      <BookingComponent
         laundry={this.props.laundry}
         machine={this.props.machines[booking.machine]}
         booking={booking} />
@@ -127,13 +123,3 @@ class Bookings extends React.Component {
     </DocumentTitle>
   }
 }
-
-Bookings.propTypes = {
-  laundry: React.PropTypes.object.isRequired,
-  user: React.PropTypes.object.isRequired,
-  userBookings: React.PropTypes.arrayOf(React.PropTypes.string),
-  bookings: React.PropTypes.object.isRequired,
-  machines: React.PropTypes.object.isRequired
-}
-
-module.exports = Bookings

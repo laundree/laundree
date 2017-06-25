@@ -2,22 +2,20 @@
  * Created by budde on 06/11/2016.
  */
 
-const faker = require('faker')
-const {timeout, signIn} = require('../../nightwatch_utils.js')
-const {UserHandler} = require('../../../test_target/handlers')
+import faker from 'faker'
+import { timeout, signIn } from '../../nightwatch_utils.js'
+import UserHandler from '../../../test_target/handlers/user'
 
 let email, password, user
 
 module.exports = {
-  'before': (client, done) => {
+  'before': async (client, done) => {
     email = faker.internet.email()
     password = faker.internet.password()
-    UserHandler
+    user = await UserHandler
+      .lib
       .createUserWithPassword(faker.name.findName(), email, password)
-      .then(u => {
-        user = u
-        done()
-      })
+    done()
   },
   'Can not login un-verified': client => {
     signIn(client.url(client.launch_url), email, password)
@@ -72,11 +70,13 @@ module.exports = {
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)
       .setValue('#Auth form label:nth-of-type(3) input', password)
+      .setValue('#Auth form label:nth-of-type(4) input', password)
       .submitForm('#Auth form')
       .waitForElementVisible('#Auth form .notion.success', timeout)
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)
       .setValue('#Auth form label:nth-of-type(3) input', password)
+      .setValue('#Auth form label:nth-of-type(4) input', password)
       .submitForm('#Auth form')
       .waitForElementVisible('#Auth form .notion.error', timeout)
     client.expect.element('#Auth form .error.notion').text.to.contain('A user with this email already exists')

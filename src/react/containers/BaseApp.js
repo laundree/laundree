@@ -1,9 +1,7 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const BaseApp = require('../views/BaseApp')
+import {connect} from 'react-redux'
+import BaseApp from '../views/BaseApp'
 
 const mapStateToProps = ({users, currentUser, laundries, config}, {location, match: {params: {laundryId}}}) => {
   return {
@@ -15,4 +13,4 @@ const mapStateToProps = ({users, currentUser, laundries, config}, {location, mat
   }
 }
 
-module.exports = connect(mapStateToProps)(BaseApp)
+export default connect(mapStateToProps)(BaseApp)

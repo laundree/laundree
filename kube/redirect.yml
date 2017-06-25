@@ -1,0 +1,46 @@
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: redirect
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: redirect
+    spec:
+      containers:
+      # [START web]
+      - name: redirect
+        image: nginx:1.13
+        env:
+          - name: 'NGINX_CONFIG'
+            value: 'c2VydmVyIHsKICBsaXN0ZW4gODAgZGVmYXVsdF9zZXJ2ZXI7CiAgbGlzdGVuIFs6Ol06ODAgZGVmYXVsdF9zZXJ2ZXI7CiAgc2VydmVyX25hbWUgXzsKICByZXR1cm4gMzAxIGh0dHBzOi8vbGF1bmRyZWUuaW8kcmVxdWVzdF91cmk7Cn0KCg=='
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        command: ["/bin/sh"]
+        args: ["-c", "echo $NGINX_CONFIG | base64 -d > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"]
+        ports:
+          - containerPort: 80
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: redirect
+  labels:
+    app: redirect
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: redirect

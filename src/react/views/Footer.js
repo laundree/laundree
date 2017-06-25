@@ -1,6 +1,7 @@
-const React = require('react')
-const {FormattedMessage} = require('react-intl')
-const {Link} = require('react-router-dom')
+// @flow
+import React from 'react'
+import {FormattedMessage} from 'react-intl'
+import {Link} from 'react-router-dom'
 
 const Footer = () => <footer>
   <ul>
@@ -55,4 +56,4 @@ const Footer = () => <footer>
   </ul>
 </footer>
 
-module.exports = Footer
+export default Footer

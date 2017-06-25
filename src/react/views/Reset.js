@@ -1,35 +1,51 @@
-/**
- * Created by budde on 11/06/16.
- */
-const React = require('react')
-const {Link} = require('react-router-dom')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {DocumentTitle, Input, Submit, Label} = require('./intl')
-const {FormattedMessage} = require('react-intl')
-const queryString = require('querystring')
+// @flow
+import React from 'react'
+import { Link } from 'react-router-dom'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import sdk from '../../client/sdk'
+import { DocumentTitle, Input, Submit, Label } from './intl'
+import { FormattedMessage } from 'react-intl'
+import type { Location } from 'react-router'
+import queryString from 'querystring'
 
-class Reset extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.submitHandler = (evt) => {
-      const search = props.location.search && props.location.search.substr(1)
-      const {user, token} = queryString.parse(search)
-      this.setState({loading: true})
-      evt.preventDefault()
-      return sdk.user(user)
-        .resetPassword(token, this.state.values.password)
-        .then(
-          () => this.reset({
-            loading: false,
-            notion: {message: <FormattedMessage id='auth.reset.success' />, success: true}
-          }),
-          () => this.setState({
-            loading: false,
-            notion: {message: <FormattedMessage id='auth.reset.error' />, success: false}
-          }))
-    }
+type ResetValues = {
+  password: string
+}
+
+type ResetProps = {
+  location: Location
+}
+
+type ResetState = {
+  loading: boolean
+}
+
+export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetState> {
+
+  initialState (): ResetState {
+    return {loading: false}
+  }
+
+  initialValues () {
+    return {password: ''}
+  }
+
+  submitHandler = (evt: Event) => {
+    const search = this.props.location.search && this.props.location.search.substr(1)
+    const {user, token} = queryString.parse(search)
+    this.setState({loading: true})
+    evt.preventDefault()
+    return sdk.api.user.resetPassword(user, token, this.state.values.password)
+      .then(
+        () => this.reset({
+          loading: false,
+          notion: {message: <FormattedMessage id='auth.reset.success' />, success: true}
+        }),
+        () => this.setState({
+          loading: false,
+          notion: {message: <FormattedMessage id='auth.reset.error' />, success: false}
+        }))
   }
 
   render () {
@@ -53,7 +69,7 @@ class Reset extends ValueUpdater {
             password trim value={this.state.values.password || ''}>
             <Label data-validate-error='auth.error.invalid-password'>
               <Input
-                onChange={this.generateValueUpdater('password')}
+                onChange={this.generateValueEventUpdater(password => ({password}))}
                 value={this.state.values.password || ''}
                 type='password' name='password' placeholder='general.new-password' />
             </Label>
@@ -88,11 +104,3 @@ class Reset extends ValueUpdater {
     </DocumentTitle>
   }
 }
-
-Reset.propTypes = {
-  location: React.PropTypes.shape({
-    search: React.PropTypes.string
-  })
-}
-
-module.exports = Reset

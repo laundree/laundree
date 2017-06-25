@@ -1,46 +1,54 @@
-const React = require('react')
-const {ValidationForm, ValidationElement} = require('./validation')
-const {ValueUpdater} = require('./helpers')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const {Input, Label, TextArea, Submit} = require('./intl')
+// @flow
+import React from 'react'
+import { ValidationForm, ValidationElement } from './validation'
+import ValueUpdater from './helpers/ValueUpdater'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
+import { Input, Label, TextArea, Submit } from './intl'
+import type {User} from 'laundree-sdk/lib/redux'
 
-const UserInput = ({user: {photo, displayName}}) => <div className='userInput'>
+const UserInput = ({user: {photo, displayName}}: { user: User }) => <div className='userInput'>
   <img className='avatar' src={photo} />
   <span className='name'>{displayName}</span>
 </div>
 
-UserInput.propTypes = {
-  user: React.PropTypes.shape({
-    photo: React.PropTypes.string.isRequired,
-    displayName: React.PropTypes.string.isRequired
-  }).isRequired
+type ContactFormValues = {
+  name: string,
+  subject: string,
+  message: string,
+  email: string
 }
+type ContactFormProps = { user?: User }
+type ContactFormState = { loading: boolean, sent: boolean }
 
-class ContactForm extends ValueUpdater {
-  constructor (props) {
-    super(props)
-    this.onSubmit = (evt) => {
-      evt.preventDefault()
-      this.submit()
-    }
-  }
+export default class ContactForm extends ValueUpdater<ContactFormValues, ContactFormProps, ContactFormState> {
 
-  submit () {
-    this.setState({loading: true})
-    const {email, name, subject, message} = this.state.values
-    sdk
-      .contact({name: name || undefined, email: email || undefined, message, subject})
-      .then(() => this.reset({loading: false, sent: true}))
-  }
-
-  get initialValues () {
+  initialValues () {
     return {
       name: '',
       subject: '',
       message: '',
       email: ''
     }
+  }
+
+  initialState () {
+    return {
+      loading: false,
+      sent: false
+    }
+  }
+
+  onSubmit = (evt: Event) => {
+    evt.preventDefault()
+    this.submit()
+  }
+
+  async submit () {
+    this.setState({loading: true})
+    const {email, name, subject, message} = this.state.values
+    await sdk.api.contact.sendMessage({name: name || undefined, email: email || undefined, message, subject})
+    this.reset({loading: false, sent: true})
   }
 
   renderUser () {
@@ -50,7 +58,8 @@ class ContactForm extends ValueUpdater {
         <Input
           readOnly={Boolean(this.props.user)}
           placeholder='general.name'
-          type='text' value={this.state.values.name} onChange={this.generateValueUpdater('name')} />
+          type='text' value={this.state.values.name}
+          onChange={this.generateValueEventUpdater((name: string) => ({name}))} />
       </Label>
     </ValidationElement>
   }
@@ -63,7 +72,7 @@ class ContactForm extends ValueUpdater {
           readOnly={Boolean(this.props.user)}
           placeholder='general.email-address'
           type='text' value={this.state.values.email}
-          onChange={this.generateValueUpdater('email')} />
+          onChange={this.generateValueEventUpdater((email: string) => ({email}))} />
       </Label>
     </ValidationElement>
   }
@@ -85,14 +94,17 @@ class ContactForm extends ValueUpdater {
         <Label data-validate-error='contact-form.error.no-subject'>
           <Input
             placeholder='general.subject'
-            type='text' value={this.state.values.subject} onChange={this.generateValueUpdater('subject')} />
+            type='text'
+            value={this.state.values.subject}
+            onChange={this.generateValueEventUpdater(subject => ({subject}))} />
         </Label>
       </ValidationElement>
       <ValidationElement sesh={this.state.sesh} value={this.state.values.message} nonEmpty trim>
         <Label data-validate-error='contact-form.error.no-message'>
           <TextArea
             placeholder='general.message'
-            value={this.state.values.message} onChange={this.generateValueUpdater('message')} />
+            value={this.state.values.message}
+            onChange={this.generateValueEventUpdater(message => ({message}))} />
         </Label>
       </ValidationElement>
       <div className='buttons'>
@@ -101,9 +113,3 @@ class ContactForm extends ValueUpdater {
     </ValidationForm>
   }
 }
-
-ContactForm.propTypes = {
-  user: React.PropTypes.object
-}
-
-module.exports = ContactForm

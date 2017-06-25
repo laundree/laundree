@@ -1,9 +1,7 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const LaundrySettings = require('../views/LaundrySettings')
+import {connect} from 'react-redux'
+import LaundrySettings from '../views/LaundrySettings'
 
 const mapStateToProps = ({users, currentUser, laundries, config: {locale, googleApiKey}}, {match: {params: {laundryId}}}) => {
   return {
@@ -15,4 +13,4 @@ const mapStateToProps = ({users, currentUser, laundries, config: {locale, google
   }
 }
 
-module.exports = connect(mapStateToProps)(LaundrySettings)
+export default connect(mapStateToProps)(LaundrySettings)

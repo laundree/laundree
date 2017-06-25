@@ -1,6 +1,7 @@
-const React = require('react')
-const {DocumentTitle} = require('./intl')
-const {FormattedMessage} = require('react-intl')
+// @flow
+import React from 'react'
+import {DocumentTitle} from './intl'
+import {FormattedMessage} from 'react-intl'
 
 const About = () => <DocumentTitle title='document-title.about'>
   <main id='About' className='topNaved'>
@@ -15,4 +16,4 @@ const About = () => <DocumentTitle title='document-title.about'>
   </main>
 </DocumentTitle>
 
-module.exports = About
+export default About

@@ -1,8 +1,4 @@
-/**
- * Created by budde on 02/12/2016.
- */
+// @flow
 
-module.exports = {
-  BaseModal: require('./BaseModal'),
-  Modal: require('./Modal')
-}
+export {default as BaseModal} from './BaseModal'
+export {default as Modal} from './Modal'

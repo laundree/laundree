@@ -1,9 +1,7 @@
-/**
- * Created by budde on 28/05/16.
- */
+// @flow
 
-const connect = require('react-redux').connect
-const LeftNav = require('../views/LeftNav')
+import {connect} from 'react-redux'
+import LeftNav from '../views/LeftNav'
 
 const mapStateToProps = ({users, laundries, currentUser}, {match: {params: {laundryId}}}) => {
   return {
@@ -13,4 +11,4 @@ const mapStateToProps = ({users, laundries, currentUser}, {match: {params: {laun
   }
 }
 
-module.exports = connect(mapStateToProps)(LeftNav)
+export default connect(mapStateToProps)(LeftNav)

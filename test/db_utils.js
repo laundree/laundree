@@ -1,10 +1,8 @@
-/**
- * Created by budde on 28/04/16.
- */
-const mongoose = require('mongoose')
-const UserHandler = require('../test_target/handlers').UserHandler
-const faker = require('faker')
-const {range} = require('../test_target/utils/array')
+// @flow
+import mongoose from 'mongoose'
+import UserHandler from '../test_target/handlers/user'
+import faker from 'faker'
+import {range} from '../test_target/utils/array'
 
 function clearDb () {
   return new Promise((resolve, reject) => {
@@ -30,8 +28,8 @@ function generateProfile () {
   }
 }
 
-function populateUsers (no) {
-  return Promise.all(range(no).map(generateProfile).map((profile) => UserHandler.createUserFromProfile(profile)))
+function populateUsers (no: number) {
+  return Promise.all(range(no).map(generateProfile).map((profile) => UserHandler.lib.createUserFromProfile(profile)))
 }
 
 function createAdministrator () {
@@ -42,7 +40,7 @@ function createAdministrator () {
     })
 }
 
-function populateTokens (no) {
+function populateTokens (no: number) {
   const userPromise = populateUsers(1)
   return userPromise
     .then(([user]) =>
@@ -51,7 +49,7 @@ function populateTokens (no) {
         .then((tokens) => ({user: user, tokens: tokens, token: tokens[0]})))
 }
 
-function populateLaundries (no) {
+function populateLaundries (no: number) {
   return populateTokens(1)
     .then(({user, token}) =>
       Promise
@@ -59,7 +57,7 @@ function populateLaundries (no) {
         .then((laundries) => ({user: user, token: token, laundries: laundries, laundry: laundries[0]})))
 }
 
-function populateMachines (no) {
+function populateMachines (no: number) {
   return populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise
@@ -84,7 +82,7 @@ function fixOverflow ({year, day, month, hour, minute}) {
   }
 }
 
-function populateBookings (no) {
+function populateBookings (no: number) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise
@@ -107,7 +105,7 @@ function populateBookings (no) {
         })))
 }
 
-function createBooking (from, to) {
+function createBooking (from: Date, to: Date) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       laundry.createBooking(machine, user, from, to)
@@ -120,7 +118,7 @@ function createBooking (from, to) {
         })))
 }
 
-function populateInvites (no) {
+function populateInvites (no: number) {
   return this.populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise

@@ -1,18 +1,24 @@
-const React = require('react')
-const {DocumentTitle} = require('./intl')
-const {Link} = require('react-router-dom')
-const sdk = require('../../client/sdk')
-const {FormattedMessage} = require('react-intl')
-const Switch = require('./Switch')
-const debug = require('debug')('laundree.react.views.AdminPanel')
+// @flow
+import React from 'react'
+import { DocumentTitle } from './intl'
+import { Link } from 'react-router-dom'
+import sdk from '../../client/sdk'
+import { FormattedMessage } from 'react-intl'
+import Switch from './Switch'
+import Debug from 'debug'
+import type {Stats, Laundry, User} from 'laundree-sdk/lib/redux'
+import type { ListOptions } from 'laundree-sdk/lib/sdk'
+const debug = Debug('laundree.react.views.AdminPanel')
 
-class Stats extends React.Component {
+class StatsComponent extends React.Component {
+  props: { stats: Stats }
+
   componentDidMount () {
     sdk.updateStats()
   }
 
   renderStats () {
-    const {realLaundryCount, realUserCount, demoUserCount, demoLaundryCount, machineCount, bookingCount} = this.stats
+    const {realLaundryCount, realUserCount, demoUserCount, demoLaundryCount, machineCount, bookingCount} = this.stats()
     return <ul className={this.props.stats ? '' : 'loading'}>
       <li>
         <span className='value'>{realUserCount}</span>
@@ -53,13 +59,14 @@ class Stats extends React.Component {
     </ul>
   }
 
-  get stats () {
+  stats () {
     if (!this.props.stats) return {}
     const {laundryCount, demoLaundryCount, userCount, demoUserCount} = this.props.stats
-    return Object.assign({
+    return {
+      ...this.props.stats,
       realLaundryCount: laundryCount - demoLaundryCount,
       realUserCount: userCount - demoUserCount
-    }, this.props.stats)
+    }
   }
 
   render () {
@@ -70,17 +77,23 @@ class Stats extends React.Component {
   }
 }
 
-Stats.propTypes = {
-  stats: React.PropTypes.object
-}
-class QueryList extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {loaded: false, page: 0}
-    this.limit = 10
+class QueryList<T: { id: string }> extends React.Component<void,
+  {
+    elements: T[],
+    totalDemo: ?number,
+    total: ?number
+  },
+  { loaded: boolean, page: number, q: ? string, demoOn: boolean }> {
+
+  limit = 10
+  state = {
+    loaded: false,
+    page: 0,
+    q: null,
+    demoOn: false
   }
 
-  updateFilter (q) {
+  updateFilter (q: ?string) {
     this.setState({q}, () => this._load())
   }
 
@@ -89,13 +102,13 @@ class QueryList extends React.Component {
   }
 
   prev () {
-    if (this.currentPage === 0) return
-    this.setState({page: this.currentPage - 1}, () => this._load())
+    if (this.currentPage() === 0) return
+    this.setState({page: this.currentPage() - 1}, () => this._load())
   }
 
   next () {
-    if (this.currentPage === this.totalPages) return
-    this.setState({page: this.currentPage + 1}, () => this._load())
+    if (this.currentPage() === this.totalPages()) return
+    this.setState({page: this.currentPage() + 1}, () => this._load())
   }
 
   load (options) {
@@ -104,19 +117,15 @@ class QueryList extends React.Component {
 
   _load () {
     const config = {
-      q: this.state.q,
+      q: this.state.q || undefined,
       showDemo: this.state.demoOn,
       limit: this.limit,
-      skip: this.limit * this.currentPage
+      skip: this.limit * this.currentPage()
     }
     debug('Loading', config)
     return this
       .load(config)
-      .then(() => this.setState({loaded: true, page: this.currentPage}))
-  }
-
-  get elements () {
-    throw new Error('Not implemented')
+      .then(() => this.setState({loaded: true, page: this.currentPage()}))
   }
 
   renderLoading () {
@@ -127,16 +136,22 @@ class QueryList extends React.Component {
     throw new Error('Not implemented')
   }
 
-  renderElement () {
+  renderElement (elm: T) {
     throw new Error('Not implemented')
   }
 
-  get currentPage () {
-    return Math.max(0, Math.min(this.state.page, this.totalPages))
+  currentPage () {
+    return Math.max(0, Math.min(this.state.page, this.totalPages()))
   }
 
-  get totalPages () {
-    return Math.max(0, Math.floor((this.props.total - 1) / this.limit))
+  totalPages () {
+    if (typeof this.props.total !== 'number') {
+      return 0
+    }
+    if (typeof this.props.totalDemo !== 'number') {
+      return 0
+    }
+    return Math.max(0, Math.floor(((this.state.demoOn ? this.props.total : this.props.total - this.props.totalDemo) - 1) / this.limit))
   }
 
   toggleDemo (on) {
@@ -155,12 +170,12 @@ class QueryList extends React.Component {
         <FormattedMessage
           id='admin-panel.page-of'
           values={{
-            page: this.currentPage + 1,
-            numPages: this.totalPages + 1
+            page: this.currentPage() + 1,
+            numPages: this.totalPages() + 1
           }}
         />
         <span
-          className={'next link' + (this.currentPage === this.totalPages ? ' inactive' : '')}
+          className={'next link' + (this.currentPage() === this.totalPages() ? ' inactive' : '')}
           onClick={() => this.next()} />
       </div>
       <div className='filter'>
@@ -174,9 +189,9 @@ class QueryList extends React.Component {
           <FormattedMessage id='admin-panel.show-demo' />
         </div>
       </div>
-      {this.elements.length
+      {this.props.elements.length
         ? <ul className='bigList'>
-          { this.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
+          { this.props.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
         </ul>
         : <div className='bigListMessage'>
           {this.renderEmpty()}
@@ -185,11 +200,8 @@ class QueryList extends React.Component {
   }
 }
 
-QueryList.propTypes = {
-  total: React.PropTypes.number
-}
+class LaundryList extends QueryList<Laundry> {
 
-class LaundryList extends QueryList {
   renderLoading () {
     return <FormattedMessage id='admin-panel.loading' />
   }
@@ -198,11 +210,7 @@ class LaundryList extends QueryList {
     return <FormattedMessage id='admin-panel.no-laundries' />
   }
 
-  get elements () {
-    return this.props.laundries
-  }
-
-  renderElement (l) {
+  renderElement (l: Laundry) {
     return <div className='name'>
       <Link to={`/laundries/${l.id}`}>
         {l.name}
@@ -210,7 +218,7 @@ class LaundryList extends QueryList {
     </div>
   }
 
-  load (options) {
+  load (options: ListOptions) {
     return sdk.listLaundries(options)
   }
 
@@ -222,12 +230,9 @@ class LaundryList extends QueryList {
   }
 }
 
-LaundryList.propTypes = {
-  laundries: React.PropTypes.array
-}
+class UserList extends QueryList<User> {
 
-class UserList extends QueryList {
-  load (options) {
+  load (options: ListOptions) {
     return sdk.listUsers(options)
   }
 
@@ -239,11 +244,7 @@ class UserList extends QueryList {
     return <FormattedMessage id='admin-panel.no-users' />
   }
 
-  get elements () {
-    return this.props.users
-  }
-
-  renderElement ({id, photo, displayName}) {
+  renderElement ({id, photo, displayName}: User) {
     return <div className='name'>
       <Link to={`/users/${id}/settings`}>
         <img src={photo} className='avatar' />
@@ -261,29 +262,23 @@ class UserList extends QueryList {
   }
 }
 
-UserList.propTypes = {
-  users: React.PropTypes.array
-}
-
-const AdminPanel = ({stats, laundries, users, userList, laundryList, laundryListSize, userListSize}) => {
+const AdminPanel = ({stats, laundries, users, userList, laundryList}: {
+  stats: Stats,
+  laundries: { [string]: Laundry },
+  users: { [string]: User },
+  userList: string[],
+  laundryList: string[]
+}) => {
+  const ls: Laundry[] = laundryList.map(id => laundries[id]).filter((l: ?Laundry) => l)
+  const us: User[] = userList.map(id => users[id]).filter(u => u)
   return <DocumentTitle title='document-title.administrator-panel'>
     <main id='AdminPanel' className='topNaved'>
       <FormattedMessage id='admin-panel.title' tagName='h1' />
-      <Stats stats={stats} />
-      <LaundryList laundries={laundryList.map(id => laundries[id])} total={laundryListSize} />
-      <UserList users={userList.map(id => users[id])} total={userListSize} />
+      <StatsComponent stats={stats} />
+      <LaundryList elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
+      <UserList elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
     </main>
   </DocumentTitle>
 }
 
-AdminPanel.propTypes = {
-  stats: React.PropTypes.object,
-  laundries: React.PropTypes.object,
-  laundryList: React.PropTypes.array,
-  userList: React.PropTypes.array,
-  users: React.PropTypes.object,
-  userListSize: React.PropTypes.number,
-  laundryListSize: React.PropTypes.number
-}
-
-module.exports = AdminPanel
+export default AdminPanel

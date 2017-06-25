@@ -1,11 +1,8 @@
-/**
- * Created by budde on 06/05/16.
- */
-const bcrypt = require('bcrypt')
-const crypto = require('crypto')
-const config = require('config')
-
-const base64UrlSafe = require('urlsafe-base64')
+// @flow
+import bcrypt from 'bcrypt'
+import crypto from 'crypto'
+import config from 'config'
+import base64UrlSafe from 'urlsafe-base64'
 
 /**
  * Hash a given password
@@ -13,9 +10,9 @@ const base64UrlSafe = require('urlsafe-base64')
  * @param {string} password
  * @return {Promise.<string>}
  */
-function hashPassword (password, saltRounds) {
-  saltRounds = saltRounds || config.get('security.password.saltRounds')
-  return new Promise((resolve, reject) => bcrypt.genSalt(saltRounds, (err, salt) => {
+export function hashPassword (password: string, saltRounds?: number): Promise<string> {
+  const certainSaltRounds: number = saltRounds || config.get('security.password.saltRounds')
+  return new Promise((resolve, reject) => bcrypt.genSalt(certainSaltRounds, (err, salt) => {
     if (err) return reject(err)
     bcrypt.hash(password, salt, (err, hash) => {
       if (err) return reject(err)
@@ -29,7 +26,7 @@ function hashPassword (password, saltRounds) {
  * @param {string} hash
  * @returns {Promise.<boolean>}
  */
-function comparePassword (password, hash) {
+export function comparePassword (password: string, hash: string): Promise<boolean> {
   return new Promise((resolve, reject) => bcrypt.compare(password, hash, (err, res) => {
     if (err) return reject(err)
     resolve(res)
@@ -39,7 +36,7 @@ function comparePassword (password, hash) {
 /**
  * @return {Promise.<string>}
  */
-function generateToken () {
+export function generateToken (): Promise<string> {
   return new Promise((resolve, reject) => crypto.randomBytes(20, (err, buffer) => {
     if (err) return reject(err)
     resolve(buffer.toString('hex'))
@@ -51,7 +48,7 @@ function generateToken () {
  * @param {int=6} entropy
  * @returns {Promise.<string>}
  */
-function generateBase64UrlSafeCode (entropy = 6) {
+export function generateBase64UrlSafeCode (entropy: number = 6): Promise<string> {
   return new Promise((resolve, reject) => crypto.randomBytes(entropy, (err, buffer) => {
     if (err) return reject(err)
     return resolve(base64UrlSafe.encode(buffer))
@@ -62,14 +59,6 @@ function generateBase64UrlSafeCode (entropy = 6) {
  * Generate a token and hash
  * @returns {Promise.<{token: string, hash: string}>}
  */
-function generateTokenAndHash () {
+export function generateTokenAndHash (): Promise<{token: string, hash: string}> {
   return generateToken().then(token => hashPassword(token).then(hash => ({hash, token})))
-}
-
-module.exports = {
-  hashPassword,
-  comparePassword,
-  generateToken,
-  generateTokenAndHash,
-  generateBase64UrlSafeCode
 }

@@ -1,18 +1,17 @@
-/**
- * Created by budde on 09/06/16.
- */
+// @flow
 
-const {api} = require('../../utils')
+import * as api from '../../utils/api'
 
-function fetchInvite (req, res) {
+function fetchInviteAsync (req, res) {
   const {invite} = req.subjects
   api.returnSuccess(res, invite.toRest())
 }
 
-function deleteInvite (req, res) {
+async function deleteInviteAsync (req, res) {
   const {invite, laundry} = req.subjects
-  laundry.deleteInvite(invite).then(() => api.returnSuccess(res))
-    .catch(api.generateErrorHandler(res))
+  await laundry.deleteInvite(invite)
+  api.returnSuccess(res)
 }
 
-module.exports = {fetchInvite, deleteInvite}
+export const fetchInvite = api.wrapErrorHandler(fetchInviteAsync)
+export const deleteInvite = api.wrapErrorHandler(deleteInviteAsync)

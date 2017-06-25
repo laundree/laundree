@@ -1,23 +1,19 @@
-/**
- * Created by budde on 26/02/2017.
- */
+// @flow
+import React from 'react'
+import sdk from '../../client/sdk'
+import uuid from 'uuid'
+import type { User } from 'laundree-sdk/lib/redux'
 
-const React = require('react')
-const sdk = require('../../client/sdk')
-const uuid = require('uuid')
-
-class NativeApp extends React.Component {
-  constructor (props) {
-    super(props)
-    this.state = {now: null, data: null}
-  }
-
-  get promisedToken () {
+export default class NativeApp extends React.Component {
+  state = {now: null, data: null}
+  _token: ?Promise<*>
+  props: {currentUser: string, users: {[string]: User}}
+  promisedToken () {
     if (this._token) return this._token
     if (!this.props.currentUser) {
       this._token = Promise.resolve({})
     } else {
-      this._token = sdk.token.createToken(`app-${uuid.v4()}`)
+      this._token = sdk.api.token.createToken(`app-${uuid.v4()}`)
         .then(({secret, owner}) => ({secret, userId: owner.id}))
         .catch(err => ({message: err}))
     }
@@ -25,14 +21,15 @@ class NativeApp extends React.Component {
   }
 
   componentDidMount () {
-    document.addEventListener('message', event => {
+    const f: Function = (event: MessageEvent) => {
       switch (event.data) {
         case 'token':
           this
-            .promisedToken
+            .promisedToken()
             .then(token => window.postMessage(JSON.stringify(token)))
       }
-    }, false)
+    }
+    document.addEventListener('message', f, false)
   }
 
   render () {
@@ -46,10 +43,3 @@ class NativeApp extends React.Component {
     </div>
   }
 }
-
-NativeApp.propTypes = {
-  currentUser: React.PropTypes.string,
-  users: React.PropTypes.object
-}
-
-module.exports = NativeApp

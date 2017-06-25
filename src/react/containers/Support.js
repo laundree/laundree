@@ -1,8 +1,10 @@
-const connect = require('react-redux').connect
-const Support = require('../views/Support')
+// @flow
+
+import {connect} from 'react-redux'
+import Support from '../views/Support'
 
 const mapStateToProps = ({currentUser, users}) => {
   return {currentUser, users}
 }
 
-module.exports = connect(mapStateToProps)(Support)
+export default connect(mapStateToProps)(Support)
