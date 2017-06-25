@@ -68,7 +68,9 @@ class LaundryHandlerLibrary extends HandlerLibrary {
   timeZoneFromGooglePlaceId (placeId: string) {
     return new Promise((resolve, reject) => {
       googleMapsClient.reverseGeocode({place_id: placeId}, (err, response) => {
-        if (err) return reject(err)
+        if (err) {
+          return err.status === 400 ? resolve('') : reject(err)
+        }
         if (response.status !== 200) return resolve('')
         const {json: {results: [result]}} = response
         if (!result) return resolve('')
