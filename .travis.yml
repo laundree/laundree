@@ -14,10 +14,22 @@ env:
   - secure: L+q7hoAHDFsYnHey1RTgpLr6iXFdKWTli9hgQ/+YB3e8J/ZZ1Lx2llwhKAPOxOOyimLrmPVcDuseYYgG62DlNGUNOJb4n5YS81hdyur2k0Z1NGinANRyaqGjne/43BtOrafa/GSidx2UAk7C34GSAi3hSrBRi4qMebYOqnkSv4hCQhGKKphooixW3DopHsAU9xhlYtmeszQ45KV8PgwfCITnv1vvIh6a2rVNN1Z1gdJGZeEsw0IiBExKtJSZQl69BYtXVNWfDH6Gv1Z9c1cetwPUXah1BJnckf3fEOTvIxcfL0wTezr2BpHb0FWoyuqdKtzV2G/nJcVzJV27pF65LDMZ8FSBUAvDDp/S1GOqM4ZlPpxguF7MPfGZNhrzXEXxMNp2ADoTw2Dczhy+A1qG+aihdffVA+MxnogDMnsFSpwlM7jK5Mi1BW6nH2p0MxycyjglN5x7NXBXQcRCHek/A0U9EWfrCNRWaqEDxCmRNfM3hRKfXp6S0Icu2R/BetMYA9P2agk68IoFAmec6lZQg2J301xaR8QA34y4aEdX+R5pGaaSnz3P08IcqcXAltpi/y127RpyN7jWM3GgJN7Atzex7khrbfuaq+mtvAvIB3yQ2+hiv4MpfIvYrXpp0T1jqAG/TkVdxtBQET/Kb801ThdUliHJYYtI49ILaboPvW8=
   - secure: nALuDdnyr+qSePtE8f7DQDWBUTvnHMlviVRW+3wLHmK6I7CC2aq9YaJJYZYtDPbDRYnGFukjsMW64K6ZBoAsA9X6ktB0WslDZvZ1+o+qpguOdLZ6oPL/Trrrt2z7OPCQum4njllH6z2+kxFgs2coprIpoflJPI78DWL7XkuKamiWiP8VJd2ybHSqVvqwTWvJuZjcj+3j1FPA8AOwRdi654bRLl5TQFV/pwAdLwf0esMwbiIJd2+AeM//mp0Rc0SE6X7D1kY7ssYg9iOcNL1LSo06zHQSepVjLht9rTKo/nvgF/wi5PtBK3ARVUIgkVKhfZEqps6pATfumg6ZI+GVz2XHaKuBVc1UUrK946I/8rRHOzOQfx/q55EDOrZRtKZNpdptexjbFgs1BWz/tN5sBF0Td3WOR+BUguU9963L4TXk/SrqaydAjutQ6uPSf774PnngPSwwXW5h1867TOkDzmpoIc9ke0fBcMCSqvL7BoHRXmwPZd0NjAU/4ZQEz3KMmfaIrsfDz6PK2Ncs+4B9rJqw2gOsSDdbCx2E054hxPnK9bfvGvg9IjwrggzBWmJFopZmdoxmbiiKBMzY801oHbAxW+rVMmMdZMna5gfcl0J1d9ZI8jBZ2mru22eUtW6M1aCwDu9E3+FntI5b3vnFj2H+6GmgXeKfVoAKtO+6zd4=
   - secure: Pa36urkub2teejUlebKtbvphTg58dUoK1jz/89n4VA0jjLiZmbbM6baMZihlw2qJ5os8xzsgN1yztE5QMB1/BaVKfSMTwVnRS+HvjyJsnmVy/e8+Grw1q2N/3CpFuCnyKszU8P+cKqW23Oo+YLeAarEkVZA6EM8+e2G0khqLvPuiMaXnsvOxF4qn+PX1yvEMg0V685+wErSqwWGTJPKlr6CYUnEdZngRKAoRZMTgkWN7CWRJlmzrE+IRGhkh31VXUggax9reQaK4rVtxGc3iT6Sga1JBqm31xH0VmqMySJjRgnJK3djfPTmB4a/JKM7vfHFy2HvUssrALNcK6FlLhK0pSamypufT0XBCGupaGM2W2EYfLQwBcblmmCxnb4Z1GWzh5nMxZmgEo4TzOVB348iBoP4dUAby4IW+c+53GP1avDIZBsNDueteXISmQK+9S/FBdUwgUSNc0bFnrSlY5y3l4b8rwn0QWiNHYNZ1YzZ6TfJi40yavoa4GRzAlpbXDDBZE/f/mibXznlMMZvnt3CT2GkvWRto2wIPPzMjmgZqGjJy/zz/iaHNBD9pb29qURwBgtGwdHAiaCGdojiVrSiuPGb8cU0EyZ4IH1qoC2nA0z2/g2TsquxII8C5MoMS5wGYUh6PKTYq91l+urz04Bb3/yfOZzkPeL6pcvqxeAY=
+  - secure: E4U6xICrj4dQruXseo/lOM1cnCdssj7/2WEI/l6dS5pK82qLIk2X2M0ZfI+OuzIdVjTuRSDq2urTTdwmC46O3seR9fZKKx+dEsXGE+o2lt60BVa5oaQ9oeSuX9A+VISmDYheebWUsEWfWrFxKXye84pUrC058ezBbmyHZdhVngw81fyavKyBYi021ZchOSL7thuMAjwlqqn5irFscC34uIPTE0SuRVBJP0ZHTLLD1djDOp0pIRq7Qf/T5CzT+4KoQU+NbxPjcy2fqrdfydA+A/RLvxPCKYYTGDD8/Xp0XEam8ja7VtAMcfNYy69lPPaqfaqSdTal9IHHsg0Ld/3O853Tg7liXUSbP/jLnCrjvoqEYwfCgf/HEguSPsMakwYGi2KC+c/DYHQ430MbxxTEDHRqEtyM0XN1sqGQ7xj16F3Bpqd4wjYGq/dD27aiSnzNsNPkTO6t3YTCMAWYk9A5nJGdRdmS+xWYkSJlM6rR9mX/mAm2A38yTVSPCuBrzp4hadijJSWEaLpYGn59WyL1tkfLvFA2u9yySm3jtMBBX77szYN6YsIFfh7GnaOdIbUyRdr0yxD8mkRZtCURojd/LUC/avZpi0+G3QSAgro4Du6LHIzijh/2kd2MIgF20RRfMxMulqBo2mrod7FiGlJZ4k+YldbHvlPYa2qitB6oHN4=
 services:
 - docker
-script:
-- ./scripts/travis.sh
+before_install:
+- npm install -g npm@5
+- npm install -g greenkeeper-lockfile@1
+- openssl aes-256-cbc -K $encrypted_3c0236424301_key -iv $encrypted_3c0236424301_iv
+  -in credentials.tar.gz.enc -out credentials.tar.gz -d
+- if [ ! -d ~/google-cloud-sdk/lib ]; then rm -r ~/google-cloud-sdk && curl https://sdk.cloud.google.com
+  > ~/gcloud.sh && chmod +x ~/gcloud.sh && ~/gcloud.sh --install-dir=${HOME} --disable-prompts
+  && ~/google-cloud-sdk/bin/gcloud components install kubectl --quiet; fi
+- tar -xzf credentials.tar.gz
+- ~/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file gcloud-credentials.json
+before_script: greenkeeper-lockfile-update
+script: ./scripts/travis.sh
+after_script: greenkeeper-lockfile-upload
 deploy:
 - provider: script
   script: ./scripts/deploy.sh
@@ -27,11 +39,3 @@ deploy:
   script: ./scripts/deploy.sh
   on:
     branch: beta
-before_install:
-- openssl aes-256-cbc -K $encrypted_3c0236424301_key -iv $encrypted_3c0236424301_iv
-  -in credentials.tar.gz.enc -out credentials.tar.gz -d
-- if [ ! -d ~/google-cloud-sdk/lib ]; then rm -r ~/google-cloud-sdk && curl https://sdk.cloud.google.com
-  > ~/gcloud.sh && chmod +x ~/gcloud.sh && ~/gcloud.sh --install-dir=${HOME} --disable-prompts && ~/google-cloud-sdk/bin/gcloud components install kubectl --quiet;
-  fi
-- tar -xzf credentials.tar.gz
-- ~/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file gcloud-credentials.json
