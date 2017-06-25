@@ -116,3 +116,27 @@ spec:
         - backend:
             serviceName: laundree-beta
             servicePort: 3000
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: laundree-io
+  annotations:
+    ingress.kubernetes.io/affinity: "cookie"
+    ingress.kubernetes.io/session-cookie-name: "route"
+    ingress.kubernetes.io/session-cookie-hash: "md5"
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - laundree.io
+    secretName: laundree-io-tls
+  rules:
+  - host: laundree.io
+    http:
+      paths:
+        - backend:
+            serviceName: laundree-master
+            servicePort: 3000
