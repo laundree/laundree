@@ -84,5 +84,7 @@ emails:
 defaultUsers:
   budde@laundree.io: admin
   malene@laundree.io: admin
+  gitte@laundree.io: admin
+  cecilie@laundree.io: admin
 
 mode: 'master'

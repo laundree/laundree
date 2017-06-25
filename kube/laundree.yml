@@ -52,6 +52,11 @@ spec:
               configMapKeyRef:
                 name: laundree-${BRANCH}
                 key: facebookCallbackUrl
+          - name: 'GOOGLE_TRACKING_ID'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: googleTrackingId
           - name: 'GOOGLE_CALLBACK_URL'
             valueFrom:
               configMapKeyRef:
