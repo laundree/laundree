@@ -10,6 +10,7 @@ data:
   opbeatAppId: '71392cdc57'
   opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
   facebookAppId: '1044245498966904'
+  googleTrackingId: 'UA-97847799-1'
   facebookCallbackUrl: 'https://laundree.io/auth/facebook/callback'
   googleClientId: '1098336985149-t3unnf4fj7c6rm6eogerpo6dnr433si6.apps.googleusercontent.com'
   googleCallbackUrl: 'https://laundree.io/auth/google/callback'
@@ -25,6 +26,7 @@ data:
   mongoUrl: "mongodb://mongo/laundree-beta"
   opbeatAppId: '2843b6b20b'
   opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
+  googleTrackingId: ''
   googleClientId: '1098336985149-rm2accpmlkfchc5176m3shv1o9rjk3ks.apps.googleusercontent.com'
   googleCallbackUrl: 'https://beta.laundree.io/auth/google/callback'
   facebookAppId: '233065037208325'
