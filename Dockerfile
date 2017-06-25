@@ -1,5 +1,4 @@
 FROM laundree/base:latest
-MAINTAINER Christian Budde Christensen <budde377@gmail.com>
 ENV PORT=3000 \
     REDIS_HOST='redis' \
     REDIS_PORT=6379 \
@@ -21,7 +20,7 @@ RUN npm install --silent
 ADD . .
 RUN chown -R laundree:laundree .
 USER laundree
-RUN git remote set-url origin https://github.com/laundree/laundree && \
-    npm run build
+RUN git remote set-url origin https://github.com/laundree/laundree \
+&&  npm run build
 CMD ["start"]
 ENTRYPOINT ["npm"]
