@@ -16,7 +16,7 @@ spec:
         image: nginx:1.13
         env:
           - name: 'NGINX_CONFIG'
-            value: 'c2VydmVyIHsKbGlzdGVuIDgwIGRlZmF1bHRfc2VydmVyOwpsaXN0ZW4gWzo6XTo4MCBkZWZhdWx0X3NlcnZlcjsKc2VydmVyX25hbWUgXzsKcmV0dXJuIDMwMiBodHRwczovL2xhdW5kcmVlLmlvOwp9Cgo='
+            value: 'c2VydmVyIHsKICBsaXN0ZW4gODAgZGVmYXVsdF9zZXJ2ZXI7CiAgbGlzdGVuIFs6Ol06ODAgZGVmYXVsdF9zZXJ2ZXI7CiAgc2VydmVyX25hbWUgXzsKICByZXR1cm4gMzAxIGh0dHBzOi8vbGF1bmRyZWUuaW8kcmVxdWVzdF91cmk7Cn0KCg=='
         readinessProbe:
           httpGet:
             path: /
