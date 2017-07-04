@@ -16,7 +16,7 @@ ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
 
 const debug = Debug('laundree.initializers.app')
 
-const socket = io('/redux')
+const socket = io('/redux', {transports: ['websocket']})
 
 function setupStore () {
   const state = window.__REDUX_STATE__
