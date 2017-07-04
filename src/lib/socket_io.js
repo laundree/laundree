@@ -19,7 +19,7 @@ const debug = Debug('laundree.lib.socket_io')
  */
 function setupSocket (server: Server) {
   const io = socketIo(server)
-  io.use((socket, next) => session(socket.request, socket.request.res, next))
+  io.use((socket, next) => session(socket.request, socket.request.res || {}, next))
   setupRedux(io.of('/redux'))
 }
 
