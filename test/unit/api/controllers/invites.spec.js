@@ -2,7 +2,7 @@ import request from 'supertest'
 import { app } from '../../../../test_target/app'
 import chai from 'chai'
 import LaundryInvitationHandler from '../../../../test_target/handlers/laundry_invitation'
-import dbUtils from '../../../db_utils'
+import * as dbUtils from '../../../db_utils'
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))
 chai.should()

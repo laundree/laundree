@@ -1436,6 +1436,43 @@ paths:
 
   /bookings/{bookingId}:
     x-swagger-router-controller: bookings
+    put:
+      security:
+        - bookingCreator: []
+      operationId: updateBooking
+      tags:
+        - Bookings
+      parameters:
+        - name: bookingId
+          in: path
+          required: true
+          type: string
+          description: Booking id
+        - name: body
+          in: body
+          required: true
+          schema:
+            properties:
+              from:
+                $ref: "#/definitions/Date"
+              to:
+                $ref: "#/definitions/Date"
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "404":
+          description: Booking not found
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
     get:
       security:
         - laundryUser: []

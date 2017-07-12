@@ -181,7 +181,7 @@ export default class BookingHandler extends Handler<BookingModel, Booking> {
     return this
   }
 
-  async updateTime (owner: UserHandler, from: Date, to: Date) {
+  async updateTime (owner: UserHandler, from?: Date = this.model.from, to?: Date = this.model.to) {
     const notificationsShouldBeUpdated = from.getTime() !== this.model.from.getTime()
     if (notificationsShouldBeUpdated) {
       this._cancelNotification().catch(logError)

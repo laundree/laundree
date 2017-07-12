@@ -3,7 +3,7 @@ import {app} from '../../../../test_target/app'
 import chai from 'chai'
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserHandler from '../../../../test_target/handlers/user'
-import dbUtils from '../../../db_utils'
+import * as dbUtils from '../../../db_utils'
 import faker from 'faker'
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))

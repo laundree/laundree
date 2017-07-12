@@ -1,6 +1,6 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
-import dbUtils from '../../db_utils'
+import * as dbUtils from '../../db_utils'
 import UserHandler from '../../../test_target/handlers/user'
 import LaundryInvitationHandler from '../../../test_target/handlers/laundry_invitation'
 import LaundryHandler from '../../../test_target/handlers/laundry'

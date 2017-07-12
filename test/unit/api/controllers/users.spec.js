@@ -1,7 +1,7 @@
 import request from 'supertest'
 import {app} from '../../../../test_target/app'
 import chai from 'chai'
-import dbUtils from '../../../db_utils'
+import * as dbUtils from '../../../db_utils'
 import UserHandler from '../../../../test_target/handlers/user'
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserModel from '../../../../test_target/models/user'
