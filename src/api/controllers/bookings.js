@@ -84,7 +84,39 @@ async function deleteBookingAsync (req, res) {
   return api.returnSuccess(res)
 }
 
+async function updateBookingAsync (req, res) {
+  const {booking, laundry} = req.subjects
+  const {from, to} = req.swagger.params.body.value
+  if (!from && !to) {
+    return api.returnSuccess(res)
+  }
+  let newFrom = booking.model.from
+  let newTo = booking.model.to
+  if (from) {
+    const fromDate = laundry.dateFromObject(from)
+    if (fromDate < booking.model.from) {
+      return api.returnError(res, 400, 'Invalid input')
+    }
+    newFrom = fromDate
+  }
+  if (to) {
+    const toDate = laundry.dateFromObject(to)
+    if (toDate > booking.model.to) {
+      return api.returnError(res, 400, 'Invalid input')
+    }
+    newTo = toDate
+  }
+
+  if (newTo.getTime() <= newFrom.getTime()) {
+    return api.returnError(res, 400, 'Invalid input')
+  }
+
+  await booking.updateTime(req.user, newFrom, newTo)
+  api.returnSuccess(res)
+}
+
 export const listBookings = api.wrapErrorHandler(listBookingsAsync)
 export const createBooking = api.wrapErrorHandler(createBookingAsync)
 export const fetchBooking = api.wrapErrorHandler(fetchBookingAsync)
 export const deleteBooking = api.wrapErrorHandler(deleteBookingAsync)
+export const updateBooking = api.wrapErrorHandler(updateBookingAsync)

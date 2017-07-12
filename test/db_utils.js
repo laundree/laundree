@@ -4,7 +4,7 @@ import UserHandler from '../test_target/handlers/user'
 import faker from 'faker'
 import {range} from '../test_target/utils/array'
 
-function clearDb () {
+export function clearDb () {
   return new Promise((resolve, reject) => {
     mongoose.connection.dropDatabase(err => {
       if (err) return reject(err)
@@ -28,11 +28,11 @@ function generateProfile () {
   }
 }
 
-function populateUsers (no: number) {
+export function populateUsers (no: number) {
   return Promise.all(range(no).map(generateProfile).map((profile) => UserHandler.lib.createUserFromProfile(profile)))
 }
 
-function createAdministrator () {
+export function createAdministrator () {
   return populateTokens(1)
     .then(({user, token}) => {
       user.model.role = 'admin'
@@ -40,7 +40,7 @@ function createAdministrator () {
     })
 }
 
-function populateTokens (no: number) {
+export function populateTokens (no: number) {
   const userPromise = populateUsers(1)
   return userPromise
     .then(([user]) =>
@@ -49,7 +49,7 @@ function populateTokens (no: number) {
         .then((tokens) => ({user: user, tokens: tokens, token: tokens[0]})))
 }
 
-function populateLaundries (no: number) {
+export function populateLaundries (no: number) {
   return populateTokens(1)
     .then(({user, token}) =>
       Promise
@@ -57,7 +57,7 @@ function populateLaundries (no: number) {
         .then((laundries) => ({user: user, token: token, laundries: laundries, laundry: laundries[0]})))
 }
 
-function populateMachines (no: number) {
+export function populateMachines (no: number) {
   return populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise
@@ -71,7 +71,7 @@ function populateMachines (no: number) {
         })))
 }
 
-function fixOverflow ({year, day, month, hour, minute}) {
+export function fixOverflow ({year, day, month, hour, minute}: *) {
   const date = new Date(year, month - 1, day - 1, hour, minute)
   return {
     year: date.getFullYear(),
@@ -82,7 +82,7 @@ function fixOverflow ({year, day, month, hour, minute}) {
   }
 }
 
-function populateBookings (no: number) {
+export function populateBookings (no: number) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       Promise
@@ -105,7 +105,7 @@ function populateBookings (no: number) {
         })))
 }
 
-function createBooking (from: Date, to: Date) {
+export function createBooking (from: *, to: *) {
   return populateMachines(1)
     .then(({user, token, laundry, machine}) =>
       laundry.createBooking(machine, user, from, to)
@@ -118,23 +118,11 @@ function createBooking (from: Date, to: Date) {
         })))
 }
 
-function populateInvites (no: number) {
+export function populateInvites (no: number) {
   return this.populateLaundries(1)
     .then(({user, token, laundry}) =>
       Promise
         .all(range(no).map(i => laundry.inviteUserByEmail(faker.internet.email())))
         .then((invites) => invites.map(({invite}) => invite).filter(i => i))
         .then(invites => ({user, token, laundry, invites, invite: invites[0]})))
-}
-
-module.exports = {
-  clearDb,
-  populateUsers,
-  populateLaundries,
-  populateTokens,
-  populateBookings,
-  populateMachines,
-  populateInvites,
-  createBooking,
-  createAdministrator
 }

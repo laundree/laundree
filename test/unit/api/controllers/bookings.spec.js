@@ -3,7 +3,7 @@ import request from 'supertest'
 import { app, promise } from '../../../../test_target/app'
 import config from 'config'
 import BookingHandler from '../../../../test_target/handlers/booking'
-import dbUtils from '../../../db_utils'
+import * as dbUtils from '../../../db_utils'
 import moment from 'moment-timezone'
 import assert from 'assert'
 
@@ -47,80 +47,76 @@ describe('controllers', function () {
           .expect('Content-Type', /json/)
           .expect('Link', /rel=.first./)
         const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((machine) => machine.toRestSummary())
-        res.body.should.deep.equal(arr)
+        assert.deepEqual(res.body, arr)
       })
 
-      it('should query range', () =>
-        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) =>
-          request(app)
-            .get(`/api/machines/${machine.model.id}/bookings`)
-            .set('Accept', 'application/json')
-            .query({from: bookings[5].model.from.getTime(), to: bookings[8].model.to.getTime() + 1})
-            .auth(user.model.id, token.secret)
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .then(res => {
-              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 9).map((machine) => machine.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
+      it('should query range', async () => {
+        const {user, token, machine, bookings} = await dbUtils.populateBookings(50)
+        const res = await request(app)
+          .get(`/api/machines/${machine.model.id}/bookings`)
+          .set('Accept', 'application/json')
+          .query({from: bookings[5].model.from.getTime(), to: bookings[8].model.to.getTime() + 1})
+          .auth(user.model.id, token.secret)
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+        const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 9).map((machine) => machine.toRestSummary())
+        assert.deepEqual(res.body, arr)
+      })
 
-      it('should query range exclusive', () =>
-        dbUtils.populateBookings(50).then(({user, token, machine, bookings}) =>
-          request(app)
-            .get(`/api/machines/${machine.model.id}/bookings`)
-            .set('Accept', 'application/json')
-            .query({from: bookings[5].model.from.getTime(), to: bookings[8].model.from.getTime()})
-            .auth(user.model.id, token.secret)
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .then(res => {
-              const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 8).map((machine) => machine.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
+      it('should query range exclusive', async () => {
+        const {user, token, machine, bookings} = await dbUtils.populateBookings(50)
+        const res = await request(app)
+          .get(`/api/machines/${machine.model.id}/bookings`)
+          .set('Accept', 'application/json')
+          .query({from: bookings[5].model.from.getTime(), to: bookings[8].model.from.getTime()})
+          .auth(user.model.id, token.secret)
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+        const arr = bookings.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(5, 8).map((machine) => machine.toRestSummary())
+        assert.deepEqual(res.body, arr)
+      })
 
-      it('fail on wrong machine id', () =>
-        dbUtils.populateBookings(50).then(({user, token}) =>
-          request(app)
-            .get('/api/machines/foo/bookings')
-            .set('Accept', 'application/json')
-            .query({from: 0, to: Date.now()})
-            .auth(user.model.id, token.secret)
-            .expect(404)
-            .expect('Content-Type', /json/)
-            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+      it('fail on wrong machine id', async () => {
+        const {user, token} = await dbUtils.populateBookings(50)
+        const res = await request(app)
+          .get('/api/machines/foo/bookings')
+          .set('Accept', 'application/json')
+          .query({from: 0, to: Date.now()})
+          .auth(user.model.id, token.secret)
+          .expect(404)
+          .expect('Content-Type', /json/)
+        assert.deepEqual(res.body, {message: 'Not found'})
+      })
 
-      it('should allow custom output size', () =>
-        dbUtils.populateBookings(50).then(({user, token, bookings, machine}) =>
-          request(app)
-            .get(`/api/machines/${machine.model.id}/bookings`)
-            .query({page_size: 12, from: 0, to: Date.now()})
-            .auth(user.model.id, token.secret)
-            .set('Accept', 'application/json')
-            .expect(200)
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .then(res => {
-              const arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((booking) => booking.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
+      it('should allow custom output size', async () => {
+        const {user, token, bookings, machine} = await dbUtils.populateBookings(50)
+        const res = await request(app)
+          .get(`/api/machines/${machine.model.id}/bookings`)
+          .query({page_size: 12, from: 0, to: Date.now()})
+          .auth(user.model.id, token.secret)
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+        const arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((booking) => booking.toRestSummary())
+        assert.deepEqual(res.body, arr)
+      })
 
-      it('should only fetch from current machine', () =>
-        Promise.all([dbUtils.populateBookings(1), dbUtils.populateBookings(2)])
-          .then(([r1, {user, token, bookings, machine}]) =>
-            request(app)
-              .get(`/api/machines/${machine.model.id}/bookings`)
-              .auth(user.model.id, token.secret)
-              .query({from: 0, to: Date.now()})
-              .set('Accept', 'application/json')
-              .expect(200)
-              .expect('Content-Type', /json/)
-              .expect('Link', /rel=.first./)
-              .then(res => {
-                const arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
-                res.body.should.deep.equal(arr)
-              })))
+      it('should only fetch from current machine', async () => {
+        const [{user, token, bookings, machine}] = await Promise.all([dbUtils.populateBookings(2), dbUtils.populateBookings(1)])
+        const res = await request(app)
+          .get(`/api/machines/${machine.model.id}/bookings`)
+          .auth(user.model.id, token.secret)
+          .query({from: 0, to: Date.now()})
+          .set('Accept', 'application/json')
+          .expect(200)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+        const arr = bookings.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((machine) => machine.toRestSummary())
+        assert.deepEqual(res.body, arr)
+      })
 
       it('should only fetch from own machine', () =>
         Promise.all([dbUtils.populateBookings(1), dbUtils.populateBookings(2)])
@@ -132,7 +128,7 @@ describe('controllers', function () {
               .set('Accept', 'application/json')
               .expect(404)
               .expect('Content-Type', /json/)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should allow since', () =>
         dbUtils.populateBookings(50).then(({machine, user, token, bookings}) => {
@@ -146,7 +142,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect('Link', /rel=.first./)
             .then(res => {
-              res.body.should.deep.equal([bookings[25].toRestSummary()])
+              assert.deepEqual(res.body, [bookings[25].toRestSummary()])
             })
         }))
     })
@@ -179,7 +175,7 @@ describe('controllers', function () {
           .auth(user.model.id, token.secret)
           .expect('Content-Type', /json/)
           .expect(400)
-        result.body.should.deep.equal({message: 'Request validation failed: Parameter (body) failed schema validation'})
+        assert.deepEqual(result.body, {message: 'Request validation failed: Parameter (body) failed schema validation'})
       })
 
       it('should fail on invalid to', () =>
@@ -201,7 +197,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'From must be before to'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'From must be before to'}))))
 
       it('should fail from on to', () =>
         dbUtils.populateBookings(1).then(({user, token, machine, bookings}) => {
@@ -212,7 +208,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'From must be before to'}))
+            .then(res => assert.deepEqual(res.body, {message: 'From must be before to'}))
         }))
 
       it('should fail if before limit', () =>
@@ -236,7 +232,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'Time limit violation'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Time limit violation'}))))
 
       it('should fail if after limit', () =>
         dbUtils
@@ -259,7 +255,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'Time limit violation'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Time limit violation'}))))
 
       it('should fail if daily limit', () =>
         dbUtils
@@ -281,7 +277,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'Daily limit violation'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Daily limit violation'}))))
 
       it('should succeed other bookings on other laundry', () => Promise
         .all([dbUtils.populateMachines(1), dbUtils.populateMachines(1)])
@@ -316,7 +312,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'Limit violation'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Limit violation'}))))
 
       it('should succeed other bookings on other laundry', () => Promise
         .all([dbUtils.populateMachines(1), dbUtils.populateMachines(1)])
@@ -341,7 +337,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(409)
-              .then(res => res.body.should.deep.equal({message: 'Machine not available'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Machine not available'}))))
 
       it('should fail on double booking 2', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
@@ -353,7 +349,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(409)
-              .then(res => res.body.should.deep.equal({message: 'Machine not available'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Machine not available'}))))
 
       it('should fail on double booking 3', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(3))
@@ -365,7 +361,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(409)
-              .then(res => res.body.should.deep.equal({message: 'Machine not available'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Machine not available'}))))
 
       it('should fail on double booking 4', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
@@ -377,7 +373,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(409)
-              .then(res => res.body.should.deep.equal({message: 'Machine not available'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Machine not available'}))))
       it('should succeed on tight booking 1', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
           .then(({user, token, machine, bookings}) =>
@@ -389,8 +385,8 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect(200)
               .then(res => {
-                res.body.from.should.deep.equal(createDateTomorrow(1, 0))
-                res.body.to.should.deep.equal(createDateTomorrow(2, 30))
+                assert.deepEqual(res.body.from, createDateTomorrow(1, 0))
+                assert.deepEqual(res.body.to, createDateTomorrow(2, 30))
               })))
       it('should succeed on tight booking 2', () =>
         dbUtils.createBooking(createDateTomorrow(1), createDateTomorrow(2))
@@ -403,8 +399,8 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect(200)
               .then(res => {
-                res.body.from.should.deep.equal(createDateTomorrow(0, 30))
-                res.body.to.should.deep.equal(createDateTomorrow(2))
+                assert.deepEqual(res.body.from, createDateTomorrow(0, 30))
+                assert.deepEqual(res.body.to, createDateTomorrow(2))
               })))
 
       it('should fail on non % 30 minutes', () => dbUtils.populateMachines(1)
@@ -458,8 +454,8 @@ describe('controllers', function () {
                 .expect('Content-Type', /json/)
                 .expect(200)
                 .then(res => {
-                  res.body.from.should.deep.equal(createDateTomorrow(2))
-                  res.body.to.should.deep.equal(createDateTomorrow(3))
+                  assert.deepEqual(res.body.from, createDateTomorrow(2))
+                  assert.deepEqual(res.body.to, createDateTomorrow(3))
                 }))))
 
       it('should not merge tight on other day', () =>
@@ -476,8 +472,8 @@ describe('controllers', function () {
               .expect('Content-Type', /json/)
               .expect(200)
               .then(res => {
-                res.body.from.should.deep.equal(createDateDayAfterTomorrow(0))
-                res.body.to.should.deep.equal(createDateDayAfterTomorrow(1))
+                assert.deepEqual(res.body.from, createDateDayAfterTomorrow(0))
+                assert.deepEqual(res.body.to, createDateDayAfterTomorrow(1))
               })))
 
       it('should fail on no such machine', () =>
@@ -491,7 +487,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should only fetch from own machine', () =>
         Promise.all([dbUtils.populateBookings(1), dbUtils.populateBookings(2)])
@@ -502,7 +498,7 @@ describe('controllers', function () {
             .set('Accept', 'application/json')
             .expect(404)
             .expect('Content-Type', /json/)
-            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should succeed when user', () =>
         Promise
@@ -519,8 +515,8 @@ describe('controllers', function () {
                 .then(res => {
                   const id = res.body.id
                   return BookingHandler.lib.findFromId(id).then((machine) => {
-                    machine.should.not.be.undefined
-                    return machine.toRest().then((result) => res.body.should.deep.equal(result))
+                    assert(machine)
+                    return machine.toRest().then((result) => assert.deepEqual(res.body, result))
                   })
                 }))))
 
@@ -537,10 +533,10 @@ describe('controllers', function () {
             .then(res => {
               const id = res.body.id
               return BookingHandler.lib.findFromId(id).then((machine) => {
-                machine.should.not.be.undefined
-                res.body.from.should.deep.equal(createDateTomorrow(1))
-                res.body.to.should.deep.equal(createDateTomorrow(2))
-                return machine.toRest().then((result) => res.body.should.deep.equal(result))
+                assert(machine)
+                assert.deepEqual(res.body.from, createDateTomorrow(1))
+                assert.deepEqual(res.body.to, createDateTomorrow(2))
+                return machine.toRest().then((result) => assert.deepEqual(res.body, result))
               })
             })))
 
@@ -562,10 +558,10 @@ describe('controllers', function () {
                 .then(res => {
                   const id = res.body.id
                   return BookingHandler.lib.findFromId(id).then((machine) => {
-                    machine.should.not.be.undefined
-                    res.body.from.should.deep.equal(createDateTomorrow(1, 0, laundry.timezone()))
-                    res.body.to.should.deep.equal(createDateTomorrow(2, 0, laundry.timezone()))
-                    return machine.toRest().then((result) => res.body.should.deep.equal(result))
+                    assert(machine)
+                    assert.deepEqual(res.body.from, createDateTomorrow(1, 0, laundry.timezone()))
+                    assert.deepEqual(res.body.to, createDateTomorrow(2, 0, laundry.timezone()))
+                    return machine.toRest().then((result) => assert.deepEqual(res.body, result))
                   })
                 }))))
 
@@ -579,7 +575,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(400)
-            .then(res => res.body.should.deep.equal({message: 'Too soon'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Too soon'}))))
     })
 
     describe('GET /bookings/{id}', () => {
@@ -600,7 +596,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(404)
-            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should return 404 on missing id', () =>
         dbUtils.populateBookings(1).then(({user, token}) =>
@@ -611,7 +607,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(404)
-            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should return 404 on other id', () =>
         Promise
@@ -624,7 +620,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should succeed', () =>
         dbUtils.populateBookings(1).then(({user, token, booking}) =>
@@ -636,7 +632,7 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(200)
             .then(res =>
-              booking.toRest().then((result) => res.body.should.deep.equal(result)))))
+              booking.toRest().then((result) => assert.deepEqual(res.body, result)))))
 
       it('should succeed when only user', () =>
         Promise
@@ -651,7 +647,7 @@ describe('controllers', function () {
                   .auth(user.model.id, token.secret)
                   .expect('Content-Type', /json/)
                   .expect(200)
-                  .then(res => booking.toRest().then((result) => res.body.should.deep.equal(result))))))
+                  .then(res => booking.toRest().then((result) => assert.deepEqual(res.body, result))))))
     })
 
     describe('DELETE /bookings/{id}', () => {
@@ -672,7 +668,7 @@ describe('controllers', function () {
           .auth(user.model.id, token.secret)
           .expect('Content-Type', /json/)
           .expect(404)
-        res.body.should.deep.equal({message: 'Not found'})
+        assert.deepEqual(res.body, {message: 'Not found'})
       })
       it('should return 404 on missing id', () =>
         dbUtils.populateBookings(1).then(({user, token, bookings}) =>
@@ -683,7 +679,7 @@ describe('controllers', function () {
             .auth(user.model.id, token.secret)
             .expect('Content-Type', /json/)
             .expect(404)
-            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should return 404 on other id', () =>
         Promise
@@ -696,7 +692,7 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
               .expect(404)
-              .then(res => res.body.should.deep.equal({message: 'Not found'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
 
       it('should succeed', () =>
         dbUtils.populateBookings(1).then(({user, token, booking}) =>
@@ -727,7 +723,7 @@ describe('controllers', function () {
                     .auth(user.model.id, token.secret)
                     .expect('Content-Type', /json/)
                     .expect(403)
-                    .then(res => res.body.should.deep.equal({message: 'Not allowed'}))))))
+                    .then(res => assert.deepEqual(res.body, {message: 'Not allowed'}))))))
 
       it('should succeed when laundry owner', () =>
         Promise
@@ -759,12 +755,143 @@ describe('controllers', function () {
     })
     describe('PUT /bookings/{id}', () => {
       it('should fail on not found', async () => {
-        const {user, token} = await dbUtils.populateUsers(1)
+        const {user, token} = await dbUtils.populateTokens(1)
         await request(app)
           .put('/api/bookings/nonExistingId')
           .set('Accept', 'application/json')
           .auth(user.model.id, token.secret)
           .expect(404)
+      })
+      it('should fail on authorized', async () => {
+        await request(app)
+          .put('/api/bookings/nonExistingId')
+          .set('Accept', 'application/json')
+          .expect(403)
+      })
+      it('should fail on not owner', async () => {
+        const {booking} = await dbUtils.populateBookings(1)
+        const {user, token} = await dbUtils.populateTokens(1)
+        await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect(404)
+      })
+      it('should succeed on empty body', async () => {
+        const {booking, user, token} = await dbUtils.populateBookings(1)
+        await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({})
+          .expect(204)
+      })
+      it('should fail on new from before old from', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newFrom = booking.model.from.getTime() - 30 * 60 * 1000
+        const res = await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({from: laundry.dateToObject(new Date(newFrom))})
+          .expect(400)
+        assert.deepEqual(res.body, {message: 'Invalid input'})
+      })
+      it('should fail on new to after old to', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newTo = booking.model.to.getTime() + 30 * 60 * 1000
+        const res = await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({to: laundry.dateToObject(new Date(newTo))})
+          .expect(400)
+        assert.deepEqual(res.body, {message: 'Invalid input'})
+      })
+      it('should fail on new to after old to and old from before from', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newTo = booking.model.to.getTime() + 30 * 60 * 1000
+        const newFrom = booking.model.from.getTime() - 30 * 60 * 1000
+        const res = await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({to: laundry.dateToObject(new Date(newTo)), from: laundry.dateToObject(new Date(newFrom))})
+          .expect(400)
+        assert.deepEqual(res.body, {message: 'Invalid input'})
+      })
+      it('should update on new from after old from', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newFrom = booking.model.from.getTime() + 60 * 60 * 1000
+        await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({from: laundry.dateToObject(new Date(newFrom))})
+          .expect(204)
+        const newBooking = await BookingHandler.lib.findFromId(booking.model.id)
+        assert.equal(newFrom, newBooking.model.from.getTime())
+      })
+      it('should update on new to before old to', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newTo = booking.model.to.getTime() - 60 * 60 * 1000
+        await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({to: laundry.dateToObject(new Date(newTo))})
+          .expect(204)
+        const newBooking = await BookingHandler.lib.findFromId(booking.model.id)
+        assert.equal(newTo, newBooking.model.to.getTime())
+      })
+      it('should update on new to before old to and old from after from', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newTo = booking.model.to.getTime() - 30 * 60 * 1000
+        const newFrom = booking.model.from.getTime() + 30 * 60 * 1000
+        await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({to: laundry.dateToObject(new Date(newTo)), from: laundry.dateToObject(new Date(newFrom))})
+          .expect(204)
+        const newBooking = await BookingHandler.lib.findFromId(booking.model.id)
+        assert.equal(newFrom, newBooking.model.from.getTime())
+        assert.equal(newTo, newBooking.model.to.getTime())
+      })
+      it('should fail on new from after old to', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newFrom = booking.model.to.getTime()
+        const res = await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({from: laundry.dateToObject(new Date(newFrom))})
+          .expect(400)
+        assert.deepEqual(res.body, {message: 'Invalid input'})
+      })
+      it('should fail on new to before old from', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newTo = booking.model.from.getTime()
+        const res = await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({to: laundry.dateToObject(new Date(newTo))})
+          .expect(400)
+        assert.deepEqual(res.body, {message: 'Invalid input'})
+      })
+
+      it('should fail on new to after old to and old from before from', async () => {
+        const {booking, user, token, laundry} = await dbUtils.populateBookings(1)
+        const newTo = booking.model.to.getTime() - 60 * 60 * 1000
+        const newFrom = booking.model.from.getTime() + 60 * 60 * 1000
+        const res = await request(app)
+          .put(`/api/bookings/${booking.model.id}`)
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .send({to: laundry.dateToObject(new Date(newTo)), from: laundry.dateToObject(new Date(newFrom))})
+          .expect(400)
+        assert.deepEqual(res.body, {message: 'Invalid input'})
       })
     })
   })

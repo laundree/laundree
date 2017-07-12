@@ -5,7 +5,7 @@ import LaundryHandler from '../../../../test_target/handlers/laundry'
 import LaundryInvitationHandler from '../../../../test_target/handlers/laundry_invitation'
 import UserHandler from '../../../../test_target/handlers/user'
 import BookingHandler from '../../../../test_target/handlers/booking'
-import dbUtils from '../../../db_utils'
+import * as dbUtils from '../../../db_utils'
 
 import base64UrlSafe from 'urlsafe-base64'
 chai.use(require('chai-as-promised'))
