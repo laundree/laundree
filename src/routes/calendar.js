@@ -46,7 +46,6 @@ router.get('/:userId/:calendarToken/calendar.ics', async (req: Request, res, nex
     }
     const events: CalEvent[] = await user.generateEvents()
     const cal = ical(config.get('calendar'))
-    // $FlowFixMe This is a false negative
     cal.events(events)
     cal.serve(res)
   } catch (err) {

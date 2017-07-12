@@ -1,15 +1,11 @@
+// @flow
 import request from 'supertest'
 import { app, promise } from '../../../../test_target/app'
-import chai from 'chai'
 import config from 'config'
 import BookingHandler from '../../../../test_target/handlers/booking'
 import dbUtils from '../../../db_utils'
 import moment from 'moment-timezone'
-
-chai.use(require('chai-as-promised'))
-chai.use(require('chai-things'))
-chai.should()
-const assert = chai.assert
+import assert from 'assert'
 
 function createDateTomorrow (hour = 0, minute = 0, tz = config.timezone) {
   const now = moment.tz(tz).add(2, 'd')
@@ -42,7 +38,6 @@ describe('controllers', function () {
 
       it('should limit output size', async () => {
         const {user, token, machine, bookings} = await dbUtils.populateBookings(50)
-
         const res = await request(app)
           .get(`/api/machines/${machine.model.id}/bookings`)
           .set('Accept', 'application/json')
@@ -668,17 +663,17 @@ describe('controllers', function () {
           .expect('Content-Type', /json/)
           .expect(403))
 
-      it('should return 404 on invalid id', () =>
-        dbUtils.populateBookings(1).then(({user, token}) =>
-          request(app)
-            .delete('/api/bookings/id')
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(404)
-            .then(res => res.body.should.deep.equal({message: 'Not found'}))))
-
+      it('should return 404 on invalid id', async () => {
+        const {user, token} = await dbUtils.populateBookings(1)
+        const res = await request(app)
+          .delete('/api/bookings/id')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(404)
+        res.body.should.deep.equal({message: 'Not found'})
+      })
       it('should return 404 on missing id', () =>
         dbUtils.populateBookings(1).then(({user, token, bookings}) =>
           request(app)
@@ -761,6 +756,16 @@ describe('controllers', function () {
                 .set('Content-Type', 'application/json')
                 .auth(user.model.id, token.secret)
                 .expect(204))))
+    })
+    describe('PUT /bookings/{id}', () => {
+      it('should fail on not found', async () => {
+        const {user, token} = await dbUtils.populateUsers(1)
+        await request(app)
+          .put('/api/bookings/nonExistingId')
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect(404)
+      })
     })
   })
 })
