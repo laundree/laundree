@@ -1,3 +1,5 @@
+// flow-typed signature: 4b57ebd0b44a427916cf904282826721
+// flow-typed version: <<STUB>>/mongoose_v^4.11.1/flow_v0.49.1
 
 declare type mongoose$SchemaDefinition = {}
 
