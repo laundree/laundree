@@ -27,7 +27,7 @@ before_install:
   && ~/google-cloud-sdk/bin/gcloud components install kubectl --quiet; fi
 - tar -xzf credentials.tar.gz
 - ~/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file gcloud-credentials.json
-- docker pull laundree/laundree:${TRAVIS_BRANCH} || true
+- docker pull laundree/laundree:master || true
 - docker-compose -f docker-compose.test.yml build
 before_script: greenkeeper-lockfile-update
 script: ./scripts/travis.sh
