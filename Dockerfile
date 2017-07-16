@@ -1,4 +1,4 @@
-FROM debian:latest
+FROM debian:stretch-slim
 
 ENV NVM_DIR=/home/laundree/.nvm \
     NODE_VERSION=8.1.4 \
