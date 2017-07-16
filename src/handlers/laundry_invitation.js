@@ -57,7 +57,7 @@ export default class LaundryInvitationHandler extends Handler<LaundryInvitationM
     return {
       email: this.model.email,
       id: this.model.id,
-      laundry: laundry.toRestSummary(),
+      laundry: laundry && laundry.toRestSummary(),
       href: this.href
     }
   }
