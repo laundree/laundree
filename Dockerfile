@@ -1,4 +1,5 @@
-FROM laundree/base:latest
+FROM node:8.1.4
+
 ENV PORT=3000 \
     REDIS_HOST='redis' \
     REDIS_PORT=6379 \
@@ -13,6 +14,13 @@ ENV PORT=3000 \
     GOOGLE_CLIENT_API_KEY='' \
     GOOGLE_SERVER_API_KEY='' \
     CODECLIMATE_REPO_TOKEN=''
+
+RUN adduser --disabled-password --gecos "" laundree && \
+    mkdir /opt/laundree && \
+    chown -R laundree:laundree /opt/laundree
+
+WORKDIR /opt/laundree
+
 ARG NODE_ENV
 EXPOSE 3000
 ADD package.json package.json
