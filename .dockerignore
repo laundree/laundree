@@ -11,3 +11,4 @@ coverage
 gcloud-credentials.json
 credentials.tar.gz
 credentials.tar.gz.enc
+Dockerfile
