@@ -24,12 +24,6 @@ redis:
   host: 'localhost'
   port: 6379
 
-mailer:
-  stubTransporter: false
-  dryRun: false
-  smtp:
-    transport: 'smtps://user%40gmail.com:pass@smtp.gmail.com'
-
 logging:
   http:
     enabled: true
@@ -88,3 +82,8 @@ defaultUsers:
   cecilie@laundree.io: admin
 
 mode: 'master'
+
+
+mailgun:
+  enabled: true
+  apiKey: some-key
