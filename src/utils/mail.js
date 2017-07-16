@@ -6,10 +6,10 @@ import config from 'config'
 import Debug from 'debug'
 import { locales } from '../locales'
 import type { LocaleType } from '../locales'
-import { Mailgun } from 'mailgun'
+import Mailgun from 'mailgun-js'
 import MailComposer from 'nodemailer/lib/mail-composer'
 
-const mg = new Mailgun(config.get('mailgun.apiKey'))
+const mailgun = Mailgun(config.get('mailgun'))
 const debug = Debug('laundree.utils.mail')
 
 type MailContent = { html: string, text: string, subject: string }
@@ -44,33 +44,47 @@ export async function sendRenderedEmail (to: string, content: MailContent, from:
   const options = {
     subject: content.subject,
     text: content.text,
-    html: content.html
+    html: content.html,
+    from,
+    to
   }
-  const mail = new MailComposer(options)
   try {
-    return await new Promise((resolve, reject) => {
-      debug('Sending mail', to, from)
-      debug(options)
-      mail.compile().build((err, msg) => {
-        if (err) {
-          return reject(err)
-        }
-        if (!config.get('mailgun.enabled')) {
-          debug('Mailgun is not enabled. Skipping.')
-          return resolve(msg)
-        }
-        mg.sendRaw(from, to, msg, (err) => {
-          if (err) {
-            return reject(err)
-          }
-          resolve(msg)
-        })
-      })
-    })
+    debug('Sending mail', to, from)
+    debug(options)
+    const message = await compileMessage(options)
+    if (!config.get('mailgun.enabled')) {
+      debug('Mailgun is not enabled. Skipping.')
+      return message
+    }
+    await sendMailgunMail(to, message)
+    return message
   } catch (err) {
     debug('Failed with error', err)
     throw err
   }
+}
+
+function compileMessage (data) {
+  const mail = new MailComposer(data)
+  return new Promise((resolve, reject) => {
+    mail.compile().build((err, msg) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve(msg)
+    })
+  })
+}
+
+function sendMailgunMail (to, message) {
+  return new Promise((resolve, reject) => {
+    mailgun.messages().sendMime({to, message: message.toString('ascii')}, (err, data) => {
+      if (err) {
+        return reject(err)
+      }
+      resolve(data)
+    })
+  })
 }
 
 /**
