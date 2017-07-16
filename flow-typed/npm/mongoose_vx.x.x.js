@@ -28,7 +28,7 @@ declare class mongoose$Schema<Definition> {
 declare class mongoose$Mongoose {
   Schema: typeof mongoose$Schema;
   Promise: Class<Promise<*>>;
-  connect(host: string): void;
+  connect(host: string, options?: {useMongoClient: boolean}): void;
   connection: events$EventEmitter & {dropDatabase: (cb: (Error) => void) => void};
   model<Definition>(name: string, schema: mongoose$Schema<Definition>): Class<mongoose$Model<Definition> & Definition>
 }

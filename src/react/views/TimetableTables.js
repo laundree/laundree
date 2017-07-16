@@ -58,15 +58,20 @@ class TimetableTable extends React.Component {
       {machines
         .map((m, i) => {
           if (m.broken) {
-            return <td key={m.id} className='broken' />
+            return <td key={m.id} className='broken'/>
           }
           const isBooked = this.isBooked(m.id, key)
+          const resizeId = this.state.mouseDownStart && this.state.mouseDownStart.resizeId
+          const yCorrection = (this.state.mouseDownStart && this.state.mouseDownStart.yCorrection) || 0
           if (isBooked) {
-            return <td key={m.id}>
+            return <td
+              key={m.id}
+              className={(this.isSelecting(i, key + (yCorrection * -1)) ? 'selecting' : '') + (resizeId === isBooked ? ' resizing' : '')}>
               {this.createBookingLink(isBooked)}
+              {this.createResizer(isBooked, this.isBooked(m.id, key - 1), this.isBooked(m.id, key + 1))}
             </td>
           }
-          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''} />
+          return <td key={m.id} className={this.isSelecting(i, key) ? 'selecting' : ''}/>
         })}
     </tr>
   }
@@ -80,7 +85,30 @@ class TimetableTable extends React.Component {
     const mine = this.isMine(bookingId)
     return <span
       onClick={this.generateActiveChangeHandler(bookingId)}
-      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')} />
+      className={'booking' + (active ? ' active' : '') + (mine ? ' mine' : '')}/>
+  }
+
+  createResizer (bookingId, prevBookingId, nextBookingId) {
+    const mine = this.isMine(bookingId)
+    if (!mine) {
+      return null
+    }
+    const children = []
+    if (bookingId !== prevBookingId) {
+      children.push(<span
+        key='top'
+        onClick={this.generateActiveChangeHandler(bookingId)}
+        data-id={bookingId}
+        className={'resizer top'}/>)
+    }
+    if (bookingId !== nextBookingId) {
+      children.push(<span
+        key='bottom'
+        data-id={bookingId}
+        onClick={this.generateActiveChangeHandler(bookingId)}
+        className={'resizer bottom'}/>)
+    }
+    return children
   }
 
   isMine (bookingId) {
@@ -118,8 +146,8 @@ class TimetableTable extends React.Component {
         }))
         .filter(({from, to}) => to.isSameOrAfter(day, 'd') && from.isSameOrBefore(day, 'd'))
         .reduce((obj, {machine, from, to, id}) => {
-          const fromY = day.isSame(from, 'd') ? TimetableTable.dateToY(from) : 0
-          const toY = day.isSame(to, 'd') ? TimetableTable.dateToY(to) : 48
+          const fromY = this.dateToY(from, 0)
+          const toY = this.dateToY(to, 48)
           range(fromY, toY).forEach((y) => {
             obj[`${machine}:${y}`] = id
           })
@@ -144,9 +172,12 @@ class TimetableTable extends React.Component {
     if (!this.state.mouseDownStart || this.props.hoverRow < 0 || this.props.hoverColumn < 0) {
       return false
     }
-    const {x: mouseX, y: mouseY} = this.state.mouseDownStart
+    const {yCorrection, x: mouseX, y: mouseY, bookingFromY, bookingToY, resizeId} = this.state.mouseDownStart
     const hoverX = this.props.hoverColumn
     const hoverY = this.props.hoverRow
+    if (resizeId && ((yCorrection < 0 && hoverY >= bookingToY) || (yCorrection > 0 && hoverY < bookingFromY))) {
+      return false
+    }
     return x >= Math.min(mouseX, hoverX) &&
       y >= Math.min(mouseY, hoverY) &&
       y <= Math.max(mouseY, hoverY) &&
@@ -174,6 +205,14 @@ class TimetableTable extends React.Component {
 
   handleMouseDown (event) {
     switch (event.target.tagName.toLowerCase()) {
+      case 'span':
+        const span = event.target
+        if (!span.classList.contains('resizer')) {
+          this.setState({mouseDownStart: null})
+          break
+        }
+        this.setState({mouseDownStart: this.spanToTablePos(span)})
+        break
       case 'td':
         const td = event.target
         this.setState({mouseDownStart: this.tdToTablePos(td)})
@@ -185,32 +224,28 @@ class TimetableTable extends React.Component {
 
   handleMouseUp (event) {
     if (!this.state.mouseDownStart) return
+    let td
     switch (event.target.tagName.toLowerCase()) {
+      case 'span':
+        td = event.target.parentNode
+        break
       case 'td':
-        const td = event.target
-        const to = this.tdToTablePos(td)
-        this.book(this.state.mouseDownStart, to)
-        this.setState({mouseDownStart: null})
+        td = event.target
     }
-  }
-
-  tdToTablePos (td) {
-    return {x: td.cellIndex, y: td.parentNode.rowIndex + this.props.times[0]}
-  }
-
-  static dateToY (date) {
-    return Math.floor((date.hours() * 60 + date.minutes()) / 30)
-  }
-
-  posToDate ({y}) {
-    const mins = y * 30
-    return {
-      year: this.props.date.year(),
-      month: this.props.date.month(),
-      day: this.props.date.date(),
-      hour: Math.floor(mins / 60),
-      minute: mins % 60
+    if (!td) {
+      return
     }
+    const {x, y} = this.tdToTablePos(td)
+    const {x: fromX, y: fromY, resizeId, yCorrection} = this.state.mouseDownStart
+    const booking = this.props.bookings[resizeId]
+    this.setState({mouseDownStart: null})
+    if (booking && yCorrection < 0 && this.dateToY(moment(booking.from).tz(this.props.laundry.timezone), 0) < y) {
+      return this.update(booking, {from: {x, y}})
+    }
+    if (booking && yCorrection > 0 && this.dateToY(moment(booking.to).tz(this.props.laundry.timezone), 48) > y) {
+      return this.update(booking, {to: {x, y: y + 1}})
+    }
+    this.book({x: fromX, y: this.lockedY(fromY)}, {y, x: this.lockedX(x)})
   }
 
   book (from, to) {
@@ -222,6 +257,51 @@ class TimetableTable extends React.Component {
         if (machine.broken) return
         return sdk.api.machine.createBooking(machine.id, this.posToDate(min), this.posToDate(maxExclusive))
       }))
+  }
+
+  update (booking, {from, to}: { from?: *, to?: * }) {
+    const machine = this.props.machines[booking.machine]
+    if (machine.broken) return
+    return sdk.api.booking.updateBooking(booking.id, {from: from && this.posToDate(from), to: to && this.posToDate(to)})
+  }
+
+  tdToTablePos (td) {
+    return {x: td.cellIndex, y: td.parentNode.rowIndex + this.props.times[0]}
+  }
+
+  spanToTablePos (span) {
+    const td = span.parentNode
+    const {x, y} = this.tdToTablePos(td)
+    const resizeId = span.dataset.id
+    const booking = this.props.bookings[resizeId]
+    const bookingFromY = booking && this.dateToY(moment(booking.from).tz(this.props.laundry.timezone), 0)
+    const bookingToY = booking && this.dateToY(moment(booking.to).tz(this.props.laundry.timezone), 48)
+    return {
+      y,
+      x,
+      lock: true,
+      bookingFromY,
+      bookingToY,
+      yCorrection: span.classList.contains('top') ? -1 : 1,
+      resizeId
+    }
+  }
+
+  dateToY (date, def) {
+    return date.isSame(this.props.date, 'd')
+      ? Math.floor((date.hours() * 60 + date.minutes()) / 30)
+      : def
+  }
+
+  posToDate ({y}) {
+    const mins = y * 30
+    return {
+      year: this.props.date.year(),
+      month: this.props.date.month(),
+      day: this.props.date.date(),
+      hour: Math.floor(mins / 60),
+      minute: mins % 60
+    }
   }
 
   static _fixPos (pos1, pos2) {
@@ -244,14 +324,26 @@ class TimetableTable extends React.Component {
     this.props.onHoverColumn(x)
   }
 
+  lockedX (x) {
+    return this.state.mouseDownStart && this.state.mouseDownStart.lock ? this.state.mouseDownStart.x : x
+  }
+
+  lockedY (y) {
+    return y + (this.state.mouseDownStart.yCorrection || 0)
+  }
+
   hoverTd (td) {
-    this.hover(this.tdToTablePos(td))
+    const {x, y} = this.tdToTablePos(td)
+    this.hover({x: this.lockedX(x), y})
   }
 
   handleMouseOver (event) {
     switch (event.target.tagName.toLowerCase()) {
       case 'td':
         this.hoverTd(event.target)
+        break
+      case 'span':
+        this.hoverTd(event.target.parentNode)
         break
       default:
         this.reset()
@@ -279,9 +371,9 @@ class TimetableTable extends React.Component {
         this.ref = ref
       }}>
       <div className='overlay'>
-        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}} />
+        <div className='off_limits' style={{height: this.state.offLimitsPosition + '%'}}/>
         {this.state.nowPosition > 0 && this.state.nowPosition < 100
-          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time} /> : ''}
+          ? <div className='now' style={{top: this.state.nowPosition + '%'}} data-time={time}/> : ''}
       </div>
       <table
         ref={ref => {
@@ -310,11 +402,11 @@ export default class TimetableTables extends React.Component {
     hoverColumn: number,
     dates: moment[],
     laundry: Laundry,
-    machines: {[string]: Machine},
-    bookings: {[string]: Booking}
+    machines: { [string]: Machine },
+    bookings: { [string]: Booking }
   }
 
-  componentWillReceiveProps ({dates, laundry: {id}}: {dates: moment[], laundry: Laundry}) {
+  componentWillReceiveProps ({dates, laundry: {id}}: { dates: moment[], laundry: Laundry }) {
     const oldDates = this.props.dates
     if (dates.length === oldDates.length && oldDates.every((d, i) => d.isSame(dates[i], 'd'))) return
     const firstDate = dates[0]
@@ -364,7 +456,7 @@ export default class TimetableTables extends React.Component {
           laundry={this.props.laundry}
           bookings={this.props.bookings}
           times={times}
-          key={date.format('YYYY-MM-DD')} />)}
+          key={date.format('YYYY-MM-DD')}/>)}
         {timeList}
       </div>
     </section>
