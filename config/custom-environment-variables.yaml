@@ -37,10 +37,6 @@ sauceLabs:
   username: 'SAUCE_LABS_USERNAME'
   accessKey: 'SAUCE_LABS_ACCESS_KEY'
 
-mailer:
-  smtp:
-    transport: 'MAILER_SMTP_TRANSPORT'
-
 mode: 'MODE'
 
 oneSignal:

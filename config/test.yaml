@@ -14,9 +14,8 @@ google:
 oneSignal:
   enabled: false
 
-mailer:
-  stubTransporter: true
-  dryRun: false
-
 defaultUsers:
   test-admin@example.com: admin
+
+mailgun:
+  enabled: false

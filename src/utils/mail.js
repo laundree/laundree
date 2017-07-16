@@ -2,13 +2,14 @@
 
 import path from 'path'
 import { EmailTemplate } from 'email-templates'
-import { createTransport } from 'nodemailer'
 import config from 'config'
 import Debug from 'debug'
 import { locales } from '../locales'
 import type { LocaleType } from '../locales'
-import nodeMailerStub from 'nodemailer-stub-transport'
+import { Mailgun } from 'mailgun'
+import MailComposer from 'nodemailer/lib/mail-composer'
 
+const mg = new Mailgun(config.get('mailgun.apiKey'))
 const debug = Debug('laundree.utils.mail')
 
 type MailContent = { html: string, text: string, subject: string }
@@ -32,35 +33,44 @@ type TransporterOptions = { from: string, to: string } & MailContent
 
 type Transporter = { sendMail: (options: TransporterOptions, callback: (err: ?Error, data: ?Object) => void) => void }
 
-const standardTransporter: Transporter = config.get('mailer.stubTransporter')
-  ? createTransport(nodeMailerStub())
-  : createTransport(config.get('mailer.smtp.transport'))
-
 /**
  * Send email
  * @param {string} to Receiver
  * @param {{html: string, text: string, subject: string}} content
  * @param from
- * @param transporter
  * @return {Promise}
  */
-export function sendRenderedEmail (to: string, content: MailContent, from: string, transporter: Transporter) {
+export async function sendRenderedEmail (to: string, content: MailContent, from: string) {
   const options = {
-    from,
-    to,
     subject: content.subject,
     text: content.text,
     html: content.html
   }
-  return new Promise((resolve, reject) => {
-    debug('Sending mail')
-    debug(options)
-    if (config.get('mailer.dryRun')) return resolve()
-    transporter.sendMail(options, (err, info) => {
-      if (err) return reject(err)
-      resolve(info)
+  const mail = new MailComposer(options)
+  try {
+    return await new Promise((resolve, reject) => {
+      debug('Sending mail', to, from)
+      debug(options)
+      mail.compile().build((err, msg) => {
+        if (err) {
+          return reject(err)
+        }
+        if (!config.get('mailgun.enabled')) {
+          debug('Mailgun is not enabled. Skipping.')
+          return resolve(msg)
+        }
+        mg.sendRaw(from, to, msg, (err) => {
+          if (err) {
+            return reject(err)
+          }
+          resolve(msg)
+        })
+      })
     })
-  })
+  } catch (err) {
+    debug('Failed with error', err)
+    throw err
+  }
 }
 
 /**
@@ -70,10 +80,10 @@ export function sendRenderedEmail (to: string, content: MailContent, from: strin
  * @param {string} to
  * @param from=
  * @param {string=} locale
- * @param transporter=
  * @returns {Promise}
  */
-export function sendEmail (data: Object, template: string, to: string, {locale = 'en', from = config.get('emails.from'), transporter = standardTransporter}: { locale?: LocaleType, from?: string, transporter?: Transporter } = {}) {
+export async function sendEmail (data: Object, template: string, to: string, {locale = 'en', from = config.get('emails.from')}: { locale?: LocaleType, from?: string, transporter?: Transporter } = {}) {
   debug(`Sending email to ${to}`)
-  return render(data, template, locale).then((rendered) => sendRenderedEmail(to, rendered, from, transporter))
+  const rendered = await render(data, template, locale)
+  return sendRenderedEmail(to, rendered, from)
 }

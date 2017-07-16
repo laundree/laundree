@@ -17,9 +17,8 @@ describe('utils', () => {
             token: 'token123'
           }, 'password-reset', 'test@example.com', {})
           .then((info) => {
-            const message = info.response.toString()
+            const message = info.toString()
             message.should.match(/https:\/\/laundree\.io\/auth\/reset\?user=someFancyUserId&token=token123/)
-            message.should.match(/test@example\.com/)
             message.should.match(/Bob Bobbesen/)
             message.should.match(/someFancyUserId/)
             message.should.match(/logo body/)
@@ -31,13 +30,12 @@ describe('utils', () => {
           token: 'token123'
         }, 'verify-email', 'test@example.com')
         .then(info => {
-          const message = info.response.toString().replace(/(?:=\r\n|\r|\n)/g, '')
+          const message = info.toString().replace(/(?:=\r\n|\r|\n)/g, '')
           message.should.match(/bob/)
           message.should.match(/Bob Bobbesen/)
           message.should.match(/bob@bobbesen\.dk/)
           message.should.match(/token123/)
           message.should.match(/someFancyUserId/)
-          message.should.match(/test@example\.com/)
           message.should.match(/logo body/)
         }))
       it('should render invite email correctly', () => mail
@@ -50,7 +48,7 @@ describe('utils', () => {
           laundry: {name: 'Bobs Laundry'}
         }, 'invite-user', 'test@example.com')
         .then((info) => {
-          const message = info.response.toString().replace(/(?:=\r\n|\r|\n)/g, '')
+          const message = info.toString().replace(/(?:=\r\n|\r|\n)/g, '')
           message.should.match(/Hi Kurt Ravn/g)
           message.should.match(/join "Bobs Laundry"/g)
           message.should.match(/join <b>Bobs Laundry<\/b>/g)
