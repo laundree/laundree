@@ -82,11 +82,11 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: googleServerApiKey
-          - name: 'MAILER_SMTP_TRANSPORT'
+          - name: 'MAILGUN_API_KEY'
             valueFrom:
               secretKeyRef:
                 name: laundree-${BRANCH}
-                key: mailerSmtpTransport
+                key: mailgunApiKey
           - name: 'ONE_SIGNAL_APP_ID'
             value: '390e23c3-658b-46cd-83ee-2fdead3211af'
           - name: 'ONE_SIGNAL_REST_API_KEY'

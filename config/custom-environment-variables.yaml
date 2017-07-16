@@ -42,3 +42,6 @@ mode: 'MODE'
 oneSignal:
   appId: 'ONE_SIGNAL_APP_ID'
   restApiKey: 'ONE_SIGNAL_REST_API_KEY'
+
+mailgun:
+  apiKey: 'MAILGUN_API_KEY'

@@ -35,7 +35,7 @@
     "jdenticon": "^1.7.2",
     "laundree-sdk": "^0.1.5",
     "locale": "^0.1.0",
-    "mailgun": "^0.5.0",
+    "mailgun-js": "^0.11.2",
     "moment": "^2.18.1",
     "moment-timezone": "^0.5.13",
     "mongoose": "^4.11.1",

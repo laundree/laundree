@@ -86,4 +86,5 @@ mode: 'master'
 
 mailgun:
   enabled: true
+  domain: 'mg.laundree.io'
   apiKey: some-key
