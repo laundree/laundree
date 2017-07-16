@@ -347,6 +347,20 @@ main#TimeTableMain
                 border-width: 0.1em 0 0.1em 0.1em
               &:first-of-type
                 border-width: 0.1em 0.1em 0.1em 0
+              .resizer
+                height: 0.5em
+                position: absolute
+                cursor: ns-resize
+                left: 0
+                right: 0
+                z-index: 10
+                +transition(0.1s background-color)
+                &:hover
+                  background-color: #357830
+                &.top
+                  top: 0
+                &.bottom
+                  bottom: 0
               .booking
                 &.active
                   background-color: #c64f4f
@@ -363,6 +377,10 @@ main#TimeTableMain
                 left: 0
                 width: 100%
                 height: calc(100% + 0.1em)
+              &.resizing.selecting
+                .booking
+                  background-color: rgb(58, 160, 124)
+
   #ActiveBooking
     .avatar
       +border-radius(0.1em)

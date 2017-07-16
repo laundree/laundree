@@ -8,6 +8,9 @@ const debug = Debug('laundree.models')
 mongoose.Promise = Promise
 
 let started = false
+const mongooseOptions = {
+  useMongoClient: true
+}
 
 export default function connectMongoose () {
   if (started) {
@@ -15,14 +18,14 @@ export default function connectMongoose () {
     return
   }
   started = true
-  mongoose.connect(config.get('mongo.url'))
+  mongoose.connect(config.get('mongo.url'), mongooseOptions)
 
   mongoose.connection.on('connected', () => debug('Mongoose connected'))
 
   mongoose.connection.on('error', (err) => {
     debug('Mongoose connection erred: ', err)
     debug('Restarting in a moment...')
-    setTimeout(() => mongoose.connect(config.get('mongo.url')), 1000)
+    setTimeout(() => mongoose.connect(config.get('mongo.url'), mongooseOptions), 1000)
   })
 
   mongoose.connection.on('disconnected', () => debug('Mongoose disconnected...'))
