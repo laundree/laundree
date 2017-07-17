@@ -6,6 +6,7 @@ import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import { FormattedMessage } from 'react-intl'
 import type { Flash } from 'laundree-sdk/lib/redux'
+import { WebAuth } from 'auth0-js'
 
 type LoginProps = {
   to?: string,
@@ -18,6 +19,7 @@ type LoginValues = {
 }
 
 export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
+  webAuth: WebAuth
 
   initialState () {
     return {}
@@ -43,6 +45,38 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
   }
 
+  componentDidMount () {
+    this.webAuth = new WebAuth({
+      domain: 'laundree-test.eu.auth0.com',
+      clientID: 'i143cn6TgLjdfpAWc7tRiPFGB1g9ns5Z',
+      redirectUri: 'http://localhost:3000/auth',
+      responseType: 'token'
+    })
+    this.webAuth.parseHash((err, authResult) => {
+      if (authResult) {
+        // Save the tokens from the authResult in local storage or a cookie
+        window.localStorage.setItem('access_token', authResult.accessToken)
+        window.localStorage.setItem('id_token', authResult.idToken)
+      } else if (err) {
+        // Handle errors
+        console.log(err)
+      }
+    })
+  }
+  loginFacebook = () => this.webAuth.authorize({connection: 'facebook'})
+
+  loginGoogle = () => this.webAuth.authorize({connection: 'google-oauth2'})
+
+  loginUsernamePassword = (evt: MouseEvent) => {
+    evt.preventDefault()
+    this.webAuth.redirect.loginWithCredentials({
+      connection: 'Username-Password-Authentication',
+      username: 'testuser',
+      password: 'testpass',
+      scope: 'openid'
+    })
+  }
+
   render () {
     const query = this.query()
     return <DocumentTitle title='document-title.login'>
@@ -54,23 +88,23 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={'/auth/facebook' + query} className='facebook'>
+          <span onClick={this.loginFacebook} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook'/>
             </svg>
             <FormattedMessage id='auth.login.method.facebook'/>
-          </a>
-          <a href={'/auth/google' + query} className='google'>
+          </span>
+          <span onClick={this.loginGoogle} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus'/>
             </svg>
             <FormattedMessage id='auth.login.method.google'/>
-          </a>
+          </span>
         </div>
         <div className='or'>
           <FormattedMessage id='general.or'/>
         </div>
-        <ValidationForm id='SignIn' method='post' action={'/auth/local' + query}>
+        <ValidationForm id='SignIn' method='post' action={'/auth/local' + query} onSubmit={this.loginUsernamePassword}>
           {this.handleNotion()}
           <ValidationElement email trim value={this.state.values.email || ''}>
             <Label
