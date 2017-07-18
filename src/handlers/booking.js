@@ -1,7 +1,7 @@
 // @flow
 
 import { Handler, HandlerLibrary } from './handler'
-import BookingModel from '../models/booking'
+import BookingModel from '../db/models/booking'
 import { createNotification, deleteNotification } from '../utils/oneSignal'
 import { logError } from '../utils/error'
 import type UserHandler from './user'

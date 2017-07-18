@@ -4,10 +4,10 @@ import React from 'react'
 import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router'
 import { createInitialStore } from '../redux'
-import * as error from '../utils/error'
+import * as error from '../../utils/error'
 import DocumentTitle from 'react-document-title'
 import config from 'config'
-import App from '../react/views/App'
+import App from '../../react/views/App'
 import type { Request, Router } from '../types'
 
 const router: Router = express.Router()

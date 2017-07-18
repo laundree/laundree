@@ -1,6 +1,6 @@
 // @flow
 import config from 'config'
-import {opbeat} from '../lib/opbeat'
+import {opbeat} from '../opbeat'
 
 export function logError (err: ?Error): void {
   if (!err) return

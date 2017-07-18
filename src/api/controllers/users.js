@@ -1,6 +1,6 @@
 // @flow
 
-import * as api from '../../utils/api'
+import * as api from '../helper'
 import * as mail from '../../utils/mail'
 import UserHandler from '../../handlers/user'
 

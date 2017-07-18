@@ -5,8 +5,8 @@ import * as fs from '../utils/fs'
 import path from 'path'
 import * as hb from '../utils/handlebars'
 import Debug from 'debug'
-import { toLocale } from '../locales'
-import type {Request, Application} from '../types'
+import { toLocale } from '../locales/index'
+import type {Request, Application} from './types'
 
 const debug = Debug('laundree.lib.handlebars')
 

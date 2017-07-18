@@ -16,30 +16,13 @@ produces:
   - application/json
 
 securityDefinitions:
-  subjectsExists:
-    type: basic
-    description: Does the subjects exists.
-  userAccess:
-    type: basic
-    description: Basic auth with user access token auth.
-  self:
-    type: basic
-    description: Is the requested user the one logged in
-  tokenOwner:
-    type: basic
-    description: Is the requested token owned by current user
-  laundryOwner:
-    type: basic
-    description: Is the requested laundry owned by current user
-  laundryUser:
-    type: basic
-    description: Is the requested laundry used by current user
-  bookingCreator:
-    type: basic
-    description: Is the requested booking created by current user
-  administrator:
-    type: basic
-    description: Is the current user an admin
+  auth0:
+    authorizationUrl: "https://laundree-test.eu.auth0.com/authorize"
+    flow: "implicit"
+    type: "oauth2"
+
+security:
+  - auth0: []
 
 paths:
   /users:
@@ -123,8 +106,6 @@ paths:
     get:
       description: Returns user with given Id.
       operationId: getUser
-      security:
-        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -153,9 +134,6 @@ paths:
     put:
       description: Update a user
       operationId: updateUser
-      security:
-        - self: []
-        - administrator: []
       parameters:
         - name: userId
           in: path
@@ -189,9 +167,6 @@ paths:
     delete:
       description: Delete a given user
       operationId: deleteUser
-      security:
-        - self: []
-        - administrator: []
       tags:
         - Users
       parameters:
@@ -220,9 +195,6 @@ paths:
     get:
       description: Get user emails
       operationId: fetchUserEmails
-      security:
-        - administrator: []
-        - self: []
       parameters:
         - name: userId
           in: path
@@ -252,8 +224,6 @@ paths:
     post:
       description: Register a OneSignal player id
       operationId: addOneSignalPlayerId
-      security:
-        - self: []
       parameters:
         - name: userId
           in: path
@@ -292,8 +262,6 @@ paths:
     post:
       description: Start user password reset
       operationId: startPasswordReset
-      security:
-        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -318,8 +286,6 @@ paths:
     post:
       description: Reset user password
       operationId: passwordReset
-      security:
-        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -362,8 +328,7 @@ paths:
         - Users
       description: Start password change
       operationId: changeUserPassword
-      security:
-        - self: []
+
       parameters:
         - name: userId
           in: path
@@ -402,8 +367,6 @@ paths:
     post:
       description: Start email verification
       operationId: startEmailVerification
-      security:
-        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -441,8 +404,6 @@ paths:
     post:
       description: Verify a user email
       operationId: verifyEmail
-      security:
-        - subjectsExists: []
       parameters:
         - name: userId
           in: path
@@ -482,8 +443,6 @@ paths:
     x-swagger-router-controller: tokens
     get:
       description: List available tokens
-      security:
-        - userAccess: []
       operationId: listTokens
       tags:
         - Tokens
@@ -525,8 +484,6 @@ paths:
     post:
       description: Create a new token
       operationId: createToken
-      security:
-        - userAccess: []
       tags:
         - Tokens
       parameters:
@@ -599,8 +556,6 @@ paths:
       operationId: fetchToken
       tags:
         - Tokens
-      security:
-        - tokenOwner: []
       parameters:
         - name: tokenId
           in: path
@@ -627,8 +582,6 @@ paths:
       operationId: deleteToken
       tags:
         - Tokens
-      security:
-        - tokenOwner: []
       parameters:
         - name: tokenId
           in: path
@@ -652,8 +605,6 @@ paths:
   /laundries:
     x-swagger-router-controller: laundries
     get:
-      security:
-        - userAccess: []
       description: Lists the current laundries
       operationId: listLaundries
       parameters:
@@ -698,8 +649,7 @@ paths:
     post:
       tags:
         - Laundries
-      security:
-        - userAccess: []
+
       description: Create a laundry
       operationId: createLaundry
       parameters:
@@ -767,9 +717,6 @@ paths:
       operationId: updateLaundry
       tags:
         - Laundries
-      security:
-        - laundryOwner: []
-        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -827,9 +774,6 @@ paths:
       operationId: fetchLaundry
       tags:
         - Laundries
-      security:
-        - laundryUser: []
-        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -856,9 +800,6 @@ paths:
       operationId: deleteLaundry
       tags:
         - Laundries
-      security:
-        - laundryOwner: []
-        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -888,9 +829,6 @@ paths:
       tags:
         - Machines
         - Laundries
-      security:
-        - laundryUser: []
-        - administrator: []
       parameters:
         - name: laundryId
           in: path
@@ -935,9 +873,6 @@ paths:
             $ref: "#/definitions/Error"
     post:
       operationId: createMachine
-      security:
-        - laundryOwner: []
-        - administrator: []
       tags:
         - Machines
         - Laundries
@@ -988,9 +923,6 @@ paths:
     x-swagger-router-controller: laundries
     post:
       operationId: addOwner
-      security:
-        - administrator: []
-        - laundryOwner: []
       tags:
         - Laundries
         - Users
@@ -1022,9 +954,6 @@ paths:
             $ref: "#/definitions/Error"
     delete:
       operationId: removeOwner
-      security:
-        - administrator: []
-        - laundryOwner: []
       tags:
         - Laundries
         - Users
@@ -1058,8 +987,6 @@ paths:
     x-swagger-router-controller: laundries
     post:
       operationId: addUserFromCode
-      security:
-        - userAccess: []
       tags:
         - Laundries
         - Users
@@ -1098,10 +1025,6 @@ paths:
     x-swagger-router-controller: laundries
     delete:
       operationId: removeUserFromLaundry
-      security:
-        - laundryOwner: []
-        - administrator: []
-        - self: []
       tags:
         - Laundries
         - Users
@@ -1136,9 +1059,6 @@ paths:
     x-swagger-router-controller: laundries
     post:
       operationId: inviteUserByEmail
-      security:
-        - laundryOwner: []
-        - administrator: []
       tags:
         - Laundries
       parameters:
@@ -1177,9 +1097,6 @@ paths:
     x-swagger-router-controller: laundries
     post:
       operationId: createInviteCode
-      security:
-        - laundryOwner: []
-        - administrator: []
       tags:
         - Laundries
       parameters:
@@ -1219,9 +1136,6 @@ paths:
       operationId: fetchMachine
       tags:
         - Machines
-      security:
-        - laundryUser: []
-        - administrator: []
       parameters:
         - name: machineId
           in: path
@@ -1247,9 +1161,6 @@ paths:
             $ref: "#/definitions/Error"
     put:
       operationId: updateMachine
-      security:
-        - laundryOwner: []
-        - administrator: []
       tags:
         - Machines
       parameters:
@@ -1289,9 +1200,6 @@ paths:
 
     delete:
       operationId: deleteMachine
-      security:
-        - laundryOwner: []
-        - administrator: []
       tags:
         - Machines
       parameters:
@@ -1324,8 +1232,7 @@ paths:
       tags:
         - Bookings
         - Machines
-      security:
-        - laundryUser: []
+
       parameters:
         - name: machineId
           in: path
@@ -1387,8 +1294,7 @@ paths:
       operationId: createBooking
       tags:
         - Bookings
-      security:
-        - laundryUser: []
+
       parameters:
         - name: machineId
           in: path
@@ -1437,8 +1343,6 @@ paths:
   /bookings/{bookingId}:
     x-swagger-router-controller: bookings
     put:
-      security:
-        - bookingCreator: []
       operationId: updateBooking
       tags:
         - Bookings
@@ -1474,8 +1378,6 @@ paths:
             $ref: "#/definitions/Error"
 
     get:
-      security:
-        - laundryUser: []
       operationId: fetchBooking
       tags:
         - Bookings
@@ -1499,9 +1401,6 @@ paths:
           schema:
             $ref: "#/definitions/Error"
     delete:
-      security:
-        - laundryOwner: []
-        - bookingCreator: []
       operationId: deleteBooking
       tags:
         - Bookings
@@ -1525,8 +1424,6 @@ paths:
   /invites/{inviteId}:
     x-swagger-router-controller: invites
     get:
-      security:
-        - laundryOwner: []
       operationId: fetchInvite
       tags:
         - Invites
@@ -1550,8 +1447,6 @@ paths:
           schema:
             $ref: "#/definitions/Error"
     delete:
-      security:
-        - laundryOwner: []
       operationId: deleteInvite
       tags:
         - Invites

@@ -1,6 +1,6 @@
 // @flow
 
-import * as api from '../../utils/api'
+import * as api from '../helper'
 
 function fetchInviteAsync (req, res) {
   const {invite} = req.subjects

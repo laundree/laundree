@@ -1,6 +1,6 @@
 // @flow
+import { opbeat, trackRelease } from '../opbeat'
 import socketIo from 'socket.io'
-import session from './session'
 import UserHandler from '../handlers/user'
 import LaundryHandler from '../handlers/laundry'
 import MachineHandler from '../handlers/machine'
@@ -8,18 +8,24 @@ import BookingHandler from '../handlers/booking'
 import LaundryInvitationHandler from '../handlers/laundry_invitation'
 import * as error from '../utils/error'
 import Debug from 'debug'
-import { opbeat } from '../lib/opbeat'
 import EventEmitter from 'events'
-import type {Action, ListInvitationsAction, ListLaundriesAction, ListUsersAction, ListMachinesAction, ListBookingsAction} from 'laundree-sdk/lib/redux'
+import type {
+  Action,
+  ListInvitationsAction,
+  ListLaundriesAction,
+  ListUsersAction,
+  ListMachinesAction,
+  ListBookingsAction
+} from 'laundree-sdk/lib/redux'
 
 const debug = Debug('laundree.lib.socket_io')
+
 /**
  * Set up the socket with provided namespaces.
  * @param {Agent} server
  */
 function setupSocket (server: Server) {
   const io = socketIo(server)
-  io.use((socket, next) => session(socket.request, socket.request.res || {}, next))
   setupRedux(io.of('/redux'))
 }
 
@@ -243,7 +249,7 @@ function authenticateSocket (socket): Promise<?UserHandler> {
         return user
       })
   }
-  const currentUserId = socket.request.session.passport ? socket.request.session.passport.user : undefined // Authenticate from session
+  const currentUserId = null
   if (!currentUserId) return Promise.resolve()
   return UserHandler.lib.findFromId(currentUserId)
 }
@@ -262,15 +268,19 @@ function setupRedux (io) {
 function actionListLaundries (laundries: LaundryHandler[]): ListLaundriesAction {
   return {type: 'LIST_LAUNDRIES', payload: laundries.map(l => l.reduxModel())}
 }
+
 function actionListUsers (users: UserHandler[]): ListUsersAction {
   return {type: 'LIST_USERS', payload: users.map(l => l.reduxModel())}
 }
+
 function actionListMachines (machines: MachineHandler[]): ListMachinesAction {
   return {type: 'LIST_MACHINES', payload: machines.map(l => l.reduxModel())}
 }
+
 function actionListBookings (machines: BookingHandler[]): ListBookingsAction {
   return {type: 'LIST_BOOKINGS', payload: machines.map(l => l.reduxModel())}
 }
+
 function actionsListInvites (machines: LaundryInvitationHandler[]): ListInvitationsAction {
   return {type: 'LIST_INVITATIONS', payload: machines.map(l => l.reduxModel())}
 }
@@ -314,3 +324,5 @@ function setupUser (socket, userUpdateEmitter, u: ?UserHandler) {
 }
 
 export default setupSocket
+
+trackRelease()

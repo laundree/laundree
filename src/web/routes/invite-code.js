@@ -1,9 +1,9 @@
 // @flow
 import express from 'express'
 import base64UrlSafe from 'urlsafe-base64'
-import LaundryHandler from '../handlers/laundry'
-import * as error from '../utils/error'
-import type UserHandler from '../handlers/user'
+import LaundryHandler from '../../handlers/laundry'
+import * as error from '../../utils/error'
+import type UserHandler from '../../handlers/user'
 import type {Request} from '../types'
 
 const router = express.Router()

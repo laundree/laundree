@@ -3,7 +3,7 @@ import express from 'express'
 import Debug from 'debug'
 import ical from 'ical-generator'
 import config from 'config'
-import UserHandler from '../handlers/user'
+import UserHandler from '../../handlers/user'
 import type { Request } from '../types'
 import type { EventOption as CalEvent } from 'ical-generator'
 
