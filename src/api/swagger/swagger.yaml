@@ -22,7 +22,7 @@ securityDefinitions:
     type: "oauth2"
 
 security:
-  - auth0: []
+  - jwt: []
 
 paths:
   /users:
@@ -268,6 +268,12 @@ paths:
           required: true
           description: The user to be queried
           type: string
+        - name: body
+          in: body
+          schema:
+            properties:
+              locale:
+                $ref: "#/definitions/locale"
       tags:
         - Users
       responses:
@@ -379,6 +385,8 @@ paths:
             required:
               - email
             properties:
+              locale:
+                $ref: "#/definitions/locale"
               email:
                 type: string
                 format: email
@@ -490,6 +498,8 @@ paths:
         - name: body
           in: body
           schema:
+            required:
+              - name
             properties:
               name:
                 $ref: "#/definitions/name"
@@ -1491,6 +1501,8 @@ paths:
               email:
                 type: string
                 format: email
+              locale:
+                $ref: "#/definitions/locale"
       responses:
         "204":
           description: Success
@@ -1791,6 +1803,11 @@ definitions:
     type: string
     format: password
     pattern: '([a-zA-Z].{5,}|.[a-zA-Z].{4,}|.{2,}[a-zA-Z].{3,}|.{3,}[a-zA-Z].{2,}|.{4,}[a-zA-Z].|.{5,}[a-zA-Z])'
+  locale:
+    type: string
+    enum:
+      - 'en'
+      - 'da'
   uuid:
     type: string
     pattern: '^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})$'

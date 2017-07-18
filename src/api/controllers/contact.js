@@ -2,21 +2,27 @@
 import * as api from '../helper'
 import { sendEmail } from '../../utils/mail'
 import config from 'config'
+import type {LocaleType} from '../../locales'
+import type UserHandler from '../../handlers/user'
+import {StatusError} from '../../utils/error'
 
-async function contactF (req, res) {
-  const {message, subject, email, name} = req.swagger.params.body.value
+async function contactF ({currentUser} : {currentUser?: UserHandler}, params: {message: string, subject: string, name?: string, email?: string, locale?: LocaleType}) {
+  const {message, subject, email, name, locale} = params
   let template, receiver, sender, userId, senderEmail, senderName
-  const user = req.user
-  if (user) {
-    senderEmail = user.model.emails[0]
-    senderName = user.model.displayName
-    sender = `"${user.model.displayName}" <${senderEmail}>`
+  if (currentUser) {
+    senderEmail = currentUser.model.emails[0]
+    senderName = currentUser.model.displayName
+    sender = `"${currentUser.model.displayName}" <${senderEmail}>`
     template = 'support'
     receiver = config.get('emails.support')
-    userId = user.model.id
+    userId = currentUser.model.id
   } else {
-    if (!name) return api.returnError(res, 400, 'Name is required')
-    if (!email) return api.returnError(res, 400, 'E-mail is required')
+    if (!name) {
+      throw new StatusError('Name is required', 400)
+    }
+    if (!email) {
+      throw new StatusError('E-mail is required', 400)
+    }
     senderName = name
     senderEmail = email
     sender = `"${name}" <${email}>`
@@ -29,9 +35,8 @@ async function contactF (req, res) {
     email: senderEmail,
     name: senderName,
     userId
-  }, template, receiver, {locale: req.locale})
-  await sendEmail({message, subject, name: senderName}, 'contact-receipt', sender, {locale: req.locale})
-  api.returnSuccess(res)
+  }, template, receiver, {locale: locale || 'en'})
+  await sendEmail({message, subject, name: senderName}, 'contact-receipt', sender, {locale: locale || 'en'})
 }
 
-export const contact = api.wrapErrorHandler(contactF)
+export const contact = api.wrap(contactF, api.securityNoop)

@@ -5,8 +5,9 @@ import type { LocaleType } from '../locales/index'
 import type { FlashType } from '../utils/flash'
 
 type CustomRequestAddendum = {
-  swagger?: {
-    apiPath: string
+  swagger: {
+    apiPath: string,
+    params: {[string]: {value: *}}
   }
 }
 
