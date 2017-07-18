@@ -23,7 +23,7 @@ function objToMintues ({hour, minute}) {
   return hour * 60 + minute
 }
 
-type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
+export type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
 
 class LaundryHandlerLibrary extends HandlerLibrary {
 

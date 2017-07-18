@@ -1,17 +1,17 @@
 // @flow
 
 import * as api from '../helper'
+import type LaundryInviteHandler from '../../handlers/laundry_invitation'
+import type LaundryHandler from '../../handlers/laundry'
 
-function fetchInviteAsync (req, res) {
-  const {invite} = req.subjects
-  api.returnSuccess(res, invite.toRest())
+async function fetchInviteAsync (subjects: {invite: LaundryInviteHandler}) {
+  return subjects.invite.toRest()
 }
 
-async function deleteInviteAsync (req, res) {
-  const {invite, laundry} = req.subjects
+async function deleteInviteAsync (subjects: {invite: LaundryInviteHandler, laundry: LaundryHandler}) {
+  const {invite, laundry} = subjects
   await laundry.deleteInvite(invite)
-  api.returnSuccess(res)
 }
 
-export const fetchInvite = api.wrapErrorHandler(fetchInviteAsync)
-export const deleteInvite = api.wrapErrorHandler(deleteInviteAsync)
+export const fetchInvite = api.wrap(fetchInviteAsync, api.securityLaundryOwner)
+export const deleteInvite = api.wrap(deleteInviteAsync, api.securityLaundryOwner)

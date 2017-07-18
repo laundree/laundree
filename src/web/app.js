@@ -17,7 +17,6 @@ import handlebarsSetup from './handlebars'
 import type { Response, Request, Application } from './types'
 import setupSass from 'node-sass-middleware'
 import identicon from './identicon'
-import webpack from '../webpack'
 import reactRouter from './routes/react'
 
 const debug = Debug('laundree.app')
@@ -76,7 +75,6 @@ app.use(setupSass({
   indentedSyntax: true,
   sourceMap: true
 }))
-app.use(webpack)
 app.use('/', reactRouter)
 app.get('/err', (req: Request, res, next) => {
   next(new Error('This is a test error'))

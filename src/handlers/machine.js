@@ -2,7 +2,7 @@
 
 import { Handler, HandlerLibrary } from './handler'
 import MachineModel from '../db/models/machine'
-import type { MachineType } from '../db/models/machine'
+import type {MachineType} from '../db/models/machine'
 import BookingHandler from './booking'
 import LaundryHandler from './laundry'
 import type UserHandler from './user'

@@ -2,11 +2,12 @@
 import TokenHandler from '../../handlers/token'
 import UserHandler from '../../handlers/user'
 import * as api from '../helper'
+import {StatusError} from '../../utils/error'
 
-async function listTokensAsync (req, res) {
-  const filter: { owner: *, _id?: * } = {owner: req.user.model._id}
-  const limit = req.swagger.params.page_size.value
-  const since = req.swagger.params.since.value
+async function listTokensAsync ({currentUser}: {currentUser: UserHandler}, params: {page_size: number, since?: string}, req, res) {
+  const filter: { owner: *, _id?: * } = {owner: currentUser.model._id}
+  const limit = params.page_size
+  const since = params.since
   if (since) {
     filter._id = {$gt: since}
   }
@@ -18,7 +19,7 @@ async function listTokensAsync (req, res) {
     links.next = `/api/tokens?since=${tokens[tokens.length - 1].id}&page_size=${limit}`
   }
   res.links(links)
-  res.json(tokens)
+  return tokens
 }
 
 async function _tokenExists (name, user) {
@@ -26,37 +27,40 @@ async function _tokenExists (name, user) {
   return t
 }
 
-async function createTokenAsync (req, res) {
-  const name = req.swagger.params.body.value.name.trim()
-  const t = await _tokenExists(name, req.user)
-  if (t) return api.returnError(res, 409, 'Token already exists', {Location: t.restUrl})
-  const token: TokenHandler = await req.user.generateAuthToken(name)
-  api.returnSuccess(res, token.toSecretRest())
+async function createTokenAsync ({currentUser}: {currentUser: UserHandler}, params: {body: {name: string}}) {
+  const name = params.body.name
+  const t = await _tokenExists(name, currentUser)
+  if (t) {
+    throw new StatusError('Token already exists', 409, {Location: t.restUrl})
+  }
+  const token: TokenHandler = await currentUser.generateAuthToken(name)
+  return token.toSecretRest()
 }
 
-function fetchTokenAsync (req, res) {
-  api.returnSuccess(res, req.subjects.token.toRest())
+async function fetchTokenAsync ({token}: {token: TokenHandler}) {
+  return token.toRest()
 }
 
-async function deleteTokenAsync (req, res) {
-  await req.user.removeAuthToken(req.subjects.token)
-  api.returnSuccess(res)
+async function deleteTokenAsync ({token, currentUser}: {token: TokenHandler, currentUser: UserHandler}) {
+  await currentUser.removeAuthToken(token)
 }
 
-async function createTokenFromEmailPasswordAsync (req, res) {
-  const {email, password, name} = req.swagger.params.body.value
+async function createTokenFromEmailPasswordAsync (subjects, params: {body: {name: string, email: string, password: string}}) {
+  const {email, password, name} = params.body
   const user = await UserHandler.lib.findFromVerifiedEmailAndVerifyPassword(email, password)
   if (!user) {
-    return api.returnError(res, 403, 'Unauthorized')
+    throw new StatusError('Unauthorized', 403)
   }
   const t = await _tokenExists(name, user)
-  if (t) return api.returnError(res, 409, 'Token already exists', {Location: t.restUrl})
+  if (t) {
+    throw new StatusError('Token already exists', 409, {Location: t.restUrl})
+  }
   const token = await user.generateAuthToken(name)
-  api.returnSuccess(res, token.toSecretRest())
+  return token.toSecretRest()
 }
 
-export const createTokenFromEmailPassword = api.wrapErrorHandler(createTokenFromEmailPasswordAsync)
-export const listTokens = api.wrapErrorHandler(listTokensAsync)
-export const createToken = api.wrapErrorHandler(createTokenAsync)
-export const deleteToken = api.wrapErrorHandler(deleteTokenAsync)
-export const fetchToken = api.wrapErrorHandler(fetchTokenAsync)
+export const createTokenFromEmailPassword = api.wrap(createTokenFromEmailPasswordAsync, api.securityNoop)
+export const listTokens = api.wrap(listTokensAsync, api.securityUserAccess)
+export const createToken = api.wrap(createTokenAsync, api.securityUserAccess)
+export const deleteToken = api.wrap(deleteTokenAsync, api.securityTokenOwner)
+export const fetchToken = api.wrap(fetchTokenAsync, api.securityTokenOwner)
