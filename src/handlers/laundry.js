@@ -1,9 +1,9 @@
 // @flow
-import LaundryModel from '../models/laundry'
-import type { LaundryRules } from '../models/laundry'
+import LaundryModel from '../db/models/laundry'
+import type { LaundryRules } from '../db/models/laundry'
 import { Handler, HandlerLibrary } from './handler'
 import UserHandler from './user'
-import type { MachineType } from '../models/machine'
+import type { MachineType } from '../db/models/machine'
 import MachineHandler from './machine'
 import BookingHandler from './booking'
 import LaundryInvitationHandler from './laundry_invitation'

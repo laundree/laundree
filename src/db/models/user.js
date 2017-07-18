@@ -1,7 +1,7 @@
 // @flow
 import mongoose from 'mongoose'
 import type { ObjectId } from 'mongoose'
-import { union } from '../utils/array'
+import { union } from '../../utils/array'
 const Schema = mongoose.Schema
 
 export type UserRole = 'user' | 'admin'

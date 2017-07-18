@@ -1,7 +1,7 @@
 // @flow
 import { createStore } from 'redux'
 import { redux } from 'laundree-sdk'
-import type UserHandler from './handlers/user'
+import type UserHandler from '../handlers/user'
 import type { Flash, Action, ListLaundriesAction } from 'laundree-sdk/lib/redux'
 
 function mapFlash (flashArray, type) {

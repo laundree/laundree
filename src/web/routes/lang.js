@@ -1,8 +1,8 @@
 // @flow
 import express from 'express'
-import {supported} from '../locales'
-import {logError} from '../utils/error'
-import type UserHandler from '../handlers/user'
+import {supported} from '../../locales/index'
+import {logError} from '../../utils/error'
+import type UserHandler from '../../handlers/user'
 import type {Request} from '../types'
 
 const router = express.Router()

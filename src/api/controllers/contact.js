@@ -1,5 +1,5 @@
 // @flow
-import * as api from '../../utils/api'
+import * as api from '../helper'
 import { sendEmail } from '../../utils/mail'
 import config from 'config'
 

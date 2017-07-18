@@ -50,6 +50,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
       domain: 'laundree-test.eu.auth0.com',
       clientID: 'i143cn6TgLjdfpAWc7tRiPFGB1g9ns5Z',
       redirectUri: 'http://localhost:3000/auth',
+      audience: 'https://laundree.io/api',
       responseType: 'token'
     })
     this.webAuth.parseHash((err, authResult) => {
@@ -71,9 +72,11 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     evt.preventDefault()
     this.webAuth.redirect.loginWithCredentials({
       connection: 'Username-Password-Authentication',
-      username: 'testuser',
-      password: 'testpass',
+      username: this.state.values.email,
+      password: this.state.values.password,
       scope: 'openid'
+    }, (err, data) => {
+      console.log(err, data)
     })
   }
 

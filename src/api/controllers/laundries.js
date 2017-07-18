@@ -2,7 +2,7 @@
 
 import LaundryHandler from '../../handlers/laundry'
 import UserHandler from '../../handlers/user'
-import * as api from '../../utils/api'
+import * as api from '../helper'
 import * as mail from '../../utils/mail'
 
 /**

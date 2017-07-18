@@ -1,6 +1,6 @@
 // @flow
-import * as error from './error'
-import type {Response, Request} from '../types'
+import * as error from '../utils/error'
+import type {Response, Request} from './types'
 
 export function generateErrorHandler (res: Response) {
   return (err: Error) => {

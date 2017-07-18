@@ -1,7 +1,7 @@
 // @flow
 import * as regex from '../utils/regex'
 import EventEmitter from 'events'
-import { linkEmitter } from '../lib/redis'
+import { linkEmitter } from '../db/redis'
 import Debug from 'debug'
 import base64UrlSafe from 'urlsafe-base64'
 import type { ObjectId, Model, QueryOptions, QueryConditions } from 'mongoose'

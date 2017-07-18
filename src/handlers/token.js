@@ -2,8 +2,8 @@
 
 import { Handler, HandlerLibrary } from './handler'
 import * as password from '../utils/password'
-import TokenModel from '../models/token'
-import type { TokenType } from '../models/token'
+import TokenModel from '../db/models/token'
+import type { TokenType } from '../db/models/token'
 import UserHandler from './user'
 import type { QueryConditions } from 'mongoose'
 

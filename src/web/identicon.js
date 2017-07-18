@@ -3,7 +3,7 @@ import jdenticon from 'jdenticon'
 import express from 'express'
 import { hash } from '../utils/string'
 import { StatusError } from '../utils/error'
-import type {Request} from '../types'
+import type {Request} from './types'
 const router = express.Router()
 
 router.get('/:id/:size.svg', (req: Request, res, next) => {
