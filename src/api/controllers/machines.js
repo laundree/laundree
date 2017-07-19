@@ -2,17 +2,16 @@
 
 import type {MachineType} from '../../db/models/machine'
 import MachineHandler from '../../handlers/machine'
-import LaundryHandler from '../../handlers/laundry'
 import * as api from '../helper'
 import {StatusError} from '../../utils/Error'
 
-async function listMachinesAsync (subjects: {laundry: LaundryHandler}, params: {page_size: number, since?: string}, req, res) {
+async function listMachinesAsync (subjects, params: {page_size: number, since?: string}, req, res) {
+  const {laundry} = api.assertSubjects({laundry: subjects.laundry})
   const filter = {}
   const {page_size: limit, since} = params
   if (since) {
     filter._id = {$gt: since}
   }
-  const laundry = subjects.laundry
   filter.laundry = laundry.model._id
   const machines = await MachineHandler.lib.find(filter, {limit, sort: {_id: 1}})
   const summarizedMachines = machines.map((machine) => machine.toRestSummary())
@@ -26,7 +25,8 @@ async function listMachinesAsync (subjects: {laundry: LaundryHandler}, params: {
   return summarizedMachines
 }
 
-async function createMachineAsync ({laundry}: {laundry: LaundryHandler}, params: {body: {broken: boolean, type: MachineType, name: string}}) {
+async function createMachineAsync (subjects, params: {body: {broken: boolean, type: MachineType, name: string}}) {
+  const {laundry} = api.assertSubjects({laundry: subjects.laundry})
   const body = params.body
   const name = body.name.trim()
   const type = body.type
@@ -41,15 +41,18 @@ async function createMachineAsync ({laundry}: {laundry: LaundryHandler}, params:
   return machine.toRest()
 }
 
-async function fetchMachineAsync ({machine}: {machine: MachineHandler}) {
+async function fetchMachineAsync (subjects) {
+  const {machine} = api.assertSubjects({machine: subjects.machine})
   return machine.toRest()
 }
 
-async function deleteMachineAsync ({machine, laundry}: {machine: MachineHandler, laundry: LaundryHandler}) {
+async function deleteMachineAsync (subjects) {
+  const {laundry, machine} = api.assertSubjects({laundry: subjects.laundry, machine: subjects.machine})
   await laundry.deleteMachine(machine)
 }
 
-async function updateMachineAsync ({machine, laundry}: {machine: MachineHandler, laundry: LaundryHandler}, params: {body: {broken?: boolean, type?: MachineType, name?: string}}) {
+async function updateMachineAsync (subjects, params: {body: {broken?: boolean, type?: MachineType, name?: string}}) {
+  const {laundry, machine} = api.assertSubjects({laundry: subjects.laundry, machine: subjects.machine})
   const body = params.body
   const name = body.name ? body.name.trim() : undefined
   const type = body.type

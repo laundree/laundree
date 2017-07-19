@@ -6,7 +6,7 @@ import {StatusError} from '../../utils/error'
 import UserHandler from '../../handlers/user'
 import type {LocaleType} from '../../locales'
 
-function getUserF (subjects: {user: UserHandler}, params: {userId: string}) {
+function getUserF (subjects, params: {userId: string}) {
   const user = api.assert(subjects.user)
   return user.toRest()
 }
@@ -44,8 +44,8 @@ async function createUserF (subjects, params: {email: string, displayName: strin
   return newUser.toRest()
 }
 
-async function startPasswordResetF (subjects: {user: UserHandler}, params: {userId: string, body?: {locale?: LocaleType}}) {
-  const {user} = subjects
+async function startPasswordResetF (subjects, params: {userId: string, body?: {locale?: LocaleType}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const token = await user.generateResetToken()
   const locale = (params.body && params.body.locale) || 'en'
   await mail.sendEmail({
@@ -54,8 +54,8 @@ async function startPasswordResetF (subjects: {user: UserHandler}, params: {user
   }, 'password-reset', user.model.emails[0], {locale})
 }
 
-async function passwordResetF (subjects: {user: UserHandler}, params: {userId: string, body: {token: string, password: string}}) {
-  const {user} = subjects
+async function passwordResetF (subjects, params: {userId: string, body: {token: string, password: string}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const {token, password} = params.body
   const result = await user.verifyResetPasswordToken(token)
   if (!result) {
@@ -64,8 +64,8 @@ async function passwordResetF (subjects: {user: UserHandler}, params: {userId: s
   await user.resetPassword(password)
 }
 
-async function startEmailVerificationF (subjects: {user: UserHandler}, params: {userId: string, body: {email: string, locale?: LocaleType}}) {
-  const {user} = subjects
+async function startEmailVerificationF (subjects, params: {userId: string, body: {email: string, locale?: LocaleType}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const email = params.body.email
   const token = await user.generateVerifyEmailToken(email)
   if (!token) {
@@ -80,8 +80,8 @@ async function startEmailVerificationF (subjects: {user: UserHandler}, params: {
   }, 'verify-email', email, {locale})
 }
 
-async function verifyEmailF (subjects: {user: UserHandler}, params: {userId: string, body: {email: string, token: string}}) {
-  const {user} = subjects
+async function verifyEmailF (subjects, params: {userId: string, body: {email: string, token: string}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const {email, token} = params.body
   const result = await user.verifyEmail(email, token)
   if (!result) {
@@ -89,8 +89,8 @@ async function verifyEmailF (subjects: {user: UserHandler}, params: {userId: str
   }
 }
 
-async function deleteUserF (subjects: {user: UserHandler}, params: {userId: string}) {
-  const {user} = subjects
+async function deleteUserF (subjects, params: {userId: string}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const laundries = await user.findOwnedLaundries()
   if (laundries.length) {
     throw new StatusError('Invalid token', 403)
@@ -98,14 +98,15 @@ async function deleteUserF (subjects: {user: UserHandler}, params: {userId: stri
   await user.deleteUser()
 }
 
-async function updateUserF (subjects: {user: UserHandler}, params: {userId: string, body: {name?: string}}) {
-  const {user} = subjects
+async function updateUserF (subjects, params: {userId: string, body: {name?: string}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const {name} = params.body
   if (!name) return
   await user.updateName(name)
 }
 
-async function changeUserPasswordF ({user}: {user: UserHandler}, params: {userId: string, body: {currentPassword: string, newPassword: string}}) {
+async function changeUserPasswordF (subjects, params: {userId: string, body: {currentPassword: string, newPassword: string}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   const {currentPassword, newPassword} = params.body
   let result = true
   if (user.hasPassword()) {
@@ -117,11 +118,13 @@ async function changeUserPasswordF ({user}: {user: UserHandler}, params: {userId
   await user.resetPassword(newPassword)
 }
 
-async function addOneSignalPlayerIdF ({user}: {user: UserHandler}, {body: {playerId}}: {userId: string, body: {playerId: string}}) {
+async function addOneSignalPlayerIdF (subjects: {user: ?UserHandler}, {body: {playerId}}: {userId: string, body: {playerId: string}}) {
+  const {user} = api.assertSubjects({user: subjects.user})
   await user.addOneSignalPlayerId(playerId)
 }
 
-function fetchUserEmailsF ({user}: {user: UserHandler}) {
+function fetchUserEmailsF (subjects) {
+  const {user} = api.assertSubjects({user: subjects.user})
   return user.model.emails
 }
 

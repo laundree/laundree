@@ -1,15 +1,14 @@
 // @flow
 
 import * as api from '../helper'
-import type LaundryInviteHandler from '../../handlers/laundry_invitation'
-import type LaundryHandler from '../../handlers/laundry'
 
-async function fetchInviteAsync (subjects: {invite: LaundryInviteHandler}) {
-  return subjects.invite.toRest()
+async function fetchInviteAsync (subjects) {
+  const {invite} = api.assertSubjects({invite: subjects.invite})
+  return invite.toRest()
 }
 
-async function deleteInviteAsync (subjects: {invite: LaundryInviteHandler, laundry: LaundryHandler}) {
-  const {invite, laundry} = subjects
+async function deleteInviteAsync (subjects) {
+  const {invite, laundry} = api.assertSubjects({invite: subjects.invite, laundry: subjects.laundry})
   await laundry.deleteInvite(invite)
 }
 

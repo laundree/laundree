@@ -325,7 +325,7 @@ export default class LaundryHandler extends Handler {
    * @param {string} email
    * @return {Promise.<{user: UserHandler=, invite: LaundryInvitationHandler=}>}
    */
-  async inviteUserByEmail (email: string): {} | { user: UserHandler } | { invite: LaundryInvitationHandler } {
+  async inviteUserByEmail (email: string): { user?: UserHandler, invite?: LaundryInvitationHandler } {
     const user = await UserHandler.lib.findFromEmail(email)
     if (user) {
       const num = await this.addUser(user)
