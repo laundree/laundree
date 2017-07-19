@@ -14,7 +14,7 @@ async function listMachinesAsync (subjects, params: {page_size: number, since?: 
   }
   filter.laundry = laundry.model._id
   const machines = await MachineHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const summarizedMachines = machines.map((machine) => machine.toRestSummary())
+  const summarizedMachines = machines.map(MachineHandler.restSummary)
   const links: { first: string, next?: string } = {
     first: `/api/laundries/${laundry.model.id}/machines?page_size=${limit}`
   }

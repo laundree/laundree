@@ -61,7 +61,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/UserSummary"
+              $ref: "#/definitions/Summary"
         default:
           description: Error
           schema:
@@ -145,6 +145,8 @@ paths:
           description: New info
           schema:
             properties:
+              locale:
+                $ref: "#/definitions/locale"
               name:
                 $ref: "#/definitions/name"
       tags:
@@ -478,7 +480,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/TokenSummary"
+              $ref: "#/definitions/Summary"
 
         "403":
           description: Unauthorized
@@ -643,7 +645,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/LaundrySummary"
+              $ref: "#/definitions/Summary"
         "400":
           description: Invalid input
           schema:
@@ -868,7 +870,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/MachineSummary"
+              $ref: "#/definitions/Summary"
         "404":
           description: Laundry not found
           schema:
@@ -1285,7 +1287,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/BookingSummary"
+              $ref: "#/definitions/Summary"
         "404":
           description: Machine not found
           schema:
@@ -1555,25 +1557,11 @@ definitions:
       laundries:
         type: array
         items:
-          $ref: "#/definitions/LaundrySummary"
+          $ref: "#/definitions/Summary"
       tokens:
         type: array
         items:
-          $ref: "#/definitions/TokenSummary"
-
-  UserSummary:
-    required:
-      - id
-      - displayName
-      - href
-    properties:
-      id:
-        type: string
-      displayName:
-        type: string
-      href:
-        type: string
-        format: url
+          $ref: "#/definitions/Summary"
 
   Laundry:
     required:
@@ -1592,32 +1580,19 @@ definitions:
       owners:
         type: array
         items:
-          $ref: "#/definitions/UserSummary"
+          $ref: "#/definitions/Summary"
       users:
         type: array
         items:
-          $ref: "#/definitions/UserSummary"
+          $ref: "#/definitions/Summary"
       machines:
         type: array
         items:
-          $ref: "#/definitions/MachineSummary"
+          $ref: "#/definitions/Summary"
       invites:
         type: array
         items:
-          $ref: "#/definitions/InviteSummary"
-  LaundrySummary:
-    required:
-      - id
-      - name
-      - href
-    properties:
-      id:
-        type: string
-      name:
-        type: string
-      href:
-        type: string
-        format: url
+          $ref: "#/definitions/Summary"
 
   Token:
     required:
@@ -1636,7 +1611,7 @@ definitions:
         type: string
         format: date-time
       owner:
-        $ref: "#/definitions/UserSummary"
+        $ref: "#/definitions/Summary"
   TokenWithSecret:
     required:
       - id
@@ -1657,17 +1632,14 @@ definitions:
         type: string
         format: date-time
       owner:
-        $ref: "#/definitions/UserSummary"
+        $ref: "#/definitions/Summary"
 
-  TokenSummary:
+  Summary:
     required:
       - id
-      - name
       - href
     properties:
       id:
-        type: string
-      name:
         type: string
       href:
         type: string
@@ -1688,28 +1660,6 @@ definitions:
         $ref: "#/definitions/Date"
       owner:
         type: string
-
-  BookingSummary:
-    required:
-      - id
-      - href
-    properties:
-      id:
-        type: string
-      href:
-        type: string
-  MachineSummary:
-    required:
-      - id
-      - href
-      - name
-    properties:
-      id:
-        type: string
-      href:
-        type: string
-      name:
-        type: string
   Invite:
     required:
       - id
@@ -1725,20 +1675,7 @@ definitions:
         type: string
         format: email
       laundry:
-        $ref: "#/definitions/LaundrySummary"
-  InviteSummary:
-    required:
-      - id
-      - href
-      - email
-    properties:
-      id:
-        type: string
-      href:
-        type: string
-      email:
-        type: string
-        format: email
+        $ref: "#/definitions/Summary"
   Machine:
     required:
       - id

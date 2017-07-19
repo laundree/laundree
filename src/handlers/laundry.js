@@ -11,10 +11,11 @@ import * as error from '../utils/error'
 import Debug from 'debug'
 import uuid from 'uuid'
 import config from 'config'
+import type { ObjectId } from 'mongoose'
 import moment from 'moment-timezone'
 import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
 import GoogleMapsClient from '@google/maps'
-import type {EventOption as CalEvent} from 'ical-generator'
+import type { EventOption as CalEvent } from 'ical-generator'
 
 const googleMapsClient = GoogleMapsClient.createClient({key: config.get('google.serverApiKey')})
 const debug = Debug('laundree.handlers.laundry')
@@ -88,6 +89,10 @@ class LaundryHandlerLibrary extends HandlerLibrary {
 }
 
 export default class LaundryHandler extends Handler {
+  static restSummary (i: ObjectId | LaundryHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/laundries/' + id}
+  }
   static lib = new LaundryHandlerLibrary()
   lib = LaundryHandler.lib
   restUrl = `/api/laundries/${this.model.id}`
@@ -346,26 +351,16 @@ export default class LaundryHandler extends Handler {
     return invite
   }
 
-  async toRest () {
-    const [owners, users, machines, invites] = await Promise.all([
-      this.fetchOwners(),
-      this.fetchUsers(),
-      this.fetchMachines(),
-      this.fetchInvites()
-    ])
+  toRest () {
     return {
       name: this.model.name,
       id: this.model.id,
       href: this.restUrl,
-      owners: owners.map(o => o.toRestSummary()),
-      users: users.map(u => u.toRestSummary()),
-      machines: machines.map(m => m.toRestSummary()),
-      invites: invites.map(i => i.toRestSummary())
+      owners: this.model.owners.map(UserHandler.restSummary),
+      users: this.model.users.map(UserHandler.restSummary),
+      machines: this.model.machines.map(MachineHandler.restSummary),
+      invites: this.model.invites.map(i => this.model.owners.map(LaundryInvitationHandler.restSummary))
     }
-  }
-
-  toRestSummary () {
-    return {name: this.model.name, id: this.model.id, href: this.restUrl}
   }
 
   timezone () {

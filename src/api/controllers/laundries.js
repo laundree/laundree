@@ -24,7 +24,7 @@ async function listLaundriesAsync (subjects, params: { page_size: number, since?
     filter._id = {$gt: since}
   }
   const laundries = await LaundryHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const summarizedLaundries = laundries.map((laundry) => laundry.toRestSummary())
+  const summarizedLaundries = laundries.map(LaundryHandler.restSummary)
   const links: { first: string, next?: string } = {
     first: `/api/laundries?page_size=${limit}`
   }

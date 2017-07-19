@@ -97,6 +97,11 @@ class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, *> {
 }
 
 export default class BookingHandler extends Handler<BookingModel, Booking> {
+  static restSummary (i: ObjectId | BookingHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/bookings/' + id}
+  }
+
   static lib = new BookingHandlerLibrary()
   lib = BookingHandler.lib
   restUrl: string
@@ -194,10 +199,6 @@ export default class BookingHandler extends Handler<BookingModel, Booking> {
     }
     this.lib.emitEvent('update', this)
     return this
-  }
-
-  toRestSummary () {
-    return {id: this.model.id, href: this.restUrl}
   }
 
   async toRest () {

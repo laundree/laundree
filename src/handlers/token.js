@@ -5,9 +5,10 @@ import * as password from '../utils/password'
 import TokenModel from '../db/models/token'
 import type { TokenType } from '../db/models/token'
 import UserHandler from './user'
-import type { QueryConditions } from 'mongoose'
+import type { QueryConditions, ObjectId } from 'mongoose'
 
 class TokenHandlerLibrary extends HandlerLibrary {
+
   constructor () {
     super(TokenHandler, TokenModel)
   }
@@ -59,6 +60,10 @@ class TokenHandlerLibrary extends HandlerLibrary {
 }
 
 export default class TokenHandler extends Handler<TokenModel, *> {
+  static restSummary (i: ObjectId | TokenHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/tokens/' + id}
+  }
   static lib = new TokenHandlerLibrary()
   lib = TokenHandler.lib
   secret: ?string
@@ -118,14 +123,10 @@ export default class TokenHandler extends Handler<TokenModel, *> {
   }
 
   async toRest (): Promise<{ id: string, name: string, owner: *, href: string }> {
-    const owner = await this.fetchOwner()
-    if (!owner) {
-      throw new Error('Owner not found!')
-    }
     return {
       id: this.model.id,
       name: this.model.name,
-      owner: owner.toRestSummary(),
+      owner: UserHandler.restSummary(this.model.owner),
       href: this.restUrl
     }
   }
@@ -135,7 +136,4 @@ export default class TokenHandler extends Handler<TokenModel, *> {
     return {...obj, secret: this.secret || undefined}
   }
 
-  toRestSummary () {
-    return {id: this.model.id, name: this.model.name, href: this.restUrl}
-  }
 }
