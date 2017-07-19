@@ -1,10 +1,10 @@
 // @flow
 import type { Request as Req, Response as Res, Application as App, Router as R } from 'express'
-import type UserHandler from '../handlers/user'
-import type { LocaleType } from '../locales/index'
-import type { FlashType } from '../utils/flash'
 
 type CustomRequestAddendum = {
+  jwt?: {
+    userId?: string
+  },
   swagger: {
     apiPath: string,
     params: {[string]: {value: *}}

@@ -3,10 +3,9 @@ import * as api from '../helper'
 import { sendEmail } from '../../utils/mail'
 import config from 'config'
 import type {LocaleType} from '../../locales'
-import type UserHandler from '../../handlers/user'
 import {StatusError} from '../../utils/error'
 
-async function contactF ({currentUser} : {currentUser?: UserHandler}, params: {message: string, subject: string, name?: string, email?: string, locale?: LocaleType}) {
+async function contactF ({currentUser}, params: {message: string, subject: string, name?: string, email?: string, locale?: LocaleType}) {
   const {message, subject, email, name, locale} = params
   let template, receiver, sender, userId, senderEmail, senderName
   if (currentUser) {

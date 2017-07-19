@@ -1087,6 +1087,8 @@ paths:
               email:
                 type: string
                 format: email
+              locale:
+                $ref: "#/definitions/locale"
       responses:
         "204":
           description: Success

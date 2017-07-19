@@ -4,7 +4,8 @@ import UserHandler from '../../handlers/user'
 import * as api from '../helper'
 import {StatusError} from '../../utils/error'
 
-async function listTokensAsync ({currentUser}: {currentUser: UserHandler}, params: {page_size: number, since?: string}, req, res) {
+async function listTokensAsync (subjects, params: {page_size: number, since?: string}, req, res) {
+  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
   const filter: { owner: *, _id?: * } = {owner: currentUser.model._id}
   const limit = params.page_size
   const since = params.since
@@ -27,7 +28,8 @@ async function _tokenExists (name, user) {
   return t
 }
 
-async function createTokenAsync ({currentUser}: {currentUser: UserHandler}, params: {body: {name: string}}) {
+async function createTokenAsync (subjects, params: {body: {name: string}}) {
+  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
   const name = params.body.name
   const t = await _tokenExists(name, currentUser)
   if (t) {
@@ -37,11 +39,13 @@ async function createTokenAsync ({currentUser}: {currentUser: UserHandler}, para
   return token.toSecretRest()
 }
 
-async function fetchTokenAsync ({token}: {token: TokenHandler}) {
+async function fetchTokenAsync (subjects) {
+  const {token} = api.assertSubjects({token: subjects.token})
   return token.toRest()
 }
 
-async function deleteTokenAsync ({token, currentUser}: {token: TokenHandler, currentUser: UserHandler}) {
+async function deleteTokenAsync (subs) {
+  const {currentUser, token} = api.assertSubjects({currentUser: subs.currentUser, token: subs.token})
   await currentUser.removeAuthToken(token)
 }
 

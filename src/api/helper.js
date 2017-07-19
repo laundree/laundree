@@ -9,19 +9,6 @@ import BookingHandler from '../handlers/booking'
 import MachineHandler from '../handlers/machine'
 
 /**
- * Return an error.
- * @param res
- * @param {number} statusCode
- * @param {string} message
- * @param {Object=} headers
- */
-export function returnError (res: Response, statusCode: number, message: string, headers: { [string]: string } = {}) {
-  res.status(statusCode)
-  Object.keys(headers).forEach((header) => res.set(header, headers[header]))
-  res.json({message: message})
-}
-
-/**
  * Return success
  * @param res
  * @param {(Promise|Object)=} result
@@ -39,7 +26,8 @@ type Subjects = {
   token: ?TokenHandler,
   invite: ?InviteHandler,
   booking: ?BookingHandler,
-  machine: ?MachineHandler
+  machine: ?MachineHandler,
+  currentUser: ?UserHandler
 }
 
 type Params = { userId?: string, machineId?: string, tokenId?: string, inviteId?: string, laundryId?: string, bookingId?: string }
@@ -54,11 +42,9 @@ async function pullSubject<H: Handler> (id: string, _Handler: Class<H>): Promise
   return instance
 }
 
-async function pullSubjects<P: Params> (params: P): Promise<Subjects> {
-  const tp = {}
-  if (params.userId) {
-    tp.user = params.userId
-  }
+async function pullSubjects<P: Params> (params: P, req: Request): Promise<Subjects> {
+  const currentUserId = (req.jwt && req.jwt.userId) || null
+  const currentUser = await (currentUserId && UserHandler.lib.findFromId(currentUserId))
   const [user, machine, token, invite, laundry, booking] = await Promise.all([
     params.userId ? pullSubject(params.userId, UserHandler) : null,
     params.machineId ? pullSubject(params.machineId, MachineHandler) : null,
@@ -67,50 +53,81 @@ async function pullSubjects<P: Params> (params: P): Promise<Subjects> {
     params.laundryId ? pullSubject(params.laundryId, LaundryHandler) : null,
     params.bookingId ? pullSubject(params.bookingId, BookingHandler) : null
   ])
-  return {user, machine, token, invite, laundry, booking}
+  const fetcherCandidate = machine || invite || booking
+  const newLaundry = (laundry || !fetcherCandidate ? laundry : await fetcherCandidate.fetchLaundry())
+  return {user, machine, token, invite, laundry: newLaundry, booking, currentUser}
 }
 
-export async function securityUserAccess (subjects: Subjects, req: Request): Promise<Subjects> {
-  return subjects
+function testUserAccess (subjects: Subjects): UserHandler {
+  if (!subjects.currentUser) {
+    throw new StatusError('Invalid credentials', 403)
+  }
+  return subjects.currentUser
 }
 
-export async function securitySelf<S: Subjects> (subjects: Subjects, req: Request): Promise<S> {
-  return subjects
+export function securityUserAccess (subjects: Subjects): void {
+  testUserAccess(subjects)
 }
 
-export async function securityTokenOwner (subjects: Subjects, req: Request): Promise<Subjects> {
-  return subjects
+export function securitySelf (subjects: Subjects): void {
+  const currentUser = testUserAccess(subjects)
+  if (!subjects.user || currentUser.model.id !== subjects.user.model.id) {
+    throw new StatusError('Not allowed', 403)
+  }
 }
 
-export async function securityLaundryOwner (subjects: Subjects, req: Request): Promise<Subjects> {
-  return subjects
+export function securityTokenOwner (subjects: Subjects): void {
+  const currentUser = testUserAccess(subjects)
+  if (subjects.token && subjects.token.isOwner(currentUser)) {
+    return
+  }
+  throw new StatusError('Not found', 404)
 }
 
-export async function securityLaundryUser (subjects: Subjects, req: Request): Promise<Subjects> {
-  return subjects
+export function securityLaundryOwner (subjects: Subjects, req: Request): void {
+  const currentUser = testUserAccess(subjects)
+  if (subjects.laundry && subjects.laundry.isOwner(currentUser)) {
+    return
+  }
+  throw new StatusError('Not allowed', 403)
 }
 
-export async function securityBookingCreator (subjects: Subjects, req: Request): Promise<Subjects> {
-  return subjects
+export function securityLaundryUser (subjects: Subjects, req: Request): void {
+  const currentUser = testUserAccess(subjects)
+  if (subjects.laundry && subjects.laundry.isUser(currentUser)) {
+    return
+  }
+  throw new StatusError('Not found', 404)
 }
 
-export async function securityAdministrator<S: Subjects> (subjects: Subjects, req: Request): Promise<S> {
-  return subjects
+export function securityBookingCreator (subjects: Subjects, req: Request): void {
+  const currentUser = testUserAccess(subjects)
+  if (subjects.booking && subjects.booking.isOwner(currentUser)) {
+    return
+  }
+  throw new StatusError('Not found', 404)
 }
 
-export async function securityNoop<S: Subjects> (subjects: Subjects, req: Request): Promise<S> {
-  return subjects
+export function securityAdministrator (subjects: Subjects, req: Request): void {
+  const currentUser = testUserAccess(subjects)
+  if (!currentUser.isAdmin()) {
+    throw new StatusError('Not allowed', 403)
+  }
 }
 
-type Security<S: Subjects> = (s: Subjects, r: Request) => Promise<S>
+export function securityNoop (subjects: Subjects, req: Request): void {
+}
 
-function buildSecurityFunction<S: Subjects, P: Params> (securities: Security<S>[]): (params: P, req: Request) => Promise<S> {
+type Security = (s: Subjects, r: Request) => void
+
+function buildSecurityFunction<P: Params> (securities: Security[]): (params: P, req: Request) => Promise<Subjects> {
   return async (params: P, req: Request) => {
-    const subjects: Subjects = await pullSubjects(params)
+    const subjects: Subjects = await pullSubjects(params, req)
     let firstError
     for (const security of securities) {
       try {
-        return await security(subjects, req)
+        security(subjects, req)
+        return subjects
       } catch (err) {
         if (firstError) continue
         firstError = err
@@ -125,12 +142,12 @@ function parseParams<P: Params> (req: Request): P {
   return Object.keys(params).reduce((o, key) => ({[key]: params[key].value}), {})
 }
 
-export function wrap<C, S1: Subjects, S2: Subjects, P: Params> (func: Middleware<C, S, P>, security: Security<S>, ...securities: Security<S>[]): (req: Request, res: Response) => * {
+export function wrap<C, P: Params> (func: Middleware<C, Subjects, P>, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
   const securityFunction = buildSecurityFunction([security].concat(securities))
   return (req: Request, res: Response) => {
     const params = parseParams(req)
     securityFunction(params, req)
-      .then((subjects: S) => func(subjects, params, req, res))
+      .then((subjects) => func(subjects, params, req, res))
       .then(result => returnSuccess(res, result))
       .catch(err => {
         const status = err.status || 500
@@ -144,4 +161,16 @@ export function wrap<C, S1: Subjects, S2: Subjects, P: Params> (func: Middleware
 export function assert<V> (v: ?V): V {
   if (!v) throw new Error('Failed assertion')
   return v
+}
+
+type Exporter = <A>(?A) => A
+
+export function assertSubjects<O: {}> (o: O): $ObjMap<O, Exporter> {
+  return Object.keys(o).reduce((acc, key) => {
+    const a = o[key]
+    if (a === null) {
+      throw new Error(`Failed assertion. ${key} not available`)
+    }
+    return {...acc, [key]: a}
+  }, {})
 }

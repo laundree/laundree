@@ -1,14 +1,11 @@
 // @flow
 
 import BookingHandler from '../../handlers/booking'
-import type MachineHandler from '../../handlers/machine'
 import * as api from '../helper'
 import type { DateTimeObject } from '../../handlers/laundry'
-import type LaundryHandler from '../../handlers/laundry'
-import type UserHandler from '../../handlers/user'
 import { StatusError } from '../../utils/error'
 
-async function listBookingsAsync (subjects: { machine: MachineHandler }, params: { page_size: number, machineId: string, since?: string, from: number, to: number }, req, res) {
+async function listBookingsAsync (subjects, params: { page_size: number, machineId: string, since?: string, from: number, to: number }, req, res) {
   const {page_size: limit, since, from, to} = params
   const filter: { from: *, to: *, _id?: *, machine?: * } = {
     from: {$gte: from},
@@ -17,7 +14,7 @@ async function listBookingsAsync (subjects: { machine: MachineHandler }, params:
   if (since) {
     filter._id = {$gt: since}
   }
-  const {machine} = subjects
+  const {machine} = api.assertSubjects({machine: subjects.machine})
   filter.machine = machine.model._id
   const bookings = await BookingHandler.lib.find(filter, {limit, sort: {_id: 1}})
   const bookingSummaries = bookings.map(booking => booking.toRestSummary())
@@ -32,8 +29,8 @@ async function listBookingsAsync (subjects: { machine: MachineHandler }, params:
   return bookingSummaries
 }
 
-async function createBookingAsync (subjects: { currentUser: UserHandler, machine: MachineHandler, laundry: LaundryHandler }, params: { machineId: string, body: { from: DateTimeObject, to: DateTimeObject } }) {
-  const {machine, laundry, currentUser} = subjects
+async function createBookingAsync (subjects, params: { machineId: string, body: { from: DateTimeObject, to: DateTimeObject } }) {
+  const {machine, laundry, currentUser} = api.assertSubjects({machine: subjects.machine, currentUser: subjects.currentUser, laundry: subjects.laundry})
   if (machine.model.broken) {
     throw new StatusError('Machine is broken', 400)
   }
@@ -74,15 +71,18 @@ async function createBookingAsync (subjects: { currentUser: UserHandler, machine
   return newBooking.toRest()
 }
 
-function fetchBookingAsync ({booking}: { booking: BookingHandler }) {
+function fetchBookingAsync (subjects) {
+  const {booking} = api.assertSubjects({booking: subjects.booking})
   return booking.toRest()
 }
 
-async function deleteBookingAsync ({booking}: { booking: BookingHandler }) {
+async function deleteBookingAsync (subjects) {
+  const {booking} = api.assertSubjects({booking: subjects.booking})
   await booking.deleteBooking()
 }
 
-async function updateBookingAsync ({booking, laundry, currentUser}: { currentUser: UserHandler, booking: BookingHandler, laundry: LaundryHandler }, params: { bookingId: string, laundryId: string, body: { from?: DateTimeObject, to?: DateTimeObject } }) {
+async function updateBookingAsync (subjects, params: { bookingId: string, laundryId: string, body: { from?: DateTimeObject, to?: DateTimeObject } }) {
+  const {booking, laundry, currentUser} = api.assertSubjects({booking: subjects.booking, currentUser: subjects.currentUser, laundry: subjects.laundry})
   const {from, to} = params.body
   if (!from && !to) {
     return
