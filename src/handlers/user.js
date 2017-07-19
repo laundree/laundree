@@ -13,8 +13,9 @@ import uuid from 'uuid'
 import config from 'config'
 import Debug from 'debug'
 import LaundryHandler from './laundry'
-import type {User} from 'laundree-sdk/lib/redux'
-import type {EventOption as CalEvent} from 'ical-generator'
+import type { User } from 'laundree-sdk/lib/redux'
+import type { EventOption as CalEvent } from 'ical-generator'
+import type { ObjectId } from 'mongoose'
 
 const debug = Debug('laundree.handlers.user')
 
@@ -169,6 +170,7 @@ class UserHandlerLibrary extends HandlerLibrary {
     return {password: token, user, email}
   }
 }
+
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -193,6 +195,11 @@ function displayNameToName (displayName) {
 export default class UserHandler extends Handler<UserModel, User> {
   static lib = new UserHandlerLibrary()
   lib = UserHandler.lib
+
+  static restSummary (i: ObjectId | UserHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/users/' + id}
+  }
 
   updateActions = [
     (user: UserHandler) => {
@@ -407,7 +414,7 @@ export default class UserHandler extends Handler<UserModel, User> {
     return this
   }
 
-  fetchLaundries () : Promise<LaundryHandler[]> {
+  fetchLaundries (): Promise<LaundryHandler[]> {
     return LaundryHandler.lib.find({_id: {$in: this.model.laundries}})
   }
 
@@ -565,26 +572,17 @@ export default class UserHandler extends Handler<UserModel, User> {
   }
 
   toRest () {
-    return this.fetchAuthTokens()
-      .then(tokens => ({
-        id: this.model.id,
-        displayName: this.model.displayName,
-        lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
-        name: {
-          familyName: this.model.name.familyName,
-          givenName: this.model.name.givenName,
-          middleName: this.model.name.middleName
-        },
-        tokens: tokens.map(t => t.toRestSummary()),
-        photo: this.photo() || '',
-        href: this.restUrl
-      }))
-  }
-
-  toRestSummary () {
     return {
       id: this.model.id,
       displayName: this.model.displayName,
+      lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
+      name: {
+        familyName: this.model.name.familyName,
+        givenName: this.model.name.givenName,
+        middleName: this.model.name.middleName
+      },
+      tokens: this.model.tokens.authTokens.map(TokenHandler.restSummary),
+      photo: this.photo() || '',
       href: this.restUrl
     }
   }

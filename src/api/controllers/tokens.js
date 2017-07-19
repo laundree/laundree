@@ -12,7 +12,7 @@ async function listTokensAsync (subjects, params: {page_size: number, since?: st
   if (since) {
     filter._id = {$gt: since}
   }
-  const tokens = (await TokenHandler.lib.find(filter, {limit, sort: {_id: 1}})).map((token) => token.toRestSummary())
+  const tokens = (await TokenHandler.lib.find(filter, {limit, sort: {_id: 1}})).map(TokenHandler.restSummary)
   const links: { first: string, next?: string } = {
     first: `/api/tokens?page_size=${limit}`
   }

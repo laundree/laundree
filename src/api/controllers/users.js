@@ -23,7 +23,7 @@ async function listUsersF (subjects, params: {email?: string, page_size: number,
     filter._id = {$gt: since}
   }
   const users = await UserHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const restUsers = users.map(u => u.toRestSummary())
+  const restUsers = users.map(UserHandler.restSummary)
   const links: { first: string, next?: string } = {
     first: `/api/users?page_size=${limit}`
   }

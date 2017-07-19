@@ -13,11 +13,17 @@ import config from 'config'
 import compression from 'compression'
 import Debug from 'debug'
 import sessionSetup from './session'
+import passportSetup from './passport'
 import handlebarsSetup from './handlebars'
 import type { Response, Request, Application } from './types'
 import setupSass from 'node-sass-middleware'
-import identicon from './identicon'
+import identicon from './routes/identicon'
 import reactRouter from './routes/react'
+import logoutRoute from './routes/logout'
+import authRoute from './routes/auth'
+import calendarRoute from './routes/calendar'
+import inviteCodeRoute from './routes/invite-code'
+import langRoute from './routes/lang'
 
 const debug = Debug('laundree.app')
 
@@ -50,6 +56,9 @@ app.get('/robots.txt', (req: Request, res: Response) => {
 // SETUP SESSION
 app.use(sessionSetup)
 
+// SETUP PASSPORT
+passportSetup(app)
+
 // SETUP LOCALE
 app.use(locale(supported))
 app.use((req: Request, res: Response, next) => {
@@ -75,6 +84,11 @@ app.use(setupSass({
   indentedSyntax: true,
   sourceMap: true
 }))
+app.use('/logout', logoutRoute)
+app.use('/auth', authRoute)
+app.use('/calendar', calendarRoute)
+app.use('/s', inviteCodeRoute)
+app.use('/lang', langRoute)
 app.use('/', reactRouter)
 app.get('/err', (req: Request, res, next) => {
   next(new Error('This is a test error'))
