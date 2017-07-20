@@ -1,6 +1,7 @@
 // @flow
 import { StatusError, logError } from '../utils/error'
-import type { Response, Request } from './types'
+import type { Response, Request, ParsedParams } from './types'
+import { parseParams } from './types'
 import UserHandler from '../handlers/user'
 import LaundryHandler from '../handlers/laundry'
 import TokenHandler from '../handlers/token'
@@ -30,9 +31,7 @@ type Subjects = {
   currentUser: ?UserHandler
 }
 
-type Params = { userId?: string, machineId?: string, tokenId?: string, inviteId?: string, laundryId?: string, bookingId?: string }
-
-type Middleware<C, S: Subjects, P: Params> = (subjects: S, p: P, req: Request, res: Response) => Promise<C>
+type Middleware<C> = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<C>
 
 type Handler = UserHandler | LaundryHandler | TokenHandler | MachineHandler | BookingHandler | InviteHandler
 
@@ -42,7 +41,7 @@ async function pullSubject<H: Handler> (id: string, _Handler: Class<H>): Promise
   return instance
 }
 
-async function pullSubjects<P: Params> (params: P, req: Request): Promise<Subjects> {
+async function pullSubjects (params: ParsedParams, req: Request): Promise<Subjects> {
   const currentUserId = (req.jwt && req.jwt.userId) || null
   const currentUser = await (currentUserId && UserHandler.lib.findFromId(currentUserId))
   const [user, machine, token, invite, laundry, booking] = await Promise.all([
@@ -120,8 +119,8 @@ export function securityNoop (subjects: Subjects, req: Request): void {
 
 type Security = (s: Subjects, r: Request) => void
 
-function buildSecurityFunction<P: Params> (securities: Security[]): (params: P, req: Request) => Promise<Subjects> {
-  return async (params: P, req: Request) => {
+function buildSecurityFunction (securities: Security[]): (params: ParsedParams, req: Request) => Promise<Subjects> {
+  return async (params: ParsedParams, req: Request) => {
     const subjects: Subjects = await pullSubjects(params, req)
     let firstError
     for (const security of securities) {
@@ -137,15 +136,10 @@ function buildSecurityFunction<P: Params> (securities: Security[]): (params: P, 
   }
 }
 
-function parseParams<P: Params> (req: Request): P {
-  const params = req.swagger
-  return Object.keys(params).reduce((o, key) => ({[key]: params[key].value}), {})
-}
-
-export function wrap<C, P: Params> (func: Middleware<C, Subjects, P>, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
+export function wrap<C> (func: Middleware<C>, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
   const securityFunction = buildSecurityFunction([security].concat(securities))
   return (req: Request, res: Response) => {
-    const params = parseParams(req)
+    const params: ParsedParams = parseParams(req.swagger.params)
     securityFunction(params, req)
       .then((subjects) => func(subjects, params, req, res))
       .then(result => returnSuccess(res, result))

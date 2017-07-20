@@ -2,11 +2,11 @@
 
 import BookingHandler from '../../handlers/booking'
 import * as api from '../helper'
-import type { DateTimeObject } from '../../handlers/laundry'
 import { StatusError } from '../../utils/error'
 
-async function listBookingsAsync (subjects, params: { page_size: number, machineId: string, since?: string, from: number, to: number }, req, res) {
-  const {page_size: limit, since, from, to} = params
+async function listBookingsAsync (subjects, params, req, res) {
+  const {limit, from, to} = api.assertSubjects({limit: params.page_size, from: params.from, to: params.to})
+  const {since} = params
   const filter: { from: *, to: *, _id?: *, machine?: * } = {
     from: {$gte: from},
     to: {$lt: to}
@@ -29,12 +29,18 @@ async function listBookingsAsync (subjects, params: { page_size: number, machine
   return bookingSummaries
 }
 
-async function createBookingAsync (subjects, params: { machineId: string, body: { from: DateTimeObject, to: DateTimeObject } }) {
-  const {machine, laundry, currentUser} = api.assertSubjects({machine: subjects.machine, currentUser: subjects.currentUser, laundry: subjects.laundry})
+async function createBookingAsync (subjects, params) {
+  const {machine, laundry, currentUser, createBookingBody} = api
+    .assertSubjects({
+      machine: subjects.machine,
+      currentUser: subjects.currentUser,
+      laundry: subjects.laundry,
+      createBookingBody: params.createBookingBody
+    })
   if (machine.model.broken) {
     throw new StatusError('Machine is broken', 400)
   }
-  const {from, to} = params.body
+  const {from, to} = createBookingBody
   if (!laundry.validateDateObject(from) || !laundry.validateDateObject(to)) {
     throw new StatusError('Invalid date', 400)
   }
@@ -81,9 +87,15 @@ async function deleteBookingAsync (subjects) {
   await booking.deleteBooking()
 }
 
-async function updateBookingAsync (subjects, params: { bookingId: string, laundryId: string, body: { from?: DateTimeObject, to?: DateTimeObject } }) {
-  const {booking, laundry, currentUser} = api.assertSubjects({booking: subjects.booking, currentUser: subjects.currentUser, laundry: subjects.laundry})
-  const {from, to} = params.body
+async function updateBookingAsync (subjects, params) {
+  const {booking, laundry, currentUser, updateBookingBody} = api
+    .assertSubjects({
+      booking: subjects.booking,
+      currentUser: subjects.currentUser,
+      laundry: subjects.laundry,
+      updateBookingBody: params.updateBookingBody
+    })
+  const {from, to} = updateBookingBody
   if (!from && !to) {
     return
   }

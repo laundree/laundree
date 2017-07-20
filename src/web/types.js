@@ -1,17 +1,18 @@
 // @flow
 import type { Request as Req, Response as Res, Application as App, Router as R } from 'express'
-import type UserHandler from '../handlers/user'
 import type { LocaleType } from '../locales/index'
 import type { FlashType } from '../utils/flash'
 
 type CustomRequestAddendum = {
   locale?: LocaleType,
+  user?: *, // TODO remove
   session: {
     returningUser?: boolean,
     to?: string,
     errorTo?: string,
     locale?: LocaleType
   },
+  logout: () => void,
   flash: (type: 'success' | 'error', type: ?FlashType) => string[]
 }
 

@@ -7,42 +7,12 @@ import swaggerTools from 'swagger-tools'
 import { logError, StatusError } from '../utils/error'
 import express from 'express'
 import type { Application, Request } from './types'
-import jwksRsa from 'jwks-rsa'
-import jwt from 'jsonwebtoken'
 import Debug from 'debug'
+
 connectMongoose()
 const debug = Debug('laundree:api.app')
 
 const app: Application = express()
-
-const rsaClient = jwksRsa({
-  cache: true,
-  jwksUri: 'https://laundree-test.eu.auth0.com/.well-known/jwks.json' // TODO change
-})
-
-const audience = 'https://laundree.io/api'
-
-function decodeToken (token) {
-  return jwt.decode(token, {complete: true})
-}
-
-function fetchSigningKey (kid) {
-  return new Promise((resolve, reject) => {
-    rsaClient.getSigningKey(kid, (err, key) => {
-      if (err) return reject(err)
-      resolve(key.publicKey || key.rsaPublicKey)
-    })
-  })
-}
-
-function verifyJwt (token, key) {
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, key, {audience}, (err, decoded) => {
-      if (err) reject(err)
-      else resolve(decoded)
-    })
-  })
-}
 
 async function auth0 (req, authOrSecDef, scopesOrApiKey, callback) {
   const authHeader = req.header('authorization')
@@ -54,12 +24,7 @@ async function auth0 (req, authOrSecDef, scopesOrApiKey, callback) {
     return
   }
   try {
-    const decoded = decodeToken(token)
     debug('Decoded successfully')
-    const k = await fetchSigningKey(decoded.header.kid)
-    debug('Fetched signing key successfully')
-    req.jwt = await verifyJwt(token, k)
-    debug('Verified successfully')
     callback()
   } catch (err) {
     debug('Failed verification with error  %s', err)

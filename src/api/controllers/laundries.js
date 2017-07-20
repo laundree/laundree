@@ -5,20 +5,19 @@ import UserHandler from '../../handlers/user'
 import * as api from '../helper'
 import * as mail from '../../utils/mail'
 import { StatusError, logError } from '../../utils/error'
-import type { LocaleType } from '../../locales'
 
 /**
  * Created by budde on 02/06/16.
  */
 
-async function listLaundriesAsync (subjects, params: { page_size: number, since?: string }, req, res) {
-  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
+async function listLaundriesAsync (subjects, params, req, res) {
+  const {currentUser, limit} = api.assertSubjects({currentUser: subjects.currentUser, limit: params.page_size})
   const filter = {}
   if (!currentUser.isAdmin()) {
     filter.users = currentUser.model._id
   }
 
-  const {page_size: limit, since} = params
+  const {since} = params
 
   if (since) {
     filter._id = {$gt: since}
@@ -35,9 +34,9 @@ async function listLaundriesAsync (subjects, params: { page_size: number, since?
   return summarizedLaundries
 }
 
-async function createLaundryAsync (subjects, params: { body: { name: string, googlePlaceId: string } }) {
-  const {name, googlePlaceId} = params.body
-  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
+async function createLaundryAsync (subjects, params) {
+  const {currentUser, createLaundryBody} = api.assertSubjects({createLaundryBody: params.createLaundryBody, currentUser: subjects.currentUser})
+  const {name, googlePlaceId} = createLaundryBody
   if (currentUser.isDemo()) {
     throw new StatusError('Not allowed', 403)
   }
@@ -117,24 +116,9 @@ function validateRules (body) {
   throw new StatusError('From must be before to', 400)
 }
 
-type UpdateParams = {
-  body: {
-    name?: string,
-    googlePlaceId?: string,
-    rules?: {
-      limit?: number,
-      dailyLimit?: number,
-      timeLimit?: {
-        from: { hour: number, minute: number },
-        to: { hour: number, minute: number }
-      }
-    }
-  }
-}
-
-async function updateLaundryAsync (subs, params: UpdateParams) {
-  const {laundry} = api.assertSubjects({laundry: subs.laundry})
-  const body = sanitizeBody(params.body)
+async function updateLaundryAsync (subs, params) {
+  const {updateLaundryBody, laundry} = api.assertSubjects({laundry: subs.laundry, updateLaundryBody: params.updateLaundryBody})
+  const body = sanitizeBody(updateLaundryBody)
   validateRules(body)
   await validateLaundryName(laundry, body)
   const timezone = await validateGooglePlaceId(laundry, body)
@@ -155,10 +139,10 @@ async function deleteLaundryAsync (subs) {
   await laundry.deleteLaundry()
 }
 
-async function inviteUserByEmailAsync (subs, params: { body: { email: string, locale?: LocaleType } }) {
-  const {laundry} = api.assertSubjects({laundry: subs.laundry})
-  const email = params.body.email
-  const locale = params.body.locale || 'en'
+async function inviteUserByEmailAsync (subs, params) {
+  const {laundry, inviteUserByEmailBody} = api.assertSubjects({laundry: subs.laundry, inviteUserByEmailBody: params.inviteUserByEmailBody})
+  const email = inviteUserByEmailBody.email
+  const locale = inviteUserByEmailBody.locale || 'en'
   if (laundry.isDemo()) {
     throw new StatusError('Not allowed', 403)
   }
@@ -223,9 +207,9 @@ async function removeOwnerAsync (subs) {
   await laundry.removeOwner(user)
 }
 
-async function addUserFromCodeAsync (subs, params: { body: { key: string } }) {
-  const {laundry, currentUser} = api.assertSubjects({laundry: subs.laundry, currentUser: subs.currentUser})
-  const {key} = params.body
+async function addUserFromCodeAsync (subs, params) {
+  const {addUserFromCodeBody, laundry, currentUser} = api.assertSubjects({addUserFromCodeBody: params.addUserFromCodeBody, laundry: subs.laundry, currentUser: subs.currentUser})
+  const {key} = addUserFromCodeBody
   const result = await laundry.verifyInviteCode(key)
   if (!result) {
     throw new StatusError('Invalid key', 400)
