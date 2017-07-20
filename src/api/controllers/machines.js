@@ -1,14 +1,13 @@
 // @flow
 
-import type {MachineType} from '../../db/models/machine'
 import MachineHandler from '../../handlers/machine'
 import * as api from '../helper'
 import {StatusError} from '../../utils/Error'
 
-async function listMachinesAsync (subjects, params: {page_size: number, since?: string}, req, res) {
-  const {laundry} = api.assertSubjects({laundry: subjects.laundry})
+async function listMachinesAsync (subjects, params, req, res) {
+  const {laundry, limit} = api.assertSubjects({laundry: subjects.laundry, limit: params.page_size})
   const filter = {}
-  const {page_size: limit, since} = params
+  const {since} = params
   if (since) {
     filter._id = {$gt: since}
   }
@@ -25,9 +24,9 @@ async function listMachinesAsync (subjects, params: {page_size: number, since?: 
   return summarizedMachines
 }
 
-async function createMachineAsync (subjects, params: {body: {broken: boolean, type: MachineType, name: string}}) {
-  const {laundry} = api.assertSubjects({laundry: subjects.laundry})
-  const body = params.body
+async function createMachineAsync (subjects, params) {
+  const {laundry, createMachineBody} = api.assertSubjects({laundry: subjects.laundry, createMachineBody: params.createMachineBody})
+  const body = createMachineBody
   const name = body.name.trim()
   const type = body.type
   const broken = body.broken
@@ -51,9 +50,9 @@ async function deleteMachineAsync (subjects) {
   await laundry.deleteMachine(machine)
 }
 
-async function updateMachineAsync (subjects, params: {body: {broken?: boolean, type?: MachineType, name?: string}}) {
-  const {laundry, machine} = api.assertSubjects({laundry: subjects.laundry, machine: subjects.machine})
-  const body = params.body
+async function updateMachineAsync (subjects, params) {
+  const {updateMachineBody, laundry, machine} = api.assertSubjects({updateMachineBody: params.updateMachineBody, laundry: subjects.laundry, machine: subjects.machine})
+  const body = updateMachineBody
   const name = body.name ? body.name.trim() : undefined
   const type = body.type
   const broken = body.broken

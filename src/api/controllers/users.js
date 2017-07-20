@@ -2,19 +2,18 @@
 
 import * as api from '../helper'
 import * as mail from '../../utils/mail'
-import {StatusError} from '../../utils/error'
+import { StatusError } from '../../utils/error'
 import UserHandler from '../../handlers/user'
-import type {LocaleType} from '../../locales'
 
-function getUserF (subjects, params: {userId: string}) {
+function getUserF (subjects) {
   const user = api.assert(subjects.user)
   return user.toRest()
 }
 
-async function listUsersF (subjects, params: {email?: string, page_size: number, since?: string}, req, res) {
+async function listUsersF (subjects, params, req, res) {
+  const {limit} = api.assertSubjects({limit: params.page_size})
   const filter = {}
   const email = params.email
-  const limit = params.page_size
   if (email) {
     filter['profiles.emails.value'] = email.toLowerCase()
   }
@@ -34,8 +33,12 @@ async function listUsersF (subjects, params: {email?: string, page_size: number,
   return restUsers
 }
 
-async function createUserF (subjects, params: {email: string, displayName: string, password: string}) {
-  const {email, displayName, password} = params
+async function createUserF (subjects, p) {
+  const {email, displayName, password} = api.assertSubjects({
+    email: p.email,
+    displayName: p.displayName,
+    password: p.password
+  })
   const user = await UserHandler.lib.findFromEmail(email)
   if (user) {
     throw new StatusError('Email address already exists.', 409, {Location: user.restUrl})
@@ -44,19 +47,22 @@ async function createUserF (subjects, params: {email: string, displayName: strin
   return newUser.toRest()
 }
 
-async function startPasswordResetF (subjects, params: {userId: string, body?: {locale?: LocaleType}}) {
+async function startPasswordResetF (subjects, params) {
   const {user} = api.assertSubjects({user: subjects.user})
   const token = await user.generateResetToken()
-  const locale = (params.body && params.body.locale) || 'en'
+  const locale = (params.startPasswordResetBody && params.startPasswordResetBody.locale) || 'en'
   await mail.sendEmail({
     user: {id: user.model.id, displayName: user.model.displayName},
     token: token.secret
   }, 'password-reset', user.model.emails[0], {locale})
 }
 
-async function passwordResetF (subjects, params: {userId: string, body: {token: string, password: string}}) {
-  const {user} = api.assertSubjects({user: subjects.user})
-  const {token, password} = params.body
+async function passwordResetF (subjects, params) {
+  const {user, passwordResetBody} = api.assertSubjects({
+    user: subjects.user,
+    passwordResetBody: params.passwordResetBody
+  })
+  const {token, password} = passwordResetBody
   const result = await user.verifyResetPasswordToken(token)
   if (!result) {
     throw new StatusError('Invalid token', 400)
@@ -64,14 +70,17 @@ async function passwordResetF (subjects, params: {userId: string, body: {token: 
   await user.resetPassword(password)
 }
 
-async function startEmailVerificationF (subjects, params: {userId: string, body: {email: string, locale?: LocaleType}}) {
-  const {user} = api.assertSubjects({user: subjects.user})
-  const email = params.body.email
+async function startEmailVerificationF (subjects, params) {
+  const {user, startEmailVerificationBody} = api.assertSubjects({
+    user: subjects.user,
+    startEmailVerificationBody: params.startEmailVerificationBody
+  })
+  const email = startEmailVerificationBody.email
   const token = await user.generateVerifyEmailToken(email)
   if (!token) {
     throw new StatusError('Invalid token', 400)
   }
-  const locale = params.body.locale || 'en'
+  const locale = startEmailVerificationBody.locale || 'en'
   await mail.sendEmail({
     email: email,
     emailEncoded: encodeURIComponent(email),
@@ -80,16 +89,16 @@ async function startEmailVerificationF (subjects, params: {userId: string, body:
   }, 'verify-email', email, {locale})
 }
 
-async function verifyEmailF (subjects, params: {userId: string, body: {email: string, token: string}}) {
-  const {user} = api.assertSubjects({user: subjects.user})
-  const {email, token} = params.body
+async function verifyEmailF (subjects, params) {
+  const {user, verifyEmailBody} = api.assertSubjects({user: subjects.user, verifyEmailBody: params.verifyEmailBody})
+  const {email, token} = verifyEmailBody
   const result = await user.verifyEmail(email, token)
   if (!result) {
     throw new StatusError('Invalid token', 400)
   }
 }
 
-async function deleteUserF (subjects, params: {userId: string}) {
+async function deleteUserF (subjects) {
   const {user} = api.assertSubjects({user: subjects.user})
   const laundries = await user.findOwnedLaundries()
   if (laundries.length) {
@@ -98,16 +107,19 @@ async function deleteUserF (subjects, params: {userId: string}) {
   await user.deleteUser()
 }
 
-async function updateUserF (subjects, params: {userId: string, body: {name?: string}}) {
-  const {user} = api.assertSubjects({user: subjects.user})
-  const {name} = params.body
+async function updateUserF (subjects, params) {
+  const {user, updateUserBody} = api.assertSubjects({user: subjects.user, updateUserBody: params.updateUserBody})
+  const {name} = updateUserBody
   if (!name) return
   await user.updateName(name)
 }
 
-async function changeUserPasswordF (subjects, params: {userId: string, body: {currentPassword: string, newPassword: string}}) {
-  const {user} = api.assertSubjects({user: subjects.user})
-  const {currentPassword, newPassword} = params.body
+async function changeUserPasswordF (subjects, params) {
+  const {user, changeUserPasswordBody} = api.assertSubjects({
+    user: subjects.user,
+    changeUserPasswordBody: params.changeUserPasswordBody
+  })
+  const {currentPassword, newPassword} = changeUserPasswordBody
   let result = true
   if (user.hasPassword()) {
     result = await user.verifyPassword(currentPassword)
@@ -118,9 +130,12 @@ async function changeUserPasswordF (subjects, params: {userId: string, body: {cu
   await user.resetPassword(newPassword)
 }
 
-async function addOneSignalPlayerIdF (subjects: {user: ?UserHandler}, {body: {playerId}}: {userId: string, body: {playerId: string}}) {
-  const {user} = api.assertSubjects({user: subjects.user})
-  await user.addOneSignalPlayerId(playerId)
+async function addOneSignalPlayerIdF (subjects, p) {
+  const {user, addOneSignalPlayerIdBody} = api.assertSubjects({
+    user: subjects.user,
+    addOneSignalPlayerIdBody: p.addOneSignalPlayerIdBody
+  })
+  await user.addOneSignalPlayerId(addOneSignalPlayerIdBody.playerId)
 }
 
 function fetchUserEmailsF (subjects) {

@@ -70,7 +70,7 @@ paths:
       description: Create a new user.
       operationId: createUser
       parameters:
-        - name: body
+        - name: createUserBody
           in: body
           required: true
           schema:
@@ -140,7 +140,7 @@ paths:
           description: The user to be updated
           required: true
           type: string
-        - name: body
+        - name: updateUserBody
           in: body
           description: New info
           schema:
@@ -232,7 +232,7 @@ paths:
           required: true
           description: The user to be queried
           type: string
-        - name: body
+        - name: addOneSignalPlayerIdBody
           in: body
           required: true
           schema:
@@ -270,7 +270,7 @@ paths:
           required: true
           description: The user to be queried
           type: string
-        - name: body
+        - name: startPasswordResetBody
           in: body
           schema:
             properties:
@@ -300,7 +300,7 @@ paths:
           required: true
           description: The user to be queried
           type: string
-        - name: body
+        - name: passwordResetBody
           in: body
           required: true
           schema:
@@ -342,7 +342,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: body
+        - name: changeUserPasswordBody
           in: body
           required: true
           schema:
@@ -380,7 +380,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: body
+        - name: startEmailVerificationBody
           in: body
           required: true
           schema:
@@ -419,7 +419,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: body
+        - name: verifyEmailBody
           in: body
           required: true
           schema:
@@ -497,7 +497,7 @@ paths:
       tags:
         - Tokens
       parameters:
-        - name: body
+        - name: createTokenBody
           in: body
           schema:
             required:
@@ -529,7 +529,7 @@ paths:
       tags:
         - Tokens
       parameters:
-        - name: body
+        - name: createTokenFromEmailPasswordBody
           in: body
           schema:
             required:
@@ -665,7 +665,7 @@ paths:
       description: Create a laundry
       operationId: createLaundry
       parameters:
-        - name: body
+        - name: createLaundryBody
           in: body
           schema:
             required:
@@ -734,7 +734,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: body
+        - name: updateLaundryBody
           in: body
           required: true
           schema:
@@ -894,7 +894,7 @@ paths:
           required: true
           type: string
           description: Machine id
-        - name: body
+        - name: createMachineBody
           in: body
           required: true
           schema:
@@ -1008,7 +1008,7 @@ paths:
           required: true
           type: string
           description: Machine id
-        - name: body
+        - name: addUserFromCodeBody
           in: body
           required: true
           schema:
@@ -1079,7 +1079,7 @@ paths:
           required: true
           type: string
           description: Machine id
-        - name: body
+        - name: inviteUserByEmailBody
           in: body
           required: true
           schema:
@@ -1183,7 +1183,7 @@ paths:
           required: true
           type: string
           description: Machine id
-        - name: body
+        - name: updateMachineBody
           in: body
           required: true
           schema:
@@ -1315,7 +1315,7 @@ paths:
           required: true
           type: string
           description: Machine id
-        - name: body
+        - name: createBookingBody
           in: body
           required: true
           schema:
@@ -1366,7 +1366,7 @@ paths:
           required: true
           type: string
           description: Booking id
-        - name: body
+        - name: updateBookingBody
           in: body
           required: true
           schema:
@@ -1488,7 +1488,7 @@ paths:
       tags:
         - Contact
       parameters:
-        - name: body
+        - name: contactBody
           in: body
           required: true
           schema:
