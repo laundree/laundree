@@ -33,6 +33,33 @@ async function listUsersF (subjects, params, req, res) {
   return restUsers
 }
 
+async function createUserFromProfileF (s, p) { // TODO test
+  const {createUserFromProfileBody} = api.assertSubjects({
+    createUserFromProfileBody: p.createUserFromProfileBody
+  })
+  const user = UserHandler.lib.findOrCreateFromProfile(createUserFromProfileBody)
+  return user.toRest()
+}
+
+async function validateCredentialsF (s, p) { // TODO test
+  const {validateCredentialsBody} = api.assertSubjects({
+    validateCredentialsBody: p.validateCredentialsBody
+  })
+  const {email, password} = validateCredentialsBody
+  const user = await UserHandler.lib.findFromEmail(email)
+  if (!user) {
+    throw new StatusError('User not found', 404)
+  }
+  const validPassword = await user.verifyPassword(password)
+  if (!validPassword) {
+    throw new StatusError('User not found', 404)
+  }
+  return {
+    userId: user.id,
+    emailVerified: user.isVerified(email)
+  }
+}
+
 async function createUserF (subjects, p) {
   const {email, displayName, password} = api.assertSubjects({
     email: p.email,
@@ -155,4 +182,6 @@ export const updateUser = api.wrap(updateUserF, api.securitySelf, api.securityAd
 export const changeUserPassword = api.wrap(changeUserPasswordF, api.securitySelf)
 export const fetchUserEmails = api.wrap(fetchUserEmailsF, api.securitySelf, api.securityAdministrator)
 export const addOneSignalPlayerId = api.wrap(addOneSignalPlayerIdF, api.securitySelf)
+export const createUserFromProfile = api.wrap(createUserFromProfileF, api.securityWebApplication)
+export const validateCredentials = api.wrap(validateCredentialsF, api.securityWebApplication)
 

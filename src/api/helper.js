@@ -68,6 +68,10 @@ export function securityUserAccess (subjects: Subjects): void {
   testUserAccess(subjects)
 }
 
+export function securityWebApplication () {
+  // TODO implement
+}
+
 export function securitySelf (subjects: Subjects): void {
   const currentUser = testUserAccess(subjects)
   if (!subjects.user || currentUser.model.id !== subjects.user.model.id) {
