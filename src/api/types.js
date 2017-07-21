@@ -3,6 +3,7 @@ import type { Request as Req, Response as Res, Application as App, Router as R }
 import type { DateTimeObject } from '../handlers/laundry'
 import type { LocaleType } from '../locales'
 import type { MachineType } from '../db/models/machine'
+import type {Profile} from '../db/models/user'
 
 type Param<T> = { value: T }
 
@@ -53,6 +54,8 @@ export type ChangeUserPasswordBody = { currentPassword: string, newPassword: str
 
 export type AddOneSignalPlayerIdBody = { playerId: string }
 
+export type ValidateCredentialsBody = {email: string, password: string}
+
 export type Params = {
   page_size?: Param<number>,
   userId?: Param<string>,
@@ -84,7 +87,9 @@ export type Params = {
   verifyEmailBody?: Param<VerifyEmailBody>,
   updateUserBody?: Param<UpdateUserBody>,
   changeUserPasswordBody?: Param<ChangeUserPasswordBody>,
-  addOneSignalPlayerIdBody?: Param<AddOneSignalPlayerIdBody>
+  addOneSignalPlayerIdBody?: Param<AddOneSignalPlayerIdBody>,
+  validateCredentialsBody?: Param<ValidateCredentialsBody>,
+  createUserFromProfileBody?: Param<Profile>
 }
 
 export type ParsedParams = {
@@ -118,7 +123,9 @@ export type ParsedParams = {
   verifyEmailBody?: VerifyEmailBody,
   updateUserBody?: UpdateUserBody,
   changeUserPasswordBody?: ChangeUserPasswordBody,
-  addOneSignalPlayerIdBody?: AddOneSignalPlayerIdBody
+  addOneSignalPlayerIdBody?: AddOneSignalPlayerIdBody,
+  validateCredentialsBody?: ValidateCredentialsBody,
+  createUserFromProfileBody?: Profile
 }
 
 type CustomRequestAddendum = {

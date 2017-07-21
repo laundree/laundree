@@ -101,6 +101,109 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /users/profile:
+    x-swagger-router-controller: users
+    post:
+      description: Create a new user from profile
+      operationId: createUserFromProfile
+      parameters:
+        - name: createUserFromProfileBody
+          in: body
+          description: The user profile
+          required: true
+          schema:
+            required:
+              - provider
+              - id
+              - displayName
+              - name
+              - emails
+            properties:
+              provider:
+                type: string
+              id:
+                type: string
+              displayName:
+                type: string
+              name:
+                properties:
+                  familyName:
+                    type: string
+                  givenName:
+                    type: string
+                  middleName:
+                    type: string
+              emails:
+                type: array
+                items:
+                  properties:
+                    value:
+                      type: string
+                    type:
+                      type: string
+                  required:
+                    - value
+              photos:
+                type: array
+                items:
+                  properties:
+                    value:
+                      type: string
+                  required:
+                    - value
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/User"
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /users/validate-credentials:
+    x-swagger-router-controller: users
+    post:
+      description: Create a new user from profile
+      operationId: validateCredentials
+      parameters:
+        - name: validateCredentialsBody
+          in: body
+          description: The user credentials
+          required: true
+          schema:
+            properties:
+              email:
+                $ref: "#/definitions/email"
+              passowrd:
+                $ref: "#/definitions/password"
+            required:
+              - email
+              - password
+      responses:
+        "200":
+          description: Success
+          schema:
+            properties:
+              userId:
+                type: string
+              emailVerified:
+                type: boolean
+            required:
+              - userId
+              - emailVerified
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /users/{userId}:
     x-swagger-router-controller: users
     get:
