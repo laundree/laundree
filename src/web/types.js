@@ -2,10 +2,11 @@
 import type { Request as Req, Response as Res, Application as App, Router as R } from 'express'
 import type { LocaleType } from '../locales/index'
 import type { FlashType } from '../utils/flash'
+import type { User } from 'laundree-sdk/lib/sdk'
 
 type CustomRequestAddendum = {
   locale?: LocaleType,
-  user?: *, // TODO remove
+  user?: User,
   session: {
     returningUser?: boolean,
     to?: string,

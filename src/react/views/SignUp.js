@@ -28,28 +28,32 @@ class SignUp extends ValueUpdater<SignUpValues, *, SignUpState> {
     return {name: '', email: '', password: '', password2: ''}
   }
 
-  submitHandler = (evt: Event) => {
+  submitHandler = async (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()
-    return sdk.api.user.signUpUser(
-      this.state.values.name,
-      this.state.values.email,
-      this.state.values.password
-    )
-      .then(
-        () => this.reset({
-          loading: false,
-          notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
-        }),
-        err => this.setState({
-          loading: false,
-          notion: {
-            success: false,
-            message: <FormattedMessage id={err.status === 409
-              ? 'auth.signup.error.already-exists'
-              : 'auth.signup.error'}/>
-          }
-        }))
+    try {
+      await sdk.api.user.signUpUser(
+        {
+          displayName: this.state.values.name,
+          email: this.state.values.email,
+          password: this.state.values.password
+        } // TODO add locale
+      )
+      this.reset({
+        loading: false,
+        notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
+      })
+    } catch (err) {
+      this.setState({
+        loading: false,
+        notion: {
+          success: false,
+          message: <FormattedMessage id={err.status === 409
+            ? 'auth.signup.error.already-exists'
+            : 'auth.signup.error'}/>
+        }
+      })
+    }
   }
 
   query () {

@@ -6,6 +6,7 @@ import TokenModel from '../db/models/token'
 import type { TokenType } from '../db/models/token'
 import UserHandler from './user'
 import type { QueryConditions, ObjectId } from 'mongoose'
+import type { Token as RestToken, TokenWithSecret as RestTokenWithSecret } from 'laundree-sdk/lib/sdk'
 
 class TokenHandlerLibrary extends HandlerLibrary {
 
@@ -59,11 +60,12 @@ class TokenHandlerLibrary extends HandlerLibrary {
 
 }
 
-export default class TokenHandler extends Handler<TokenModel, *> {
+export default class TokenHandler extends Handler<TokenModel, *, RestToken> {
   static restSummary (i: ObjectId | TokenHandler) {
     const id = (i.model ? i.model._id : i).toString()
     return {id, href: '/api/tokens/' + id}
   }
+
   static lib = new TokenHandlerLibrary()
   lib = TokenHandler.lib
   secret: ?string
@@ -122,7 +124,7 @@ export default class TokenHandler extends Handler<TokenModel, *> {
     return UserHandler.lib.findFromId(this.model.owner)
   }
 
-  async toRest (): Promise<{ id: string, name: string, owner: *, href: string }> {
+  async toRest (): Promise<RestToken> {
     return {
       id: this.model.id,
       name: this.model.name,
@@ -131,9 +133,17 @@ export default class TokenHandler extends Handler<TokenModel, *> {
     }
   }
 
-  async toSecretRest (): Promise<{ id: string, name: string, owner: *, href: string, secret?: string }> {
-    const obj: { id: string, name: string, owner: *, href: string } = await this.toRest()
-    return {...obj, secret: this.secret || undefined}
+  async toSecretRest (): Promise<RestTokenWithSecret> {
+    if (!this.secret) {
+      throw new Error('No secret')
+    }
+    return {
+      secret: this.secret,
+      id: this.model.id,
+      name: this.model.name,
+      owner: UserHandler.restSummary(this.model.owner),
+      href: this.restUrl
+    }
   }
 
 }

@@ -1,8 +1,9 @@
 // @flow
 import { createStore } from 'redux'
 import { redux } from 'laundree-sdk'
-import type UserHandler from '../handlers/user'
-import type { Flash, Action, ListLaundriesAction } from 'laundree-sdk/lib/redux'
+import type { User, Laundry } from 'laundree-sdk/lib/sdk'
+import type { User as ReduxUser, Laundry as ReduxLaundry, Flash, Action, ListLaundriesAction } from 'laundree-sdk/lib/redux'
+import sdk from './sdk'
 
 function mapFlash (flashArray, type) {
   return flashArray
@@ -10,32 +11,54 @@ function mapFlash (flashArray, type) {
     .map((flash: Flash) => ({type: 'FLASH', payload: flash}))
 }
 
-async function fetchLaundries (currentUser) : Promise<ListLaundriesAction> {
-  const laundries = await currentUser.fetchLaundries()
-  return {type: 'LIST_LAUNDRIES', payload: laundries.map(l => l.reduxModel())}
+async function fetchLaundries (currentUser: User): Promise<ListLaundriesAction> {
+  const laundries = await Promise.all(currentUser.laundries.map(({id}) => sdk.api.laundry.get(id)))
+  const reduxLaundries = laundries.map(laundryToReduxLaundry)
+  return {type: 'LIST_LAUNDRIES', payload: reduxLaundries}
+}
+
+function laundryToReduxLaundry (laundry: Laundry): ReduxLaundry {
+  return {
+    id: laundry.id,
+    name: laundry.name,
+    machines: laundry.machines.map(({id}) => id),
+    users: laundry.users.map(({id}) => id),
+    owners: laundry.owners.map(({id}) => id),
+    invites: laundry.invites.map(({id}) => id),
+    timezone: laundry.timezone,
+    googlePlaceId: laundry.googlePlaceId,
+    demo: laundry.demo,
+    rules: laundry.rules
+  }
+}
+
+function userToReduxUser (user: User): ReduxUser {
+  return {
+    id: user.id,
+    photo: user.photo,
+    displayName: user.displayName,
+    laundries: user.laundries.map(({id}) => id),
+    role: user.role,
+    lastSeen: user.lastSeen || undefined,
+    demo: Boolean(user.demo)
+  }
 }
 
 /**
  * Create initial store
- * @param {UserHandler} currentUser
- * @param {Array=} successFlash
- * @param {Array=} errorFlash
- * @param {string=} locale
- * @param {string=} googleApiKey
- * @param {boolean=} returningUser
- * @return {Promise}
  */
-export function createInitialEvents (currentUser: ?UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
+export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
   let events: Action[] = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
   events.push({type: 'CONFIGURE', payload: {locale, googleApiKey, returningUser}})
-  if (!currentUser) return Promise.resolve(events)
-  const signInAction: Action = {type: 'SIGN_IN_USER', payload: currentUser.reduxModel()}
+  if (!currentUser) return events
+  const signInAction: Action = {type: 'SIGN_IN_USER', payload: userToReduxUser(currentUser)}
   events.push(signInAction)
-  return fetchLaundries(currentUser).then((event: Action) => events.concat(event))
+  const event = await fetchLaundries(currentUser)
+  return events.concat(event)
 }
 
-export function createInitialStore (currentUser: ?UserHandler, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
+export function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
   return createInitialEvents(currentUser, successFlash, errorFlash, locale, googleApiKey, returningUser)
     .then((events) => {
       const store = createStore(redux.reducer)

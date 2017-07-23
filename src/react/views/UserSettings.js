@@ -14,7 +14,7 @@ class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User },
   onSubmit = async (event) => {
     this.setState({loading: true})
     event.preventDefault()
-    await sdk.api.user.updateName(this.props.user.id, this.state.values.displayName)
+    await sdk.api.user.updateUser(this.props.user.id, {displayName: this.state.values.displayName})
     this.setState({loading: false})
   }
 
@@ -44,11 +44,11 @@ class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User },
         <label>
           <input
             onChange={this.generateValueEventUpdater(displayName => ({displayName}))}
-            type='text' value={this.state.values.displayName} />
+            type='text' value={this.state.values.displayName}/>
         </label>
       </ValidationElement>
       <div className='buttons'>
-        <Submit value='general.update' />
+        <Submit value='general.update'/>
       </div>
     </ValidationForm>
   }
@@ -61,13 +61,14 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
     event.preventDefault()
     try {
       await sdk.api.user
-        .changePassword(this.props.user.id,
-          this.state.values.currentPassword,
-          this.state.values.newPassword)
+        .changePassword(this.props.user.id, {
+          currentPassword: this.state.values.currentPassword,
+          newPassword: this.state.values.newPassword
+        })
       this.reset({
         loading: false,
         notion: {
-          message: <FormattedMessage id='user-settings.change-password.success' />,
+          message: <FormattedMessage id='user-settings.change-password.success'/>,
           success: true
         }
       })
@@ -78,7 +79,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           success: false,
           message: <FormattedMessage id={err.status === 403
             ? 'user-settings.change-password.error.invalid'
-            : 'user-settings.change-password.error'} />
+            : 'user-settings.change-password.error'}/>
         }
       })
     }
@@ -110,7 +111,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           <Input
             value={this.state.values.currentPassword}
             onChange={this.generateValueEventUpdater(currentPassword => ({currentPassword}))}
-            type='password' placeholder='general.current-password' />
+            type='password' placeholder='general.current-password'/>
         </Label>
       </ValidationElement>
       <ValidationElement
@@ -121,7 +122,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           <Input
             value={this.state.values.newPassword}
             onChange={this.generateValueEventUpdater(newPassword => ({newPassword}))}
-            type='password' placeholder='general.new-password' />
+            type='password' placeholder='general.new-password'/>
         </Label>
       </ValidationElement>
       <ValidationElement
@@ -132,11 +133,11 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           <Input
             value={this.state.values.newPasswordRepeat}
             onChange={this.generateValueEventUpdater(newPasswordRepeat => ({newPasswordRepeat}))}
-            type='password' placeholder='general.repeat-password' />
+            type='password' placeholder='general.repeat-password'/>
         </Label>
       </ValidationElement>
       <div className='buttons'>
-        <Submit value='general.change-password' />
+        <Submit value='general.change-password'/>
       </div>
     </ValidationForm>
   }
@@ -163,10 +164,10 @@ class DeleteUser extends React.Component {
         actions={[
           {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
           {label: 'general.no', action: this.handleCloseModal}
-        ]} />
+        ]}/>
       <div className='buttonContainer'>
         <button onClick={this.handleOpenModal} className='red'>
-          <FormattedMessage id='general.delete-account' />
+          <FormattedMessage id='general.delete-account'/>
         </button>
       </div>
     </div>
@@ -194,8 +195,8 @@ class UserSettings extends React.Component {
   renderPassword () {
     if (this.isAdmin() && !this.isSelf()) return null
     return <section>
-      <FormattedMessage id='user-settings.change-password.title' tagName='h2' />
-      <UserPasswordForm user={this.user()} />
+      <FormattedMessage id='user-settings.change-password.title' tagName='h2'/>
+      <UserPasswordForm user={this.user()}/>
     </section>
   }
 
@@ -225,7 +226,7 @@ class UserSettings extends React.Component {
 
   renderDelete () {
     return <section>
-      <FormattedMessage id='user-settings.delete-account.title' tagName='h2' />
+      <FormattedMessage id='user-settings.delete-account.title' tagName='h2'/>
       {this.renderDeleteText()}
     </section>
   }
@@ -234,15 +235,15 @@ class UserSettings extends React.Component {
     if (this.isOwner()) {
       return <div className='text'>
         <FormattedMessage
-          values={{nl: <br />}}
-          id='user-settings.delete-account.message.owner' />
+          values={{nl: <br/>}}
+          id='user-settings.delete-account.message.owner'/>
       </div>
     }
     return <div className='text'>
       <FormattedMessage
-        values={{nl: <br />}}
-        id='user-settings.delete-account.message.user' />
-      <DeleteUser user={this.user()} />
+        values={{nl: <br/>}}
+        id='user-settings.delete-account.message.user'/>
+      <DeleteUser user={this.user()}/>
     </div>
   }
 
@@ -251,7 +252,7 @@ class UserSettings extends React.Component {
       return <div className='bigListMessage email'>
         <button className={this.state.loading ? 'grey' : ''} onClick={this.onLoadClick}>
           <FormattedMessage
-            id={this.state.loading ? 'user-settings.email-addresses.loading' : 'user-settings.email-addresses.load'} />
+            id={this.state.loading ? 'user-settings.email-addresses.loading' : 'user-settings.email-addresses.load'}/>
         </button>
       </div>
     }
@@ -269,7 +270,7 @@ class UserSettings extends React.Component {
   renderEmails () {
     if (!this.isAdmin() && !this.isSelf()) return
     return <section>
-      <FormattedMessage id='user-settings.email-addresses.title' tagName='h2' />
+      <FormattedMessage id='user-settings.email-addresses.title' tagName='h2'/>
       <div className='text'>
         {this.renderEmailList()}
       </div>
@@ -278,12 +279,12 @@ class UserSettings extends React.Component {
 
   renderCalendar () {
     return <section>
-      <FormattedMessage tagName='h2' id='user-settings.calendar.title' />
+      <FormattedMessage tagName='h2' id='user-settings.calendar.title'/>
       <div className='text'>
         <FormattedMessage tagName='div' id='user-settings.calendar.text' values={{
-          nl: <br />,
-          link: <a href='/calendar' target='_blank'><FormattedMessage id='user-settings.calendar.text.link' /></a>
-        }} />
+          nl: <br/>,
+          link: <a href='/calendar' target='_blank'><FormattedMessage id='user-settings.calendar.text.link'/></a>
+        }}/>
       </div>
     </section>
   }
@@ -292,17 +293,17 @@ class UserSettings extends React.Component {
     const user = this.user()
     return <DocumentTitle title='document-title.profile-settings'>
       <main className='topNaved' id='Settings'>
-        <FormattedMessage tagName='h1' id='user-settings.title' />
+        <FormattedMessage tagName='h1' id='user-settings.title'/>
         <section>
-          <FormattedMessage tagName='h2' id='user-settings.basic-info.title' />
-          <UserNameForm user={user} />
+          <FormattedMessage tagName='h2' id='user-settings.basic-info.title'/>
+          <UserNameForm user={user}/>
         </section>
         {this.renderCalendar()}
         {this.renderEmails()}
         {this.renderPassword()}
         {this.renderDelete()}
         <section>
-          <FormattedMessage tagName='h2' id='user-settings.laundries.title' />
+          <FormattedMessage tagName='h2' id='user-settings.laundries.title'/>
           <div className='text'>
             {this.renderLaundries(user)}
           </div>
@@ -314,7 +315,7 @@ class UserSettings extends React.Component {
   renderLaundries (user) {
     if (user.laundries.length === 0) {
       return <div className='bigListMessage'>
-        <FormattedMessage id='user-settings.laundries.no-laundries' />
+        <FormattedMessage id='user-settings.laundries.no-laundries'/>
       </div>
     }
     return <ul className='bigList'>
@@ -333,7 +334,7 @@ class UserSettings extends React.Component {
 
 const UserSettingsWrapper = (props: UserSettingsProps) => {
   if (!props.users[props.user]) {
-    return <NotFound />
+    return <NotFound/>
   }
   return <UserSettings {...props} />
 }

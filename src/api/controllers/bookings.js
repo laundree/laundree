@@ -121,6 +121,7 @@ async function updateBookingAsync (subjects, params) {
   }
 
   await booking.updateTime(currentUser, newFrom, newTo)
+  return booking.toRest()
 }
 
 export const listBookings = api.wrap(listBookingsAsync, api.securityLaundryUser, api.securityAdministrator)

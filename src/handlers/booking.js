@@ -9,8 +9,9 @@ import type { QueryOptions, QueryConditions, ObjectId } from 'mongoose'
 import MachineHandler from './machine'
 import LaundryHandler from './laundry'
 import type {Booking} from 'laundree-sdk/lib/redux'
+import type {Booking as RestBooking} from 'laundree-sdk/lib/sdk'
 
-class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, *> {
+class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, RestBooking, *> {
 
   constructor () {
     super(BookingHandler, BookingModel, {
@@ -96,7 +97,7 @@ class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, *> {
   }
 }
 
-export default class BookingHandler extends Handler<BookingModel, Booking> {
+export default class BookingHandler extends Handler<BookingModel, Booking, RestBooking> {
   static restSummary (i: ObjectId | BookingHandler) {
     const id = (i.model ? i.model._id : i).toString()
     return {id, href: '/api/bookings/' + id}
@@ -201,7 +202,7 @@ export default class BookingHandler extends Handler<BookingModel, Booking> {
     return this
   }
 
-  async toRest () {
+  async toRest (): Promise<RestBooking> {
     const laundry = await this.fetchLaundry()
     return {
       id: this.model.id,

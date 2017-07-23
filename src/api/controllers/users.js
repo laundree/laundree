@@ -61,11 +61,10 @@ async function validateCredentialsF (s, p) { // TODO test
 }
 
 async function createUserF (subjects, p) {
-  const {email, displayName, password} = api.assertSubjects({
-    email: p.email,
-    displayName: p.displayName,
-    password: p.password
+  const {createUserBody} = api.assertSubjects({
+    createUserBody: p.createUserBody
   })
+  const {email, displayName, password} = createUserBody
   const user = await UserHandler.lib.findFromEmail(email)
   if (user) {
     throw new StatusError('Email address already exists.', 409, {Location: user.restUrl})
@@ -136,9 +135,8 @@ async function deleteUserF (subjects) {
 
 async function updateUserF (subjects, params) {
   const {user, updateUserBody} = api.assertSubjects({user: subjects.user, updateUserBody: params.updateUserBody})
-  const {name} = updateUserBody
-  if (!name) return
-  await user.updateName(name)
+  await user.update(updateUserBody)
+  return user.toRest()
 }
 
 async function changeUserPasswordF (subjects, params) {

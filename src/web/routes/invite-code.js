@@ -1,41 +1,32 @@
 // @flow
 import express from 'express'
 import base64UrlSafe from 'urlsafe-base64'
-import LaundryHandler from '../../handlers/laundry'
 import * as error from '../../utils/error'
-import type UserHandler from '../../handlers/user'
-import type {Request} from '../types'
+import type { Request } from '../types'
+import sdk from '../sdk'
 
 const router = express.Router()
 
 const notFoundError = new error.StatusError('Not found', 404)
 
-router.get('/:laundryId/:id', (req: Request, res, next) => {
+router.get('/:laundryId/:id', async (req: Request, res, next) => {
   const {id, laundryId} = req.params
   if (!base64UrlSafe.validate(id) || !base64UrlSafe.validate(laundryId)) {
     return next(notFoundError)
   }
-  const user: ?UserHandler = req.user
+  const user = req.user
   if (!user) return res.redirect(`/auth?to=${encodeURIComponent(req.originalUrl)}`)
-  if (user.isDemo()) {
+  if (user.demo) {
     return next(notFoundError)
   }
-  LaundryHandler
-    .lib
-    .findFromShortId(laundryId)
-    .then(laundry => {
-      if (!laundry) {
-        throw notFoundError
-      }
-      return laundry
-        .verifyInviteCode(id)
-        .then(result => {
-          if (!result) throw new Error('Invalid key')
-          return laundry.addUser(req.user)
-        })
-        .then(() => res.redirect(`/laundries/${laundry.model.id}`))
-    })
-    .catch(next)
+  try {
+    const laundry = await sdk.api.laundry.get(laundryId)
+    await sdk.api.laundry.verifyInviteCode(laundry.id, {key: id})
+    await sdk.api.laundry.addUser(laundry.id, user.id)
+    res.redirect(`/laundries/${laundry.model.id}`)
+  } catch (err) {
+    next(err)
+  }
 })
 
 export default router

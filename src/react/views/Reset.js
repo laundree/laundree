@@ -31,21 +31,23 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
     return {password: ''}
   }
 
-  submitHandler = (evt: Event) => {
+  submitHandler = async (evt: Event) => {
     const search = this.props.location.search && this.props.location.search.substr(1)
     const {user, token} = queryString.parse(search)
     this.setState({loading: true})
     evt.preventDefault()
-    return sdk.api.user.resetPassword(user, token, this.state.values.password)
-      .then(
-        () => this.reset({
-          loading: false,
-          notion: {message: <FormattedMessage id='auth.reset.success' />, success: true}
-        }),
-        () => this.setState({
-          loading: false,
-          notion: {message: <FormattedMessage id='auth.reset.error' />, success: false}
-        }))
+    try {
+      await sdk.api.user.resetPassword(user, {token, password: this.state.values.password})
+      this.reset({
+        loading: false,
+        notion: {message: <FormattedMessage id='auth.reset.success'/>, success: true}
+      })
+    } catch (err) {
+      this.setState({
+        loading: false,
+        notion: {message: <FormattedMessage id='auth.reset.error'/>, success: false}
+      })
+    }
   }
 
   render () {
@@ -56,7 +58,7 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
         </h1>
         <Link to='/' id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo' />
+            <use xlinkHref='#MediaLogo'/>
           </svg>
         </Link>
         <ValidationForm
@@ -71,11 +73,11 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
               <Input
                 onChange={this.generateValueEventUpdater(password => ({password}))}
                 value={this.state.values.password || ''}
-                type='password' name='password' placeholder='general.new-password' />
+                type='password' name='password' placeholder='general.new-password'/>
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.reset' />
+            <Submit value='general.reset'/>
           </div>
           <div className='forgot'>
             <div>
@@ -83,9 +85,9 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
                 id='auth.links.login3'
                 values={{
                   link: <Link to='/auth'>
-                    <FormattedMessage id='auth.links.login3.link' />
+                    <FormattedMessage id='auth.links.login3.link'/>
                   </Link>
-                }} />
+                }}/>
             </div>
             <div>
               <FormattedMessage
@@ -94,9 +96,9 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
                   link: <Link
                     to='/auth/sign-up'
                     className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link' />
+                    <FormattedMessage id='auth.links.signup.link'/>
                   </Link>
-                }} />
+                }}/>
             </div>
           </div>
         </ValidationForm>
