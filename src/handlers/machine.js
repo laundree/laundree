@@ -7,9 +7,10 @@ import BookingHandler from './booking'
 import LaundryHandler from './laundry'
 import type UserHandler from './user'
 import type {Machine} from 'laundree-sdk/lib/redux'
+import type {Machine as RestMachine} from 'laundree-sdk/lib/sdk'
 import type { ObjectId } from 'mongoose'
 
-class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
+class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, RestMachine, *> {
 
   constructor () {
     super(MachineHandler, MachineModel, {
@@ -28,7 +29,7 @@ class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
 
 }
 
-export default class MachineHandler extends Handler {
+export default class MachineHandler extends Handler<MachineModel, Machine, RestMachine> {
   static lib = new MachineHandlerLibrary()
   lib = MachineHandler.lib
   restUrl: string
@@ -149,7 +150,7 @@ export default class MachineHandler extends Handler {
     }))
   }
 
-  toRest () {
+  toRest (): RestMachine {
     return {
       name: this.model.name,
       href: this.restUrl,

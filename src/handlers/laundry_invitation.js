@@ -5,8 +5,9 @@ import { Handler, HandlerLibrary } from './handler'
 import LaundryInvitationModel from '../db/models/laundry_invitation'
 import type {Invite} from 'laundree-sdk/lib/redux'
 import type { ObjectId } from 'mongoose'
+import type {LaundryInvitation as RestLaundryInvitation} from 'laundree-sdk/lib/sdk'
 
-class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, *> {
+class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, RestLaundryInvitation, *> {
 
   constructor () {
     super(LaundryInvitationHandler, LaundryInvitationModel, {
@@ -30,7 +31,7 @@ class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvi
 
 }
 
-export default class LaundryInvitationHandler extends Handler<LaundryInvitationModel, Invite> {
+export default class LaundryInvitationHandler extends Handler<LaundryInvitationModel, Invite, RestLaundryInvitation> {
   static restSummary (i: ObjectId | LaundryInvitationHandler) {
     const id = (i.model ? i.model._id : i).toString()
     return {id, href: '/api/invites/' + id}
@@ -53,7 +54,7 @@ export default class LaundryInvitationHandler extends Handler<LaundryInvitationM
     return LaundryHandler.lib.findFromId(this.model.laundry)
   }
 
-  toRest () {
+  toRest (): RestLaundryInvitation {
     return {
       email: this.model.email,
       id: this.model.id,

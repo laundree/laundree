@@ -11,19 +11,21 @@ type VerificationValues = { email: string }
 
 export default class Verification extends ValueUpdater<VerificationValues, {}, { loading: boolean }> {
 
-  submitHandler = (evt: Event) => {
+  submitHandler = async (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()
-    return sdk.api.user.startEmailVerification(this.state.values.email)
-      .then(
-        () => this.reset({
-          loading: false,
-          notion: {message: <FormattedMessage id='auth.verification.success'/>, success: true}
-        }),
-        () => this.setState({
-          loading: false,
-          notion: {message: <FormattedMessage id='auth.verification.error'/>, success: false}
-        }))
+    try {
+      await sdk.api.user.startEmailVerification({email: this.state.values.email}) // TODO add locale
+      this.reset({
+        loading: false,
+        notion: {message: <FormattedMessage id='auth.verification.success'/>, success: true}
+      })
+    } catch (err) {
+      this.setState({
+        loading: false,
+        notion: {message: <FormattedMessage id='auth.verification.error'/>, success: false}
+      })
+    }
   }
 
   initialValues () {

@@ -124,6 +124,7 @@ async function updateLaundryAsync (subs, params) {
   const timezone = await validateGooglePlaceId(laundry, body)
   const newBody = timezone ? {...body, timezone} : body
   await laundry.updateLaundry(newBody)
+  return laundry.toRest()
 }
 
 function fetchLaundryAsync (subs) {
@@ -188,12 +189,28 @@ async function createInviteCodeAsync (subs) {
   }
 }
 
+async function verifyInviteCodeAsync (subs, p) {
+  const {laundry, verifyInviteCodeBody} = api.assertSubjects({laundry: subs.laundry, verifyInviteCodeBody: p.verifyInviteCodeBody})
+  const result = await laundry.verifyInviteCode(verifyInviteCodeBody.key)
+  if (!result) {
+    throw new StatusError('Not found', 404)
+  }
+}
+
 async function addOwnerAsync (subs) {
   const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
   if (!laundry.isUser(user) || laundry.isOwner(user)) {
     throw new StatusError('Not allowed', 403)
   }
   await laundry.addOwner(user)
+}
+
+async function addUserToLaundryAsync (subs) { // TODO test
+  const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
+  if (laundry.isUser(user)) {
+    throw new StatusError('Not allowed', 403)
+  }
+  await laundry.addUser(user)
 }
 
 async function removeOwnerAsync (subs) {
@@ -228,4 +245,6 @@ export const createLaundry = api.wrap(createLaundryAsync, api.securityUserAccess
 export const removeUserFromLaundry = api.wrap(removeUserFromLaundryAsync, api.securityLaundryOwner, api.securityAdministrator, api.securitySelf)
 export const createInviteCode = api.wrap(createInviteCodeAsync, api.securityLaundryOwner, api.securityAdministrator)
 export const addOwner = api.wrap(addOwnerAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const addUserToLaundry = api.wrap(addUserToLaundryAsync, api.securityWebApplication)
 export const removeOwner = api.wrap(removeOwnerAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const verifyInviteCode = api.wrap(verifyInviteCodeAsync, api.securityWebApplication)

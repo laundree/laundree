@@ -24,7 +24,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
   submitHandler = (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()
-    return sdk.api.user.forgotPassword(this.state.values.email.toLowerCase())
+    return sdk.api.user.forgotPassword({email: this.state.values.email.toLowerCase()}) // TODO add locale
       .then(
         () =>
           this.reset({

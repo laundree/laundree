@@ -255,8 +255,10 @@ paths:
       tags:
         - Users
       responses:
-        "204":
+        "200":
           description: Success
+          schema:
+            $ref: "#/definitions/User"
         "404":
           description: Not found
           schema:
@@ -847,27 +849,12 @@ paths:
               googlePlaceId:
                 type: string
               rules:
-                properties:
-                  limit:
-                    type: number
-                    format: int32
-                    minimum: 0
-                  dailyLimit:
-                    type: number
-                    format: int32
-                    minimum: 0
-                  timeLimit:
-                    required:
-                      - from
-                      - to
-                    properties:
-                      from:
-                        $ref: "#/definitions/Time"
-                      to:
-                        $ref: "#/definitions/Time"
+                $ref: "#/definitions/Rules"
       responses:
-        "204":
+        "200":
           description: Success
+          schema:
+            $ref: "#/definitions/Laundry"
         "403":
           description: Unauthorized
           schema:
@@ -1138,6 +1125,37 @@ paths:
 
   /laundries/{laundryId}/users/{userId}:
     x-swagger-router-controller: laundries
+    post:
+      operationId: addUserToLaundry
+      tags:
+        - Laundries
+        - Users
+      parameters:
+        - name: laundryId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: userId
+          in: path
+          required: true
+          type: string
+          description: User id
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
     delete:
       operationId: removeUserFromLaundry
       tags:
@@ -1194,6 +1212,43 @@ paths:
                 format: email
               locale:
                 $ref: "#/definitions/locale"
+      responses:
+        "204":
+          description: Success
+        "404":
+          description: Laundry not found
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /laundries/{laundryId}/verify-invite-code:
+    x-swagger-router-controller: laundries
+    post:
+      operationId: verifyInviteCode
+      tags:
+        - Laundries
+      parameters:
+        - name: laundryId
+          in: path
+          required: true
+          type: string
+          description: Machine id
+        - name: verifyInviteCodeBody
+          in: body
+          required: true
+          schema:
+            required:
+              - code
+            properties:
+              key:
+                type: string
       responses:
         "204":
           description: Success
@@ -1479,8 +1534,10 @@ paths:
               to:
                 $ref: "#/definitions/Date"
       responses:
-        "204":
+        "200":
           description: Success
+          schema:
+            $ref: "#/definitions/Booking"
         "400":
           description: Invalid input
           schema:
@@ -1635,6 +1692,10 @@ definitions:
       - displayName
       - photo
       - tokens
+      - laundries
+      - role
+      - demo
+      - locale
     properties:
       id:
         type: string
@@ -1643,9 +1704,18 @@ definitions:
         format: url
       displayName:
         type: string
+      role:
+        type: string
+        enum:
+          - user
+          - admin
+      demo:
+        type: boolean
       lastSeen:
         type: string
         format: date-time
+      locale:
+        $ref: "#/definitions/locale"
       name:
         properties:
           familyName:
@@ -1673,7 +1743,21 @@ definitions:
       - href
       - owners
       - users
+      - machines
+      - invites
+      - demo
+      - timezone
+      - googlePlaceId
+      - rules
     properties:
+      demo:
+        type: boolean
+      timezone:
+        type: string
+      googlePlaceId:
+        type: string
+      rules:
+        $ref: "#/definitions/Rules"
       id:
         type: string
       name:
@@ -1696,7 +1780,25 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/Summary"
-
+  Rules:
+    properties:
+      limit:
+        type: number
+        format: int32
+        minimum: 0
+      dailyLimit:
+        type: number
+        format: int32
+        minimum: 0
+      timeLimit:
+        required:
+          - from
+          - to
+        properties:
+          from:
+            $ref: "#/definitions/Time"
+          to:
+            $ref: "#/definitions/Time"
   Token:
     required:
       - id
@@ -1710,9 +1812,6 @@ definitions:
         type: string
       href:
         type: string
-      lastSeen:
-        type: string
-        format: date-time
       owner:
         $ref: "#/definitions/Summary"
   TokenWithSecret:
@@ -1731,9 +1830,6 @@ definitions:
         type: string
       href:
         type: string
-      lastSeen:
-        type: string
-        format: date-time
       owner:
         $ref: "#/definitions/Summary"
 

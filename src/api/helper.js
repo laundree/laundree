@@ -8,7 +8,7 @@ import TokenHandler from '../handlers/token'
 import InviteHandler from '../handlers/laundry_invitation'
 import BookingHandler from '../handlers/booking'
 import MachineHandler from '../handlers/machine'
-
+import type {ApiResult} from 'laundree-sdk/lib/sdk'
 /**
  * Return success
  * @param res
@@ -31,7 +31,7 @@ type Subjects = {
   currentUser: ?UserHandler
 }
 
-type Middleware<C> = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<C>
+type Middleware = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<?ApiResult>
 
 type Handler = UserHandler | LaundryHandler | TokenHandler | MachineHandler | BookingHandler | InviteHandler
 
@@ -140,7 +140,7 @@ function buildSecurityFunction (securities: Security[]): (params: ParsedParams, 
   }
 }
 
-export function wrap<C> (func: Middleware<C>, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
+export function wrap (func: Middleware, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
   const securityFunction = buildSecurityFunction([security].concat(securities))
   return (req: Request, res: Response) => {
     const params: ParsedParams = parseParams(req.swagger.params)

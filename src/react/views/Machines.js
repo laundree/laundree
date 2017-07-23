@@ -217,7 +217,7 @@ class Machines extends React.Component {
     laundries: { [string]: Laundry }
 
   }
-  creator = (type: 'wash' | 'dry', name: string, broken: boolean) => sdk.api.laundry.createMachine(this.props.currentLaundry, name, type, broken)
+  creator = (type: 'wash' | 'dry', name: string, broken: boolean) => sdk.api.laundry.createMachine(this.props.currentLaundry, {name, type, broken})
 
   laundry () {
     return this.props.laundries[this.props.currentLaundry]

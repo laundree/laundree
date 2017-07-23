@@ -14,12 +14,14 @@ import config from 'config'
 import Debug from 'debug'
 import LaundryHandler from './laundry'
 import type { User } from 'laundree-sdk/lib/redux'
+import type { User as RestUser } from 'laundree-sdk/lib/sdk'
 import type { EventOption as CalEvent } from 'ical-generator'
 import type { ObjectId } from 'mongoose'
+import type { LocaleType } from '../locales'
 
 const debug = Debug('laundree.handlers.user')
 
-class UserHandlerLibrary extends HandlerLibrary {
+class UserHandlerLibrary extends HandlerLibrary<User, UserModel, RestUser, *> {
 
   constructor () {
     super(UserHandler, UserModel, {
@@ -192,7 +194,7 @@ function displayNameToName (displayName) {
  * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string=, middleName: string=, givenName: string=}, emails: {value: string, type: string=}[], photos: {value: string}[]=}} Profile
  */
 
-export default class UserHandler extends Handler<UserModel, User> {
+export default class UserHandler extends Handler<UserModel, User, RestUser> {
   static lib = new UserHandlerLibrary()
   lib = UserHandler.lib
 
@@ -355,14 +357,19 @@ export default class UserHandler extends Handler<UserModel, User> {
 
   /**
    * Update the name of the user.
-   * @param name
    */
-  async updateName (name: string) {
-    this.model.overrideDisplayName = name
-    await this.model
-      .save()
+  async update (opts: { name?: string, locale?: LocaleType }) {
+    if (opts.name) {
+      this.model.overrideDisplayName = opts.name
+    }
+    if (opts.locale) {
+      this.model.locale = opts.locale
+    }
+    if (!opts.locale && !opts.name) {
+      return
+    }
+    await this.model.save()
     this.lib.emitEvent('update', this)
-    return this
   }
 
   /**
@@ -536,17 +543,6 @@ export default class UserHandler extends Handler<UserModel, User> {
     })
   }
 
-  /**
-   * Sets the perfered locale of this user
-   * @param {string} locale
-   * @returns {Promise}
-   */
-  setLocale (locale: string) {
-    debug(`Setting locale of user ${this.model.displayName} to ${locale}`)
-    this.model.locale = locale
-    return this.save()
-  }
-
   restUrl = `/api/users/${this.model.id}`
 
   photo (): ?string {
@@ -571,7 +567,7 @@ export default class UserHandler extends Handler<UserModel, User> {
     return Boolean(this.model.password)
   }
 
-  toRest () {
+  toRest (): RestUser {
     return {
       id: this.model.id,
       displayName: this.model.displayName,
@@ -581,8 +577,12 @@ export default class UserHandler extends Handler<UserModel, User> {
         givenName: this.model.name.givenName,
         middleName: this.model.name.middleName
       },
+      locale: this.model.locale || 'en',
+      laundries: this.model.laundries.map(LaundryHandler.restSummary),
       tokens: this.model.tokens.authTokens.map(TokenHandler.restSummary),
-      photo: this.photo() || '',
+      photo: this.photo() || `/identicon/${str.hash(this.model.id)}/150.svg`,
+      demo: Boolean(this.model.demo),
+      role: this.model.role,
       href: this.restUrl
     }
   }
@@ -593,7 +593,7 @@ export default class UserHandler extends Handler<UserModel, User> {
       photo: this.photo() || `/identicon/${str.hash(this.model.id)}/150.svg`,
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
-      lastSeen: this.model.lastSeen,
+      lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
       role: this.model.role,
       demo: Boolean(this.model.demo)
     }

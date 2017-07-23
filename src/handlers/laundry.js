@@ -16,6 +16,8 @@ import moment from 'moment-timezone'
 import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
 import GoogleMapsClient from '@google/maps'
 import type { EventOption as CalEvent } from 'ical-generator'
+import type {Laundry as RestLaundry} from 'laundree-sdk/lib/sdk'
+import type {Laundry as ReduxLaundry} from 'laundree-sdk/lib/redux'
 
 const googleMapsClient = GoogleMapsClient.createClient({key: config.get('google.serverApiKey')})
 const debug = Debug('laundree.handlers.laundry')
@@ -26,7 +28,7 @@ function objToMintues ({hour, minute}) {
 
 export type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
 
-class LaundryHandlerLibrary extends HandlerLibrary {
+class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, RestLaundry, *> {
 
   constructor () {
     super(LaundryHandler, LaundryModel, {
@@ -88,7 +90,7 @@ class LaundryHandlerLibrary extends HandlerLibrary {
 
 }
 
-export default class LaundryHandler extends Handler {
+export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, RestLaundry> {
   static restSummary (i: ObjectId | LaundryHandler) {
     const id = (i.model ? i.model._id : i).toString()
     return {id, href: '/api/laundries/' + id}
@@ -351,7 +353,7 @@ export default class LaundryHandler extends Handler {
     return invite
   }
 
-  toRest () {
+  toRest () : RestLaundry {
     return {
       name: this.model.name,
       id: this.model.id,
@@ -359,7 +361,11 @@ export default class LaundryHandler extends Handler {
       owners: this.model.owners.map(UserHandler.restSummary),
       users: this.model.users.map(UserHandler.restSummary),
       machines: this.model.machines.map(MachineHandler.restSummary),
-      invites: this.model.invites.map(i => this.model.owners.map(LaundryInvitationHandler.restSummary))
+      invites: this.model.invites.map(i => this.model.owners.map(LaundryInvitationHandler.restSummary)),
+      timezone: this.timezone(),
+      googlePlaceId: this.googlePlaceId(),
+      demo: this.model.demo,
+      rules: this.rules()
     }
   }
 

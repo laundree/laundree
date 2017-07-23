@@ -1,60 +1,31 @@
 // @flow
 import type { Request as Req, Response as Res, Application as App, Router as R } from 'express'
-import type { DateTimeObject } from '../handlers/laundry'
-import type { LocaleType } from '../locales'
-import type { MachineType } from '../db/models/machine'
-import type {Profile} from '../db/models/user'
+import type {
+  CreateUserBody,
+  CreateBookingBody,
+  UpdateBookingBody,
+  ContactBody,
+  CreateLaundryBody,
+  UpdateLaundryBody,
+  InviteUserByEmailBody,
+  AddUserFromCodeBody,
+  CreateMachineBody,
+  UpdateMachineBody,
+  CreateTokenBody,
+  CreateTokenFromEmailPasswordBody,
+  StartPasswordResetBody,
+  PasswordResetBody,
+  StartEmailVerificationBody,
+  VerifyEmailBody,
+  UpdateUserBody,
+  ChangeUserPasswordBody,
+  AddOneSignalPlayerIdBody,
+  ValidateCredentialsBody,
+  CreateUserFromProfileBody,
+  VerifyInviteCodeBody
+} from 'laundree-sdk/lib/sdk'
 
 type Param<T> = { value: T }
-
-export type CreateBookingBody = { from: DateTimeObject, to: DateTimeObject }
-
-export type UpdateBookingBody = { from?: DateTimeObject, to?: DateTimeObject }
-
-export type ContactBody = { message: string, subject: string, name?: string, email?: string, locale?: LocaleType }
-
-export type CreateLaundryBody = { name: string, googlePlaceId: string }
-
-export type InviteUserByEmailBody = { email: string, locale?: LocaleType }
-
-export type UpdateLaundryBody = {
-  name?: string,
-  googlePlaceId?: string,
-  rules?: {
-    limit?: number,
-    dailyLimit?: number,
-    timeLimit?: {
-      from: { hour: number, minute: number },
-      to: { hour: number, minute: number }
-    }
-  }
-}
-
-export type AddUserFromCodeBody = { key: string }
-
-export type CreateMachineBody = { broken: boolean, type: MachineType, name: string }
-
-export type UpdateMachineBody = { broken?: boolean, type?: MachineType, name?: string }
-
-export type CreateTokenBody = { name: string }
-
-export type CreateTokenFromEmailPasswordBody = { name: string, email: string, password: string }
-
-export type StartPasswordResetBody = { locale?: LocaleType }
-
-export type PasswordResetBody = { token: string, password: string }
-
-export type StartEmailVerificationBody = { email: string, locale?: LocaleType }
-
-export type VerifyEmailBody = { email: string, token: string }
-
-export type UpdateUserBody = { name?: string }
-
-export type ChangeUserPasswordBody = { currentPassword: string, newPassword: string }
-
-export type AddOneSignalPlayerIdBody = { playerId: string }
-
-export type ValidateCredentialsBody = {email: string, password: string}
 
 export type Params = {
   page_size?: Param<number>,
@@ -68,8 +39,7 @@ export type Params = {
   from?: Param<number>,
   to?: Param<number>,
   email?: Param<string>,
-  displayName?: Param<string>,
-  password?: Param<string>,
+  createUserBody?: Param<CreateUserBody>,
   createBookingBody?: Param<CreateBookingBody>,
   updateBookingBody?: Param<UpdateBookingBody>,
   contactBody?: Param<ContactBody>,
@@ -89,7 +59,8 @@ export type Params = {
   changeUserPasswordBody?: Param<ChangeUserPasswordBody>,
   addOneSignalPlayerIdBody?: Param<AddOneSignalPlayerIdBody>,
   validateCredentialsBody?: Param<ValidateCredentialsBody>,
-  createUserFromProfileBody?: Param<Profile>
+  createUserFromProfileBody?: Param<CreateUserFromProfileBody>,
+  verifyInviteCodeBody?: Param<VerifyInviteCodeBody>
 }
 
 export type ParsedParams = {
@@ -125,7 +96,9 @@ export type ParsedParams = {
   changeUserPasswordBody?: ChangeUserPasswordBody,
   addOneSignalPlayerIdBody?: AddOneSignalPlayerIdBody,
   validateCredentialsBody?: ValidateCredentialsBody,
-  createUserFromProfileBody?: Profile
+  createUserFromProfileBody?: CreateUserFromProfileBody,
+  createUserBody?: CreateUserBody,
+  verifyInviteCodeBody?: VerifyInviteCodeBody
 }
 
 type CustomRequestAddendum = {

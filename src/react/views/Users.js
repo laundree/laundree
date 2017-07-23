@@ -18,7 +18,7 @@ class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry 
   submitHandler = async (evt: Event) => {
     evt.preventDefault()
     await sdk.api.laundry
-      .inviteUserByEmail(this.props.laundry.id, this.state.values.email)
+      .inviteUserByEmail(this.props.laundry.id, {email: this.state.values.email}) // TODO add locale
     this.reset()
   }
 
