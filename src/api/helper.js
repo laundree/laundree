@@ -8,7 +8,7 @@ import TokenHandler from '../handlers/token'
 import InviteHandler from '../handlers/laundry_invitation'
 import BookingHandler from '../handlers/booking'
 import MachineHandler from '../handlers/machine'
-import type {ApiResult} from 'laundree-sdk/lib/sdk'
+import type {ApiResult, Summary} from 'laundree-sdk/lib/sdk'
 /**
  * Return success
  * @param res
@@ -30,8 +30,6 @@ type Subjects = {
   machine: ?MachineHandler,
   currentUser: ?UserHandler
 }
-
-type Middleware = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<?ApiResult>
 
 type Handler = UserHandler | LaundryHandler | TokenHandler | MachineHandler | BookingHandler | InviteHandler
 
@@ -140,6 +138,8 @@ function buildSecurityFunction (securities: Security[]): (params: ParsedParams, 
   }
 }
 
+type Middleware = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<?ApiResult>
+
 export function wrap (func: Middleware, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
   const securityFunction = buildSecurityFunction([security].concat(securities))
   return (req: Request, res: Response) => {
@@ -153,6 +153,28 @@ export function wrap (func: Middleware, security: Security, ...securities: Secur
         res.status(status)
         res.json({message: err.message})
       })
+  }
+}
+
+type PaginateFunction = (since: ?string, pageSize: number, subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<{summaries: Summary[], linkBase: string}>
+
+function buildQs (vars) {
+  const qs = Object.keys(vars).reduce((acc, k) => vars[k] === undefined ? acc : `&${acc}=${encodeURIComponent(vars[k])}`, '')
+  return qs && qs.substr(1)
+}
+
+export function paginate (p: PaginateFunction): Middleware {
+  return async (subjects: Subjects, params: ParsedParams, req, res) => {
+    const {pageSize} = assertSubjects({pageSize: params.page_size})
+    const {summaries, linkBase} = await p(params.since || null, pageSize, subjects, params, req, res)
+    const links: { first: string, next?: string } = {
+      first: `${linkBase}?${buildQs({...req.query, since: undefined, page_size: pageSize})}`
+    }
+    if (summaries.length) {
+      links.next = `${linkBase}?${buildQs({...req.query, since: summaries[summaries.length - 1], page_size: pageSize})}`
+    }
+    res.links(links)
+    return summaries
   }
 }
 
