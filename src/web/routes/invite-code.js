@@ -23,7 +23,7 @@ router.get('/:laundryId/:id', async (req: Request, res, next) => {
     const laundry = await sdk.api.laundry.get(laundryId)
     await sdk.api.laundry.verifyInviteCode(laundry.id, {key: id})
     await sdk.api.laundry.addUser(laundry.id, user.id)
-    res.redirect(`/laundries/${laundry.model.id}`)
+    res.redirect(`/laundries/${laundry.id}`)
   } catch (err) {
     next(err)
   }

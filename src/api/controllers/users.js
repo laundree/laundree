@@ -5,32 +5,23 @@ import * as mail from '../../utils/mail'
 import { StatusError } from '../../utils/error'
 import UserHandler from '../../handlers/user'
 
-function getUserF (subjects) {
+async function getUserF (subjects) {
   const user = api.assert(subjects.user)
   return user.toRest()
 }
 
-async function listUsersF (subjects, params, req, res) {
-  const {limit} = api.assertSubjects({limit: params.page_size})
+async function listUsersF (since, limit, s, params) {
   const filter = {}
   const email = params.email
   if (email) {
     filter['profiles.emails.value'] = email.toLowerCase()
   }
-  const since = params.since
   if (since) {
     filter._id = {$gt: since}
   }
   const users = await UserHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const restUsers = users.map(UserHandler.restSummary)
-  const links: { first: string, next?: string } = {
-    first: `/api/users?page_size=${limit}`
-  }
-  if (restUsers.length === limit) {
-    links.next = `/api/users?since=${restUsers[restUsers.length - 1].id}&page_size=${limit}`
-  }
-  res.links(links)
-  return restUsers
+  const summaries = users.map(UserHandler.restSummary)
+  return {summaries, linkBase: '/api/users'}
 }
 
 async function createUserFromProfileF (s, p) { // TODO test
@@ -169,7 +160,7 @@ function fetchUserEmailsF (subjects) {
 }
 
 export const getUser = api.wrap(getUserF, api.securityNoop)
-export const listUsers = api.wrap(listUsersF, api.securityNoop)
+export const listUsers = api.wrap(api.paginate(listUsersF), api.securityNoop)
 export const createUser = api.wrap(createUserF, api.securityNoop)
 export const startPasswordReset = api.wrap(startPasswordResetF, api.securityNoop)
 export const passwordReset = api.wrap(passwordResetF, api.securityNoop)

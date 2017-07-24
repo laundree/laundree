@@ -4,9 +4,8 @@ import BookingHandler from '../../handlers/booking'
 import * as api from '../helper'
 import { StatusError } from '../../utils/error'
 
-async function listBookingsAsync (subjects, params, req, res) {
-  const {limit, from, to} = api.assertSubjects({limit: params.page_size, from: params.from, to: params.to})
-  const {since} = params
+async function listBookingsAsync (since, pageSize, subjects, params) {
+  const {from, to} = api.assertSubjects({from: params.from, to: params.to})
   const filter: { from: *, to: *, _id?: *, machine?: * } = {
     from: {$gte: from},
     to: {$lt: to}
@@ -16,17 +15,9 @@ async function listBookingsAsync (subjects, params, req, res) {
   }
   const {machine} = api.assertSubjects({machine: subjects.machine})
   filter.machine = machine.model._id
-  const bookings = await BookingHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const bookingSummaries = bookings.map(BookingHandler.restSummary)
-  const fromToQuerySegment = (from ? `&from=${from}` : '') + (to ? `&from=${to}` : '')
-  const links: { first: string, next?: string } = {
-    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}${fromToQuerySegment}`
-  }
-  if (bookingSummaries.length === limit) {
-    links.next = `/api/machines/${machine.model.id}/bookings?since=${bookingSummaries[bookingSummaries.length - 1].id}&page_size=${limit}${fromToQuerySegment}`
-  }
-  res.links(links)
-  return bookingSummaries
+  const bookings = await BookingHandler.lib.find(filter, {limit: pageSize, sort: {_id: 1}})
+  const summaries = bookings.map(BookingHandler.restSummary)
+  return {summaries, linkBase: `/api/machines/${machine.model.id}/bookings`}
 }
 
 async function createBookingAsync (subjects, params) {
@@ -124,7 +115,7 @@ async function updateBookingAsync (subjects, params) {
   return booking.toRest()
 }
 
-export const listBookings = api.wrap(listBookingsAsync, api.securityLaundryUser, api.securityAdministrator)
+export const listBookings = api.wrap(api.paginate(listBookingsAsync), api.securityLaundryUser, api.securityAdministrator)
 export const createBooking = api.wrap(createBookingAsync, api.securityLaundryUser)
 export const fetchBooking = api.wrap(fetchBookingAsync, api.securityLaundryUser, api.securityAdministrator)
 export const deleteBooking = api.wrap(deleteBookingAsync, api.securityBookingCreator, api.securityLaundryOwner)

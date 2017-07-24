@@ -10,28 +10,19 @@ import { StatusError, logError } from '../../utils/error'
  * Created by budde on 02/06/16.
  */
 
-async function listLaundriesAsync (subjects, params, req, res) {
-  const {currentUser, limit} = api.assertSubjects({currentUser: subjects.currentUser, limit: params.page_size})
+async function listLaundriesAsync (since, limit, subjects) {
+  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
   const filter = {}
   if (!currentUser.isAdmin()) {
     filter.users = currentUser.model._id
   }
 
-  const {since} = params
-
   if (since) {
     filter._id = {$gt: since}
   }
   const laundries = await LaundryHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const summarizedLaundries = laundries.map(LaundryHandler.restSummary)
-  const links: { first: string, next?: string } = {
-    first: `/api/laundries?page_size=${limit}`
-  }
-  if (laundries.length === limit) {
-    links.next = `/api/laundries?since=${summarizedLaundries[laundries.length - 1].id}&page_size=${limit}`
-  }
-  res.links(links)
-  return summarizedLaundries
+  const summaries = laundries.map(LaundryHandler.restSummary)
+  return {summaries, linkBase: '/api/laundries'}
 }
 
 async function createLaundryAsync (subjects, params) {
@@ -127,7 +118,7 @@ async function updateLaundryAsync (subs, params) {
   return laundry.toRest()
 }
 
-function fetchLaundryAsync (subs) {
+async function fetchLaundryAsync (subs) {
   const {laundry} = api.assertSubjects({laundry: subs.laundry})
   return laundry.toRest()
 }
@@ -237,7 +228,7 @@ async function addUserFromCodeAsync (subs, params) {
 export const addUserFromCode = api.wrap(addUserFromCodeAsync, api.securityUserAccess)
 export const createDemoLaundry = api.wrap(createDemoLaundryAsync, api.securityNoop)
 export const inviteUserByEmail = api.wrap(inviteUserByEmailAsync, api.securityLaundryOwner, api.securityAdministrator)
-export const listLaundries = api.wrap(listLaundriesAsync, api.securityUserAccess)
+export const listLaundries = api.wrap(api.paginate(listLaundriesAsync), api.securityUserAccess)
 export const updateLaundry = api.wrap(updateLaundryAsync, api.securityLaundryOwner, api.securityAdministrator)
 export const fetchLaundry = api.wrap(fetchLaundryAsync, api.securityLaundryUser, api.securityAdministrator)
 export const deleteLaundry = api.wrap(deleteLaundryAsync, api.securityLaundryOwner, api.securityAdministrator)
