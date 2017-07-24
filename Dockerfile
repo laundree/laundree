@@ -32,14 +32,15 @@ USER laundree
 
 ARG NODE_ENV
 EXPOSE 3000
-ADD package.json package-lock.json ./
 RUN bash -c " \
     curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.33.2/install.sh | bash \
 &&  . $NVM_DIR/nvm.sh \
 &&  nvm install $NODE_VERSION \
 &&  nvm alias default $NODE_VERSION \
 &&  nvm use default \
-&&  npm i -g npm@latest \
+&&  npm i -g npm@latest"
+ADD package.json package-lock.json ./
+RUN  bash -c ". $NVM_DIR/nvm.sh \
 &&  npm install --silent"
 ADD . .
 USER root
