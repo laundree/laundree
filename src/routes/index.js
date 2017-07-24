@@ -13,6 +13,7 @@ import inviteCode from './invite-code'
 import lang from './lang'
 import app from './app'
 import webpack from './webpack'
+import userCsv from './user_csv'
 import {fetchRouter} from './swagger'
 
 export function fetchPseudoStaticRoutes () {
@@ -32,6 +33,7 @@ export function fetchPseudoStaticRoutes () {
 
 export function fetchRoutes () {
   const router = express.Router()
+  router.use('/csv', userCsv)
   router.use('/logout', logout)
   router.use('/auth', auth)
   router.use('/calendar', calendar)
