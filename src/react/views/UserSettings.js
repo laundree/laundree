@@ -277,18 +277,6 @@ class UserSettings extends React.Component {
     </section>
   }
 
-  renderCalendar () {
-    return <section>
-      <FormattedMessage tagName='h2' id='user-settings.calendar.title'/>
-      <div className='text'>
-        <FormattedMessage tagName='div' id='user-settings.calendar.text' values={{
-          nl: <br/>,
-          link: <a href='/calendar' target='_blank'><FormattedMessage id='user-settings.calendar.text.link'/></a>
-        }}/>
-      </div>
-    </section>
-  }
-
   render () {
     const user = this.user()
     return <DocumentTitle title='document-title.profile-settings'>
@@ -298,7 +286,6 @@ class UserSettings extends React.Component {
           <FormattedMessage tagName='h2' id='user-settings.basic-info.title'/>
           <UserNameForm user={user}/>
         </section>
-        {this.renderCalendar()}
         {this.renderEmails()}
         {this.renderPassword()}
         {this.renderDelete()}

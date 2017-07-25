@@ -22,7 +22,8 @@ import type {
   AddOneSignalPlayerIdBody,
   ValidateCredentialsBody,
   CreateUserFromProfileBody,
-  VerifyInviteCodeBody
+  VerifyInviteCodeBody,
+  VerifyTokenBody
 } from 'laundree-sdk/lib/sdk'
 
 type Param<T> = { value: T }
@@ -60,7 +61,8 @@ export type Params = {
   addOneSignalPlayerIdBody?: Param<AddOneSignalPlayerIdBody>,
   validateCredentialsBody?: Param<ValidateCredentialsBody>,
   createUserFromProfileBody?: Param<CreateUserFromProfileBody>,
-  verifyInviteCodeBody?: Param<VerifyInviteCodeBody>
+  verifyInviteCodeBody?: Param<VerifyInviteCodeBody>,
+  verifyTokenBody?: Param<VerifyTokenBody>
 }
 
 export type ParsedParams = {
@@ -87,6 +89,7 @@ export type ParsedParams = {
   createMachineBody?: CreateMachineBody,
   updateMachineBody?: UpdateMachineBody,
   createTokenBody?: CreateTokenBody,
+  verifyTokenBody?: VerifyTokenBody,
   createTokenFromEmailPasswordBody?: CreateTokenFromEmailPasswordBody,
   startPasswordResetBody?: StartPasswordResetBody,
   passwordResetBody?: PasswordResetBody,

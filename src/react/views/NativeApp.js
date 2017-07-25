@@ -13,7 +13,7 @@ export default class NativeApp extends React.Component {
     if (!this.props.currentUser) {
       this._token = Promise.resolve({})
     } else {
-      this._token = sdk.api.token.createToken({name: `app-${uuid.v4()}`})
+      this._token = sdk.api.user.createToken(this.props.currentUser, {name: `app-${uuid.v4()}`, type: 'auth'})
         .then(({secret, owner}) => ({secret, userId: owner.id}))
         .catch(err => ({message: err}))
     }

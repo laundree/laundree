@@ -280,10 +280,10 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
    * Create a new calendar token
    * @returns {Promise.<TokenHandler>}
    */
-  generateCalendarToken () {
+  generateCalendarToken (name: string) {
     debug('Generating calendar token')
     return this
-      ._generateToken(uuid.v4(), 'calendar')
+      ._generateToken(name, 'calendar')
       .then(token => {
         debug('Token ', token.model.id)
         this.model.calendarTokensReferences.push(token.model._id)
@@ -329,6 +329,11 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
    */
   findAuthTokenFromSecret (secret: string): Promise<?TokenHandler> {
     return TokenHandler.lib.findTokenFromSecret(secret, {_id: {$in: this.model.authTokens}})
+  }
+
+  async verifyAuthToken (secret: string): Promise<boolean> {
+    const token = await this.findAuthTokenFromSecret(secret)
+    return Boolean(token)
   }
 
   fetchAuthTokens () {

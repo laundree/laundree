@@ -21,7 +21,6 @@ import identicon from './routes/identicon'
 import reactRouter from './routes/react'
 import logoutRoute from './routes/logout'
 import authRoute from './routes/auth'
-import calendarRoute from './routes/calendar'
 import inviteCodeRoute from './routes/invite-code'
 import langRoute from './routes/lang'
 
@@ -86,7 +85,6 @@ app.use(setupSass({
 }))
 app.use('/logout', logoutRoute)
 app.use('/auth', authRoute)
-app.use('/calendar', calendarRoute)
 app.use('/s', inviteCodeRoute)
 app.use('/lang', langRoute)
 app.use('/', reactRouter)
