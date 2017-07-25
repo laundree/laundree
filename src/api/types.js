@@ -25,6 +25,7 @@ import type {
   VerifyInviteCodeBody,
   VerifyTokenBody
 } from 'laundree-sdk/lib/sdk'
+import type {Payload} from '../auth'
 
 type Param<T> = { value: T }
 
@@ -105,9 +106,7 @@ export type ParsedParams = {
 }
 
 type CustomRequestAddendum = {
-  jwt?: {
-    userId?: string
-  },
+  jwt?: Payload,
   swagger: {
     apiPath: string,
     params: Params

@@ -28,7 +28,7 @@ async function createUserFromProfileF (s, p) { // TODO test
   const {createUserFromProfileBody} = api.assertSubjects({
     createUserFromProfileBody: p.createUserFromProfileBody
   })
-  const user = UserHandler.lib.findOrCreateFromProfile(createUserFromProfileBody)
+  const user = await UserHandler.lib.findOrCreateFromProfile(createUserFromProfileBody)
   return user.toRest()
 }
 

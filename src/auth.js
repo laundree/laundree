@@ -9,18 +9,16 @@ type Issuer = 'https://api.laundree.io'
 type Audience = 'https://api.laundree.io'
   | 'https://socket.laundree.io'
 
-type ExpiresIn = number | string
-
-type Payload = {
+export type Payload = {
   iss: Issuer,
   sub: 'user',
-  exp: ExpiresIn,
+  exp: number,
   aud: Audience | Audience[],
   payload: { userId: string }
 } | {
   iss: Issuer,
   sub: 'app',
-  exp: ExpiresIn,
+  exp: number,
   aud: Audience | Audience[]
 }
 
@@ -37,7 +35,24 @@ function sign (payload: Payload): Promise<string> {
   })
 }
 
-export async function signAppToken (iss: Issuer, aud: Audience | Audience[], exp: ExpiresIn = '7d'): Promise<string> {
+export function verify (token: string, audience: Audience) {
+  return new Promise((resolve, reject) => {
+    jwt.verify(
+      token,
+      config.get('auth.secret'),
+      {
+        audience,
+        issuer: ['https://api.laundree.io', 'https://socket.laundree.io', 'https://web.laundree.io']
+      },
+      (err, data) => {
+        if (err) reject(err)
+        else resolve(data)
+      }
+    )
+  })
+}
+
+export async function signAppToken (iss: Issuer, aud: Audience | Audience[], exp: number): Promise<string> {
   return sign({
     iss,
     exp,
