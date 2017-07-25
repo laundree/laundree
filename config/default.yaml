@@ -3,6 +3,9 @@ web:
   port: 3000
   protocol: https
 
+api:
+  base: https://laundree.io/api
+
 auth:
   secret: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
 

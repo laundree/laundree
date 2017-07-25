@@ -8,13 +8,14 @@ import { logError, StatusError } from '../utils/error'
 import express from 'express'
 import type { Application, Request } from './types'
 import Debug from 'debug'
+import {verify} from '../auth'
 
 connectMongoose()
 const debug = Debug('laundree:api.app')
 
 const app: Application = express()
 
-async function auth0 (req, authOrSecDef, scopesOrApiKey, callback) {
+async function jwt (req, authOrSecDef, scopesOrApiKey, callback) {
   const authHeader = req.header('authorization')
   const match = authHeader && authHeader.match(/^Bearer (.+)$/)
   const token = match && match[1]
@@ -24,7 +25,8 @@ async function auth0 (req, authOrSecDef, scopesOrApiKey, callback) {
     return
   }
   try {
-    debug('Decoded successfully')
+    const data = await verify(token, 'https://api.laundree.io')
+    debug('Decoded successfully', data)
     callback()
   } catch (err) {
     debug('Failed verification with error  %s', err)
@@ -45,7 +47,7 @@ export default new Promise((resolve) => {
           next()
         })
         app.use(middleware.swaggerSecurity({
-          auth0
+          jwt
         }))
         app.use(middleware.swaggerValidator({validateResponse: true}))
         app.use(middleware.swaggerRouter({controllers: path.join(__dirname, 'controllers')}))

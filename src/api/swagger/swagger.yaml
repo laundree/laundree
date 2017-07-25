@@ -16,7 +16,7 @@ produces:
   - application/json
 
 securityDefinitions:
-  auth0:
+  jwt:
     authorizationUrl: "https://laundree-test.eu.auth0.com/authorize"
     flow: "implicit"
     type: "oauth2"
@@ -177,7 +177,8 @@ paths:
           schema:
             properties:
               email:
-                $ref: "#/definitions/email"
+                type: string
+                format: email
               passowrd:
                 $ref: "#/definitions/password"
             required:
@@ -1831,6 +1832,7 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/Summary"
+
   Rules:
     properties:
       limit:
@@ -1850,6 +1852,7 @@ definitions:
             $ref: "#/definitions/Time"
           to:
             $ref: "#/definitions/Time"
+
   Token:
     required:
       - id
@@ -1865,6 +1868,7 @@ definitions:
         type: string
       owner:
         $ref: "#/definitions/Summary"
+
   TokenWithSecret:
     required:
       - id
@@ -1893,6 +1897,7 @@ definitions:
         type: string
       href:
         type: string
+
   Booking:
     required:
       - id
@@ -1910,6 +1915,7 @@ definitions:
         $ref: "#/definitions/Date"
       owner:
         type: string
+
   Invite:
     required:
       - id
@@ -1926,6 +1932,7 @@ definitions:
         format: email
       laundry:
         $ref: "#/definitions/Summary"
+
   Machine:
     required:
       - id
@@ -1944,6 +1951,7 @@ definitions:
         $ref: "#/definitions/machineType"
       broken:
         type: boolean
+
   Date:
     required:
       - year
@@ -1965,6 +1973,7 @@ definitions:
         enum:
           - 0
           - 30
+
   Time:
     required:
       - hour
@@ -1977,6 +1986,7 @@ definitions:
         enum:
           - 0
           - 30
+
   Error:
     required:
       - message

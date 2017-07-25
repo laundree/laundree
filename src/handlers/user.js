@@ -584,7 +584,7 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
       },
       locale: this.model.locale || 'en',
       laundries: this.model.laundries.map(LaundryHandler.restSummary),
-      tokens: this.model.tokens.authTokens.map(TokenHandler.restSummary),
+      tokens: this.model.authTokens.map(TokenHandler.restSummary),
       photo: this.photo() || `/identicon/${str.hash(this.model.id)}/150.svg`,
       demo: Boolean(this.model.demo),
       role: this.model.role,
