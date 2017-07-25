@@ -554,6 +554,88 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /users/{userId}/tokens:
+    x-swagger-router-controller: users
+    post:
+      description: Create a new token
+      operationId: createToken
+      tags:
+        - Tokens
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: createTokenBody
+          in: body
+          schema:
+            required:
+              - type
+              - name
+            properties:
+              type:
+                $ref: "#/definitions/tokenType"
+              name:
+                $ref: "#/definitions/name"
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/TokenWithSecret"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        "409":
+          description: Token conflict
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /users/{userId}/tokens/verify:
+    x-swagger-router-controller: users
+    post:
+      description: Verify a token
+      operationId: verifyToken
+      tags:
+        - Tokens
+        - Users
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+        - name: verifyTokenBody
+          in: body
+          schema:
+            required:
+              - type
+              - token
+            properties:
+              type:
+                $ref: "#/definitions/tokenType"
+              token:
+                type: string
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Invalid input
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+
   /tokens:
     x-swagger-router-controller: tokens
     get:
@@ -592,37 +674,6 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Error"
-    post:
-      description: Create a new token
-      operationId: createToken
-      tags:
-        - Tokens
-      parameters:
-        - name: createTokenBody
-          in: body
-          schema:
-            required:
-              - name
-            properties:
-              name:
-                $ref: "#/definitions/name"
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/TokenWithSecret"
-        "403":
-          description: Unauthorized
-          schema:
-            $ref: "#/definitions/Error"
-        "409":
-          description: Token conflict
-          schema:
-            $ref: "#/definitions/Error"
         default:
           description: Error
           schema:
@@ -1937,6 +1988,11 @@ definitions:
     enum:
       - wash
       - dry
+  tokenType:
+    type: string
+    enum:
+      - calendar
+      - auth
   password:
     type: string
     format: password

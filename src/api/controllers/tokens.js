@@ -19,18 +19,34 @@ async function _tokenExists (name, user) {
   return t
 }
 
-async function createTokenAsync (subjects, params) {
-  const {currentUser, createTokenBody} = api.assertSubjects({
-    currentUser: subjects.currentUser,
+async function createTokenAsync (subjects, params) { // TODO test
+  const {user, createTokenBody} = api.assertSubjects({
+    user: subjects.user,
     createTokenBody: params.createTokenBody
   })
-  const name = createTokenBody.name
-  const t = await _tokenExists(name, currentUser)
+  const {name, type} = createTokenBody
+  const t = await _tokenExists(name, user)
   if (t) {
     throw new StatusError('Token already exists', 409, {Location: t.restUrl})
   }
-  const token: TokenHandler = await currentUser.generateAuthToken(name)
+  const token: TokenHandler = await (type === 'calendar'
+    ? user.generateCalendarToken(name)
+    : user.generateAuthToken(name))
   return token.toSecretRest()
+}
+
+async function verifyTokenAsync (subjects, params) { // TODO test
+  const {user, verifyTokenBody} = api.assertSubjects({
+    user: subjects.user,
+    verifyTokenBody: params.verifyTokenBody
+  })
+  const {token, type} = verifyTokenBody
+  const result = await (type === 'calendar'
+    ? user.verifyCalendarToken(token)
+    : user.verifyAuthToken(token))
+  if (!result) {
+    throw new StatusError('Invalid token', 400)
+  }
 }
 
 async function fetchTokenAsync (subjects) {
@@ -60,6 +76,7 @@ async function createTokenFromEmailPasswordAsync (subjects, p) {
 
 export const createTokenFromEmailPassword = api.wrap(createTokenFromEmailPasswordAsync, api.securityNoop)
 export const listTokens = api.wrap(api.paginate(listTokensAsync), api.securityUserAccess)
-export const createToken = api.wrap(createTokenAsync, api.securityUserAccess)
+export const createToken = api.wrap(createTokenAsync, api.securitySelf, api.securityWebApplication)
 export const deleteToken = api.wrap(deleteTokenAsync, api.securityTokenOwner)
 export const fetchToken = api.wrap(fetchTokenAsync, api.securityTokenOwner)
+export const verifyToken = api.wrap(verifyTokenAsync, api.securitySelf, api.securityWebApplication)

@@ -15,7 +15,7 @@ export default class NativeApp extends React.Component {
   }
 
   async setupToken () {
-    const {secret, owner} = await sdk.api.token.createToken({name: `app-${uuid.v4()}`})
+    const {secret, owner} = await sdk.api.user.createToken(this.props.currentUser, {name: `app-${uuid.v4()}`, type: 'auth'})
     window.location = `laundree://auth/${owner.id}/${secret}`
   }
 
