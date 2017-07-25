@@ -75,6 +75,7 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use('/identicon', identicon)
+
 app.use(setupSass({
   src: path.join(__dirname, '..', '..', 'stylesheets'),
   dest: path.join(__dirname, '..', '..', 'dist', 'stylesheets'),
@@ -83,6 +84,7 @@ app.use(setupSass({
   indentedSyntax: true,
   sourceMap: true
 }))
+
 app.use('/logout', logoutRoute)
 app.use('/auth', authRoute)
 app.use('/s', inviteCodeRoute)
