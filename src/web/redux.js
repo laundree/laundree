@@ -47,10 +47,10 @@ function userToReduxUser (user: User): ReduxUser {
 /**
  * Create initial store
  */
-export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
+export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', token: string = '') {
   let events: Action[] = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
-  events.push({type: 'CONFIGURE', payload: {locale, googleApiKey, returningUser}})
+  events.push({type: 'CONFIGURE', payload: {locale, googleApiKey, token}})
   if (!currentUser) return events
   const signInAction: Action = {type: 'SIGN_IN_USER', payload: userToReduxUser(currentUser)}
   events.push(signInAction)
@@ -58,8 +58,8 @@ export async function createInitialEvents (currentUser: ?User, successFlash: str
   return events.concat(event)
 }
 
-export function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', returningUser: boolean = false) {
-  return createInitialEvents(currentUser, successFlash, errorFlash, locale, googleApiKey, returningUser)
+export function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', googleApiKey: string = '', token: string = '') {
+  return createInitialEvents(currentUser, successFlash, errorFlash, locale, googleApiKey, token)
     .then((events) => {
       const store = createStore(redux.reducer)
       events.forEach((event) => store.dispatch(event))

@@ -6,9 +6,15 @@ import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
+import type { LocaleType } from '../../locales/index'
 
 type SignUpState = {
   loading: boolean
+}
+
+type SignUpProps = {
+  locale: LocaleType,
+  to?: string
 }
 
 type SignUpValues = {
@@ -18,7 +24,7 @@ type SignUpValues = {
   password2: string
 }
 
-class SignUp extends ValueUpdater<SignUpValues, *, SignUpState> {
+class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
 
   initialState () {
     return {loading: false}
@@ -36,8 +42,9 @@ class SignUp extends ValueUpdater<SignUpValues, *, SignUpState> {
         {
           displayName: this.state.values.name,
           email: this.state.values.email,
-          password: this.state.values.password
-        } // TODO add locale
+          password: this.state.values.password,
+          locale: this.props.locale
+        }
       )
       this.reset({
         loading: false,

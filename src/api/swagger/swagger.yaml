@@ -28,6 +28,7 @@ paths:
   /users:
     x-swagger-router-controller: users
     get:
+      security: []
       description: List users.
       operationId: listUsers
       parameters:
@@ -67,6 +68,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
     post:
+      security: []
       description: Create a new user.
       operationId: createUser
       parameters:
@@ -208,6 +210,7 @@ paths:
   /users/{userId}:
     x-swagger-router-controller: users
     get:
+      security: []
       description: Returns user with given Id.
       operationId: getUser
       parameters:
@@ -368,6 +371,7 @@ paths:
   /users/{userId}/start-password-reset:
     x-swagger-router-controller: users
     post:
+      security: []
       description: Start user password reset
       operationId: startPasswordReset
       parameters:
@@ -399,6 +403,7 @@ paths:
     x-swagger-router-controller: users
     post:
       description: Reset user password
+      security: []
       operationId: passwordReset
       parameters:
         - name: userId
@@ -481,6 +486,7 @@ paths:
     post:
       description: Start email verification
       operationId: startEmailVerification
+      security: []
       parameters:
         - name: userId
           in: path
@@ -520,6 +526,7 @@ paths:
     post:
       description: Verify a user email
       operationId: verifyEmail
+      security: []
       parameters:
         - name: userId
           in: path

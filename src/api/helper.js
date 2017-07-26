@@ -8,7 +8,8 @@ import TokenHandler from '../handlers/token'
 import InviteHandler from '../handlers/laundry_invitation'
 import BookingHandler from '../handlers/booking'
 import MachineHandler from '../handlers/machine'
-import type {ApiResult, Summary} from 'laundree-sdk/lib/sdk'
+import type { ApiResult, Summary } from 'laundree-sdk/lib/sdk'
+
 /**
  * Return success
  * @param res
@@ -66,8 +67,9 @@ export function securityUserAccess (subjects: Subjects): void {
   testUserAccess(subjects)
 }
 
-export function securityWebApplication () {
-  // TODO implement
+export function securityWebApplication (subjects: Subjects, req: Request) {
+  if (req.jwt && req.jwt.sub === 'app') return
+  throw new StatusError('Not allowed', 403)
 }
 
 export function securitySelf (subjects: Subjects): void {
@@ -156,7 +158,7 @@ export function wrap (func: Middleware, security: Security, ...securities: Secur
   }
 }
 
-type PaginateFunction = (since: ?string, pageSize: number, subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<{summaries: Summary[], linkBase: string}>
+type PaginateFunction = (since: ?string, pageSize: number, subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<{ summaries: Summary[], linkBase: string }>
 
 function buildQs (vars) {
   const qs = Object.keys(vars).reduce((acc, k) => vars[k] === undefined ? acc : `&${acc}=${encodeURIComponent(vars[k])}`, '')

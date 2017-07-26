@@ -5,6 +5,7 @@ const router = express.Router()
 
 router.get('/', function (req: Request, res) {
   req.logout()
+  req.session.token = undefined
   res.redirect('/')
 })
 

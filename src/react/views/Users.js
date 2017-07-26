@@ -14,11 +14,11 @@ import toBuffer from 'blob-to-buffer'
 import type { Laundry, User, Invite } from 'laundree-sdk/lib/redux'
 import type { LocaleType } from '../../locales'
 
-class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry }, {}> {
+class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry, locale: LocaleType }, {}> {
   submitHandler = async (evt: Event) => {
     evt.preventDefault()
     await sdk.api.laundry
-      .inviteUserByEmail(this.props.laundry.id, {email: this.state.values.email}) // TODO add locale
+      .inviteUserByEmail(this.props.laundry.id, {email: this.state.values.email, locale: this.props.locale})
     this.reset()
   }
 
@@ -359,7 +359,7 @@ export default class Users extends React.Component {
           </section>
           <section id='InviteUserForm'>
             <FormattedMessage id='users.invite-from-email' tagName='h2'/>
-            <InviteUserForm laundry={this.props.laundry}/>
+            <InviteUserForm laundry={this.props.laundry} locale={this.props.locale}/>
           </section>
           <section id='QrInviteSection'>
             <FormattedMessage id='users.invite-from-qr' tagName='h2'/>
