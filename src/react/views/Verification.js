@@ -6,16 +6,17 @@ import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { Label, Input, Submit, DocumentTitle } from './intl'
 import { FormattedMessage } from 'react-intl'
+import type { LocaleType } from '../../locales/index'
 
 type VerificationValues = { email: string }
 
-export default class Verification extends ValueUpdater<VerificationValues, {}, { loading: boolean }> {
+export default class Verification extends ValueUpdater<VerificationValues, {locale: LocaleType}, { loading: boolean }> {
 
   submitHandler = async (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()
     try {
-      await sdk.api.user.startEmailVerification({email: this.state.values.email}) // TODO add locale
+      await sdk.api.user.startEmailVerification({email: this.state.values.email, locale: this.props.locale})
       this.reset({
         loading: false,
         notion: {message: <FormattedMessage id='auth.verification.success'/>, success: true}

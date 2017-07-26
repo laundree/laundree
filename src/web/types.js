@@ -8,7 +8,7 @@ type CustomRequestAddendum = {
   locale?: LocaleType,
   user?: User,
   session: {
-    returningUser?: boolean,
+    token?: string,
     to?: string,
     errorTo?: string,
     locale?: LocaleType

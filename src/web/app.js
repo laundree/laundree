@@ -23,7 +23,7 @@ import logoutRoute from './routes/logout'
 import authRoute from './routes/auth'
 import inviteCodeRoute from './routes/invite-code'
 import langRoute from './routes/lang'
-
+import { signUserToken, verifyExpiration } from '../auth'
 const debug = Debug('laundree.app')
 
 const app: Application = express()
@@ -47,6 +47,17 @@ app.use(setupSass({
 }))
 app.use(express.static(path.join(__dirname, '..', '..', 'public')))
 app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
+app.use('/identicon', identicon)
+
+app.use(setupSass({
+  src: path.join(__dirname, '..', '..', 'stylesheets'),
+  dest: path.join(__dirname, '..', '..', 'dist', 'stylesheets'),
+  prefix: '/stylesheets',
+  outputStyle: config.get('sass.outputStyle'),
+  indentedSyntax: true,
+  sourceMap: true
+}))
+
 app.get('/robots.txt', (req: Request, res: Response) => {
   res.type('text/plain')
   const sitemapUrl = `${config.get('web.protocol')}://${config.get('web.host')}/sitemap.txt`
@@ -61,10 +72,25 @@ passportSetup(app)
 // SETUP LOCALE
 app.use(locale(supported))
 app.use((req: Request, res: Response, next) => {
-  let locale =req.session.locale || req.locale
+  let locale = req.session.locale || req.locale
   locale = toLocale(locale, 'en')
   req.locale = locale
   res.set('Content-Language', locale)
+  next()
+})
+
+app.use(async (req: Request, res: Response, next) => {
+  if (!req.user) {
+    return next()
+  }
+  const id = req.user.id
+  debug('Checking token')
+  if (req.session.token && verifyExpiration(req.session.token, 60 * 60)) {
+    debug('Token is still fresh AF')
+    return next()
+  }
+  debug('Renewing token')
+  req.session.token = await signUserToken(id, 'https://web.laundree.io', ['https://api.laundree.io', 'https://socket.laundree.io'], Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60)
   next()
 })
 
@@ -74,16 +100,6 @@ handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
-app.use('/identicon', identicon)
-
-app.use(setupSass({
-  src: path.join(__dirname, '..', '..', 'stylesheets'),
-  dest: path.join(__dirname, '..', '..', 'dist', 'stylesheets'),
-  prefix: '/stylesheets',
-  outputStyle: config.get('sass.outputStyle'),
-  indentedSyntax: true,
-  sourceMap: true
-}))
 
 app.use('/logout', logoutRoute)
 app.use('/auth', authRoute)

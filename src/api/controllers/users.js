@@ -46,7 +46,7 @@ async function validateCredentialsF (s, p) { // TODO test
     throw new StatusError('User not found', 404)
   }
   return {
-    userId: user.id,
+    userId: user.model.id,
     emailVerified: user.isVerified(email)
   }
 }

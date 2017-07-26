@@ -17,6 +17,7 @@ import type {
   ListMachinesAction,
   ListBookingsAction
 } from 'laundree-sdk/lib/redux'
+import { verify } from '../auth'
 
 const debug = Debug('laundree.lib.socket_io')
 
@@ -217,51 +218,59 @@ function setupAdminFunctions (socket) {
                demoUserCount,
                bookingCount,
                machineCount
-             ]) => [{
-        type: 'UPDATE_STATS',
-        payload: {
-          demoLaundryCount,
-          demoUserCount,
-          laundryCount,
-          userCount,
-          bookingCount,
-          machineCount
-        }
-      }])
+             ]) =>
+        [
+          {
+            type: 'UPDATE_STATS',
+            payload: {
+              demoLaundryCount,
+              demoUserCount,
+              laundryCount,
+              userCount,
+              bookingCount,
+              machineCount
+            }
+          }])
   )
 }
 
-function authenticateSocket (socket): Promise<?UserHandler> {
+async function authenticateSocket (socket): Promise<?UserHandler> {
   debug('Authenticating user')
-  const {userId, token} = socket.handshake.query || {} // Authenticate token from query
+  const {userId, token, jwt} = socket.handshake.query || {} // Authenticate token from query
   if (userId && token) {
     debug('Got userId and token', userId, token)
-    return UserHandler
+    const {user, token: token2} = await UserHandler
       .lib
       .findFromIdWithTokenSecret(userId, token)
-      .then(({user, token}) => {
-        if (!user || !token) {
-          debug('Authentication failed')
-          return
-        }
-        token.seen()
-        debug('Authentication successful')
-        return user
-      })
+    if (user && token2) {
+      token2.seen()
+      debug('Authentication successful')
+      return user
+    }
+    debug('Authentication failed')
   }
-  const currentUserId = null
-  if (!currentUserId) return Promise.resolve()
-  return UserHandler.lib.findFromId(currentUserId)
+  if (jwt) {
+    debug('Got jwt', jwt)
+    try {
+      const decoded = await verify(jwt, {audience: 'https://socket.laundree.io', subject: 'user'})
+      const user = await UserHandler.lib.findFromId(decoded.userId)
+      if (user) {
+        return user
+      }
+    } catch (err) {
+      debug('Authentication failed', err)
+    }
+  }
 }
 
 function setupRedux (io) {
   setupRooms(io)
   const userUpdateEmitter = new EventEmitter()
   UserHandler.lib.on('update', user => userUpdateEmitter.emit(user.model.id, user))
-  io.on('connect', socket => {
+  io.on('connect', async socket => {
     debug('Connecting socket')
-    authenticateSocket(socket)
-      .then(user => setupUser(socket, userUpdateEmitter, user))
+    const user = await authenticateSocket(socket)
+    setupUser(socket, userUpdateEmitter, user)
   })
 }
 

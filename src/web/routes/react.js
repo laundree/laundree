@@ -17,8 +17,8 @@ router.use((req: Request, res, next) => {
   const locale = req.locale
   const successFlash = req.flash('success')
   const failureFlash = req.flash('error')
-  const returningUser = req.session.returningUser
-  createInitialStore(user, successFlash, failureFlash, locale, config.get('google.clientApiKey'), returningUser)
+  const apiKey = req.session.token
+  createInitialStore(user, successFlash, failureFlash, locale, config.get('google.clientApiKey'), apiKey)
     .then(store => {
       const context = {}
       const html = renderToString(<StaticRouter context={context} location={req.originalUrl}>

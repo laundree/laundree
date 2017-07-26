@@ -8,13 +8,15 @@ import { DocumentTitle, Input, Submit, Label } from './intl'
 import { FormattedMessage } from 'react-intl'
 import type { Location } from 'react-router'
 import queryString from 'querystring'
+import type {LocaleType} from '../../locales'
 
 type ResetValues = {
   password: string
 }
 
 type ResetProps = {
-  location: Location
+  location: Location,
+  locale: LocaleType
 }
 
 type ResetState = {
@@ -53,9 +55,7 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
   render () {
     return <DocumentTitle title='document-title.reset-password'>
       <div>
-        <h1>
-          Reset your password
-        </h1>
+        <FormattedMessage tagName='h1' id='auth.forgot.title'/>
         <Link to='/' id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo'/>

@@ -25,8 +25,9 @@ async function jwt (req, authOrSecDef, scopesOrApiKey, callback) {
     return
   }
   try {
-    const data = await verify(token, 'https://api.laundree.io')
+    const data = await verify(token, {audience: 'https://api.laundree.io'})
     debug('Decoded successfully', data)
+    req.jwt = data
     callback()
   } catch (err) {
     debug('Failed verification with error  %s', err)
