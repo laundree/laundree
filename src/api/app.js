@@ -8,7 +8,8 @@ import { logError, StatusError } from '../utils/error'
 import express from 'express'
 import type { Application, Request } from './types'
 import Debug from 'debug'
-import {verify} from '../auth'
+import { verify } from '../auth'
+import UserHandler from '../handlers/user'
 
 connectMongoose()
 const debug = Debug('laundree:api.app')
@@ -27,12 +28,42 @@ async function jwt (req, authOrSecDef, scopesOrApiKey, callback) {
   try {
     const data = await verify(token, {audience: 'https://api.laundree.io'})
     debug('Decoded successfully', data)
-    req.jwt = data
+    req.userId = data.userId
+    req.subject = data.sub
     callback()
   } catch (err) {
     debug('Failed verification with error  %s', err)
     callback(new StatusError('Invalid token', 401))
   }
+}
+
+async function basic (req, authOrSecDef, scopesOrApiKey, callback) {
+  const authHeader = req.header('authorization')
+  const match = authHeader && authHeader.match(/^Basic (.+)$/)
+  const token = match && match[1]
+  debug('Verifying token %s', token)
+  if (!token) {
+    callback(new StatusError('Token not found', 401))
+    return
+  }
+  const data = Buffer.from(token, 'base64').toString().split(':')
+  if (data.length < 2) {
+    throw new StatusError('Invalid token', 401)
+  }
+  const username = data[0]
+  const password = data.slice(1).join(':')
+  const user = await UserHandler.lib.findFromId(username)
+  if (!user) {
+    throw new StatusError('Invalid token', 401)
+  }
+  const [validToken, validPassword] = await Promise.all([user.verifyAuthToken(password), user.verifyPassword(password)])
+  if (!validToken && !validPassword) {
+    throw new StatusError('Invalid token', 401)
+  }
+  debug('Decoded successfully')
+  req.userId = user.model.id
+  req.subject = 'user'
+  callback()
 }
 
 export default new Promise((resolve) => {
@@ -48,13 +79,17 @@ export default new Promise((resolve) => {
           next()
         })
         app.use(middleware.swaggerSecurity({
-          jwt
+          jwt,
+          basic
         }))
         app.use(middleware.swaggerValidator({validateResponse: true}))
         app.use(middleware.swaggerRouter({controllers: path.join(__dirname, 'controllers')}))
         app.get('/', (req: Request, res, next) => {
           const err: Error = new StatusError('Not found', 404)
           next(err)
+        })
+        app.use((err, req: Request, res, next) => {
+          next(err.code === 'SCHEMA_VALIDATION_FAILED' ? new StatusError(err.message, 400) : err)
         })
         app.use((err, req: Request, res, next) => {
           const status = (typeof err.status === 'number' && err.status) || 500

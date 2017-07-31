@@ -4,7 +4,7 @@ import chai from 'chai'
 import * as dbUtils from '../../../db_utils'
 import UserHandler from '../../../../test_target/handlers/user'
 import TokenHandler from '../../../../test_target/handlers/token'
-import UserModel from '../../../../test_target/models/user'
+import UserModel from '../../../../test_target/db/models/user'
 
 chai.use(require('chai-as-promised'))
 chai.use(require('chai-things'))

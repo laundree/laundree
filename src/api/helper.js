@@ -41,7 +41,7 @@ async function pullSubject<H: Handler> (id: string, _Handler: Class<H>): Promise
 }
 
 async function pullSubjects (params: ParsedParams, req: Request): Promise<Subjects> {
-  const currentUserId = (req.jwt && req.jwt.userId) || null
+  const currentUserId = req.userId || null
   const currentUser = await (currentUserId && UserHandler.lib.findFromId(currentUserId))
   const [user, machine, token, invite, laundry, booking] = await Promise.all([
     params.userId ? pullSubject(params.userId, UserHandler) : null,
@@ -68,7 +68,7 @@ export function securityUserAccess (subjects: Subjects): void {
 }
 
 export function securityWebApplication (subjects: Subjects, req: Request) {
-  if (req.jwt && req.jwt.sub === 'app') return
+  if (req.subject === 'app') return
   throw new StatusError('Not allowed', 403)
 }
 

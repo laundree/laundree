@@ -5,7 +5,7 @@
 import chai from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import {clearDb} from '../../db_utils'
-import UserModel from '../../../test_target/models/user'
+import UserModel from '../../../test_target/db/models/user'
 
 chai.use(chaiAsPromised)
 chai.should()

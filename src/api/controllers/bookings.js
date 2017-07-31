@@ -118,5 +118,5 @@ async function updateBookingAsync (subjects, params) {
 export const listBookings = api.wrap(api.paginate(listBookingsAsync), api.securityLaundryUser, api.securityAdministrator)
 export const createBooking = api.wrap(createBookingAsync, api.securityLaundryUser)
 export const fetchBooking = api.wrap(fetchBookingAsync, api.securityLaundryUser, api.securityAdministrator)
-export const deleteBooking = api.wrap(deleteBookingAsync, api.securityBookingCreator, api.securityLaundryOwner)
+export const deleteBooking = api.wrap(deleteBookingAsync, api.securityLaundryOwner, api.securityBookingCreator)
 export const updateBooking = api.wrap(updateBookingAsync, api.securityBookingCreator)
