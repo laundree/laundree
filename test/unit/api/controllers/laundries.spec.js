@@ -1,20 +1,21 @@
 import request from 'supertest'
-import {app} from '../../../../test_target/app'
-import chai from 'chai'
+import promisedApp from '../../../../test_target/api/app'
 import LaundryHandler from '../../../../test_target/handlers/laundry'
 import LaundryInvitationHandler from '../../../../test_target/handlers/laundry_invitation'
 import UserHandler from '../../../../test_target/handlers/user'
 import BookingHandler from '../../../../test_target/handlers/booking'
 import * as dbUtils from '../../../db_utils'
+import assert from 'assert'
 
 import base64UrlSafe from 'urlsafe-base64'
-chai.use(require('chai-as-promised'))
-chai.use(require('chai-things'))
-chai.should()
-const assert = chai.assert
+
+let app
 
 describe('controllers', function () {
-  beforeEach(() => dbUtils.clearDb())
+  beforeEach(async () => {
+    await dbUtils.clearDb()
+    app = await promisedApp
+  })
   describe('laundries', function () {
     this.timeout(5000)
     describe('GET /api/laundries', () => {
@@ -703,7 +704,7 @@ describe('controllers', function () {
               .lib
               .find({email: 'alice@example.com', laundry: laundry.model._id})
               .then(([invitation]) => {
-                chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
+                assert(invitation !== undefined, 'Invitation should not be undefined.')
               }))))
 
       it('should create invitation in lower case', () =>
@@ -719,7 +720,7 @@ describe('controllers', function () {
               .lib
               .find({email: 'alice@example.com', laundry: laundry.model._id})
               .then(([invitation]) => {
-                chai.assert(invitation !== undefined, 'Invitation should not be undefined.')
+                assert(invitation !== undefined, 'Invitation should not be undefined.')
               }))))
 
       it('should not create another invitation', () =>

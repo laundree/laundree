@@ -1,17 +1,17 @@
 import request from 'supertest'
-import {app} from '../../../../test_target/app'
-import chai from 'chai'
+import promisedApp from '../../../../test_target/api/app'
 import * as dbUtils from '../../../db_utils'
 import UserHandler from '../../../../test_target/handlers/user'
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserModel from '../../../../test_target/db/models/user'
+import assert from 'assert'
 
-chai.use(require('chai-as-promised'))
-chai.use(require('chai-things'))
-chai.should()
-
+let app
 describe('controllers', function () {
-  beforeEach(() => dbUtils.clearDb())
+  beforeEach(async () => {
+    await dbUtils.clearDb()
+    app = await promisedApp
+  })
   describe('users', function () {
     this.timeout(5000)
     describe('GET /api/users/{id}', () => {
@@ -715,7 +715,7 @@ describe('controllers', function () {
               .expect(204)
               .then(res =>
                 UserHandler.lib.findFromId(user.model.id)
-                  .then((result) => chai.assert(!result)))))
+                  .then((result) => assert(!result)))))
 
       it('should fail on owner', () =>
         dbUtils.populateLaundries(1).then(({user, token}) =>

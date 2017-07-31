@@ -8,7 +8,9 @@ import { locales } from '../locales'
 import type { LocaleType } from '../locales'
 import Mailgun from 'mailgun-js'
 import MailComposer from 'nodemailer/lib/mail-composer'
+import {setupHandlebarsHelpers} from '../utils/handlebars'
 
+setupHandlebarsHelpers()
 const mailgun = Mailgun(config.get('mailgun'))
 const debug = Debug('laundree.utils.mail')
 
