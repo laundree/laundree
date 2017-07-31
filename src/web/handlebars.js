@@ -24,23 +24,9 @@ function setupRenderHb (req: Request, res, next) {
   next()
 }
 
-function format (context, options) {
-  return new handlebars.SafeString(Object.keys(options.hash).reduce((message, key) => {
-    const regexp = new RegExp(`{${key}}`, 'g')
-    return message.replace(regexp, options.hash[key])
-  }, context))
-}
-
 export default function setup (app: Application) {
   app.use(setupRenderHb)
-  handlebars.registerHelper({
-    formatIntl: (context, options) => {
-      const messages = options.hash.messages
-      const message = messages[context]
-      return format(message, options)
-    },
-    format
-  })
+  hb.setupHandlebarsHelpers()
   return fs.readdir(partialsPath)
     .then(files => Promise.all(files.map(file => fs
       .readFile(path.resolve(partialsPath, file))

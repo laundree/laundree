@@ -1,21 +1,21 @@
 import request from 'supertest'
-import {app} from '../../../../test_target/app'
-import chai from 'chai'
+import promisedApp from '../../../../test_target/api/app'
 import MachineHandler from '../../../../test_target/handlers/machine'
 import * as dbUtils from '../../../db_utils'
-
-chai.use(require('chai-as-promised'))
-chai.use(require('chai-things'))
-chai.should()
-const assert = chai.assert
+import assert from 'assert'
 
 describe('controllers', function () {
   this.timeout(10000)
-  let admin, admintoken
-  beforeEach(() => dbUtils.clearDb().then(() => dbUtils.createAdministrator()).then(({user, token}) => {
+  let admin, admintoken, app
+
+  beforeEach(async () => {
+    await dbUtils.clearDb()
+    const {user, token} = await dbUtils.createAdministrator()
+    app = await promisedApp
     admin = user
     admintoken = token
-  }))
+  })
+
   describe('machines', function () {
     describe('GET /api/laundries/{id}/machines', () => {
       it('should fail on not authenticated', () =>

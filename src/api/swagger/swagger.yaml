@@ -1706,6 +1706,7 @@ paths:
   /contact:
     x-swagger-router-controller: contact
     post:
+      security: []
       operationId: contact
       tags:
         - Contact

@@ -1,17 +1,19 @@
 import request from 'supertest'
-import {app} from '../../../../test_target/app'
-import chai from 'chai'
+import promisedApp from '../../../../test_target/api/app'
+
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserHandler from '../../../../test_target/handlers/user'
 import * as dbUtils from '../../../db_utils'
 import faker from 'faker'
-chai.use(require('chai-as-promised'))
-chai.use(require('chai-things'))
-chai.should()
-const assert = chai.assert
+import assert from 'assert'
+
+let app
 
 describe('controllers', function () {
-  beforeEach(() => dbUtils.clearDb())
+  beforeEach(async () => {
+    await dbUtils.clearDb()
+    app = await promisedApp
+  })
   describe('tokens', function () {
     this.timeout(5000)
     describe('GET /api/tokens', () => {
