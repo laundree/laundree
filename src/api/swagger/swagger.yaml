@@ -20,9 +20,12 @@ securityDefinitions:
     authorizationUrl: "https://laundree-test.eu.auth0.com/authorize"
     flow: "implicit"
     type: "oauth2"
+  basic:
+    type: basic
 
 security:
   - jwt: []
+  - basic: []
 
 paths:
   /users:
