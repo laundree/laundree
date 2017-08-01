@@ -92,7 +92,7 @@ export default new Promise((resolve) => {
           next(err.code === 'SCHEMA_VALIDATION_FAILED' ? new StatusError(err.message, 400) : err)
         })
         app.use((err, req: Request, res, next) => {
-          const status = (typeof err.status === 'number' && err.status) || 500
+          const status = (typeof err.status === 'number' && err.status) || res.statusCode || 500
           res.status(status)
           if (status !== 500) {
             res.json({message: err.message})

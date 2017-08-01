@@ -18,7 +18,7 @@ type CustomRequestAddendum = {
 }
 
 type CustomResponseAddendum = {
-  renderHb: (file: string, options: Object) => void
+  renderHb: (file: string, options: Object) => Promise<void>
 }
 
 export type Request = Req<CustomRequestAddendum, CustomResponseAddendum> & CustomRequestAddendum
