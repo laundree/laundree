@@ -13,25 +13,30 @@ const debug = Debug('laundree.lib.handlebars')
 const partialsPath = path.resolve(__dirname, '..', '..', 'templates', 'partials')
 
 function setupRenderHb (req: Request, res, next) {
-  res.renderHb = (file: string, args) => {
-    const locale = toLocale(req.locale || '', 'en')
-    hb
-      .render(path.join('web', file),
-        args,
-        locale)
-      .then(result => res.send(result), next)
+  res.renderHb = async (file: string, args) => {
+    try {
+      const locale = toLocale(req.locale || '', 'en')
+      const result = await hb
+        .render(path.join('web', file),
+          args,
+          locale)
+      res.send(result)
+    } catch (err) {
+      next(err)
+    }
   }
   next()
 }
 
-export default function setup (app: Application) {
+async function registerPartial (file) {
+  const data = await fs.readFile(path.resolve(partialsPath, file))
+  debug(`Registered partial ${file}`)
+  return handlebars.registerPartial(file, handlebars.compile(data))
+}
+
+export default async function setup (app: Application) {
   app.use(setupRenderHb)
   hb.setupHandlebarsHelpers()
-  return fs.readdir(partialsPath)
-    .then(files => Promise.all(files.map(file => fs
-      .readFile(path.resolve(partialsPath, file))
-      .then(data => {
-        debug(`Registered partial ${file}`)
-        return handlebars.registerPartial(file, handlebars.compile(data))
-      }))))
+  const files = await fs.readdir(partialsPath)
+  await Promise.all(files.map(registerPartial))
 }
