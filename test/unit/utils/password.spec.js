@@ -1,26 +1,27 @@
-/**
- * Created by budde on 06/05/16.
- */
+// @flow
 
-const password = require('../../../test_target/utils/password')
-
-const chai = require('chai')
-chai.use(require('chai-as-promised'))
-chai.should()
+import * as password from '../../../test_target/utils/password'
+import assert from 'assert'
 
 const clearPassword = 'password1234'
 
 describe('utils', () => {
   describe('password', () => {
     describe('hashPassword', () => {
-      it('should hash', () => password.hashPassword(clearPassword, 1).should.eventually.not.be.undefined)
+      it('should hash', async () => {
+        assert(await password.hashPassword(clearPassword, 1))
+      })
     })
     describe('comparePassword', () => {
-      it('should match', () => password.hashPassword(clearPassword, 2)
-        .then((hash) => password.comparePassword(clearPassword, hash)).should.eventually.be.true)
+      it('should match', async () => {
+        const hash = await password.hashPassword(clearPassword, 2)
+        assert(password.comparePassword(clearPassword, hash))
+      })
     })
     describe('generateToken', () => {
-      it('should generate hex string', () => password.generateToken().should.eventually.match(/^[a-f0-9]{40}$/))
+      it('should generate hex string', async () => {
+        assert((await password.generateToken()).match(/^[a-f0-9]{40}$/))
+      })
     })
   })
 })

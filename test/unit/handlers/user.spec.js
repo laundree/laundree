@@ -1,16 +1,12 @@
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
+// @flow
+
 import * as dbUtils from '../../db_utils'
 import UserHandler from '../../../test_target/handlers/user'
 import LaundryInvitationHandler from '../../../test_target/handlers/laundry_invitation'
 import LaundryHandler from '../../../test_target/handlers/laundry'
+import assert from 'assert'
 
 const clearDb = dbUtils.clearDb
-
-chai.use(chaiAsPromised)
-chai.should()
-
-const assert = chai.assert
 
 describe('handlers', () => {
   describe('UserHandler', function () {
@@ -24,9 +20,10 @@ describe('handlers', () => {
     }
     let user = null
 
-    beforeEach(() => clearDb().then(() => UserHandler.lib.createUserFromProfile(profile)).then((u) => {
-      user = u
-    }))
+    beforeEach(async () => {
+      await clearDb()
+      user = await UserHandler.lib.createUserFromProfile(profile)
+    })
 
     describe('createUserFromProfile', () => {
       it('should set role', () => user.model.role.should.equal('user'))

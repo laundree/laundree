@@ -1,3 +1,5 @@
+// @flow
+
 import request from 'supertest'
 import promisedApp from '../../../../test_target/api/app'
 import * as dbUtils from '../../../db_utils'

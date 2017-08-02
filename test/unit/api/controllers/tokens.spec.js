@@ -1,6 +1,7 @@
+// @flow
+
 import request from 'supertest'
 import promisedApp from '../../../../test_target/api/app'
-
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserHandler from '../../../../test_target/handlers/user'
 import * as dbUtils from '../../../db_utils'
@@ -79,21 +80,21 @@ describe('controllers', function () {
       })
     })
 
-    describe('POST /tokens', () => {
+    describe('POST /users/:userId/tokens', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .post('/tokens')
-          .send({name: 'Token 1'})
+          .post(`/users/someid/tokens`)
+          .send({name: 'Token 1', type: 'auth'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403))
+          .expect(401))
 
       it('should fail on empty name', async () => {
         const {user, tokens} = await dbUtils.populateTokens(1)
         await request(app)
           .post(`/users/${user.model.id}/tokens`)
-          .send({name: ' '})
+          .send({name: ' ', type: 'auth'})
           .set('Accept', 'application/json')
           .auth(user.model.id, tokens[0].secret)
           .expect('Content-Type', /json/)
@@ -104,7 +105,7 @@ describe('controllers', function () {
         const {user, tokens} = await dbUtils.populateTokens(1)
         const res = await request(app)
           .post(`/users/${user.model.id}/tokens`)
-          .send({name: tokens[0].model.name})
+          .send({name: tokens[0].model.name, type: 'auth'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .auth(user.model.id, tokens[0].secret)
@@ -117,7 +118,7 @@ describe('controllers', function () {
         const {user, tokens} = await dbUtils.populateTokens(1)
         const res = await request(app)
           .post(`/users/${user.model.id}/tokens`)
-          .send({name: tokens[0].model.name + ' 2'})
+          .send({name: tokens[0].model.name + ' 2', type: 'auth'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .auth(user.model.id, tokens[0].secret)
@@ -135,7 +136,7 @@ describe('controllers', function () {
         const {user, tokens} = await dbUtils.populateTokens(1)
         const res = await request(app)
           .post(`/users/${user.model.id}/tokens`)
-          .send({name: tokens[0].model.name + ' 2'})
+          .send({name: tokens[0].model.name + ' 2', type: 'auth'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .auth(user.model.id, tokens[0].secret)
@@ -152,7 +153,7 @@ describe('controllers', function () {
         const {user, tokens} = await dbUtils.populateTokens(1)
         const res = await request(app)
           .post(`/users/${user.model.id}/tokens`)
-          .send({name: tokens[0].model.name + ' 2'})
+          .send({name: tokens[0].model.name + ' 2', type: 'auth'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .auth(user.model.id, tokens[0].secret)
@@ -165,6 +166,8 @@ describe('controllers', function () {
         assert(result)
       })
     })
+    // TODO test with calendar token
+    // TODO test verify
     describe('POST /tokens/email-password', () => {
       let user, token
       const name = faker.name.findName()
@@ -193,8 +196,8 @@ describe('controllers', function () {
         request(app)
           .post('/tokens/email-password')
           .send({email, password: password, name: tokenName})
-          .expect('Location', token.restUrl)
           .expect(409)
+          .expect('Location', token.restUrl)
       )
       it('should succeed', async () => {
         const {body} = await request(app)
@@ -213,7 +216,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403)
+          .expect(401)
       )
 
       it('should return 404 on invalid id', async () => {
@@ -273,7 +276,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403)
+          .expect(401)
       )
 
       it('should return 404 on invalid id', async () => {
@@ -320,7 +323,7 @@ describe('controllers', function () {
           .set('Content-Type', 'application/json')
           .auth(user.model.id, tokens[0].secret)
           .expect(204)
-        const t = TokenHandler
+        const t = await TokenHandler
           .lib
           .findFromId(tokens[0].model.id)
         assert(!t)

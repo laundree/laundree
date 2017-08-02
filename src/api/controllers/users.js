@@ -4,6 +4,7 @@ import * as api from '../helper'
 import * as mail from '../../utils/mail'
 import { StatusError } from '../../utils/error'
 import UserHandler from '../../handlers/user'
+import TokenHandler from '../../handlers/token'
 
 async function getUserF (subjects) {
   const user = api.assert(subjects.user)
@@ -159,6 +160,27 @@ function fetchUserEmailsF (subjects) {
   return user.model.emails
 }
 
+async function _tokenExists (name, user) {
+  const [t] = await TokenHandler.lib.find({name, owner: user.model._id})
+  return t
+}
+
+async function createTokenF (subjects, params) { // TODO test
+  const {user, createTokenBody} = api.assertSubjects({
+    user: subjects.user,
+    createTokenBody: params.createTokenBody
+  })
+  const {name, type} = createTokenBody
+  const t = await _tokenExists(name, user)
+  if (t) {
+    throw new StatusError('Token already exists', 409, {Location: t.restUrl})
+  }
+  const token: TokenHandler = await (type === 'calendar'
+    ? user.generateCalendarToken(name)
+    : user.generateAuthToken(name))
+  return token.toSecretRest()
+}
+
 export const getUser = api.wrap(getUserF, api.securityNoop)
 export const listUsers = api.wrap(api.paginate(listUsersF), api.securityNoop)
 export const createUser = api.wrap(createUserF, api.securityNoop)
@@ -173,4 +195,4 @@ export const fetchUserEmails = api.wrap(fetchUserEmailsF, api.securitySelf, api.
 export const addOneSignalPlayerId = api.wrap(addOneSignalPlayerIdF, api.securitySelf)
 export const createUserFromProfile = api.wrap(createUserFromProfileF, api.securityWebApplication)
 export const validateCredentials = api.wrap(validateCredentialsF, api.securityWebApplication)
-
+export const createToken = api.wrap(createTokenF, api.securitySelf, api.securityWebApplication)
