@@ -693,6 +693,7 @@ paths:
     x-swagger-router-controller: tokens
     post:
       operationId: createTokenFromEmailPassword
+      security: []
       tags:
         - Tokens
       parameters:

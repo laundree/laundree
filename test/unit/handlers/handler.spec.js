@@ -1,23 +1,17 @@
-/**
- * Created by budde on 02/10/16.
- */
+// @flow
 
-const chai = require('chai')
-chai.should()
-const {Handler} = require('../../../test_target/handlers/handler')
+import assert from 'assert'
+import { Handler } from '../../../test_target/handlers/handler'
 
 describe('handlers', () => {
   describe('Handler', () => {
     describe('updateDocument', () => {
-      it('should do nothing with no actions', () => {
+      it('should do nothing with no actions', async () => {
         const handler = new Handler({id: 1, docVersion: 0})
-        return handler
-          .updateDocument()
-          .then(h2 => {
-            h2.should.deep.equal(handler)
-          })
+        const h2 = await handler.updateDocument()
+        assert.deepEqual(h2, handler)
       })
-      it('should update document', () => {
+      it('should update document', async () => {
         const handler = new Handler({id: 1, docVersion: 0})
         handler.updateActions = [
           (h) => {
@@ -26,12 +20,9 @@ describe('handlers', () => {
             return Promise.resolve(h)
           }
         ]
-        return handler
-          .updateDocument()
-          .then(h2 => {
-            h2.model.id.should.equal(2)
-            h2.model.docVersion.should.equal(1)
-          })
+        const h2 = await handler.updateDocument()
+        assert(h2.model.id === 2)
+        assert(h2.model.docVersion === 1)
       })
     })
   })

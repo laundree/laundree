@@ -1,12 +1,8 @@
-/**
- * Created by budde on 27/04/16.
- */
+// @flow
 
-const chai = require('chai')
-const chaiAsPromised = require('chai-as-promised')
-chai.use(chaiAsPromised)
-chai.should()
-const dbUtils = require('../../db_utils')
+import * as dbUtils from '../../db_utils'
+import assert from 'assert'
+
 const clearDb = dbUtils.clearDb
 
 describe('handlers', () => {
@@ -15,25 +11,25 @@ describe('handlers', () => {
     beforeEach(() => clearDb())
 
     describe('updateActions', () => {
-      it('should work with no change', () => dbUtils
-        .populateBookings(1)
-        .then(({booking}) => booking.updateDocument()))
+      it('should work with no change', async () => {
+        const {booking} = await dbUtils.populateBookings(1)
+        booking.updateDocument()
+      })
 
-      it('should work with no change', () => dbUtils
-        .populateBookings(1)
-        .then(({booking}) => {
-          booking.model.docVersion = 0
-          return booking.save().then(() => booking.updateDocument())
-        })
-        .then(booking => {
-          booking.model.docVersion.should.equal(1)
-        }))
+      it('should work with no change', async () => {
+        const {booking} = await dbUtils.populateBookings(1)
+        booking.model.docVersion = 0
+        await booking.save()
+        await booking.updateDocument()
+        assert(booking.model.docVersion === 1)
+      })
     })
     describe('fetchMachine', () => {
-      it('should fetch machine', () => dbUtils
-        .populateBookings(1)
-        .then(({machine, booking}) => booking.fetchMachine()
-          .then(machine2 => machine2.model.id.should.equal(machine.model.id))))
+      it('should fetch machine', async () => {
+        const {machine, booking} = await dbUtils.populateBookings(1)
+        const machine2 = await booking.fetchMachine()
+        assert(machine2.model.id === machine.model.id)
+      })
     })
   })
 })

@@ -1,3 +1,5 @@
+// @flow
+
 import request from 'supertest'
 import promisedApp from '../../../../test_target/api/app'
 import LaundryInvitationHandler from '../../../../test_target/handlers/laundry_invitation'

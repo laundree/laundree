@@ -142,6 +142,19 @@ function buildSecurityFunction (securities: Security[]): (params: ParsedParams, 
 
 type Middleware = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<?ApiResult>
 
+export function handleError (res: Response, err: Error) {
+  const status = (typeof err.status === 'number' && err.status) || res.statusCode || 500
+  res.status(status)
+  const headers: Object = (typeof err.headers === 'object') && err.headers ? err.headers : {}
+  Object.keys(headers).forEach(key => res.set(key, headers[key]))
+  if (status !== 500) {
+    res.json({message: err.message})
+    return
+  }
+  logError(err)
+  res.json({message: 'Internal server error'})
+}
+
 export function wrap (func: Middleware, security: Security, ...securities: Security[]): (req: Request, res: Response) => * {
   const securityFunction = buildSecurityFunction([security].concat(securities))
   return (req: Request, res: Response) => {
@@ -149,12 +162,7 @@ export function wrap (func: Middleware, security: Security, ...securities: Secur
     securityFunction(params, req)
       .then((subjects) => func(subjects, params, req, res))
       .then(result => returnSuccess(res, result))
-      .catch(err => {
-        const status = err.status || 500
-        if (status === 500) logError(err)
-        res.status(status)
-        res.json({message: err.message})
-      })
+      .catch(err => handleError(res, err))
   }
 }
 

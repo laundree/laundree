@@ -1,75 +1,50 @@
-/**
- * Created by budde on 15/05/16.
- */
+// @flow
+import * as mail from '../../../test_target/utils/mail'
+import assert from 'assert'
 
-const mail = require('../../../test_target/utils/mail')
-const chai = require('chai')
-chai.use(require('chai-as-promised'))
-chai.should()
-require('../../../test_target/app')
 describe('utils', () => {
   describe('mail', () => {
     describe('sendEmail', () => {
-      it('should render reset email correctly', () =>
-        mail
+      it('should render reset email correctly', async () => {
+        const info = await mail
           .sendEmail({
             user: {id: 'someFancyUserId', displayName: 'Bob Bobbesen'},
             token: 'token123'
           }, 'password-reset', 'test@example.com', {})
-          .then((info) => {
-            const message = info.toString()
-            message.should.match(/https:\/\/laundree\.io\/auth\/reset\?user=someFancyUserId&token=token123/)
-            message.should.match(/Bob Bobbesen/)
-            message.should.match(/someFancyUserId/)
-            message.should.match(/logo body/)
-          }))
-      it('should render verify email correctly', () => mail
-        .sendEmail({
-          user: {id: 'someFancyUserId', displayName: 'Bob Bobbesen'},
-          email: 'bob@bobbesen.dk',
-          token: 'token123'
-        }, 'verify-email', 'test@example.com')
-        .then(info => {
-          const message = info.toString().replace(/(?:=\r\n|\r|\n)/g, '')
-          message.should.match(/bob/)
-          message.should.match(/Bob Bobbesen/)
-          message.should.match(/bob@bobbesen\.dk/)
-          message.should.match(/token123/)
-          message.should.match(/someFancyUserId/)
-          message.should.match(/logo body/)
-        }))
-      it('should render invite email correctly', () => mail
-        .sendEmail({
-          user: {
-            id: 'bob',
-            name: {firstName: 'Bob', lastName: 'Bobbesen', middleName: 'Sun'},
-            displayName: 'Kurt Ravn'
-          },
-          laundry: {name: 'Bobs Laundry'}
-        }, 'invite-user', 'test@example.com')
-        .then((info) => {
-          const message = info.toString().replace(/(?:=\r\n|\r|\n)/g, '')
-          message.should.match(/Hi Kurt Ravn/g)
-          message.should.match(/join "Bobs Laundry"/g)
-          message.should.match(/join <b>Bobs Laundry<\/b>/g)
-          message.should.match(/logo body/)
-        }))
-      it('should render invite email correctly wrt. locale', () => mail
-        .sendEmail({
-          user: {
-            id: 'bob',
-            name: {firstName: 'Bob', lastName: 'Bobbesen', middleName: 'Sun'},
-            displayName: 'Kurt Ravn'
-          },
-          laundry: {name: 'Bobs Laundry'}
-        }, 'invite-user', 'test@example.com', {locale: 'da'})
-        .then((info) => {
-          // TODO add this
-          // const message = info.response.toString()
-          // message.match(/Hej Kurt Ravn/g).should.have.length(2)
-          // message.match(/tilmeld dig "Bobs Laundry"/g).should.have.length(1)
-          // message.match(/tilmeld dig <b>Bobs Laundry<\/b>/g).should.have.length(1)
-        }))
+        const message = info.toString()
+        assert(message.match(/https:\/\/laundree\.io\/auth\/reset\?user=someFancyUserId&token=token123/))
+        assert(message.match(/Bob Bobbesen/))
+        assert(message.match(/someFancyUserId/))
+      })
+      it('should render verify email correctly', async () => {
+        const info = await mail
+          .sendEmail({
+            user: {id: 'someFancyUserId', displayName: 'Bob Bobbesen'},
+            email: 'bob@bobbesen.dk',
+            token: 'token123'
+          }, 'verify-email', 'test@example.com')
+        const message = info.toString().replace(/(?:=\r\n|\r|\n)/g, '')
+        assert(message.match(/bob/))
+        assert(message.match(/Bob Bobbesen/))
+        assert(message.match(/bob@bobbesen\.dk/))
+        assert(message.match(/token123/))
+        assert(message.match(/someFancyUserId/))
+      })
+      it('should render invite email correctly', async () => {
+        const info = await mail
+          .sendEmail({
+            user: {
+              id: 'bob',
+              name: {firstName: 'Bob', lastName: 'Bobbesen', middleName: 'Sun'},
+              displayName: 'Kurt Ravn'
+            },
+            laundry: {name: 'Bobs Laundry'}
+          }, 'invite-user', 'test@example.com')
+        const message = info.toString().replace(/(?:=\r\n|\r|\n)/g, '')
+        assert(message.match(/Hi Kurt Ravn/g))
+        assert(message.match(/join "Bobs Laundry"/g))
+        assert(message.match(/join <b>Bobs Laundry<\/b>/g))
+      })
     })
   })
 })

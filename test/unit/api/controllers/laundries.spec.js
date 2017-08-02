@@ -1,3 +1,5 @@
+// @flow
+
 import request from 'supertest'
 import promisedApp from '../../../../test_target/api/app'
 import LaundryHandler from '../../../../test_target/handlers/laundry'
@@ -18,62 +20,58 @@ describe('controllers', function () {
   })
   describe('laundries', function () {
     this.timeout(5000)
-    describe('GET /api/laundries', () => {
+    describe('GET /laundries', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .get('/api/laundries')
+          .get('/laundries')
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403))
+          .expect(401))
 
-      it('should limit output size', () =>
-        dbUtils.populateLaundries(50).then(({user, token, laundries}) =>
-          request(app)
-            .get('/api/laundries')
-            .set('Accept', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .expect(200)
-            .then(res => {
-              const arr = laundries.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map((token) => token.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
-      it('should allow custom output size', () =>
-        dbUtils.populateLaundries(50).then(({user, token, laundries}) =>
-          request(app)
-            .get('/api/laundries')
-            .query({page_size: 12})
-            .auth(user.model.id, token.secret)
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .expect(200)
-            .then(res => {
-              const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map((laundry) => laundry.toRestSummary())
-              res.body.should.deep.equal(arr)
-            })))
+      it('should limit output size', async () => {
+        const {user, token, laundries} = await dbUtils.populateLaundries(50)
+        const res = await request(app)
+          .get('/laundries')
+          .set('Accept', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+          .expect(200)
+        const arr = laundries.sort((l1, l2) => l1.model.id.localeCompare(l2.model.id)).slice(0, 10).map(LaundryHandler.restSummary)
+        assert.deepEqual(res.body, arr)
+      })
+      it('should allow custom output size', async () => {
+        const {user, token, laundries} = await dbUtils.populateLaundries(50)
+        const res = await request(app)
+          .get('/laundries')
+          .query({page_size: 12})
+          .auth(user.model.id, token.secret)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+          .expect(200)
+        const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).slice(0, 12).map(LaundryHandler.restSummary)
+        assert.deepEqual(res.body, arr)
+      })
 
-      it('should only fetch from current user', () =>
-        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(2)])
-          .then(([r1, {user, token, laundries}]) =>
-            request(app)
-              .get('/api/laundries')
-              .auth(user.model.id, token.secret)
-              .set('Accept', 'application/json')
-              .expect('Content-Type', /json/)
-              .expect('Link', /rel=.first./)
-              .expect(200)
-              .then(res => {
-                const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((laundry) => laundry.toRestSummary())
-                res.body.should.deep.equal(arr)
-              })))
+      it('should only fetch from current user', async () => {
+        const [{user, token, laundries}] = await Promise.all([dbUtils.populateLaundries(2), dbUtils.populateLaundries(1)])
+        const res = await request(app)
+          .get('/laundries')
+          .auth(user.model.id, token.secret)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+          .expect(200)
+        const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map(LaundryHandler.restSummary)
+        assert.deepEqual(res.body, arr)
+      })
 
       it('should fetch all for administrator', () =>
         Promise.all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(2), dbUtils.createAdministrator()])
           .then(([{laundries: laundries1}, {laundries: laundries2}, {user, token}]) =>
             request(app)
-              .get('/api/laundries')
+              .get('/laundries')
               .auth(user.model.id, token.secret)
               .set('Accept', 'application/json')
               .expect('Content-Type', /json/)
@@ -89,7 +87,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(50).then(({user, token, laundries}) => {
           laundries = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id))
           return request(app)
-            .get('/api/laundries')
+            .get('/laundries')
             .query({since: laundries[24].model.id, page_size: 1})
             .auth(user.model.id, token.secret)
             .set('Accept', 'application/json')
@@ -100,10 +98,10 @@ describe('controllers', function () {
         }))
     })
 
-    describe('POST /api/laundries', () => {
+    describe('POST /laundries', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .post('/api/laundries')
+          .post('/laundries')
           .send({name: 'Laundry 1', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
@@ -113,7 +111,7 @@ describe('controllers', function () {
       it('should fail on empty name', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name: ' ', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
@@ -123,7 +121,7 @@ describe('controllers', function () {
       it('should fail on invalid place id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name: ' ', googlePlaceId: '<3'})
             .set('Accept', 'application/json')
             .auth(user.model.id, token.secret)
@@ -133,7 +131,7 @@ describe('controllers', function () {
       it('should fail on duplicate name', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name: laundries[0].model.name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -148,7 +146,7 @@ describe('controllers', function () {
           return user.save().then(() => ({user, token}))
         }).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name: 'Some crazy laundry', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -159,7 +157,7 @@ describe('controllers', function () {
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -176,7 +174,7 @@ describe('controllers', function () {
       it('should set timezone', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -195,7 +193,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
           const name = `${laundry.model.name} 2   `
           return request(app)
-            .post('/api/laundries')
+            .post('/laundries')
             .send({name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -213,9 +211,9 @@ describe('controllers', function () {
         }))
     })
 
-    describe('POST /api/laundries/demo', () => {
+    describe('POST /laundries/demo', () => {
       it('should create a new demo user', () => request(app)
-        .post('/api/laundries/demo')
+        .post('/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => {
@@ -224,7 +222,7 @@ describe('controllers', function () {
         })))
 
       it('should create a new user with one-time password', () => request(app)
-        .post('/api/laundries/demo')
+        .post('/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user
@@ -234,7 +232,7 @@ describe('controllers', function () {
           }))))
 
       it('should create a new user with one-time password', () => request(app)
-        .post('/api/laundries/demo')
+        .post('/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => {
@@ -242,7 +240,7 @@ describe('controllers', function () {
         })))
 
       it('should create a new user with a demo laundry', () => request(app)
-        .post('/api/laundries/demo')
+        .post('/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(laundries => {
@@ -251,7 +249,7 @@ describe('controllers', function () {
         }))))
 
       it('should create a new user with a laundry and two machines', () => request(app)
-        .post('/api/laundries/demo')
+        .post('/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
         .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(([laundry]) => {
@@ -259,9 +257,9 @@ describe('controllers', function () {
         }))))
     })
 
-    describe('GET /api/laundries/{id}', () => {
+    describe('GET /laundries/{id}', () => {
       it('should fail on not authenticated', () => request(app)
-        .get('/api/laundries/id')
+        .get('/laundries/id')
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
         .expect('Content-Type', /json/)
@@ -270,7 +268,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .get('/api/laundries/id')
+            .get('/laundries/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -281,7 +279,7 @@ describe('controllers', function () {
       it('should return 404 on missing id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .get('/api/laundries/id')
+            .get('/laundries/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -292,7 +290,7 @@ describe('controllers', function () {
       it('should return 404 on other id', () =>
         Promise.all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) => request(app)
-            .get(`/api/laundries/${laundry.model.id}`)
+            .get(`/laundries/${laundry.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -303,7 +301,7 @@ describe('controllers', function () {
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .get(`/api/laundries/${laundries[0].model.id}`)
+            .get(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -316,7 +314,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
           .then(([{laundries}, {user, token}]) =>
             request(app)
-              .get(`/api/laundries/${laundries[0].model.id}`)
+              .get(`/laundries/${laundries[0].model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -327,7 +325,7 @@ describe('controllers', function () {
       it('should succeed 2', () =>
         dbUtils.populateMachines(2).then(({user, token, laundry}) =>
           request(app)
-            .get(`/api/laundries/${laundry.model.id}`)
+            .get(`/laundries/${laundry.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -342,7 +340,7 @@ describe('controllers', function () {
       it('should succeed 3', () =>
         dbUtils.populateInvites(2).then(({user, token, laundry}) =>
           request(app)
-            .get(`/api/laundries/${laundry.model.id}`)
+            .get(`/laundries/${laundry.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -361,7 +359,7 @@ describe('controllers', function () {
             laundry.addUser(user)
               .then(() =>
                 request(app)
-                  .get(`/api/laundries/${laundry.model.id}`)
+                  .get(`/laundries/${laundry.model.id}`)
                   .set('Accept', 'application/json')
                   .set('Content-Type', 'application/json')
                   .auth(user.model.id, token.secret)
@@ -370,10 +368,10 @@ describe('controllers', function () {
                   .then(res => laundry.toRest().then(result => res.body.should.deep.equal(result))))))
     })
 
-    describe('PUT /api/laundries/{id}', () => {
+    describe('PUT /laundries/{id}', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .put('/api/laundries/id')
+          .put('/laundries/id')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .send({name: 'L1'})
@@ -383,7 +381,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put('/api/laundries/id')
+            .put('/laundries/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .send({name: 'L1'})
@@ -395,7 +393,7 @@ describe('controllers', function () {
       it('should return 404 on missing id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put('/api/laundries/id')
+            .put('/laundries/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -408,7 +406,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .put(`/api/laundries/${laundry.model.id}`)
+              .put(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .send({name: 'L1'})
@@ -420,7 +418,7 @@ describe('controllers', function () {
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put(`/api/laundries/${laundries[0].model.id}`)
+            .put(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -434,7 +432,7 @@ describe('controllers', function () {
       it('should succeed with name and place', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put(`/api/laundries/${laundries[0].model.id}`)
+            .put(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -452,7 +450,7 @@ describe('controllers', function () {
       it('should succeed with name and rule', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put(`/api/laundries/${laundries[0].model.id}`)
+            .put(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -469,7 +467,7 @@ describe('controllers', function () {
       it('should succeed with name more rules', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put(`/api/laundries/${laundries[0].model.id}`)
+            .put(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -493,7 +491,7 @@ describe('controllers', function () {
       it('should succeed with place', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .put(`/api/laundries/${laundries[0].model.id}`)
+            .put(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -513,7 +511,7 @@ describe('controllers', function () {
           .then(([{laundry}, {user, token}]) => {
             const name = `${laundry.model.name} 2`
             return request(app)
-              .put(`/api/laundries/${laundry.model.id}`)
+              .put(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -528,7 +526,7 @@ describe('controllers', function () {
       it('should succeed same name', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .put(`/api/laundries/${laundry.model.id}`)
+            .put(`/laundries/${laundry.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -539,7 +537,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
           const name = laundry.model.name
           return request(app)
-            .put(`/api/laundries/${laundry.model.id}`)
+            .put(`/laundries/${laundry.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -554,7 +552,7 @@ describe('controllers', function () {
       it('should fail on other laundry', () =>
         dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
           request(app)
-            .put(`/api/laundries/${laundry1.model.id}`)
+            .put(`/laundries/${laundry1.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -564,7 +562,7 @@ describe('controllers', function () {
       it('should succeed on no options', () =>
         dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
           request(app)
-            .put(`/api/laundries/${laundry1.model.id}`)
+            .put(`/laundries/${laundry1.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -574,7 +572,7 @@ describe('controllers', function () {
       it('should fail with invalid place id', () =>
         dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
           request(app)
-            .put(`/api/laundries/${laundry1.model.id}`)
+            .put(`/laundries/${laundry1.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -585,7 +583,7 @@ describe('controllers', function () {
       it('should fail invalid time-rule', () =>
         dbUtils.populateLaundries(2).then(({user, token, laundries: [laundry1, laundry2]}) =>
           request(app)
-            .put(`/api/laundries/${laundry1.model.id}`)
+            .put(`/laundries/${laundry1.model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -598,7 +596,7 @@ describe('controllers', function () {
           .all([dbUtils.populateTokens(1), dbUtils.populateLaundries(1)])
           .then(([{token, user}, {laundry}]) => laundry.addUser(user)
             .then(() => request(app)
-              .put(`/api/laundries/${laundry.model.id}`)
+              .put(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .send({name: 'L1'})
@@ -608,10 +606,10 @@ describe('controllers', function () {
               .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
     })
 
-    describe('POST /api/laundries/{id}/invite-by-email', () => {
+    describe('POST /laundries/{id}/invite-by-email', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .post('/api/laundries/id/invite-by-email')
+          .post('/laundries/id/invite-by-email')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -620,7 +618,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries/id/invite-by-email')
+            .post('/laundries/id/invite-by-email')
             .send({email: 'alice@example.com'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -632,7 +630,7 @@ describe('controllers', function () {
       it('should return 404 on missing id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries/id/invite-by-email')
+            .post('/laundries/id/invite-by-email')
             .send({email: 'alice@example.com'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -646,7 +644,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .post(`/laundries/${laundry.model.id}/invite-by-email`)
               .send({email: 'alice@example.com'})
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -658,7 +656,7 @@ describe('controllers', function () {
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .post(`/laundries/${laundry.model.id}/invite-by-email`)
             .send({email: 'alice@example.com'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -669,7 +667,7 @@ describe('controllers', function () {
         Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .post(`/laundries/${laundry.model.id}/invite-by-email`)
               .send({email: 'alice@example.com'})
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -684,7 +682,7 @@ describe('controllers', function () {
           })
           .then(({user, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .post(`/laundries/${laundry.model.id}/invite-by-email`)
               .send({email: 'alice@example.com'})
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -694,7 +692,7 @@ describe('controllers', function () {
       it('should create invitation', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .post(`/laundries/${laundry.model.id}/invite-by-email`)
             .send({email: 'alice@example.com'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -710,7 +708,7 @@ describe('controllers', function () {
       it('should create invitation in lower case', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+            .post(`/laundries/${laundry.model.id}/invite-by-email`)
             .send({email: 'ALICE@example.com'})
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -727,7 +725,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           laundry.inviteUserByEmail('alice@example.com').then(() =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .post(`/laundries/${laundry.model.id}/invite-by-email`)
               .send({email: 'alice@example.com'})
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -744,7 +742,7 @@ describe('controllers', function () {
         dbUtils.populateLaundries(1)
           .then(({user, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .post(`/laundries/${laundry.model.id}/invite-by-email`)
               .send({email: user.model.emails[0]})
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -762,7 +760,7 @@ describe('controllers', function () {
           .then(([{laundry, user, token}, [user2]]) => {
             const email = user2.model.emails[0]
             return request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+              .post(`/laundries/${laundry.model.id}/invite-by-email`)
               .send({email})
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -785,7 +783,7 @@ describe('controllers', function () {
             .addUser(user)
             .then(() =>
               request(app)
-                .post(`/api/laundries/${laundry.model.id}/invite-by-email`)
+                .post(`/laundries/${laundry.model.id}/invite-by-email`)
                 .send({email: 'alice@example.com'})
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
@@ -794,7 +792,7 @@ describe('controllers', function () {
                 .expect(403)
                 .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
     })
-    describe('POST /api/laundries/{id}/users/add-from-key', () => {
+    describe('POST /laundries/{id}/users/add-from-key', () => {
       let user1, token1, laundry, inviteCode
       beforeEach(() => Promise.all([dbUtils.populateTokens(1), dbUtils.populateLaundries(1)]).then(([{user: u, token: t}, {laundry: l}]) => {
         user1 = u
@@ -806,14 +804,14 @@ describe('controllers', function () {
       }))
       it('should fail on not authenticated', () =>
         request(app)
-          .post('/api/laundries/id/users/add-from-code')
+          .post('/laundries/id/users/add-from-code')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
           .expect(403))
       it('should fail on no laundry', () =>
         request(app)
-          .post('/api/laundries/id/users/add-from-code')
+          .post('/laundries/id/users/add-from-code')
           .auth(user1.model.id, token1.secret)
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
@@ -821,7 +819,7 @@ describe('controllers', function () {
           .expect(404))
       it('should fail without right key', () =>
         request(app)
-          .post(`/api/laundries/${laundry.model.id}/users/add-from-code`)
+          .post(`/laundries/${laundry.model.id}/users/add-from-code`)
           .auth(user1.model.id, token1.secret)
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
@@ -830,7 +828,7 @@ describe('controllers', function () {
           .expect(400))
       it('should succeed with key', () =>
         request(app)
-          .post(`/api/laundries/${laundry.model.id}/users/add-from-code`)
+          .post(`/laundries/${laundry.model.id}/users/add-from-code`)
           .auth(user1.model.id, token1.secret)
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
@@ -840,10 +838,10 @@ describe('controllers', function () {
             Boolean(l.isUser(user1)).should.be.true
           })))
     })
-    describe('POST /api/laundries/{id}/invite-code', () => {
+    describe('POST /laundries/{id}/invite-code', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .post('/api/laundries/id/invite-code')
+          .post('/laundries/id/invite-code')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -852,7 +850,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries/id/invite-code')
+            .post('/laundries/id/invite-code')
             .send()
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -864,7 +862,7 @@ describe('controllers', function () {
       it('should return 404 on missing id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries/id/invite-code')
+            .post('/laundries/id/invite-code')
             .send()
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -878,7 +876,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-code`)
+              .post(`/laundries/${laundry.model.id}/invite-code`)
               .send()
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -890,7 +888,7 @@ describe('controllers', function () {
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-code`)
+            .post(`/laundries/${laundry.model.id}/invite-code`)
             .send()
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -900,7 +898,7 @@ describe('controllers', function () {
       it('should succeed with valid key', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-code`)
+            .post(`/laundries/${laundry.model.id}/invite-code`)
             .send()
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -911,7 +909,7 @@ describe('controllers', function () {
         Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-code`)
+              .post(`/laundries/${laundry.model.id}/invite-code`)
               .send()
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -926,7 +924,7 @@ describe('controllers', function () {
           })
           .then(({user, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/invite-code`)
+              .post(`/laundries/${laundry.model.id}/invite-code`)
               .send()
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
@@ -936,7 +934,7 @@ describe('controllers', function () {
       it('should create code', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundry}) =>
           request(app)
-            .post(`/api/laundries/${laundry.model.id}/invite-code`)
+            .post(`/laundries/${laundry.model.id}/invite-code`)
             .send()
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
@@ -958,7 +956,7 @@ describe('controllers', function () {
             .addUser(user)
             .then(() =>
               request(app)
-                .post(`/api/laundries/${laundry.model.id}/invite-code`)
+                .post(`/laundries/${laundry.model.id}/invite-code`)
                 .send()
                 .set('Accept', 'application/json')
                 .set('Content-Type', 'application/json')
@@ -968,10 +966,10 @@ describe('controllers', function () {
                 .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
     })
 
-    describe('DELETE /api/laundries/{id}', () => {
+    describe('DELETE /laundries/{id}', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .delete('/api/laundries/id')
+          .delete('/laundries/id')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -980,7 +978,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .delete('/api/laundries/id')
+            .delete('/laundries/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -991,7 +989,7 @@ describe('controllers', function () {
       it('should return 404 on missing id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .delete('/api/laundries/id')
+            .delete('/laundries/id')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -1004,7 +1002,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}`)
+              .delete(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1015,7 +1013,7 @@ describe('controllers', function () {
       it('should succeed', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .delete(`/api/laundries/${laundries[0].model.id}`)
+            .delete(`/laundries/${laundries[0].model.id}`)
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -1029,7 +1027,7 @@ describe('controllers', function () {
         Promise.all([dbUtils.populateLaundries(1), dbUtils.createAdministrator()])
           .then(([{laundries}, {user, token}]) =>
             request(app)
-              .delete(`/api/laundries/${laundries[0].model.id}`)
+              .delete(`/laundries/${laundries[0].model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1047,7 +1045,7 @@ describe('controllers', function () {
           })
           .then(({user, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}`)
+              .delete(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1062,7 +1060,7 @@ describe('controllers', function () {
           })
           .then(({user, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}`)
+              .delete(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1076,7 +1074,7 @@ describe('controllers', function () {
           })
           .then(({user, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}`)
+              .delete(`/laundries/${laundry.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1089,7 +1087,7 @@ describe('controllers', function () {
             laundry.addUser(user)
               .then(() =>
                 request(app)
-                  .delete(`/api/laundries/${laundry.model.id}`)
+                  .delete(`/laundries/${laundry.model.id}`)
                   .set('Accept', 'application/json')
                   .set('Content-Type', 'application/json')
                   .auth(user.model.id, token.secret)
@@ -1098,10 +1096,10 @@ describe('controllers', function () {
                   .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
     })
 
-    describe('DELETE /api/laundries/{id}/owners/{userId}', () => {
+    describe('DELETE /laundries/{id}/owners/{userId}', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .delete('/api/laundries/id/owners/id')
+          .delete('/laundries/id/owners/id')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -1110,7 +1108,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .delete('/api/laundries/id/owners/userId')
+            .delete('/laundries/id/owners/userId')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -1128,7 +1126,7 @@ describe('controllers', function () {
           })))
           .then(({owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/id`)
+              .delete(`/laundries/${laundry.model.id}/owners/id`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1141,7 +1139,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/id`)
+              .delete(`/laundries/${laundry.model.id}/owners/id`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1154,7 +1152,7 @@ describe('controllers', function () {
           .then(([{user, token, laundry}, [user2]]) => ({owner: user, token, laundry, user: user2}))
           .then(({owner, user, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1179,7 +1177,7 @@ describe('controllers', function () {
           })))
           .then(({owner, user, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1197,7 +1195,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1215,7 +1213,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1235,7 +1233,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1252,7 +1250,7 @@ describe('controllers', function () {
           .then(() => ({laundry, user, token})))
         .then(({laundry, user, token}) =>
           request(app)
-            .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+            .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
             .auth(user.model.id, token.secret)
             .expect(204)))
 
@@ -1260,7 +1258,7 @@ describe('controllers', function () {
         .populateLaundries(1)
         .then(({laundry, user, token}) =>
           request(app)
-            .delete(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+            .delete(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
             .auth(user.model.id, token.secret)
             .expect(403)))
 
@@ -1276,7 +1274,7 @@ describe('controllers', function () {
             })))
           .then(({user1, user2, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/owners/${user2.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/owners/${user2.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user1.model.id, token.secret)
@@ -1284,10 +1282,10 @@ describe('controllers', function () {
               .then(res => res.body.should.deep.equal({message: 'Not allowed'}))))
     })
 
-    describe('POST /api/laundries/{id}/owners/{userId}', () => {
+    describe('POST /laundries/{id}/owners/{userId}', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .post('/api/laundries/id/owners/id')
+          .post('/laundries/id/owners/id')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -1296,7 +1294,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .post('/api/laundries/id/owners/userId')
+            .post('/laundries/id/owners/userId')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -1314,7 +1312,7 @@ describe('controllers', function () {
           })))
           .then(({owner, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/id`)
+              .post(`/laundries/${laundry.model.id}/owners/id`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1327,7 +1325,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/id`)
+              .post(`/laundries/${laundry.model.id}/owners/id`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1340,7 +1338,7 @@ describe('controllers', function () {
           .then(([{user, token, laundry}, [user2]]) => ({owner: user, token, laundry, user: user2}))
           .then(({owner, user, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .post(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1365,7 +1363,7 @@ describe('controllers', function () {
           })))
           .then(({owner, user, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .post(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1383,7 +1381,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .post(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1401,7 +1399,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .post(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1421,7 +1419,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/${user.model.id}`)
+              .post(`/laundries/${laundry.model.id}/owners/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1443,7 +1441,7 @@ describe('controllers', function () {
             })))
           .then(({user1, user2, token, laundry}) =>
             request(app)
-              .post(`/api/laundries/${laundry.model.id}/owners/${user2.model.id}`)
+              .post(`/laundries/${laundry.model.id}/owners/${user2.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user1.model.id, token.secret)
@@ -1451,10 +1449,10 @@ describe('controllers', function () {
               .then(res => res.body.should.deep.equal({message: 'Not allowed'}))))
     })
 
-    describe('DELETE /api/laundries/{id}/users/{userId}', () => {
+    describe('DELETE /laundries/{id}/users/{userId}', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .delete('/api/laundries/id/users/id')
+          .delete('/laundries/id/users/id')
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
@@ -1463,7 +1461,7 @@ describe('controllers', function () {
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
           request(app)
-            .delete('/api/laundries/id/users/userId')
+            .delete('/laundries/id/users/userId')
             .set('Accept', 'application/json')
             .set('Content-Type', 'application/json')
             .auth(user.model.id, token.secret)
@@ -1481,7 +1479,7 @@ describe('controllers', function () {
           })))
           .then(({owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/id`)
+              .delete(`/laundries/${laundry.model.id}/users/id`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1494,7 +1492,7 @@ describe('controllers', function () {
           .all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(1)])
           .then(([{laundry}, {user, token}]) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/id`)
+              .delete(`/laundries/${laundry.model.id}/users/id`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1507,7 +1505,7 @@ describe('controllers', function () {
           .then(([{user, token, laundry}, [user2]]) => ({owner: user, token, laundry, user: user2}))
           .then(({owner, user, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/users/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1525,7 +1523,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/users/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1545,7 +1543,7 @@ describe('controllers', function () {
           })))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/users/${user.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(owner.model.id, token.secret)
@@ -1565,7 +1563,7 @@ describe('controllers', function () {
           }))
           .then(({user, owner, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/${owner.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/users/${owner.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
@@ -1581,7 +1579,7 @@ describe('controllers', function () {
               Date.now() + 2 * 60 * 60 * 1000))
             .then(booking => ({booking, laundry, owner, token, user})))
         .then(({laundry, user, owner, token, booking}) => request(app)
-          .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+          .delete(`/laundries/${laundry.model.id}/users/${user.model.id}`)
           .auth(owner.model.id, token.secret)
           .expect(204)
           .then(res => BookingHandler
@@ -1598,7 +1596,7 @@ describe('controllers', function () {
           .then(() => ({laundry, user, token})))
         .then(({laundry, user, token}) =>
           request(app)
-            .delete(`/api/laundries/${laundry.model.id}/users/${user.model.id}`)
+            .delete(`/laundries/${laundry.model.id}/users/${user.model.id}`)
             .auth(user.model.id, token.secret)
             .expect(204)))
 
@@ -1614,7 +1612,7 @@ describe('controllers', function () {
             })))
           .then(({user1, user2, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/${user2.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/users/${user2.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user1.model.id, token.secret)
@@ -1632,7 +1630,7 @@ describe('controllers', function () {
             })))
           .then(({user1, user2, token, laundry}) =>
             request(app)
-              .delete(`/api/laundries/${laundry.model.id}/users/${user2.model.id}`)
+              .delete(`/laundries/${laundry.model.id}/users/${user2.model.id}`)
               .set('Accept', 'application/json')
               .set('Content-Type', 'application/json')
               .auth(user1.model.id, token.secret)

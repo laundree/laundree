@@ -1,8 +1,10 @@
 // @flow
+import connectMongoose from '../test_target/db/mongoose'
 import mongoose from 'mongoose'
 import UserHandler from '../test_target/handlers/user'
 import faker from 'faker'
 import {range} from '../test_target/utils/array'
+connectMongoose()
 
 export function clearDb () {
   return new Promise((resolve, reject) => {

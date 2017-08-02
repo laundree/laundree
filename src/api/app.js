@@ -4,12 +4,13 @@ import { opbeat, trackRelease } from '../opbeat'
 import path from 'path'
 import YAML from 'yamljs'
 import swaggerTools from 'swagger-tools'
-import { logError, StatusError } from '../utils/error'
+import { StatusError } from '../utils/error'
 import express from 'express'
 import type { Application, Request } from './types'
 import Debug from 'debug'
 import { verify } from '../auth'
 import UserHandler from '../handlers/user'
+import {handleError} from './helper'
 
 connectMongoose()
 const debug = Debug('laundree:api.app')
@@ -88,19 +89,7 @@ export default new Promise((resolve) => {
           const err: Error = new StatusError('Not found', 404)
           next(err)
         })
-        app.use((err, req: Request, res, next) => {
-          next(err.code === 'SCHEMA_VALIDATION_FAILED' ? new StatusError(err.message, 400) : err)
-        })
-        app.use((err, req: Request, res, next) => {
-          const status = (typeof err.status === 'number' && err.status) || res.statusCode || 500
-          res.status(status)
-          if (status !== 500) {
-            res.json({message: err.message})
-            return
-          }
-          logError(err)
-          res.json({message: 'Internal server error'})
-        })
+        app.use((err, req: Request, res, next) => handleError(res, err))
         resolve(app)
       })
     })
