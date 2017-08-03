@@ -67,35 +67,33 @@ describe('controllers', function () {
         assert.deepEqual(res.body, arr)
       })
 
-      it('should fetch all for administrator', () =>
-        Promise.all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(2), dbUtils.createAdministrator()])
-          .then(([{laundries: laundries1}, {laundries: laundries2}, {user, token}]) =>
-            request(app)
-              .get('/laundries')
-              .auth(user.model.id, token.secret)
-              .set('Accept', 'application/json')
-              .expect('Content-Type', /json/)
-              .expect('Link', /rel=.first./)
-              .expect(200)
-              .then(res => {
-                const laundries = laundries1.concat(laundries2)
-                const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map((laundry) => laundry.toRestSummary())
-                res.body.should.deep.equal(arr)
-              })))
+      it('should fetch all for administrator', async () => {
+        const [{laundries: laundries1}, {laundries: laundries2}, {user, token}] = await Promise.all([dbUtils.populateLaundries(1), dbUtils.populateLaundries(2), dbUtils.createAdministrator()])
+        const res = await request(app)
+          .get('/laundries')
+          .auth(user.model.id, token.secret)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+          .expect(200)
+        const laundries = laundries1.concat(laundries2)
+        const arr = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id)).map(LaundryHandler.restSummary)
+        assert.deepEqual(res.body, arr)
+      })
 
-      it('should allow since', () =>
-        dbUtils.populateLaundries(50).then(({user, token, laundries}) => {
-          laundries = laundries.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id))
-          return request(app)
-            .get('/laundries')
-            .query({since: laundries[24].model.id, page_size: 1})
-            .auth(user.model.id, token.secret)
-            .set('Accept', 'application/json')
-            .expect('Content-Type', /json/)
-            .expect('Link', /rel=.first./)
-            .expect(200)
-            .then(res => res.body.should.deep.equal([laundries[25].toRestSummary()]))
-        }))
+      it('should allow since', async () => {
+        const {user, token, laundries: ls} = await dbUtils.populateLaundries(50)
+        const laundries = ls.sort((t1, t2) => t1.model.id.localeCompare(t2.model.id))
+        const res = await request(app)
+          .get('/laundries')
+          .query({since: laundries[24].model.id, page_size: 1})
+          .auth(user.model.id, token.secret)
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect('Link', /rel=.first./)
+          .expect(200)
+        assert.deepEqual(res.body, [LaundryHandler.restSummary(laundries[25])])
+      })
     })
 
     describe('POST /laundries', () => {
@@ -106,7 +104,7 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
           .expect('Content-Type', /json/)
-          .expect(403))
+          .expect(401))
 
       it('should fail on empty name', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
@@ -128,17 +126,18 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(400)))
 
-      it('should fail on duplicate name', () =>
-        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
-          request(app)
-            .post('/laundries')
-            .send({name: laundries[0].model.name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(409)
-            .then(res => res.body.should.deep.equal({message: 'Laundry already exists'}))))
+      it('should fail on duplicate name', async () => {
+        const {user, token, laundries} = await dbUtils.populateLaundries(1)
+        const res = await request(app)
+          .post('/laundries')
+          .send({name: laundries[0].model.name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(409)
+        assert.deepEqual(res.body, {message: 'Laundry already exists'})
+      })
 
       it('should fail on demo user', () =>
         dbUtils.populateTokens(1).then(({user, token}) => {
@@ -154,61 +153,54 @@ describe('controllers', function () {
             .expect('Content-Type', /json/)
             .expect(403)))
 
-      it('should succeed', () =>
-        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
-          request(app)
-            .post('/laundries')
-            .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {
-              const id = res.body.id
-              return LaundryHandler.lib.findFromId(id).then((laundry) => {
-                laundry.should.not.be.undefined
-                return laundry.toRest().then((result) => res.body.should.deep.equal(result))
-              })
-            })))
-      it('should set timezone', () =>
-        dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
-          request(app)
-            .post('/laundries')
-            .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {
-              const id = res.body.id
-              return LaundryHandler.lib.findFromId(id).then((laundry) => {
-                laundry.should.not.be.undefined
-                laundry.timezone().should.equal('America/Godthab')
-                return laundry.toRest().then((result) => res.body.should.deep.equal(result))
-              })
-            })))
-      it('should trim', () =>
-        dbUtils.populateLaundries(1).then(({user, token, laundry}) => {
-          const name = `${laundry.model.name} 2   `
-          return request(app)
-            .post('/laundries')
-            .send({name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
-            .set('Accept', 'application/json')
-            .set('Content-Type', 'application/json')
-            .auth(user.model.id, token.secret)
-            .expect('Content-Type', /json/)
-            .expect(200)
-            .then(res => {
-              const id = res.body.id
-              res.body.name.should.equal(name.trim())
-              return LaundryHandler.lib.findFromId(id).then((laundry) => {
-                laundry.should.not.be.undefined
-                return laundry.toRest().then((result) => res.body.should.deep.equal(result))
-              })
-            })
-        }))
+      it('should succeed', async () => {
+        const {user, token, laundries} = await dbUtils.populateLaundries(1)
+        const res = await request(app)
+          .post('/laundries')
+          .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const id = res.body.id
+        const laundry = await LaundryHandler.lib.findFromId(id)
+        assert(laundry)
+        assert.deepEqual(await laundry.toRest(), res.body)
+      })
+      it('should set timezone', async () => {
+        const {user, token, laundries} = await dbUtils.populateLaundries(1)
+        const res = await request(app)
+          .post('/laundries')
+          .send({name: laundries[0].model.name + ' 2', googlePlaceId: 'ChIJJSezGs4Nok4RBiNpTfsl5D0'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const id = res.body.id
+        const laundry = await LaundryHandler.lib.findFromId(id)
+        assert(laundry)
+        assert.equal(laundry.timezone(), 'America/Godthab')
+        assert.deepEqual(await laundry.toRest(), res.body)
+      })
+      it('should trim', async () => {
+        const {user, token, laundry} = await dbUtils.populateLaundries(1)
+        const name = `${laundry.model.name} 2   `
+        const res = await request(app)
+          .post('/laundries')
+          .send({name, googlePlaceId: 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const id = res.body.id
+        assert.equal(res.body.name, name.trim())
+        const l = await LaundryHandler.lib.findFromId(id)
+        assert(l)
+        assert.deepEqual(await l.toRest(), res.body)
+      })
     })
 
     describe('POST /laundries/demo', () => {
@@ -216,45 +208,51 @@ describe('controllers', function () {
         .post('/laundries/demo')
         .expect(200)
         .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => {
+        .then(res => UserHandler.lib.findFromEmail(res.body.email))
+        .then(user => {
           assert(user)
-          user.isDemo().should.be.true
-        })))
+          assert(user.isDemo())
+        }))
 
-      it('should create a new user with one-time password', () => request(app)
-        .post('/laundries/demo')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user
-          .verifyPassword(res.body.password).then(result => {
-            assert(result)
-            return user.verifyPassword(res.body.password).should.eventually.be.false
-          }))))
+      it('should create a new user with one-time password', async () => {
+        const res = await request(app)
+          .post('/laundries/demo')
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+        const user = await UserHandler.lib.findFromEmail(res.body.email)
+        assert(await user.verifyPassword(res.body.password))
+        assert(!await user.verifyPassword(res.body.password))
+      })
 
-      it('should create a new user with one-time password', () => request(app)
-        .post('/laundries/demo')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => {
-          assert(user.isVerified(res.body.email))
-        })))
+      it('should create a new user with one-time password', async () => {
+        const res = await request(app)
+          .post('/laundries/demo')
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+        const user = await UserHandler.lib.findFromEmail(res.body.email)
+        assert(user.isVerified(res.body.email))
+      })
 
-      it('should create a new user with a demo laundry', () => request(app)
-        .post('/laundries/demo')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(laundries => {
-          laundries.should.have.length(1)
-          laundries[0].isDemo().should.be.true
-        }))))
+      it('should create a new user with a demo laundry', async () => {
+        const res = await request(app)
+          .post('/laundries/demo')
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+        const user = await UserHandler.lib.findFromEmail(res.body.email)
+        const laundries = await user.fetchLaundries()
+        assert.equal(laundries.length, 1)
+        assert(laundries[0].isDemo())
+      })
 
-      it('should create a new user with a laundry and two machines', () => request(app)
-        .post('/laundries/demo')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-        .then(res => UserHandler.lib.findFromEmail(res.body.email).then(user => user.fetchLaundries().then(([laundry]) => {
-          laundry.model.machines.should.have.length(2)
-        }))))
+      it('should create a new user with a laundry and two machines', async () => {
+        const res = await request(app)
+          .post('/laundries/demo')
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+        const user = await UserHandler.lib.findFromEmail(res.body.email)
+        const [laundry] = await user.fetchLaundries()
+        assert.equal(laundry.model.machines.length, 2)
+      })
     })
 
     describe('GET /laundries/{id}', () => {
@@ -263,7 +261,7 @@ describe('controllers', function () {
         .set('Accept', 'application/json')
         .set('Content-Type', 'application/json')
         .expect('Content-Type', /json/)
-        .expect(403))
+        .expect(401))
 
       it('should return 404 on invalid id', () =>
         dbUtils.populateLaundries(1).then(({user, token, laundries}) =>
@@ -792,6 +790,7 @@ describe('controllers', function () {
                 .expect(403)
                 .then(res => res.body.should.deep.equal({message: 'Not allowed'})))))
     })
+
     describe('POST /laundries/{id}/users/add-from-key', () => {
       let user1, token1, laundry, inviteCode
       beforeEach(() => Promise.all([dbUtils.populateTokens(1), dbUtils.populateLaundries(1)]).then(([{user: u, token: t}, {laundry: l}]) => {
@@ -838,6 +837,7 @@ describe('controllers', function () {
             Boolean(l.isUser(user1)).should.be.true
           })))
     })
+
     describe('POST /laundries/{id}/invite-code', () => {
       it('should fail on not authenticated', () =>
         request(app)

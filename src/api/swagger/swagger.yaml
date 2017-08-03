@@ -864,6 +864,7 @@ paths:
   /laundries/demo:
     x-swagger-router-controller: laundries
     post:
+      security: []
       tags:
         - Laundries
       description: Create a demo laundry
