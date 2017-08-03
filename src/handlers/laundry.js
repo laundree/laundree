@@ -384,6 +384,7 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
   rules (): LaundryRules {
     const obj = this.model.rules.toObject()
     if (
+      !obj || !obj.timeLimit ||
       Object.keys(obj.timeLimit.from).length === 0 ||
       Object.keys(obj.timeLimit.to).length === 0
     ) {
