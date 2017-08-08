@@ -9,7 +9,7 @@ const router = express.Router()
 router.get('/users.csv', async (req: Request, res, next) => {
   if (!req.user || !req.user.isAdmin()) return next()
   res.set('Content-Type', 'text/csv')
-  const users = await UserHandler.lib.find({demo: false})
+  const users = await UserHandler.lib.find({demo: {'$ne': true}})
   const data = users
     .map(u => u.model.emails
       .map(email => ([
