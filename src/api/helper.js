@@ -84,7 +84,7 @@ export function securityTokenOwner (subjects: Subjects): void {
   if (subjects.token && subjects.token.isOwner(currentUser)) {
     return
   }
-  throw new StatusError('Not found', 404)
+  throw new StatusError('Not allowed', 403)
 }
 
 export function securityLaundryOwner (subjects: Subjects, req: Request): void {
@@ -100,7 +100,7 @@ export function securityLaundryUser (subjects: Subjects, req: Request): void {
   if (subjects.laundry && subjects.laundry.isUser(currentUser)) {
     return
   }
-  throw new StatusError('Not found', 404)
+  throw new StatusError('Not allowed', 403)
 }
 
 export function securityBookingCreator (subjects: Subjects, req: Request): void {
@@ -108,7 +108,7 @@ export function securityBookingCreator (subjects: Subjects, req: Request): void 
   if (subjects.booking && subjects.booking.isOwner(currentUser)) {
     return
   }
-  throw new StatusError('Not found', 404)
+  throw new StatusError('Not allowed', 403)
 }
 
 export function securityAdministrator (subjects: Subjects, req: Request): void {

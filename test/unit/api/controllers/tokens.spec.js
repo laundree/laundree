@@ -252,8 +252,8 @@ describe('controllers', function () {
           .set('Content-Type', 'application/json')
           .auth(user.model.id, token2.secret)
           .expect('Content-Type', /json/)
-          .expect(404)
-        assert.deepEqual(res.body, {message: 'Not found'})
+          .expect(403)
+        assert.deepEqual(res.body, {message: 'Not allowed'})
       })
 
       it('should succeed', async () => {
@@ -311,8 +311,8 @@ describe('controllers', function () {
           .set('Content-Type', 'application/json')
           .auth(user.model.id, token2.secret)
           .expect('Content-Type', /json/)
-          .expect(404)
-        assert.deepEqual(res.body, {message: 'Not found'})
+          .expect(403)
+        assert.deepEqual(res.body, {message: 'Not allowed'})
       })
 
       it('should succeed', async () => {
