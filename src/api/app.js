@@ -49,17 +49,20 @@ async function basic (req, authOrSecDef, scopesOrApiKey, callback) {
   }
   const data = Buffer.from(token, 'base64').toString().split(':')
   if (data.length < 2) {
-    throw new StatusError('Invalid token', 401)
+    callback(new StatusError('Invalid token', 401))
+    return
   }
   const username = data[0]
   const password = data.slice(1).join(':')
   const user = await UserHandler.lib.findFromId(username)
   if (!user) {
-    throw new StatusError('Invalid token', 401)
+    callback(new StatusError('Invalid token', 401))
+    return
   }
   const [validToken, validPassword] = await Promise.all([user.verifyAuthToken(password), user.verifyPassword(password)])
   if (!validToken && !validPassword) {
-    throw new StatusError('Invalid token', 401)
+    callback(new StatusError('Invalid token', 401))
+    return
   }
   debug('Decoded successfully')
   req.userId = user.model.id

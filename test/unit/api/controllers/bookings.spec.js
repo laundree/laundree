@@ -144,9 +144,9 @@ describe('controllers', function () {
               .auth(user.model.id, token.secret)
               .query({from: 0, to: Date.now()})
               .set('Accept', 'application/json')
-              .expect(404)
+              .expect(403)
               .expect('Content-Type', /json/)
-              .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
+              .then(res => assert.deepEqual(res.body, {message: 'Not allowed'}))))
 
       it('should allow since', () =>
         dbUtils.populateBookings(50).then(({machine, user, token, bookings}) => {
@@ -514,9 +514,9 @@ describe('controllers', function () {
             .send({from: createDateTomorrow(1), to: createDateTomorrow(2)})
             .auth(user.model.id, token.secret)
             .set('Accept', 'application/json')
-            .expect(404)
+            .expect(403)
             .expect('Content-Type', /json/)
-            .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
+            .then(res => assert.deepEqual(res.body, {message: 'Not allowed'}))))
 
       it('should succeed when user', () =>
         Promise
@@ -637,8 +637,8 @@ describe('controllers', function () {
               .set('Content-Type', 'application/json')
               .auth(user.model.id, token.secret)
               .expect('Content-Type', /json/)
-              .expect(404)
-              .then(res => assert.deepEqual(res.body, {message: 'Not found'}))))
+              .expect(403)
+              .then(res => assert.deepEqual(res.body, {message: 'Not allowed'}))))
 
       it('should succeed', () =>
         dbUtils.populateBookings(1).then(({user, token, booking}) =>
@@ -791,7 +791,7 @@ describe('controllers', function () {
           .put(`/bookings/${booking.model.id}`)
           .set('Accept', 'application/json')
           .auth(user.model.id, token.secret)
-          .expect(404)
+          .expect(403)
       })
       it('should succeed on empty body', async () => {
         const {booking, user, token} = await dbUtils.populateBookings(1)

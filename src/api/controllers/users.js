@@ -120,7 +120,7 @@ async function deleteUserF (subjects) {
   const {user} = api.assertSubjects({user: subjects.user})
   const laundries = await user.findOwnedLaundries()
   if (laundries.length) {
-    throw new StatusError('Invalid token', 403)
+    throw new StatusError('Not allowed', 403)
   }
   await user.deleteUser()
 }
