@@ -9,6 +9,7 @@ import LaundryInvitationHandler from '../handlers/laundry_invitation'
 import * as error from '../utils/error'
 import Debug from 'debug'
 import EventEmitter from 'events'
+import config from 'config'
 import type {
   Action,
   ListInvitationsAction,
@@ -26,7 +27,7 @@ const debug = Debug('laundree.lib.socket_io')
  * @param {Agent} server
  */
 function setupSocket (server: Server) {
-  const io = socketIo(server)
+  const io = socketIo(server, {path: config.get('socket_io.path')})
   setupRedux(io.of('/redux'))
 }
 

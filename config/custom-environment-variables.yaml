@@ -48,3 +48,6 @@ mailgun:
 
 api:
   base: 'API_BASE'
+
+socket_io:
+  path: 'SOCKET_IO_PATH'
