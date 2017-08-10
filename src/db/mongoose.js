@@ -29,5 +29,4 @@ export default function connectMongoose () {
   })
 
   mongoose.connection.on('disconnected', () => debug('Mongoose disconnected...'))
-
 }

@@ -3,8 +3,8 @@ import webApp from './web/app'
 import apiAppPromise from './api/app'
 import webpack from './webpack'
 
-if (process.env.NODE_ENV !== 'development') {
-  process.emitWarning('Server started on non development environment')
+if (['development', 'test'].indexOf(process.env.NODE_ENV) >= 0) {
+  process.emitWarning('Server started on non development nor test environment')
 }
 
 const app = express()
