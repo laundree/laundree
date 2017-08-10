@@ -20,12 +20,13 @@ subClient.setMaxListeners(100)
  * @param {function (Object) : Promise.<string> } serialize
  * @param {function (string) : Promise.<Object>} deserialize
  */
-export function linkEmitter<A, B> (subEmitter: EventEmitter, pubEmitter: EventEmitter, name: string, listen: string[], serialize: (A) => Promise<string>, deserialize: (string) => Promise<B>) {
+export function linkEmitter<A, B> (subEmitter: EventEmitter, pubEmitter: EventEmitter, name: string, listen: string[], serialize: (a: A) => Promise<string>, deserialize: (s: string) => Promise<B>) {
   const channelName = `eventEmitter@${name + listen.join('+')}`
-  subClient.on('message', (channel, message) => {
+  subClient.on('message', async (channel, message) => {
     if (channelName !== channel) return
     const parsedMessage = JSON.parse(message)
-    deserialize(parsedMessage.message).then((obj) => pubEmitter.emit(parsedMessage.event, obj))
+    const obj = await deserialize(parsedMessage.message)
+    pubEmitter.emit(parsedMessage.event, obj)
   })
   subClient.subscribe(channelName)
   listen.forEach((event) => subEmitter

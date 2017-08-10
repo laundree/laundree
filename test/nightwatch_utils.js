@@ -1,7 +1,7 @@
 /**
  * Created by budde on 31/10/2016.
  */
-import connectMongoose from '../test_target/lib/mongoose'
+import connectMongoose from '../test_target/db/mongoose'
 import faker from 'faker'
 import config from 'config'
 

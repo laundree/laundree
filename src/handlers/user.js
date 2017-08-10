@@ -204,10 +204,11 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
   }
 
   updateActions = [
-    (user: UserHandler) => {
+    async (user: UserHandler) => {
       user.model.calendarTokensReferences = []
       user.model.docVersion = 1
-      return user.model.save().then(() => new UserHandler(user.model))
+      await user.model.save()
+      return new UserHandler(user.model)
     }
   ]
 
@@ -539,13 +540,11 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
    * Update the last seen variable to now
    * @return {Promise.<Date>}
    */
-  seen () {
+  async seen () {
     const date = new Date()
     this.model.lastSeen = date
-    return this.model.save().then((model) => {
-      this.model = model
-      return date
-    })
+    this.model = await this.model.save()
+    return date
   }
 
   restUrl = `/api/users/${this.model.id}`
