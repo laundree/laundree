@@ -2,13 +2,21 @@ version: '2'
 services:
   web:
     environment:
+      - DEBUG=laundree*
       - REDIS_HOST=redis
       - REDIS_PORT=6379
       - MONGO_URL=mongodb://mongo/laundree
+      - API_BASE=http://localhost:3000/api
+      - NODE_ENV=test
+      - GOOGLE_CLIENT_API_KEY
+      - GOOGLE_SERVER_API_KEY
     build: .
     links:
       - redis
+      - mongo
     ports:
       - '80:3000'
   redis:
     image: redis
+  mongo:
+    image: mongo

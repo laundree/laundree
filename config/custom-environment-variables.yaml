@@ -45,3 +45,6 @@ oneSignal:
 
 mailgun:
   apiKey: 'MAILGUN_API_KEY'
+
+api:
+  base: 'API_BASE'

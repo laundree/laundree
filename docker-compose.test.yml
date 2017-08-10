@@ -13,6 +13,7 @@ services:
       - NIGHTWATCH_LAUNCH_URL=http://web:3000/
       - CODECLIMATE_REPO_TOKEN
       - LAUNDREE_START_SERVER=false
+      - API_BASE=http://localhost:3000/api
     build: .
     links:
       - redis

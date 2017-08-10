@@ -11,6 +11,8 @@ import {
   INVALID_EMAIL_PASSWORD_COMBINATION,
   USER_NOT_VERIFIED
 } from '../utils/flash'
+import Debug from 'debug'
+const debug = Debug('laundree.web.passwort')
 
 const oauthCallback = async (accessToken, refreshToken, profile, done) => {
   if (!profile.emails || !profile.emails.length) return done(null, null)
@@ -39,11 +41,13 @@ passport.use(new LocalStrategy(async (username, password, done) => {
   try {
     const {userId, emailVerified} = await sdk.api.user.validateCredentials({email, password})
     if (!emailVerified) {
+      debug('User %s is not verified', email)
       return done(null, false, {message: USER_NOT_VERIFIED})
     }
     const user = await sdk.api.user.get(userId)
     done(null, user)
   } catch (err) {
+    debug('User verification failed: %s', err.message)
     done(null, false, {message: INVALID_EMAIL_PASSWORD_COMBINATION})
   }
 }))

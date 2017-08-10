@@ -14,5 +14,5 @@ const authenticator = async () => {
   return {type: 'bearer', token: tokenCache.token}
 }
 
-const s: Sdk = new Sdk(config.get('api.base'), authenticator) // TODO make api address configurable
+const s: Sdk = new Sdk(config.get('api.base'), authenticator)
 export default s
