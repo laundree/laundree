@@ -2,7 +2,7 @@
 
 import MachineHandler from '../../handlers/machine'
 import * as api from '../helper'
-import {StatusError} from '../../utils/Error'
+import {StatusError} from '../../utils/error'
 
 async function listMachinesAsync (since, limit, subjects) {
   const {laundry} = api.assertSubjects({laundry: subjects.laundry})
