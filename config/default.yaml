@@ -94,3 +94,6 @@ mailgun:
   enabled: true
   domain: 'mg.laundree.io'
   apiKey: some-key
+
+socket_io:
+  path: 'socket.io'
