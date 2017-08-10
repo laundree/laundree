@@ -96,4 +96,4 @@ mailgun:
   apiKey: some-key
 
 socket_io:
-  path: 'socket.io'
+  path: '/socket.io'
