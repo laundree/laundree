@@ -67,7 +67,7 @@
     "socket.io-client": "^2.0.3",
     "superagent": "^3.5.2",
     "swagger-tools": "^0.10.1",
-    "tmp": "0.0.31",
+    "tmp": "0.0.33",
     "transform-loader": "^0.2.4",
     "urlsafe-base64": "^1.0.0",
     "uuid": "^3.1.0",
