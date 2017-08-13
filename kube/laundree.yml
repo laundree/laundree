@@ -244,7 +244,7 @@ kind: Deployment
 metadata:
   name: socket-${BRANCH}
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
