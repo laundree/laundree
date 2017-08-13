@@ -11,11 +11,14 @@ import Debug from 'debug'
 import { verify } from '../auth'
 import UserHandler from '../handlers/user'
 import {handleError} from './helper'
+import morganSetup from '../morgan'
 
 connectMongoose()
 const debug = Debug('laundree:api.app')
 
 const app: Application = express()
+
+morganSetup(app)
 
 async function jwt (req, authOrSecDef, scopesOrApiKey, callback) {
   const authHeader = req.header('authorization')
