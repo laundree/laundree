@@ -51,3 +51,6 @@ api:
 
 socket_io:
   path: 'SOCKET_IO_PATH'
+
+auth:
+  secret: 'AUTH_SECRET'

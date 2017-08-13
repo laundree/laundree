@@ -114,6 +114,17 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: sessionSecret
+          - name: 'AUTH_SECRET'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: authSecret
+          - name: 'API_BASE'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: apiBase
+
         ports:
           - containerPort: 3000
 ---

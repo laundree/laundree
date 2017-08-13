@@ -3,14 +3,15 @@ import type { LocaleType } from '../locales'
 import qr from 'qr-image'
 import {locales} from '../locales'
 import PdfDocument from 'pdfkit'
+import path from 'path'
 
-export async function createInvitePdf (logoString: string, laundryId: string, id: string, locale: LocaleType) {
+export async function createInvitePdf (laundryId: string, code: string, locale: LocaleType) {
   const doc = new PdfDocument({size: [2 * 240, 2 * 320]})
-  const link = `https://laundree.io/s/${laundryId}/${id}`
+  const link = `https://laundree.io/s/${laundryId}/${code}`
   const logoWidth = 150
   const logoX = (doc.page.width - logoWidth) / 2
   doc
-    .image(logoString, logoX, 40, {width: logoWidth})
+    .image(path.join(__dirname, '..', '..', 'public', 'images', 'logo.png'), logoX, 40, {width: logoWidth})
     .fontSize(13)
     .moveDown(6)
     .text(locales[locale]['pdf.invite.text.1'], {align: 'justify'})

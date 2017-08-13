@@ -1,4 +1,5 @@
 // @flow
+import connectMongoose from '../db/mongoose'
 import { opbeat, trackRelease } from '../opbeat'
 import socketIo from 'socket.io'
 import UserHandler from '../handlers/user'
@@ -19,6 +20,7 @@ import type {
   ListBookingsAction
 } from 'laundree-sdk/lib/redux'
 import { verify } from '../auth'
+connectMongoose()
 
 const debug = Debug('laundree.lib.socket_io')
 
@@ -245,6 +247,7 @@ async function authenticateSocket (socket): Promise<?UserHandler> {
       .findFromIdWithTokenSecret(userId, token)
     if (user && token2) {
       token2.seen()
+      user.seen()
       debug('Authentication successful')
       return user
     }
@@ -254,8 +257,11 @@ async function authenticateSocket (socket): Promise<?UserHandler> {
     debug('Got jwt', jwt)
     try {
       const decoded = await verify(jwt, {audience: 'https://socket.laundree.io', subject: 'user'})
+      debug('Decoded token to', decoded)
       const user = await UserHandler.lib.findFromId(decoded.userId)
       if (user) {
+        debug('Authentication successful')
+        user.seen()
         return user
       }
     } catch (err) {
@@ -297,7 +303,10 @@ function actionsListInvites (machines: LaundryInvitationHandler[]): ListInvitati
 
 function setupUser (socket, userUpdateEmitter, u: ?UserHandler) {
   const user = u
-  if (!user) return
+  if (!user) {
+    debug('Found no user, will not setup')
+    return
+  }
   socket.currentUserId = user.model.id
   let rooms = userToRooms(user)
   const listener = (user) => {

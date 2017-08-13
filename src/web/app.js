@@ -5,7 +5,7 @@ import path from 'path'
 import cookieParser from 'cookie-parser'
 import bodyParser from 'body-parser'
 import flash from 'connect-flash'
-import morganSetup from './morgan'
+import morganSetup from '../morgan'
 import * as error from '../utils/error'
 import locale from 'locale'
 import { toLocale, supported } from '../locales/index'
@@ -18,6 +18,7 @@ import handlebarsSetup from './handlebars'
 import type { Response, Request, Application } from './types'
 import setupSass from 'node-sass-middleware'
 import identicon from './routes/identicon'
+import pdf from './routes/pdf'
 import reactRouter from './routes/react'
 import logoutRoute from './routes/logout'
 import authRoute from './routes/auth'
@@ -37,6 +38,7 @@ morganSetup(app)
 
 // SETUP STATIC + PSEUDO-STATIC ROUTES
 app.use('/identicon', identicon)
+app.use('/pdf', pdf)
 app.use(setupSass({
   src: path.join(__dirname, '..', '..', 'stylesheets'),
   dest: path.join(__dirname, '..', '..', 'dist', 'stylesheets'),
@@ -47,7 +49,6 @@ app.use(setupSass({
 }))
 app.use(express.static(path.join(__dirname, '..', '..', 'public')))
 app.use(express.static(path.join(__dirname, '..', '..', 'dist')))
-app.use('/identicon', identicon)
 
 app.use(setupSass({
   src: path.join(__dirname, '..', '..', 'stylesheets'),

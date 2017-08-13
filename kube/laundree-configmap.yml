@@ -14,6 +14,7 @@ data:
   facebookCallbackUrl: 'https://laundree.io/auth/facebook/callback'
   googleClientId: '1098336985149-t3unnf4fj7c6rm6eogerpo6dnr433si6.apps.googleusercontent.com'
   googleCallbackUrl: 'https://laundree.io/auth/google/callback'
+  apiBase: 'https://laundree.io/api'
 
 ---
 
@@ -31,3 +32,4 @@ data:
   googleCallbackUrl: 'https://beta.laundree.io/auth/google/callback'
   facebookAppId: '233065037208325'
   facebookCallbackUrl: 'https://beta.laundree.io/auth/facebook/callback'
+  apiBase: 'https://beta.laundree.io/api'

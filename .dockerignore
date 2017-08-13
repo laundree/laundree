@@ -12,3 +12,7 @@ gcloud-credentials.json
 credentials.tar.gz
 credentials.tar.gz.enc
 Dockerfile
+docker-compose.yml
+docker-compose.test.yml
+.travis.yml
+nginx
