@@ -4,14 +4,15 @@ import { Strategy as FacebookStrategy } from 'passport-facebook'
 import { OAuth2Strategy as GoogleStrategy } from 'passport-google-oauth'
 import { Strategy as LocalStrategy } from 'passport-local'
 import config from 'config'
-import type {Application} from './types'
+import type { WebApp } from './types'
 import sdk from './sdk'
-import type {User} from 'laundree-sdk/lib/sdk'
+import type { User } from 'laundree-sdk/lib/sdk'
 import {
   INVALID_EMAIL_PASSWORD_COMBINATION,
   USER_NOT_VERIFIED
 } from '../utils/flash'
 import Debug from 'debug'
+
 const debug = Debug('laundree.web.passwort')
 
 const oauthCallback = async (accessToken, refreshToken, profile, done) => {
@@ -61,7 +62,7 @@ passport.deserializeUser(async (userId, done) => {
   done(null, user)
 })
 
-function setup (app: Application) {
+function setup (app: WebApp) {
   app.use(passport.initialize())
   app.use(passport.session())
 }

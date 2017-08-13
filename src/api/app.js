@@ -6,7 +6,7 @@ import YAML from 'yamljs'
 import swaggerTools from 'swagger-tools'
 import { StatusError } from '../utils/error'
 import express from 'express'
-import type { Application, Request } from './types'
+import type { ApiApp, Request } from './types'
 import Debug from 'debug'
 import { verify } from '../auth'
 import UserHandler from '../handlers/user'
@@ -16,7 +16,7 @@ import morganSetup from '../morgan'
 connectMongoose()
 const debug = Debug('laundree:api.app')
 
-const app: Application = express()
+const app: ApiApp = express()
 
 morganSetup(app)
 

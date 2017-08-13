@@ -4,7 +4,7 @@ import type { LocaleType } from '../locales/index'
 import type { FlashType } from '../utils/flash'
 import type { User } from 'laundree-sdk/lib/sdk'
 
-type CustomRequestAddendum = {
+type WebRequestAddendum = {
   locale?: LocaleType,
   user?: User,
   session: {
@@ -17,14 +17,14 @@ type CustomRequestAddendum = {
   flash: (type: 'success' | 'error', type: ?FlashType) => string[]
 }
 
-type CustomResponseAddendum = {
+type WebResponseAddendum = {
   renderHb: (file: string, options: Object) => Promise<void>
 }
 
-export type Request = Req<CustomRequestAddendum, CustomResponseAddendum> & CustomRequestAddendum
+export type Request = Req<WebRequestAddendum, WebResponseAddendum> & WebRequestAddendum
 
-export type Response = Res<CustomRequestAddendum, CustomResponseAddendum> & CustomResponseAddendum
+export type Response = Res<WebRequestAddendum, WebResponseAddendum> & WebResponseAddendum
 
-export type Application = App<CustomRequestAddendum, CustomResponseAddendum>
+export type WebApp = App<WebRequestAddendum, WebResponseAddendum>
 
-export type Router = R<CustomRequestAddendum, CustomResponseAddendum>
+export type Router = R<WebRequestAddendum, WebResponseAddendum>

@@ -6,7 +6,7 @@ import path from 'path'
 import * as hb from '../utils/handlebars'
 import Debug from 'debug'
 import { toLocale } from '../locales/index'
-import type {Request, Application} from './types'
+import type {Request, WebApp} from './types'
 
 const debug = Debug('laundree.lib.handlebars')
 
@@ -34,7 +34,7 @@ async function registerPartial (file) {
   return handlebars.registerPartial(file, handlebars.compile(data))
 }
 
-export default async function setup (app: Application) {
+export default async function setup (app: WebApp) {
   app.use(setupRenderHb)
   hb.setupHandlebarsHelpers()
   const files = await fs.readdir(partialsPath)
