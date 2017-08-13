@@ -26,11 +26,6 @@ spec:
             value: '6379'
           - name: 'NODE_ENV'
             value: 'production'
-          - name: 'MONGO_URL'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: mongoUrl
           - name: 'HOST'
             valueFrom:
               configMapKeyRef:
@@ -81,18 +76,6 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: googleServerApiKey
-          - name: 'MAILGUN_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: mailgunApiKey
-          - name: 'ONE_SIGNAL_APP_ID'
-            value: '390e23c3-658b-46cd-83ee-2fdead3211af'
-          - name: 'ONE_SIGNAL_REST_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: oneSignalRestApiKey
           - name: 'OPBEAT_APP_ID'
             valueFrom:
               configMapKeyRef:
@@ -164,46 +147,6 @@ spec:
               configMapKeyRef:
                 name: laundree-${BRANCH}
                 key: host
-          - name: FACEBOOK_APP_ID
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: facebookAppId
-          - name: 'FACEBOOK_APP_SECRET'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: facebookAppSecret
-          - name: 'FACEBOOK_CALLBACK_URL'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: facebookCallbackUrl
-          - name: 'GOOGLE_TRACKING_ID'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: googleTrackingId
-          - name: 'GOOGLE_CALLBACK_URL'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: googleCallbackUrl
-          - name: 'GOOGLE_CLIENT_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: googleClientApiKey
-          - name: 'GOOGLE_CLIENT_ID'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: googleClientId
-          - name: 'GOOGLE_CLIENT_SECRET'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: googleClientSecret
           - name: 'GOOGLE_SERVER_API_KEY'
             valueFrom:
               secretKeyRef:
@@ -236,22 +179,11 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: opbeatSecretToken
-          - name: 'SESSION_SECRET'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: sessionSecret
           - name: 'AUTH_SECRET'
             valueFrom:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: authSecret
-          - name: 'API_BASE'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: apiBase
-
         ports:
           - containerPort: 3000
 ---
@@ -290,68 +222,6 @@ spec:
               configMapKeyRef:
                 name: laundree-${BRANCH}
                 key: mongoUrl
-          - name: 'HOST'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: host
-          - name: FACEBOOK_APP_ID
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: facebookAppId
-          - name: 'FACEBOOK_APP_SECRET'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: facebookAppSecret
-          - name: 'FACEBOOK_CALLBACK_URL'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: facebookCallbackUrl
-          - name: 'GOOGLE_TRACKING_ID'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: googleTrackingId
-          - name: 'GOOGLE_CALLBACK_URL'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: googleCallbackUrl
-          - name: 'GOOGLE_CLIENT_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: googleClientApiKey
-          - name: 'GOOGLE_CLIENT_ID'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: googleClientId
-          - name: 'GOOGLE_CLIENT_SECRET'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: googleClientSecret
-          - name: 'GOOGLE_SERVER_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: googleServerApiKey
-          - name: 'MAILGUN_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: mailgunApiKey
-          - name: 'ONE_SIGNAL_APP_ID'
-            value: '390e23c3-658b-46cd-83ee-2fdead3211af'
-          - name: 'ONE_SIGNAL_REST_API_KEY'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: oneSignalRestApiKey
           - name: 'OPBEAT_APP_ID'
             valueFrom:
               configMapKeyRef:
@@ -367,22 +237,11 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: opbeatSecretToken
-          - name: 'SESSION_SECRET'
-            valueFrom:
-              secretKeyRef:
-                name: laundree-${BRANCH}
-                key: sessionSecret
           - name: 'AUTH_SECRET'
             valueFrom:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: authSecret
-          - name: 'API_BASE'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: apiBase
-
         ports:
           - containerPort: 3000
 ---
