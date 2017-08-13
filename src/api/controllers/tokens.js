@@ -1,24 +1,17 @@
 // @flow
 import TokenHandler from '../../handlers/token'
 import UserHandler from '../../handlers/user'
-import * as api from '../../utils/api'
+import * as api from '../helper'
+import { StatusError } from '../../utils/error'
 
-async function listTokensAsync (req, res) {
-  const filter: { owner: *, _id?: * } = {owner: req.user.model._id}
-  const limit = req.swagger.params.page_size.value
-  const since = req.swagger.params.since.value
+async function listTokensAsync (since, limit, subjects) {
+  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
+  const filter: { owner: *, _id?: * } = {owner: currentUser.model._id}
   if (since) {
     filter._id = {$gt: since}
   }
-  const tokens = (await TokenHandler.lib.find(filter, {limit, sort: {_id: 1}})).map((token) => token.toRestSummary())
-  const links: { first: string, next?: string } = {
-    first: `/api/tokens?page_size=${limit}`
-  }
-  if (tokens.length === limit) {
-    links.next = `/api/tokens?since=${tokens[tokens.length - 1].id}&page_size=${limit}`
-  }
-  res.links(links)
-  res.json(tokens)
+  const summaries = (await TokenHandler.lib.find(filter, {limit, sort: {_id: 1}})).map(TokenHandler.restSummary)
+  return {summaries, linkBase: '/api/tokens'}
 }
 
 async function _tokenExists (name, user) {
@@ -26,37 +19,47 @@ async function _tokenExists (name, user) {
   return t
 }
 
-async function createTokenAsync (req, res) {
-  const name = req.swagger.params.body.value.name.trim()
-  const t = await _tokenExists(name, req.user)
-  if (t) return api.returnError(res, 409, 'Token already exists', {Location: t.restUrl})
-  const token: TokenHandler = await req.user.generateAuthToken(name)
-  api.returnSuccess(res, token.toSecretRest())
+async function verifyTokenAsync (subjects, params) {
+  const {user, verifyTokenBody} = api.assertSubjects({
+    user: subjects.user,
+    verifyTokenBody: params.verifyTokenBody
+  })
+  const {token, type} = verifyTokenBody
+  const result = await (type === 'calendar'
+    ? user.verifyCalendarToken(token)
+    : user.verifyAuthToken(token))
+  if (!result) {
+    throw new StatusError('Invalid token', 400)
+  }
 }
 
-function fetchTokenAsync (req, res) {
-  api.returnSuccess(res, req.subjects.token.toRest())
+async function fetchTokenAsync (subjects) {
+  const {token} = api.assertSubjects({token: subjects.token})
+  return token.toRest()
 }
 
-async function deleteTokenAsync (req, res) {
-  await req.user.removeAuthToken(req.subjects.token)
-  api.returnSuccess(res)
+async function deleteTokenAsync (subs) {
+  const {currentUser, token} = api.assertSubjects({currentUser: subs.currentUser, token: subs.token})
+  await currentUser.removeAuthToken(token)
 }
 
-async function createTokenFromEmailPasswordAsync (req, res) {
-  const {email, password, name} = req.swagger.params.body.value
+async function createTokenFromEmailPasswordAsync (subjects, p) {
+  const {createTokenFromEmailPasswordBody} = api.assertSubjects({createTokenFromEmailPasswordBody: p.createTokenFromEmailPasswordBody})
+  const {email, password, name} = createTokenFromEmailPasswordBody
   const user = await UserHandler.lib.findFromVerifiedEmailAndVerifyPassword(email, password)
   if (!user) {
-    return api.returnError(res, 403, 'Unauthorized')
+    throw new StatusError('Unauthorized', 403)
   }
   const t = await _tokenExists(name, user)
-  if (t) return api.returnError(res, 409, 'Token already exists', {Location: t.restUrl})
+  if (t) {
+    throw new StatusError('Token already exists', 409, {Location: t.restUrl})
+  }
   const token = await user.generateAuthToken(name)
-  api.returnSuccess(res, token.toSecretRest())
+  return token.toSecretRest()
 }
 
-export const createTokenFromEmailPassword = api.wrapErrorHandler(createTokenFromEmailPasswordAsync)
-export const listTokens = api.wrapErrorHandler(listTokensAsync)
-export const createToken = api.wrapErrorHandler(createTokenAsync)
-export const deleteToken = api.wrapErrorHandler(deleteTokenAsync)
-export const fetchToken = api.wrapErrorHandler(fetchTokenAsync)
+export const createTokenFromEmailPassword = api.wrap(createTokenFromEmailPasswordAsync, api.securityNoop)
+export const listTokens = api.wrap(api.paginate(listTokensAsync), api.securityUserAccess)
+export const deleteToken = api.wrap(deleteTokenAsync, api.securityTokenOwner)
+export const fetchToken = api.wrap(fetchTokenAsync, api.securityTokenOwner)
+export const verifyToken = api.wrap(verifyTokenAsync, api.securitySelf, api.securityWebApplication)

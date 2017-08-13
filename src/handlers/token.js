@@ -2,12 +2,14 @@
 
 import { Handler, HandlerLibrary } from './handler'
 import * as password from '../utils/password'
-import TokenModel from '../models/token'
-import type { TokenType } from '../models/token'
+import TokenModel from '../db/models/token'
+import type { TokenType } from '../db/models/token'
 import UserHandler from './user'
-import type { QueryConditions } from 'mongoose'
+import type { QueryConditions, ObjectId } from 'mongoose'
+import type { Token as RestToken, TokenWithSecret as RestTokenWithSecret } from 'laundree-sdk/lib/sdk'
 
 class TokenHandlerLibrary extends HandlerLibrary {
+
   constructor () {
     super(TokenHandler, TokenModel)
   }
@@ -58,7 +60,12 @@ class TokenHandlerLibrary extends HandlerLibrary {
 
 }
 
-export default class TokenHandler extends Handler<TokenModel, *> {
+export default class TokenHandler extends Handler<TokenModel, *, RestToken> {
+  static restSummary (i: ObjectId | TokenHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/tokens/' + id}
+  }
+
   static lib = new TokenHandlerLibrary()
   lib = TokenHandler.lib
   secret: ?string
@@ -117,25 +124,26 @@ export default class TokenHandler extends Handler<TokenModel, *> {
     return UserHandler.lib.findFromId(this.model.owner)
   }
 
-  async toRest (): Promise<{ id: string, name: string, owner: *, href: string }> {
-    const owner = await this.fetchOwner()
-    if (!owner) {
-      throw new Error('Owner not found!')
-    }
+  async toRest (): Promise<RestToken> {
     return {
       id: this.model.id,
       name: this.model.name,
-      owner: owner.toRestSummary(),
+      owner: UserHandler.restSummary(this.model.owner),
       href: this.restUrl
     }
   }
 
-  async toSecretRest (): Promise<{ id: string, name: string, owner: *, href: string, secret?: string }> {
-    const obj: { id: string, name: string, owner: *, href: string } = await this.toRest()
-    return {...obj, secret: this.secret || undefined}
+  async toSecretRest (): Promise<RestTokenWithSecret> {
+    if (!this.secret) {
+      throw new Error('No secret')
+    }
+    return {
+      secret: this.secret,
+      id: this.model.id,
+      name: this.model.name,
+      owner: UserHandler.restSummary(this.model.owner),
+      href: this.restUrl
+    }
   }
 
-  toRestSummary () {
-    return {id: this.model.id, name: this.model.name, href: this.restUrl}
-  }
 }

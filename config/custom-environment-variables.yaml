@@ -45,3 +45,12 @@ oneSignal:
 
 mailgun:
   apiKey: 'MAILGUN_API_KEY'
+
+api:
+  base: 'API_BASE'
+
+socket_io:
+  path: 'SOCKET_IO_PATH'
+
+auth:
+  secret: 'AUTH_SECRET'

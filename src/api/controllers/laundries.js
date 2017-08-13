@@ -2,68 +2,61 @@
 
 import LaundryHandler from '../../handlers/laundry'
 import UserHandler from '../../handlers/user'
-import * as api from '../../utils/api'
+import * as api from '../helper'
 import * as mail from '../../utils/mail'
+import { StatusError, logError } from '../../utils/error'
 
 /**
  * Created by budde on 02/06/16.
  */
 
-async function listLaundriesAsync (req, res) {
-  const {currentUser} = req.subjects
+async function listLaundriesAsync (since, limit, subjects) {
+  const {currentUser} = api.assertSubjects({currentUser: subjects.currentUser})
   const filter = {}
   if (!currentUser.isAdmin()) {
     filter.users = currentUser.model._id
   }
-  const limit = req.swagger.params.page_size.value
-  const since = req.swagger.params.since.value
+
   if (since) {
     filter._id = {$gt: since}
   }
   const laundries = await LaundryHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const summarizedLaundries = laundries.map((laundry) => laundry.toRestSummary())
-  const links: { first: string, next?: string } = {
-    first: `/api/laundries?page_size=${limit}`
-  }
-  if (laundries.length === limit) {
-    links.next = `/api/laundries?since=${summarizedLaundries[laundries.length - 1].id}&page_size=${limit}`
-  }
-  res.links(links)
-  res.json(summarizedLaundries)
+  const summaries = laundries.map(LaundryHandler.restSummary)
+  return {summaries, linkBase: '/api/laundries'}
 }
 
-async function createLaundryAsync (req, res) {
-  const {name, googlePlaceId} = req.swagger.params.body.value
-  const {currentUser} = req.subjects
+async function createLaundryAsync (subjects, params) {
+  const {currentUser, createLaundryBody} = api.assertSubjects({createLaundryBody: params.createLaundryBody, currentUser: subjects.currentUser})
+  const {name, googlePlaceId} = createLaundryBody
   if (currentUser.isDemo()) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   const timezone = await LaundryHandler
     .lib
     .timeZoneFromGooglePlaceId(googlePlaceId)
 
   if (!timezone) {
-    return api.returnError(res, 400, 'Invalid place-id')
+    throw new StatusError('Invalid place-id', 400)
   }
   const [l] = await LaundryHandler
     .lib
     .find({name: name.trim()})
 
   if (l) {
-    return api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
+    throw new StatusError('Laundry already exists', 409, {Location: l.restUrl})
   }
-  const laundry = await req.user.createLaundry(name.trim(), timezone, googlePlaceId)
-  api.returnSuccess(res, laundry.toRest())
+  const laundry = await currentUser.createLaundry(name.trim(), timezone, googlePlaceId)
+  return laundry.toRest()
 }
 
-async function createDemoLaundryAsync (req, res) {
+async function createDemoLaundryAsync () {
   const {user, email, password} = await UserHandler
     .lib
     .createDemoUser()
   await LaundryHandler
     .lib
     .createDemoLaundry(user)
-  api.returnSuccess(res, {email, password})
+  return {email, password}
 }
 
 function sanitizeBody ({name, rules, googlePlaceId}) {
@@ -84,159 +77,165 @@ function timeToMinutes ({hour, minute}) {
   return hour * 60 + minute
 }
 
-async function validateLaundryName (res, laundry, body) {
+async function validateLaundryName (laundry, body) {
   const {name} = body
-  if (!name || name === laundry.model.name) return body
+  if (!name || name === laundry.model.name) {
+    return
+  }
   const [l] = await LaundryHandler
     .lib
     .find({name})
-  if (l) {
-    api.returnError(res, 409, 'Laundry already exists', {Location: l.restUrl})
-    return null
-  }
-  return body
+  if (!l) return
+  throw new StatusError('Laundry already exists', 409, {Location: l.restUrl})
 }
 
-async function validateGooglePlaceId (res, laundry, body) {
+async function validateGooglePlaceId (laundry, body) {
   const {googlePlaceId} = body
-  if (!googlePlaceId || googlePlaceId === laundry.model.googlePlaceId) return body
+  if (!googlePlaceId || googlePlaceId === laundry.model.googlePlaceId) return null
   const timeZone = await LaundryHandler.lib.timeZoneFromGooglePlaceId(googlePlaceId)
-  if (!timeZone) {
-    api.returnError(res, 400, 'Invalid place-id')
-    return null
+  if (timeZone) {
+    return timeZone
   }
-  body.timezone = timeZone
-  return body
+  throw new StatusError('Invalid place-id', 400)
 }
 
-function validateRules (res, body) {
+function validateRules (body) {
   const {rules} = body
-  if (!rules || !rules.timeLimit) return body
-  if (timeToMinutes(rules.timeLimit.from) < timeToMinutes(rules.timeLimit.to)) return body
-  api.returnError(res, 400, 'From must be before to')
-  return null
+  if (!rules || !rules.timeLimit) return
+  const {from, to} = rules.timeLimit
+  if (timeToMinutes(from) < timeToMinutes(to)) return
+  throw new StatusError('From must be before to', 400)
 }
 
-async function validateBody (res, laundry, body) {
-  const b2 = validateRules(res, body)
-  if (!b2) {
-    return b2
-  }
-  const b3 = await validateLaundryName(res, laundry, b2)
-  if (!b3) {
-    return b3
-  }
-  return validateGooglePlaceId(res, laundry, b3)
+async function updateLaundryAsync (subs, params) {
+  const {updateLaundryBody, laundry} = api.assertSubjects({laundry: subs.laundry, updateLaundryBody: params.updateLaundryBody})
+  const body = sanitizeBody(updateLaundryBody)
+  validateRules(body)
+  await validateLaundryName(laundry, body)
+  const timezone = await validateGooglePlaceId(laundry, body)
+  const newBody = timezone ? {...body, timezone} : body
+  await laundry.updateLaundry(newBody)
+  return laundry.toRest()
 }
 
-async function updateLaundryAsync (req, res) {
-  const {laundry} = req.subjects
-  let body = req.swagger.params.body.value
-  const result = await validateBody(res, laundry, sanitizeBody(body))
-  if (!result) return
-  await laundry.updateLaundry(result)
-  api.returnSuccess(res)
+async function fetchLaundryAsync (subs) {
+  const {laundry} = api.assertSubjects({laundry: subs.laundry})
+  return laundry.toRest()
 }
 
-function fetchLaundryAsync (req, res) {
-  const laundry = req.subjects.laundry
-  api.returnSuccess(res, laundry.toRest())
-}
-
-async function deleteLaundryAsync (req, res) {
-  const {laundry, currentUser} = req.subjects
+async function deleteLaundryAsync (subs) {
+  const {laundry, currentUser} = api.assertSubjects({laundry: subs.laundry, currentUser: subs.currentUser})
   if (!currentUser.isAdmin() && laundry.isDemo()) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   await laundry.deleteLaundry()
-  api.returnSuccess(res)
 }
 
-async function inviteUserByEmailAsync (req, res) {
-  const email = req.swagger.params.body.value.email
-  const laundry = req.subjects.laundry
-  if (laundry.isDemo()) return api.returnError(res, 403, 'Not allowed')
+async function inviteUserByEmailAsync (subs, params) {
+  const {laundry, inviteUserByEmailBody} = api.assertSubjects({laundry: subs.laundry, inviteUserByEmailBody: params.inviteUserByEmailBody})
+  const email = inviteUserByEmailBody.email
+  const locale = inviteUserByEmailBody.locale || 'en'
+  if (laundry.isDemo()) {
+    throw new StatusError('Not allowed', 403)
+  }
   const {user, invite} = await laundry.inviteUserByEmail(email)
   if (user) {
-    mail.sendEmail({
-      email,
-      laundry: laundry.model.toObject(),
-      user: {displayName: user.model.displayName, id: user.model.id}
-    }, 'invite-user', email, {locale: req.locale})
+    mail
+      .sendEmail({
+        email,
+        laundry: laundry.model.toObject(),
+        user: {displayName: user.model.displayName, id: user.model.id}
+      }, 'invite-user', email, {locale})
+      .catch(logError)
   } else if (invite) {
-    mail.sendEmail({
-      email,
-      laundry: laundry.model.toObject()
-    }, 'invite', email, {locale: req.locale})
+    mail
+      .sendEmail({
+        email,
+        laundry: laundry.model.toObject()
+      }, 'invite', email, {locale})
+      .catch(logError)
   }
-  api.returnSuccess(res)
 }
 
-async function removeUserFromLaundryAsync (req, res) {
-  const {user, laundry} = req.subjects
+async function removeUserFromLaundryAsync (subs) {
+  const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
   if (!laundry.isUser(user)) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   if (laundry.isOwner(user)) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   await laundry.removeUser(user)
-  api.returnSuccess(res)
 }
 
-async function createInviteCodeAsync (req, res) {
-  const {laundry} = req.subjects
+async function createInviteCodeAsync (subs) {
+  const {laundry} = api.assertSubjects({laundry: subs.laundry})
   if (laundry.model.demo) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   const key = await laundry.createInviteCode()
-  api.returnSuccess(res, {
+  return {
     key,
     href: `https://laundree.io/s/${laundry.shortId()}/${key}`
-  })
+  }
 }
 
-async function addOwnerAsync (req, res) {
-  const {laundry, user} = req.subjects
+async function verifyInviteCodeAsync (subs, p) {
+  const {laundry, verifyInviteCodeBody} = api.assertSubjects({laundry: subs.laundry, verifyInviteCodeBody: p.verifyInviteCodeBody})
+  const result = await laundry.verifyInviteCode(verifyInviteCodeBody.key)
+  if (!result) {
+    throw new StatusError('Not found', 404)
+  }
+}
+
+async function addOwnerAsync (subs) {
+  const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
   if (!laundry.isUser(user) || laundry.isOwner(user)) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   await laundry.addOwner(user)
-  api.returnSuccess(res)
 }
 
-async function removeOwnerAsync (req, res) {
-  const {laundry, user} = req.subjects
+async function addUserToLaundryAsync (subs) {
+  const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
+  if (laundry.isUser(user)) {
+    throw new StatusError('Not allowed', 403)
+  }
+  await laundry.addUser(user)
+}
+
+async function removeOwnerAsync (subs) {
+  const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
   if (!laundry.isOwner(user)) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
   if (!laundry.model.owners.find(id => !id.equals(user.model._id))) {
-    return api.returnError(res, 403, 'Not allowed')
+    throw new StatusError('Not allowed', 403)
   }
-  laundry.removeOwner(user)
-    .then(() => api.returnSuccess(res))
-    .catch(api.generateErrorHandler(res))
+  await laundry.removeOwner(user)
 }
 
-async function addUserFromCodeAsync (req, res) {
-  const {laundry, currentUser} = req.subjects
-  const {key} = req.swagger.params.body.value
-  const result = await laundry
-    .verifyInviteCode(key)
-  if (!result) return api.returnError(res, 400, 'Invalid key')
+async function addUserFromCodeAsync (subs, params) {
+  const {addUserFromCodeBody, laundry, currentUser} = api.assertSubjects({addUserFromCodeBody: params.addUserFromCodeBody, laundry: subs.laundry, currentUser: subs.currentUser})
+  const {key} = addUserFromCodeBody
+  const result = await laundry.verifyInviteCode(key)
+  if (!result) {
+    throw new StatusError('Invalid key', 400)
+  }
   await laundry.addUser(currentUser)
-  api.returnSuccess(res)
 }
 
-export const addUserFromCode = api.wrapErrorHandler(addUserFromCodeAsync)
-export const createDemoLaundry = api.wrapErrorHandler(createDemoLaundryAsync)
-export const inviteUserByEmail = api.wrapErrorHandler(inviteUserByEmailAsync)
-export const listLaundries = api.wrapErrorHandler(listLaundriesAsync)
-export const updateLaundry = api.wrapErrorHandler(updateLaundryAsync)
-export const fetchLaundry = api.wrapErrorHandler(fetchLaundryAsync)
-export const deleteLaundry = api.wrapErrorHandler(deleteLaundryAsync)
-export const createLaundry = api.wrapErrorHandler(createLaundryAsync)
-export const removeUserFromLaundry = api.wrapErrorHandler(removeUserFromLaundryAsync)
-export const createInviteCode = api.wrapErrorHandler(createInviteCodeAsync)
-export const addOwner = api.wrapErrorHandler(addOwnerAsync)
-export const removeOwner = api.wrapErrorHandler(removeOwnerAsync)
+export const addUserFromCode = api.wrap(addUserFromCodeAsync, api.securityUserAccess)
+export const createDemoLaundry = api.wrap(createDemoLaundryAsync, api.securityNoop)
+export const inviteUserByEmail = api.wrap(inviteUserByEmailAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const listLaundries = api.wrap(api.paginate(listLaundriesAsync), api.securityUserAccess)
+export const updateLaundry = api.wrap(updateLaundryAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const fetchLaundry = api.wrap(fetchLaundryAsync, api.securityWebApplication, api.securityLaundryUser, api.securityAdministrator)
+export const deleteLaundry = api.wrap(deleteLaundryAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const createLaundry = api.wrap(createLaundryAsync, api.securityUserAccess)
+export const removeUserFromLaundry = api.wrap(removeUserFromLaundryAsync, api.securityLaundryOwner, api.securityAdministrator, api.securitySelf)
+export const createInviteCode = api.wrap(createInviteCodeAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const addOwner = api.wrap(addOwnerAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const addUserToLaundry = api.wrap(addUserToLaundryAsync, api.securityWebApplication)
+export const removeOwner = api.wrap(removeOwnerAsync, api.securityLaundryOwner, api.securityAdministrator)
+export const verifyInviteCode = api.wrap(verifyInviteCodeAsync, api.securityWebApplication)

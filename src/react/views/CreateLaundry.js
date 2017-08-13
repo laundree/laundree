@@ -41,7 +41,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     event.preventDefault()
     this.setState({loading: true})
     sdk.api.laundry
-      .createLaundry(this.state.values.name.trim(), this.state.values.placeId)
+      .createLaundry({name: this.state.values.name.trim(), googlePlaceId: this.state.values.placeId})
       .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
   }
 

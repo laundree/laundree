@@ -1,12 +1,7 @@
-/**
- * Created by budde on 11/09/16.
- */
-
-const error = require('../../../test_target/utils/error')
-const chai = require('chai')
-chai.use(require('sinon-chai'))
-chai.should()
-const sinon = require('sinon')
+// @flow
+import assert from 'assert'
+import * as error from '../../../test_target/utils/error'
+import sinon from 'sinon'
 
 describe('utils', () => {
   describe('error', () => {
@@ -17,7 +12,7 @@ describe('utils', () => {
 
       it('Succeed', () => {
         error.logError(new Error('Test error, please ignore'))
-        console.error.should.be.called
+        assert(console.error.called)
       })
     })
   })

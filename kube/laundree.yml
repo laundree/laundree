@@ -4,15 +4,52 @@ kind: Deployment
 metadata:
   name: laundree-${BRANCH}
 spec:
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
         app: laundree-${BRANCH}
     spec:
       containers:
-      # [START web]
-      - name: laundree
+      - name: nginx
+        image: nginx
+        resources:
+          requests:
+            cpu: 0.02
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        ports:
+          - containerPort: 3000
+        volumeMounts:
+          - mountPath: /etc/nginx/
+            name: nginx-config
+            readOnly: true
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: laundree-${BRANCH}
+          items:
+            - key: nginx.conf
+              path: nginx.conf
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: web-${BRANCH}
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: web-${BRANCH}
+    spec:
+      containers:
+      - name: web
         image: laundree/laundree:${TAG}
         readinessProbe:
           httpGet:
@@ -20,6 +57,13 @@ spec:
             port: 3000
           initialDelaySeconds: 10
           periodSeconds: 5
+        command:
+          - "bash"
+          - "-c"
+          - ". /home/laundree/.nvm/nvm.sh && npm run start:web"
+        resources:
+          requests:
+            cpu: 0.01
         env:
           - name: 'REDIS_HOST'
             value: 'redis'
@@ -27,11 +71,6 @@ spec:
             value: '6379'
           - name: 'NODE_ENV'
             value: 'production'
-          - name: 'MONGO_URL'
-            valueFrom:
-              configMapKeyRef:
-                name: laundree-${BRANCH}
-                key: mongoUrl
           - name: 'HOST'
             valueFrom:
               configMapKeyRef:
@@ -82,6 +121,89 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: googleServerApiKey
+          - name: 'OPBEAT_APP_ID'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatAppId
+          - name: 'OPBEAT_ORGANIZATION_ID'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatOrgId
+          - name: 'OPBEAT_SECRET_TOKEN'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatSecretToken
+          - name: 'SESSION_SECRET'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: sessionSecret
+          - name: 'AUTH_SECRET'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: authSecret
+          - name: 'API_BASE'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: apiBase
+
+        ports:
+          - containerPort: 3000
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: api-${BRANCH}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: api-${BRANCH}
+    spec:
+      containers:
+      - name: api
+        image: laundree/laundree:${TAG}
+        command:
+          - "bash"
+          - "-c"
+          - ". /home/laundree/.nvm/nvm.sh && npm run start:api"
+        readinessProbe:
+          httpGet:
+            path: /users
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        resources:
+          requests:
+            cpu: 0.02
+        env:
+          - name: 'REDIS_HOST'
+            value: 'redis'
+          - name: 'REDIS_PORT'
+            value: '6379'
+          - name: 'NODE_ENV'
+            value: 'production'
+          - name: 'MONGO_URL'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: mongoUrl
+          - name: 'HOST'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: host
+          - name: 'GOOGLE_SERVER_API_KEY'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: googleServerApiKey
           - name: 'MAILGUN_API_KEY'
             valueFrom:
               secretKeyRef:
@@ -109,11 +231,74 @@ spec:
               secretKeyRef:
                 name: laundree-${BRANCH}
                 key: opbeatSecretToken
-          - name: 'SESSION_SECRET'
+          - name: 'AUTH_SECRET'
             valueFrom:
               secretKeyRef:
                 name: laundree-${BRANCH}
-                key: sessionSecret
+                key: authSecret
+        ports:
+          - containerPort: 3000
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: socket-${BRANCH}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: socket-${BRANCH}
+    spec:
+      containers:
+      # [START web]
+      - name: socket
+        command:
+          - "bash"
+          - "-c"
+          - ". /home/laundree/.nvm/nvm.sh && npm run start:socket"
+        image: laundree/laundree:${TAG}
+        resources:
+          requests:
+            cpu: 0.02
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 3000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        env:
+          - name: 'REDIS_HOST'
+            value: 'redis'
+          - name: 'REDIS_PORT'
+            value: '6379'
+          - name: 'NODE_ENV'
+            value: 'production'
+          - name: 'MONGO_URL'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: mongoUrl
+          - name: 'OPBEAT_APP_ID'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatAppId
+          - name: 'OPBEAT_ORGANIZATION_ID'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatOrgId
+          - name: 'OPBEAT_SECRET_TOKEN'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: opbeatSecretToken
+          - name: 'AUTH_SECRET'
+            valueFrom:
+              secretKeyRef:
+                name: laundree-${BRANCH}
+                key: authSecret
         ports:
           - containerPort: 3000
 ---
@@ -133,3 +318,55 @@ spec:
     name: http
   selector:
     app: laundree-${BRANCH}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-${BRANCH}
+  labels:
+    app: web-${BRANCH}
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: web-${BRANCH}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-${BRANCH}
+  labels:
+    app: api-${BRANCH}
+spec:
+  type: NodePort
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: api-${BRANCH}
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: socket-${BRANCH}
+  labels:
+    app: socket-${BRANCH}
+spec:
+  type: NodePort
+  sessionAffinity: ClientIP
+  ports:
+  - port: 3000
+    targetPort: 3000
+    protocol: TCP
+    name: http
+  selector:
+    app: socket-${BRANCH}

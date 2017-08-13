@@ -255,7 +255,7 @@ class TimetableTable extends React.Component {
       .map(x => {
         const machine = this.props.machines[this.props.laundry.machines[x]]
         if (machine.broken) return
-        return sdk.api.machine.createBooking(machine.id, this.posToDate(min), this.posToDate(maxExclusive))
+        return sdk.api.machine.createBooking(machine.id, {from: this.posToDate(min), to: this.posToDate(maxExclusive)})
       }))
   }
 

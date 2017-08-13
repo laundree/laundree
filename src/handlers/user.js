@@ -4,8 +4,8 @@ import { Handler, HandlerLibrary } from './handler'
 import TokenHandler from './token'
 import BookingHandler from './booking'
 import LaundryInvitationHandler from './laundry_invitation'
-import UserModel from '../models/user'
-import type { Profile, UserRole } from '../models/user'
+import UserModel from '../db/models/user'
+import type { Profile, UserRole } from '../db/models/user'
 import * as str from '../utils/string'
 import * as error from '../utils/error'
 import * as pwd from '../utils/password'
@@ -13,12 +13,15 @@ import uuid from 'uuid'
 import config from 'config'
 import Debug from 'debug'
 import LaundryHandler from './laundry'
-import type {User} from 'laundree-sdk/lib/redux'
-import type {EventOption as CalEvent} from 'ical-generator'
+import type { User } from 'laundree-sdk/lib/redux'
+import type { User as RestUser } from 'laundree-sdk/lib/sdk'
+import type { EventOption as CalEvent } from 'ical-generator'
+import type { ObjectId } from 'mongoose'
+import type { LocaleType } from '../locales'
 
 const debug = Debug('laundree.handlers.user')
 
-class UserHandlerLibrary extends HandlerLibrary {
+class UserHandlerLibrary extends HandlerLibrary<User, UserModel, RestUser, *> {
 
   constructor () {
     super(UserHandler, UserModel, {
@@ -169,6 +172,7 @@ class UserHandlerLibrary extends HandlerLibrary {
     return {password: token, user, email}
   }
 }
+
 /**
  * @param {string}displayName
  * @return {{givenName: string=, middleName: string=, lastName: string=}}
@@ -190,15 +194,21 @@ function displayNameToName (displayName) {
  * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string=, middleName: string=, givenName: string=}, emails: {value: string, type: string=}[], photos: {value: string}[]=}} Profile
  */
 
-export default class UserHandler extends Handler<UserModel, User> {
+export default class UserHandler extends Handler<UserModel, User, RestUser> {
   static lib = new UserHandlerLibrary()
   lib = UserHandler.lib
 
+  static restSummary (i: ObjectId | UserHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/users/' + id}
+  }
+
   updateActions = [
-    (user: UserHandler) => {
+    async (user: UserHandler) => {
       user.model.calendarTokensReferences = []
       user.model.docVersion = 1
-      return user.model.save().then(() => new UserHandler(user.model))
+      await user.model.save()
+      return new UserHandler(user.model)
     }
   ]
 
@@ -271,10 +281,10 @@ export default class UserHandler extends Handler<UserModel, User> {
    * Create a new calendar token
    * @returns {Promise.<TokenHandler>}
    */
-  generateCalendarToken () {
+  generateCalendarToken (name: string) {
     debug('Generating calendar token')
     return this
-      ._generateToken(uuid.v4(), 'calendar')
+      ._generateToken(name, 'calendar')
       .then(token => {
         debug('Token ', token.model.id)
         this.model.calendarTokensReferences.push(token.model._id)
@@ -322,6 +332,11 @@ export default class UserHandler extends Handler<UserModel, User> {
     return TokenHandler.lib.findTokenFromSecret(secret, {_id: {$in: this.model.authTokens}})
   }
 
+  async verifyAuthToken (secret: string): Promise<boolean> {
+    const token = await this.findAuthTokenFromSecret(secret)
+    return Boolean(token)
+  }
+
   fetchAuthTokens () {
     return TokenHandler.lib.find({_id: {$in: this.model.authTokens}})
   }
@@ -348,14 +363,19 @@ export default class UserHandler extends Handler<UserModel, User> {
 
   /**
    * Update the name of the user.
-   * @param name
    */
-  async updateName (name: string) {
-    this.model.overrideDisplayName = name
-    await this.model
-      .save()
+  async update (opts: { name?: string, locale?: LocaleType }) {
+    if (opts.name) {
+      this.model.overrideDisplayName = opts.name
+    }
+    if (opts.locale) {
+      this.model.locale = opts.locale
+    }
+    if (!opts.locale && !opts.name) {
+      return
+    }
+    await this.model.save()
     this.lib.emitEvent('update', this)
-    return this
   }
 
   /**
@@ -407,7 +427,7 @@ export default class UserHandler extends Handler<UserModel, User> {
     return this
   }
 
-  fetchLaundries () : Promise<LaundryHandler[]> {
+  fetchLaundries (): Promise<LaundryHandler[]> {
     return LaundryHandler.lib.find({_id: {$in: this.model.laundries}})
   }
 
@@ -520,24 +540,11 @@ export default class UserHandler extends Handler<UserModel, User> {
    * Update the last seen variable to now
    * @return {Promise.<Date>}
    */
-  seen () {
+  async seen () {
     const date = new Date()
     this.model.lastSeen = date
-    return this.model.save().then((model) => {
-      this.model = model
-      return date
-    })
-  }
-
-  /**
-   * Sets the perfered locale of this user
-   * @param {string} locale
-   * @returns {Promise}
-   */
-  setLocale (locale: string) {
-    debug(`Setting locale of user ${this.model.displayName} to ${locale}`)
-    this.model.locale = locale
-    return this.save()
+    this.model = await this.model.save()
+    return date
   }
 
   restUrl = `/api/users/${this.model.id}`
@@ -564,27 +571,22 @@ export default class UserHandler extends Handler<UserModel, User> {
     return Boolean(this.model.password)
   }
 
-  toRest () {
-    return this.fetchAuthTokens()
-      .then(tokens => ({
-        id: this.model.id,
-        displayName: this.model.displayName,
-        lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
-        name: {
-          familyName: this.model.name.familyName,
-          givenName: this.model.name.givenName,
-          middleName: this.model.name.middleName
-        },
-        tokens: tokens.map(t => t.toRestSummary()),
-        photo: this.photo() || '',
-        href: this.restUrl
-      }))
-  }
-
-  toRestSummary () {
+  toRest (): RestUser {
     return {
       id: this.model.id,
       displayName: this.model.displayName,
+      lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
+      name: {
+        familyName: this.model.name.familyName,
+        givenName: this.model.name.givenName,
+        middleName: this.model.name.middleName
+      },
+      locale: this.model.locale || 'en',
+      laundries: this.model.laundries.map(LaundryHandler.restSummary),
+      tokens: this.model.authTokens.map(TokenHandler.restSummary),
+      photo: this.photo() || `/identicon/${str.hash(this.model.id)}/150.svg`,
+      demo: Boolean(this.model.demo),
+      role: this.model.role,
       href: this.restUrl
     }
   }
@@ -595,7 +597,7 @@ export default class UserHandler extends Handler<UserModel, User> {
       photo: this.photo() || `/identicon/${str.hash(this.model.id)}/150.svg`,
       displayName: this.model.displayName,
       laundries: this.model.laundries.map((id) => id.toString()),
-      lastSeen: this.model.lastSeen,
+      lastSeen: this.model.lastSeen ? this.model.lastSeen.toISOString() : undefined,
       role: this.model.role,
       demo: Boolean(this.model.demo)
     }

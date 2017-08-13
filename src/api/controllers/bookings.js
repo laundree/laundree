@@ -1,13 +1,11 @@
 // @flow
 
 import BookingHandler from '../../handlers/booking'
-import * as api from '../../utils/api'
+import * as api from '../helper'
+import { StatusError } from '../../utils/error'
 
-async function listBookingsAsync (req, res) {
-  const limit = req.swagger.params.page_size.value
-  const since = req.swagger.params.since.value
-  const from = req.swagger.params.from.value
-  const to = req.swagger.params.to.value
+async function listBookingsAsync (since, pageSize, subjects, params) {
+  const {from, to} = api.assertSubjects({from: params.from, to: params.to})
   const filter: { from: *, to: *, _id?: *, machine?: * } = {
     from: {$gte: from},
     to: {$lt: to}
@@ -15,108 +13,110 @@ async function listBookingsAsync (req, res) {
   if (since) {
     filter._id = {$gt: since}
   }
-  const {machine} = req.subjects
+  const {machine} = api.assertSubjects({machine: subjects.machine})
   filter.machine = machine.model._id
-  const bookings = await BookingHandler.lib.find(filter, {limit, sort: {_id: 1}})
-  const bookingSummaries = bookings.map(booking => booking.toRestSummary())
-  const fromToQuerySegment = (from ? `&from=${from}` : '') + (to ? `&from=${to}` : '')
-  const links = {
-    first: `/api/machines/${machine.model.id}/bookings?page_size=${limit}${fromToQuerySegment}`,
-    next: undefined
-  }
-  if (bookingSummaries.length === limit) {
-    links.next = `/api/machines/${machine.model.id}/bookings?since=${bookingSummaries[bookingSummaries.length - 1].id}&page_size=${limit}${fromToQuerySegment}`
-  }
-  res.links(links)
-  res.json(bookingSummaries)
+  const bookings = await BookingHandler.lib.find(filter, {limit: pageSize, sort: {_id: 1}})
+  const summaries = bookings.map(BookingHandler.restSummary)
+  return {summaries, linkBase: `/api/machines/${machine.model.id}/bookings`}
 }
 
-async function createBookingAsync (req, res) {
-  const {machine, laundry} = req.subjects
+async function createBookingAsync (subjects, params) {
+  const {machine, laundry, currentUser, createBookingBody} = api
+    .assertSubjects({
+      machine: subjects.machine,
+      currentUser: subjects.currentUser,
+      laundry: subjects.laundry,
+      createBookingBody: params.createBookingBody
+    })
   if (machine.model.broken) {
-    return api.returnError(res, 400, 'Machine is broken')
+    throw new StatusError('Machine is broken', 400)
   }
-  const {from, to} = req.swagger.params.body.value
+  const {from, to} = createBookingBody
   if (!laundry.validateDateObject(from) || !laundry.validateDateObject(to)) {
-    return api.returnError(res, 400, 'Invalid date')
+    throw new StatusError('Invalid date', 400)
   }
   let fromDate = laundry.dateFromObject(from)
   let toDate = laundry.dateFromObject(to)
   if (fromDate >= toDate) { // Test that from is before to
-    return api.returnError(res, 400, 'From must be before to')
+    throw new StatusError('From must be before to', 400)
   }
   if (fromDate.getTime() <= (Date.now() + 10 * 60 * 1000)) { // Test that booking is after now
-    return api.returnError(res, 400, 'Too soon')
+    throw new StatusError('Too soon', 400)
   }
   if (!laundry.checkTimeLimit(from, to)) { // Test that booking meets time limit
-    return api.returnError(res, 400, 'Time limit violation')
+    throw new StatusError('Time limit violation', 400)
   }
   if (to.hour < 24 && !laundry.isSameDay(from, to)) { // Test that booking isn't cross day
-    return api.returnError(res, 400, 'From and to must be same day')
+    throw new StatusError('From and to must be same day', 400)
   }
   const [dailyResult, limitResult] = await Promise
     .all([
-      laundry.checkDailyLimit(req.user, from, to), // Test that daily limit isn't violated
-      laundry.checkLimit(req.user, from, to) // Test that limit isn't violated
+      laundry.checkDailyLimit(currentUser, from, to), // Test that daily limit isn't violated
+      laundry.checkLimit(currentUser, from, to) // Test that limit isn't violated
     ])
   if (!dailyResult) {
-    return api.returnError(res, 400, 'Daily limit violation')
+    throw new StatusError('Daily limit violation', 400)
   }
   if (!limitResult) {
-    return api.returnError(res, 400, 'Limit violation')
+    throw new StatusError('Limit violation', 400)
   }
   let [booking] = await machine.fetchBookings(fromDate, toDate)
   if (booking) { // Test for existing booking
-    return api.returnError(res, 409, 'Machine not available', {Location: booking.restUrl})
+    throw new StatusError('Machine not available', 409, {Location: booking.restUrl})
   }
-  const newBooking = await machine.createAndMergeBooking(req.user, fromDate, toDate)
-  return api.returnSuccess(res, newBooking.toRest())
+  const newBooking = await machine.createAndMergeBooking(currentUser, fromDate, toDate)
+  return newBooking.toRest()
 }
 
-function fetchBookingAsync (req, res) {
-  const {booking} = req.subjects
-  return api.returnSuccess(res, booking.toRest())
+function fetchBookingAsync (subjects) {
+  const {booking} = api.assertSubjects({booking: subjects.booking})
+  return booking.toRest()
 }
 
-async function deleteBookingAsync (req, res) {
-  const {booking} = req.subjects
+async function deleteBookingAsync (subjects) {
+  const {booking} = api.assertSubjects({booking: subjects.booking})
   await booking.deleteBooking()
-  return api.returnSuccess(res)
 }
 
-async function updateBookingAsync (req, res) {
-  const {booking, laundry} = req.subjects
-  const {from, to} = req.swagger.params.body.value
+async function updateBookingAsync (subjects, params) {
+  const {booking, laundry, currentUser, updateBookingBody} = api
+    .assertSubjects({
+      booking: subjects.booking,
+      currentUser: subjects.currentUser,
+      laundry: subjects.laundry,
+      updateBookingBody: params.updateBookingBody
+    })
+  const {from, to} = updateBookingBody
   if (!from && !to) {
-    return api.returnSuccess(res)
+    return
   }
   let newFrom = booking.model.from
   let newTo = booking.model.to
   if (from) {
     const fromDate = laundry.dateFromObject(from)
     if (fromDate < booking.model.from) {
-      return api.returnError(res, 400, 'Invalid input')
+      throw new StatusError('Invalid input', 400)
     }
     newFrom = fromDate
   }
   if (to) {
     const toDate = laundry.dateFromObject(to)
     if (toDate > booking.model.to) {
-      return api.returnError(res, 400, 'Invalid input')
+      throw new StatusError('Invalid input', 400)
     }
     newTo = toDate
   }
 
   if (newTo.getTime() <= newFrom.getTime()) {
-    return api.returnError(res, 400, 'Invalid input')
+    throw new StatusError('Invalid input', 400)
   }
 
-  await booking.updateTime(req.user, newFrom, newTo)
-  api.returnSuccess(res)
+  await booking.updateTime(currentUser, newFrom, newTo)
+  return booking.toRest()
 }
 
-export const listBookings = api.wrapErrorHandler(listBookingsAsync)
-export const createBooking = api.wrapErrorHandler(createBookingAsync)
-export const fetchBooking = api.wrapErrorHandler(fetchBookingAsync)
-export const deleteBooking = api.wrapErrorHandler(deleteBookingAsync)
-export const updateBooking = api.wrapErrorHandler(updateBookingAsync)
+export const listBookings = api.wrap(api.paginate(listBookingsAsync), api.securityLaundryUser, api.securityAdministrator)
+export const createBooking = api.wrap(createBookingAsync, api.securityLaundryUser)
+export const fetchBooking = api.wrap(fetchBookingAsync, api.securityLaundryUser, api.securityAdministrator)
+export const deleteBooking = api.wrap(deleteBookingAsync, api.securityLaundryOwner, api.securityBookingCreator)
+export const updateBooking = api.wrap(updateBookingAsync, api.securityBookingCreator)

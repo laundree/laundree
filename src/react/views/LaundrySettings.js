@@ -9,7 +9,7 @@ import LocationSelector from './LocationSelector'
 import Switch from './Switch'
 import type { LocaleType } from '../../locales'
 import type { Laundry, User } from 'laundree-sdk/lib/redux'
-import type { LaundryModifier, Time, Hour, Minute } from 'laundree-sdk/lib/sdk'
+import type { Time } from 'laundree-sdk/lib/sdk'
 
 type LaundrySettingsFormValues = {
   name: string,
@@ -195,10 +195,8 @@ function timeStringToObject (time): ?Time {
   if (!time) return undefined
   const timeMatch = time.match(/^(\d+):(\d+)$/)
   if (!timeMatch || !timeMatch[1] || !timeMatch[2]) return undefined
-  // $FlowFixMe These are the correct format
-  const minute: Minute = parseInt(timeMatch[2])
-  // $FlowFixMe These are the correct format
-  const hour: Hour = parseInt(timeMatch[1])
+  const minute = parseInt(timeMatch[2])
+  const hour = parseInt(timeMatch[1])
   return {hour, minute}
 }
 
@@ -321,7 +319,7 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
     sdk.api.laundry.updateLaundry(this.props.laundry.id, modifier)
   }
 
-  rules (): LaundryModifier {
+  rules () {
     const ruleObject = {}
     if (this.state.values.limitEnable) {
       ruleObject.limit = this.state.values.limit

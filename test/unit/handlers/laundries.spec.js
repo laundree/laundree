@@ -1,33 +1,29 @@
-/**
- * Created by budde on 27/04/16.
- */
+// @flow
 
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
-import {clearDb, populateLaundries} from '../../db_utils'
+import { clearDb, populateLaundries } from '../../db_utils'
 import UserHandler from '../../../test_target/handlers/user'
 import LaundryHandler from '../../../test_target/handlers/laundry'
-chai.use(chaiAsPromised)
-chai.should()
+import assert from 'assert'
 
 describe('handlers', () => {
   describe('LaundryHandler', () => {
     let laundry, demoUser
-    beforeEach(() => clearDb()
-      .then(() => Promise
-        .all([UserHandler.lib.createDemoUser(), populateLaundries(1)])
-        .then(([{user}, {laundry: l}]) => {
-          laundry = l
-          demoUser = user
-        })))
-    it('should not be possible to add demo user to laundry', () => laundry
-      .addUser(demoUser)
-      .then(result => {
-        result.should.equal(0)
-      }))
-    it('should be possible to create demo laundry', () => LaundryHandler.lib.createDemoLaundry(demoUser)
-      .then(() => UserHandler.lib.findFromId(demoUser.model.id)
-        .then(user => user.fetchLaundries())
-        .then(laundries => laundries.length.should.equal(1))))
+    beforeEach(async () => {
+      await clearDb()
+      const [{user}, {laundry: l}] = await Promise.all([UserHandler.lib.createDemoUser(), populateLaundries(1)])
+      laundry = l
+      demoUser = user
+    })
+    it('should not be possible to add demo user to laundry', async () => {
+      const result = await laundry
+        .addUser(demoUser)
+      assert(result === 0)
+    })
+    it('should be possible to create demo laundry', async () => {
+      await LaundryHandler.lib.createDemoLaundry(demoUser)
+      const user = await UserHandler.lib.findFromId(demoUser.model.id)
+      const laundries = await user.fetchLaundries()
+      assert(laundries.length === 1)
+    })
   })
 })

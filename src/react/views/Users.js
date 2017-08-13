@@ -8,17 +8,14 @@ import sdk from '../../client/sdk'
 import Loader from './Loader'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
 import { Link } from 'react-router-dom'
-import { createInvitePdf } from '../../utils/pdf'
-import request from 'superagent'
-import toBuffer from 'blob-to-buffer'
 import type { Laundry, User, Invite } from 'laundree-sdk/lib/redux'
 import type { LocaleType } from '../../locales'
 
-class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry }, {}> {
+class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry, locale: LocaleType }, {}> {
   submitHandler = async (evt: Event) => {
     evt.preventDefault()
     await sdk.api.laundry
-      .inviteUserByEmail(this.props.laundry.id, this.state.values.email)
+      .inviteUserByEmail(this.props.laundry.id, {email: this.state.values.email, locale: this.props.locale})
     this.reset()
   }
 
@@ -66,41 +63,15 @@ class QrInvite extends React.Component {
     locale: LocaleType
   }
 
-  generatePdf () {
+  async generatePdf () {
     if (this.state.generating) return
     this.setState({generating: true})
-    Promise
-      .all([sdk.api.laundry.createInviteCode(this.props.laundry.id), this.fetchLogo()])
-      .then(([{key}, logoBuffer]) => this.generatePdfBuffer(logoBuffer, key))
-      .then(buffer => this.setState({pdf: buffer, generating: false}))
-  }
-
-  generatePdfBuffer (logoBuffer, code) {
-    return new Promise(async (resolve, reject) => {
-      const stream = await createInvitePdf(
-        logoBuffer,
-        this.props.laundry.id,
-        code,
-        this.props.locale)
-      const buffers = []
-      stream.on('data', d => buffers.push(d))
-      stream.on('end', () => resolve(Buffer.concat(buffers)))
-      stream.on('error', reject)
-    })
-  }
-
-  fetchLogo () {
-    return request
-      .get('/images/logo.png')
-      .responseType('blob')
-      .then(({body}) => new Promise((resolve, reject) => toBuffer(body, (err, buffer) => {
-        if (err) return reject(err)
-        resolve(buffer)
-      })))
+    const {key} = await sdk.api.laundry.createInviteCode(this.props.laundry.id)
+    this.setState({key, generating: false})
   }
 
   generateLink () {
-    if (!this.state.pdf) {
+    if (!this.state.key) {
       return <button
         className={'pdfLink' + (this.state.generating ? 'inactive' : '')}
         onClick={() => this.generatePdf()}>
@@ -111,7 +82,8 @@ class QrInvite extends React.Component {
     }
     return <a
       className='button red qr-download'
-      href={`data:application/pdf;base64,${this.state.pdf.toString('base64')}`} target='_blank'>
+      href={`/pdf/invitation/${this.props.laundry.id}/${this.state.key}.pdf`}
+      target='_blank'>
       <svg>
         <use xlinkHref='#MediaDownload'/>
       </svg>
@@ -290,6 +262,7 @@ class InviteItem extends React.Component {
   props: {
     invite: Invite
   }
+
   render () {
     return <div>
       <Modal
@@ -316,11 +289,12 @@ class InviteItem extends React.Component {
 export default class Users extends React.Component {
   props: {
     locale: LocaleType,
-    invites: {[string]: Invite},
-    users: {[string]: User},
+    invites: { [string]: Invite },
+    users: { [string]: User },
     laundry: Laundry,
     currentUser: string
   }
+
   renderUsers () {
     return <ul className='bigList'>
       {this.users().map(user => <li key={user.id}><UserItem
@@ -359,7 +333,7 @@ export default class Users extends React.Component {
           </section>
           <section id='InviteUserForm'>
             <FormattedMessage id='users.invite-from-email' tagName='h2'/>
-            <InviteUserForm laundry={this.props.laundry}/>
+            <InviteUserForm laundry={this.props.laundry} locale={this.props.locale}/>
           </section>
           <section id='QrInviteSection'>
             <FormattedMessage id='users.invite-from-qr' tagName='h2'/>

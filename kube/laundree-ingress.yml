@@ -4,9 +4,6 @@ kind: Ingress
 metadata:
   name: buddes-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -28,9 +25,6 @@ kind: Ingress
 metadata:
   name: laundree-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -51,9 +45,6 @@ kind: Ingress
 metadata:
   name: bookrs-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -74,9 +65,6 @@ kind: Ingress
 metadata:
   name: booknwash-com
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -97,9 +85,6 @@ kind: Ingress
 metadata:
   name: booknwash-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -120,9 +105,6 @@ kind: Ingress
 metadata:
   name: www-bookrs-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -143,9 +125,6 @@ kind: Ingress
 metadata:
   name: www-booknwash-com
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -166,9 +145,6 @@ kind: Ingress
 metadata:
   name: www-booknwash-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -189,9 +165,6 @@ kind: Ingress
 metadata:
   name: www-laundree-dk
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -212,9 +185,6 @@ kind: Ingress
 metadata:
   name: www-laundree-io
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -237,9 +207,6 @@ kind: Ingress
 metadata:
   name: beta-laundree-io
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:
@@ -261,9 +228,6 @@ kind: Ingress
 metadata:
   name: laundree-io
   annotations:
-    ingress.kubernetes.io/affinity: "cookie"
-    ingress.kubernetes.io/session-cookie-name: "route"
-    ingress.kubernetes.io/session-cookie-hash: "md5"
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
 spec:

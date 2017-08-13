@@ -16,10 +16,9 @@ ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
 
 const debug = Debug('laundree.initializers.app')
 
-const socket = io('/redux')
-
 function setupStore () {
   const state = window.__REDUX_STATE__
+  const socket = io('/redux', {query: {jwt: state.config.token}})
   debug('Setting up store with state', state)
   const store = createStore(redux.reducer, state)
 
@@ -40,6 +39,11 @@ function setup () {
   const store = setupStore()
   const state: State = store.getState()
   const locale = toLocale(state.config.locale || '', 'en')
+  const token = state.config.token || null
+  if (typeof token === 'string') {
+    sdk.authenticator = () => Promise.resolve({type: 'bearer', token})
+  }
+
   ReactDOM.render(
     <BrowserRouter>
       <App store={store} locale={locale} />

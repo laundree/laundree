@@ -1,14 +1,60 @@
-version: '2'
+version: '3'
 services:
   web:
     environment:
+      - DEBUG=laundree*
       - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - MONGO_URL=mongodb://mongo/laundree
+      - NODE_ENV=development
+      - API_BASE=http://api:3000
+      - GOOGLE_CLIENT_API_KEY
     build: .
     links:
       - redis
-    ports:
-      - '80:3000'
+    command:
+      - "-c"
+      - ". /home/laundree/.nvm/nvm.sh && npm run start:web"
+  api:
+    environment:
+      - DEBUG=laundree*
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URL=mongodb://mongo/laundree
+      - NODE_ENV=development
+      - GOOGLE_SERVER_API_KEY
+    build: .
+    links:
+      - redis
+      - mongo
+    command:
+      - "-c"
+      - ". /home/laundree/.nvm/nvm.sh && npm run start:api"
+  socket:
+    environment:
+      - SOCKET_IO_PATH=/
+      - DEBUG=laundree*
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URL=mongodb://mongo/laundree
+      - NODE_ENV=development
+    build: .
+    links:
+      - redis
+      - mongo
+    command:
+      - "-c"
+      - ". /home/laundree/.nvm/nvm.sh && npm run start:socket"
   redis:
     image: redis
+  mongo:
+    image: mongo
+  nginx:
+    image: nginx
+    links:
+      - api
+      - socket
+      - web
+    volumes:
+      - './nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+    ports:
+      - '3000:3000'

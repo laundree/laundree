@@ -1,14 +1,16 @@
 // @flow
 
 import { Handler, HandlerLibrary } from './handler'
-import MachineModel from '../models/machine'
-import type { MachineType } from '../models/machine'
+import MachineModel from '../db/models/machine'
+import type {MachineType} from '../db/models/machine'
 import BookingHandler from './booking'
 import LaundryHandler from './laundry'
 import type UserHandler from './user'
 import type {Machine} from 'laundree-sdk/lib/redux'
+import type {Machine as RestMachine} from 'laundree-sdk/lib/sdk'
+import type { ObjectId } from 'mongoose'
 
-class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
+class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, RestMachine, *> {
 
   constructor () {
     super(MachineHandler, MachineModel, {
@@ -27,10 +29,15 @@ class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, *> {
 
 }
 
-export default class MachineHandler extends Handler {
+export default class MachineHandler extends Handler<MachineModel, Machine, RestMachine> {
   static lib = new MachineHandlerLibrary()
   lib = MachineHandler.lib
   restUrl: string
+
+  static restSummary (i: ObjectId | MachineHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/machines/' + id}
+  }
 
   constructor (model: MachineModel) {
     super(model)
@@ -143,11 +150,7 @@ export default class MachineHandler extends Handler {
     }))
   }
 
-  toRestSummary () {
-    return {name: this.model.name, href: this.restUrl, id: this.model.id}
-  }
-
-  async toRest () {
+  toRest (): RestMachine {
     return {
       name: this.model.name,
       href: this.restUrl,

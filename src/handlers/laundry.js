@@ -1,9 +1,9 @@
 // @flow
-import LaundryModel from '../models/laundry'
-import type { LaundryRules } from '../models/laundry'
+import LaundryModel from '../db/models/laundry'
+import type { LaundryRules } from '../db/models/laundry'
 import { Handler, HandlerLibrary } from './handler'
 import UserHandler from './user'
-import type { MachineType } from '../models/machine'
+import type { MachineType } from '../db/models/machine'
 import MachineHandler from './machine'
 import BookingHandler from './booking'
 import LaundryInvitationHandler from './laundry_invitation'
@@ -11,10 +11,13 @@ import * as error from '../utils/error'
 import Debug from 'debug'
 import uuid from 'uuid'
 import config from 'config'
+import type { ObjectId } from 'mongoose'
 import moment from 'moment-timezone'
 import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
 import GoogleMapsClient from '@google/maps'
-import type {EventOption as CalEvent} from 'ical-generator'
+import type { EventOption as CalEvent } from 'ical-generator'
+import type {Laundry as RestLaundry} from 'laundree-sdk/lib/sdk'
+import type {Laundry as ReduxLaundry} from 'laundree-sdk/lib/redux'
 
 const googleMapsClient = GoogleMapsClient.createClient({key: config.get('google.serverApiKey')})
 const debug = Debug('laundree.handlers.laundry')
@@ -23,9 +26,9 @@ function objToMintues ({hour, minute}) {
   return hour * 60 + minute
 }
 
-type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
+export type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
 
-class LaundryHandlerLibrary extends HandlerLibrary {
+class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, RestLaundry, *> {
 
   constructor () {
     super(LaundryHandler, LaundryModel, {
@@ -87,7 +90,11 @@ class LaundryHandlerLibrary extends HandlerLibrary {
 
 }
 
-export default class LaundryHandler extends Handler {
+export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, RestLaundry> {
+  static restSummary (i: ObjectId | LaundryHandler) {
+    const id = (i.model ? i.model._id : i).toString()
+    return {id, href: '/api/laundries/' + id}
+  }
   static lib = new LaundryHandlerLibrary()
   lib = LaundryHandler.lib
   restUrl = `/api/laundries/${this.model.id}`
@@ -325,7 +332,7 @@ export default class LaundryHandler extends Handler {
    * @param {string} email
    * @return {Promise.<{user: UserHandler=, invite: LaundryInvitationHandler=}>}
    */
-  async inviteUserByEmail (email: string): {} | { user: UserHandler } | { invite: LaundryInvitationHandler } {
+  async inviteUserByEmail (email: string): { user?: UserHandler, invite?: LaundryInvitationHandler } {
     const user = await UserHandler.lib.findFromEmail(email)
     if (user) {
       const num = await this.addUser(user)
@@ -346,26 +353,20 @@ export default class LaundryHandler extends Handler {
     return invite
   }
 
-  async toRest () {
-    const [owners, users, machines, invites] = await Promise.all([
-      this.fetchOwners(),
-      this.fetchUsers(),
-      this.fetchMachines(),
-      this.fetchInvites()
-    ])
+  toRest () : RestLaundry {
     return {
       name: this.model.name,
       id: this.model.id,
       href: this.restUrl,
-      owners: owners.map(o => o.toRestSummary()),
-      users: users.map(u => u.toRestSummary()),
-      machines: machines.map(m => m.toRestSummary()),
-      invites: invites.map(i => i.toRestSummary())
+      owners: this.model.owners.map(UserHandler.restSummary),
+      users: this.model.users.map(UserHandler.restSummary),
+      machines: this.model.machines.map(MachineHandler.restSummary),
+      invites: this.model.invites.map(i => this.model.owners.map(LaundryInvitationHandler.restSummary)),
+      timezone: this.timezone(),
+      googlePlaceId: this.googlePlaceId(),
+      demo: this.model.demo,
+      rules: this.rules()
     }
-  }
-
-  toRestSummary () {
-    return {name: this.model.name, id: this.model.id, href: this.restUrl}
   }
 
   timezone () {
@@ -383,6 +384,7 @@ export default class LaundryHandler extends Handler {
   rules (): LaundryRules {
     const obj = this.model.rules.toObject()
     if (
+      !obj || !obj.timeLimit ||
       Object.keys(obj.timeLimit.from).length === 0 ||
       Object.keys(obj.timeLimit.to).length === 0
     ) {

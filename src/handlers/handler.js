@@ -1,15 +1,16 @@
 // @flow
 import * as regex from '../utils/regex'
 import EventEmitter from 'events'
-import { linkEmitter } from '../lib/redis'
+import { linkEmitter } from '../db/redis'
 import Debug from 'debug'
 import base64UrlSafe from 'urlsafe-base64'
 import type { ObjectId, Model, QueryOptions, QueryConditions } from 'mongoose'
+import type {Resource} from 'laundree-sdk/lib/sdk'
 import type {Action} from 'laundree-sdk/lib/redux'
 
 const debug = Debug('laundree.handlers.handler')
 
-type ReduxActionCreator<A> = (a: Handler<*, A> | string) => ?Action
+type ReduxActionCreator<A> = (a: Handler<*, A, *> | string) => ?Action
 
 type ActionCreators<A> = {
   create?: ReduxActionCreator<A>,
@@ -17,7 +18,7 @@ type ActionCreators<A> = {
   update?: ReduxActionCreator<A>
 }
 
-export class HandlerLibrary<ReduxModel: {}, M: Model<*>, H: Handler<M, ReduxModel>> {
+export class HandlerLibrary<ReduxModel: {}, M: Model<*>, RestModel: Resource, H: Handler<M, ReduxModel, RestModel>> {
   _Handler: Class<H>
   _Model: Class<M>
   subEmitter: EventEmitter = new EventEmitter()
@@ -113,9 +114,9 @@ function findLaundries (handler: { model: { _id: ObjectId, laundry?: ObjectId, l
 
 type UpdateAction<A> =(A) => Promise<A>
 
-export class Handler<M: Model<*>, ReduxModel: {}> {
+export class Handler<M: Model<*>, ReduxModel: {}, RestModel: Resource> {
   model: M
-  lib: HandlerLibrary<ReduxModel, M, *>
+  lib: HandlerLibrary<ReduxModel, M, RestModel, *>
   updateActions: UpdateAction<*>[] = []
 
   constructor (model: M) {
@@ -152,6 +153,10 @@ export class Handler<M: Model<*>, ReduxModel: {}> {
   }
 
   reduxModel (): ReduxModel {
+    throw new Error('Not implemented!')
+  }
+
+  toRest (): Promise<RestModel> | RestModel {
     throw new Error('Not implemented!')
   }
 }

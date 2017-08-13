@@ -6,9 +6,10 @@ import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
+import type { LocaleType } from '../../locales/index'
 
 type ForgotValues = { email: string }
-type ForgotProps = {}
+type ForgotProps = { locale: LocaleType }
 type ForgotState = { loading: boolean }
 
 class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
@@ -21,26 +22,27 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
     return {email: ''}
   }
 
-  submitHandler = (evt: Event) => {
+  submitHandler = async (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()
-    return sdk.api.user.forgotPassword(this.state.values.email.toLowerCase())
-      .then(
-        () =>
-          this.reset({
-            loading: false,
-            notion: {
-              message: <FormattedMessage id='auth.forgot.success'/>,
-              success: true
-            }
-          }),
-        () => this.setState({
-          loading: false,
-          notion: {
-            message: <FormattedMessage id='auth.forgot.error'/>,
-            success: false
-          }
-        }))
+    try {
+      await sdk.api.user.forgotPassword({email: this.state.values.email.toLowerCase(), locale: this.props.locale})
+      this.reset({
+        loading: false,
+        notion: {
+          message: <FormattedMessage id='auth.forgot.success'/>,
+          success: true
+        }
+      })
+    } catch (err) {
+      this.setState({
+        loading: false,
+        notion: {
+          message: <FormattedMessage id='auth.forgot.error'/>,
+          success: false
+        }
+      })
+    }
   }
 
   render () {

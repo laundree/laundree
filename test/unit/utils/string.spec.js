@@ -1,19 +1,15 @@
-/**
- * Created by budde on 06/07/16.
- */
-const string = require('../../../test_target/utils/string')
-const chai = require('chai')
-chai.use(require('chai-as-promised'))
-chai.should()
+// @flow
+import * as string from '../../../test_target/utils/string'
+import assert from 'assert'
 
 describe('utils', () => {
   describe('string', () => {
     it('should match', () => {
-      string.shortName('foo bar baz 123').should.equal('FBB123')
-      string.shortName(' foo bar baz 123').should.equal('FBB123')
-      string.shortName(' foo    bar baz 123').should.equal('FBB123')
-      string.shortName(' foo    bar baz 1  23').should.equal('FBB123')
-      string.shortName(' fOo    bar baz 1  23').should.equal('FBB123')
+      assert(string.shortName('foo bar baz 123') === 'FBB123')
+      assert(string.shortName(' foo bar baz 123') === 'FBB123')
+      assert(string.shortName(' foo    bar baz 123') === 'FBB123')
+      assert(string.shortName(' foo    bar baz 1  23') === 'FBB123')
+      assert(string.shortName(' fOo    bar baz 1  23') === 'FBB123')
     })
   })
 })

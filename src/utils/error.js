@@ -1,6 +1,6 @@
 // @flow
 import config from 'config'
-import {opbeat} from '../lib/opbeat'
+import {opbeat} from '../opbeat'
 
 export function logError (err: ?Error): void {
   if (!err) return
@@ -8,10 +8,15 @@ export function logError (err: ?Error): void {
   if (opbeat) opbeat.captureError(err)
 }
 
+type HeaderName = 'Location'
+
 export class StatusError extends Error {
   status: number
-  constructor (msg: string, status: number) {
+  headers: {[HeaderName]: string}
+
+  constructor (msg: string, status: number, headers: {[HeaderName]: string} = {}) {
     super(msg)
     this.status = status
+    this.headers = headers
   }
 }

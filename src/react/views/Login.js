@@ -138,4 +138,3 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     </DocumentTitle>
   }
 }
-

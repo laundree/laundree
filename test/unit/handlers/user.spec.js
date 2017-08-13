@@ -1,16 +1,13 @@
-import chai from 'chai'
-import chaiAsPromised from 'chai-as-promised'
+// @flow
+
 import * as dbUtils from '../../db_utils'
 import UserHandler from '../../../test_target/handlers/user'
 import LaundryInvitationHandler from '../../../test_target/handlers/laundry_invitation'
 import LaundryHandler from '../../../test_target/handlers/laundry'
+import assert from 'assert'
+import faker from 'faker'
 
 const clearDb = dbUtils.clearDb
-
-chai.use(chaiAsPromised)
-chai.should()
-
-const assert = chai.assert
 
 describe('handlers', () => {
   describe('UserHandler', function () {
@@ -22,19 +19,20 @@ describe('handlers', () => {
       emails: [{value: 'bob@example.com'}],
       name: {familyName: 'Bobbesen', givenName: 'Bob'}
     }
-    let user = null
+    let user: UserHandler
 
-    beforeEach(() => clearDb().then(() => UserHandler.lib.createUserFromProfile(profile)).then((u) => {
-      user = u
-    }))
+    beforeEach(async () => {
+      await clearDb()
+      user = await UserHandler.lib.createUserFromProfile(profile)
+    })
 
     describe('createUserFromProfile', () => {
-      it('should set role', () => user.model.role.should.equal('user'))
+      it('should set role', () => assert.equal(user.model.role, 'user'))
 
       it('should set role from config', () => UserHandler
         .lib
         .createUserFromProfile(Object.assign({}, profile, {emails: [{value: 'test-admin@example.com'}]}))
-        .then(user => user.model.role.should.equal('admin')))
+        .then(user => assert.equal(user.model.role, 'admin')))
 
       it('should add laundry if invitations on creation', () =>
         user.createLaundry('Bobs Laundry').then((laundry) =>
@@ -44,19 +42,19 @@ describe('handlers', () => {
               .lib
               .createUserFromProfile(Object.assign({}, profile, {emails: [{value: 'alice@example.com'}]}))
               .then((user) => {
-                user.model.laundries.should.have.length(1)
-                user.model.laundries[0].toString().should.equal(laundry.model.id)
+                assert.equal(1, user.model.laundries.length)
+                assert.equal(user.model.laundries[0].toString(), laundry.model.id)
                 return LaundryHandler
                   .lib
                   .find({_id: laundry.model._id})
                   .then(([laundry]) => {
-                    Boolean(laundry.isUser(user)).should.be.true
+                    assert(laundry.isUser(user))
                     return LaundryInvitationHandler
                       .lib
                       .find({email: 'alice@example.com'})
                       .then((results) => {
-                        results.should.have.length(1)
-                        results[0].model.used.should.be.true
+                        assert.equal(1, results.length)
+                        assert(results[0].model.used)
                       })
                   })
               }))))
@@ -64,90 +62,101 @@ describe('handlers', () => {
 
     describe('findFromEmail', () => {
       it('should be possible to find existing profiles from email',
-        () => UserHandler.lib.findFromEmail('bob@example.com').then(user => user.should.not.be.undefined))
+        () => UserHandler.lib.findFromEmail('bob@example.com').then(assert))
     })
 
     describe('updateProfile', () => {
-      it('should update', () => user.updateProfile({
-        provider: 'google',
-        id: 'someId',
-        displayName: 'Bob Bobbesen',
-        emails: [{value: 'bob@example.com'}],
-        name: {familyName: 'Bobbesen', givenName: 'Bob'},
-        photos: [{value: 'http://example.com/foo.jpeg'}]
-      }).then((user) => {
-        user.model.latestProvider.should.be.equal('google')
-        user.model.photo.should.be.equal('http://example.com/foo.jpeg')
-      }))
+      it('should update', () => user
+        .updateProfile({
+          provider: 'google',
+          id: 'someId',
+          displayName: 'Bob Bobbesen',
+          emails: [{value: 'bob@example.com'}],
+          name: {familyName: 'Bobbesen', givenName: 'Bob'},
+          photos: [{value: 'http://example.com/foo.jpeg'}]
+        })
+        .then((user) => {
+          assert.equal(user.model.latestProvider, 'google')
+          assert.equal(user.model.photo, 'http://example.com/foo.jpeg')
+        }))
     })
 
     describe('findOrCreateFromProfile', () => {
       it('should find existing user', () => UserHandler.lib.findOrCreateFromProfile(profile).then((u) => {
-        u.model.id.should.be.deep.equal(user.model.id)
+        assert.equal(u.model.id, user.model.id)
       }))
 
       it('should create new user', () => {
         profile.emails[0].value = 'new@example.com'
         profile.id = '1231312312312312'
         return UserHandler.lib.findOrCreateFromProfile(profile).then((u) => {
-          u.model.id.should.not.be.deep.equal(user.model.id)
+          assert.notEqual(u.model.id, user.model.id)
         })
       })
     })
     describe('findFromId', () => {
       it('should find right',
-        () => UserHandler.lib.findFromId(user.model.id).then((u) => u.model.id.should.equal(user.model.id)))
+        () => UserHandler.lib.findFromId(user.model.id).then((u) => assert.equal(u.model.id, user.model.id)))
       it('should reject on error',
-        () => UserHandler.lib.findFromId(user.model.id + 'asd').should.eventually.be.null)
+        () => UserHandler.lib.findFromId(user.model.id + 'asd').then(r => !r).then(assert))
       it('should reject on error',
-        () => UserHandler.lib.findFromId('aaaaaaaaaaaaaaaaaaaa').should.eventually.be.null)
+        () => UserHandler.lib.findFromId('aaaaaaaaaaaaaaaaaaaa').then(r => !r).then(assert))
     })
 
     describe('resetPassword', () => {
-      it('should reset the password', () => user.resetPassword('password12345').then(() => {
-        return user.verifyPassword('password12345').should.eventually.be.true
-      }))
+      it('should reset the password', () => user.resetPassword('password12345')
+        .then(() => user.verifyPassword('password12345'))
+        .then(assert))
       it('should remove reset token', () => user.generateResetToken()
         .then((token) => user.resetPassword('asd1234')
-          .then(() => user.verifyResetPasswordToken(token).should.eventually.be.false)))
+          .then(() => user.verifyResetPasswordToken(token)
+            .then(r => assert(!r)))))
     })
 
     describe('verifyResetPasswordToken', () => {
       it('should verify', () => user.generateResetToken()
-        .then(token => user.verifyResetPasswordToken(token.secret).should.eventually.be.true))
+        .then(token => user.verifyResetPasswordToken(token.secret))
+        .then(assert))
     })
 
     describe('createUserWithPassword', () => {
       it('should create user', () =>
         UserHandler.lib.createUserWithPassword('Alice Alison', 'ali@example.com', 'password1234')
           .then((user) => {
-            user.model.name.familyName.should.be.equal('Alison')
-            user.model.name.givenName.should.be.equal('Alice')
+            assert.equal(user.model.name.familyName, 'Alison')
+            assert.equal(user.model.name.givenName, 'Alice')
             assert(user.model.name.middleName === undefined)
-            user.model.displayName.should.be.equal('Alice Alison')
-            return user.verifyPassword('password1234').should.eventually.be.true
-          }))
+            assert.equal(user.model.displayName, 'Alice Alison')
+            return user.verifyPassword('password1234')
+          })
+          .then(assert))
+
       it('should create user with more names', () =>
         UserHandler.lib.createUserWithPassword('Alice Alu   Ali Alison', 'ali@example.com', 'password1234')
           .then((user) => {
-            user.model.name.familyName.should.be.equal('Alison')
-            user.model.name.givenName.should.be.equal('Alice')
-            user.model.name.middleName.should.be.equal('Alu Ali')
-            user.model.displayName.should.be.equal('Alice Alu Ali Alison')
-            return user.verifyPassword('password1234').should.eventually.be.true
-          }))
+            assert.equal(user.model.name.familyName, 'Alison')
+            assert.equal(user.model.name.givenName, 'Alice')
+            assert.equal(user.model.name.middleName, 'Alu Ali')
+            assert.equal(user.model.displayName, 'Alice Alu Ali Alison')
+            return user.verifyPassword('password1234')
+          })
+          .then(assert))
     })
     describe('generateVerifyEmailToken', () => {
       it('should generate a token', () =>
-        dbUtils.populateUsers(1).then((users) => {
-          const [user] = users
-          return user.generateVerifyEmailToken(user.model.emails[0]).should.eventually.not.be.undefined
-        }))
+        dbUtils.populateUsers(1)
+          .then((users) => {
+            const [user] = users
+            return user.generateVerifyEmailToken(user.model.emails[0])
+          })
+          .then(assert))
       it('should not generate token for non-registered email', () =>
-        dbUtils.populateUsers(1).then((users) => {
-          const [user] = users
-          return user.generateVerifyEmailToken('not-valid' + user.model.emails[0]).should.eventually.be.undefined
-        }))
+        dbUtils.populateUsers(1)
+          .then((users) => {
+            const [user] = users
+            return user.generateVerifyEmailToken('not-valid' + user.model.emails[0])
+          })
+          .then(r => assert(!r)))
       it('should generate a new token', () =>
         dbUtils.populateUsers(1).then((users) => {
           const [user] = users
@@ -156,19 +165,21 @@ describe('handlers', () => {
             user.generateVerifyEmailToken(user.model.emails[0])
           ]).then((tokens) => {
             const [token1, token2] = tokens
-            token1.should.not.equal(token2)
+            assert.notEqual(token1, token2)
           })
         }))
     })
     describe('seen', () => {
-      it('should return date', () => dbUtils.populateUsers(1).then((users) => {
-        const [user] = users
-        user.seen().should.eventually.be.an.instanceof(Date)
-      }))
+      it('should return date', () => dbUtils.populateUsers(1)
+        .then((users) => {
+          const [user] = users
+          return user.seen()
+        })
+        .then(r => assert.equal(typeof r.toISOString(), 'string')))
       it('should update lastSeen', () => dbUtils.populateUsers(1).then((users) => {
         const [user] = users
-        user.seen().then((time) => {
-          user.model.lastSeen.should.be.equal(time)
+        return user.seen().then((time) => {
+          assert.equal(user.model.lastSeen, time)
         })
       }))
     })
@@ -178,7 +189,7 @@ describe('handlers', () => {
         const email = user.model.emails[0]
         return user.generateVerifyEmailToken(email)
           .then(token => user.verifyEmail(email, token.secret))
-          .should.eventually.be.true
+          .then(assert)
       }))
       it('explicit verify email', () => dbUtils.populateUsers(1).then((users) => {
         const [user] = users
@@ -186,7 +197,7 @@ describe('handlers', () => {
         return user.generateVerifyEmailToken(email)
           .then(token => user.verifyEmail(email, token.secret))
           .then(() => user.model.explicitVerifiedEmails)
-          .should.eventually.contain(email)
+          .then(r => assert(r.indexOf(email) >= 0))
       }))
 
       it('should resolve to false', () => dbUtils.populateUsers(1).then((users) => {
@@ -194,31 +205,34 @@ describe('handlers', () => {
         const email = user.model.emails[0]
         return user.generateVerifyEmailToken(email)
           .then(token => user.verifyEmail(email, token.secret + 'asd'))
-          .should.eventually.be.false
+          .then(r => assert(!r))
       }))
 
-      it('should resolve to false', () => dbUtils.populateUsers(1).then((users) => {
-        const [user] = users
-        const email = user.model.emails[0]
-        return user.verifyEmail(email, 'tokenbob1').should.eventually.be.false
-      }))
+      it('should resolve to false', () => dbUtils.populateUsers(1)
+        .then((users) => {
+          const [user] = users
+          const email = user.model.emails[0]
+          return user.verifyEmail(email, 'tokenbob1')
+        })
+        .then(r => assert(!r)))
       it('should verify latest', () =>
         dbUtils.populateUsers(1).then((users) => {
           const [user] = users
           const email = user.model.emails[0]
-          return user.generateVerifyEmailToken(email).then(token1 =>
-            user.generateVerifyEmailToken(email)
-              .then(token2 => Promise.all([user.verifyEmail(email, token1.secret), user.verifyEmail(email, token2.secret)]))
-              .should.eventually.deep.equal([false, true]))
+          return user.generateVerifyEmailToken(email)
+            .then(token1 => user.generateVerifyEmailToken(email)
+              .then(token2 => Promise.all([user.verifyEmail(email, token1.secret), user.verifyEmail(email, token2.secret)])))
+            .then(r => assert.deepEqual(r, [false, true]))
         }))
       it('should remove old', () =>
         dbUtils.populateUsers(1).then((users) => {
           const [user] = users
           const email = user.model.emails[0]
-          return user.generateVerifyEmailToken(email).then(token1 =>
-            user.generateVerifyEmailToken(email)
-              .then(token2 => Promise.all([user.verifyEmail(email, token2.secret), user.verifyEmail(email, token1.secret)])))
-            .should.eventually.deep.equal([true, false])
+          return user.generateVerifyEmailToken(email)
+            .then(token1 =>
+              user.generateVerifyEmailToken(email)
+                .then(token2 => Promise.all([user.verifyEmail(email, token2.secret), user.verifyEmail(email, token1.secret)])))
+            .then(r => assert.deepEqual(r, [true, false]))
         }))
       it('should not verify twice', () =>
         dbUtils.populateUsers(1).then((users) => {
@@ -226,37 +240,37 @@ describe('handlers', () => {
           const email = user.model.emails[0]
           return user.generateVerifyEmailToken(email).then(token1 =>
             user.verifyEmail(email, token1.secret).then(result1 =>
-              Promise.all([result1, user.verifyEmail(email, token1.secret)]))
-              .should.eventually.deep.equal([true, false]))
+              Promise.all([result1, user.verifyEmail(email, token1.secret)])))
+            .then(r => assert.deepEqual(r, [true, false]))
         }))
     })
     describe('generateCalendarToken', () => {
-      it('should generate token', () => user.generateCalendarToken()
-        .then(token => token.should.not.be.empty))
-      it('should generate new', () => Promise.all([user.generateCalendarToken(), user.generateCalendarToken()])
-        .then(([t1, t2]) => t1.should.not.equal(t2)))
+      it('should generate token', () => user.generateCalendarToken(faker.name.findName())
+        .then(assert))
+      it('should generate new', () => Promise.all([user.generateCalendarToken(faker.name.findName()), user.generateCalendarToken(faker.name.findName())])
+        .then(([t1, t2]) => assert.notEqual(t1, t2)))
     })
     describe('verifyCalendarToken', () => {
       it('should fail on invalid token', () => user.verifyCalendarToken('invalid')
-        .then(result => result.should.be.false))
-      it('should succeed w token', () => user.generateCalendarToken()
+        .then(result => assert(!result)))
+      it('should succeed w token', () => user.generateCalendarToken(faker.name.findName())
         .then(token => user.verifyCalendarToken(token.secret))
-        .then(result => result.should.be.true))
-      it('should succeed with more tokens', () => Promise.all([user.generateCalendarToken(), user.generateCalendarToken()])
+        .then(assert))
+      it('should succeed with more tokens', () => Promise.all([user.generateCalendarToken(faker.name.findName()), user.generateCalendarToken(faker.name.findName())])
         .then(([token]) => user.verifyCalendarToken(token.secret))
-        .then(result => result.should.be.true))
+        .then(assert))
     })
     describe('findAuthTokenFromSecret', () => {
       it('should right token find', () =>
         dbUtils.populateTokens(10)
           .then(({user, tokens}) =>
             user.findAuthTokenFromSecret(tokens[9].secret)
-              .then((token) => token.model.id.should.deep.equal(tokens[9].model.id))))
+              .then((token) => assert.deepEqual(token.model.id, tokens[9].model.id))))
       it('should right old token find', () =>
         dbUtils.populateTokens(10)
           .then(({user, tokens}) =>
             user.findAuthTokenFromSecret(tokens[9].secret.split('.')[2])
-              .then((token) => token.model.id.should.deep.equal(tokens[9].model.id))))
+              .then((token) => assert.deepEqual(token.model.id, tokens[9].model.id))))
     })
   })
 })
