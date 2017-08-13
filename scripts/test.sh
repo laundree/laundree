@@ -15,8 +15,6 @@ npm run test:flow
 
 npm run test:unit
 
-nyc report
-
 if [ -z "$SELENIUM_HOST" ] || [ "$SELENIUM_HOST" = "localhost" ]; then
     selenium-standalone install
     selenium-standalone start 2>/dev/null >/dev/null &
