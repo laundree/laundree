@@ -10,6 +10,7 @@ import * as dbUtils from '../../../db_utils'
 import assert from 'assert'
 
 import base64UrlSafe from 'urlsafe-base64'
+import { signAppToken } from '../../../../test_target/auth'
 
 let app
 
@@ -1376,6 +1377,54 @@ describe('controllers', function () {
           .auth(user.model.id, token.secret)
           .expect(403)
         assert.deepEqual(res.body, {message: 'Not allowed'})
+      })
+    })
+
+    describe('POST /laundries/{id}/users/{userId}', () => {
+      it('should fail on not authenticated', async () => {
+        await request(app)
+          .post('/laundries/{id}/users/{userId}')
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(401)
+      })
+      it('should fail on only user', async () => {
+        const {user, token, laundry} = await dbUtils.populateLaundries(1)
+        const [user2] = await dbUtils.populateUsers(1)
+        const res = await request(app)
+          .post(`/laundries/${laundry.model.id}/users/${user2.model.id}`)
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, token.secret)
+          .expect('Content-Type', /json/)
+          .expect(403)
+        assert.deepEqual(res.body, {message: 'Not allowed'})
+      })
+      it('should succeed on web', async () => {
+        const {laundry} = await dbUtils.populateLaundries(1)
+        const [user2] = await dbUtils.populateUsers(1)
+        const token = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        await request(app)
+          .post(`/laundries/${laundry.model.id}/users/${user2.model.id}`)
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', `Bearer ${token}`)
+          .expect(204)
+        const l: LaundryHandler = await LaundryHandler.lib.findFromId(laundry.model.id)
+        assert(l.isUser(user2))
+      })
+      it('should fail on already user', async () => {
+        const {laundry} = await dbUtils.populateLaundries(1)
+        const [user2] = await dbUtils.populateUsers(1)
+        await laundry.addUser(user2)
+        const token = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        await request(app)
+          .post(`/laundries/${laundry.model.id}/users/${user2.model.id}`)
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .set('Authorization', `Bearer ${token}`)
+          .expect(403)
       })
     })
 

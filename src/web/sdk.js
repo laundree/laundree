@@ -10,7 +10,7 @@ const authenticator = async () => {
   if (tokenCache && tokenCache.cacheTime + 60 * 60 * 1000 < Date.now()) {
     return {type: 'bearer', token: tokenCache.token}
   }
-  tokenCache = {token: await signAppToken('https://web.laundree.io', 'https://api.laundree.io', Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60), cacheTime: Date.now()}
+  tokenCache = {token: await signAppToken('https://web.laundree.io', 'https://api.laundree.io'), cacheTime: Date.now()}
   return {type: 'bearer', token: tokenCache.token}
 }
 

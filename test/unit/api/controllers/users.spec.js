@@ -7,6 +7,7 @@ import UserHandler from '../../../../test_target/handlers/user'
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserModel from '../../../../test_target/db/models/user'
 import assert from 'assert'
+import { signAppToken } from '../../../../test_target/auth'
 
 let app
 describe('controllers', function () {
@@ -320,6 +321,85 @@ describe('controllers', function () {
               .expect(403)))
     })
 
+    describe('POST /users/validate-credentials', () => {
+      it('should fail on not authorized', async () => {
+        await request(app)
+          .post('/users/validate-credentials')
+          .expect(401)
+      })
+      it('should fail on authenticated as user', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post('/users/validate-credentials')
+          .auth(user.model.id, token.secret)
+          .send({email: 'test@test.dk', password: 'somePassword123'})
+          .expect(403)
+      })
+      it('should fail on web but wrong cred', async () => {
+        const jwt = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        await request(app)
+          .post('/users/validate-credentials')
+          .set('Authorization', `Bearer ${jwt}`)
+          .send({email: 'test@test.dk', password: 'somePassword123'})
+          .expect(404)
+      })
+      it('should fail on web but wrong cred', async () => {
+        const jwt = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        await request(app)
+          .post('/users/validate-credentials')
+          .set('Authorization', `Bearer ${jwt}`)
+          .send({email: 'test@test.dk', password: 'somePassword123'})
+          .expect(404)
+      })
+      it('should succeed on web and right cred', async () => {
+        const [user] = await dbUtils.populateUsers(1)
+        await user.resetPassword('password1234')
+        const jwt = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        const res = await request(app)
+          .post('/users/validate-credentials')
+          .set('Authorization', `Bearer ${jwt}`)
+          .send({email: user.model.emails[0], password: 'password1234'})
+          .expect(200)
+        assert.deepEqual(res.body, {userId: user.model.id, emailVerified: true})
+      })
+    })
+    describe('POST /users/profile', () => {
+      const profile = {
+        provider: 'google',
+        id: 'someId',
+        displayName: 'Bob Bobbesen',
+        name: {
+          givenName: 'Bob',
+          familyName: 'Bobbesen'
+        },
+        emails: [{
+          value: 'bob@bobbesen.com'
+        }]
+      }
+      it('should fail on not authorized', async () => {
+        await request(app)
+          .post('/users/profile')
+          .expect(401)
+      })
+      it('should fail on authenticated as user', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post('/users/profile')
+          .auth(user.model.id, token.secret)
+          .send(profile)
+          .expect(403)
+      })
+      it('succeed as web', async () => {
+        const jwt = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        const {body} = await request(app)
+          .post('/users/profile')
+          .set('Authorization', `Bearer ${jwt}`)
+          .send(profile)
+          .expect(200)
+        const user = await UserHandler.lib.findFromId(body.id)
+        assert.deepEqual({...body, lastSeen: undefined, name: {...profile.name, middleName: undefined}}, user.toRest())
+      })
+    })
     describe('GET /users', () => {
       it('should return an empty list', () =>
         request(app)

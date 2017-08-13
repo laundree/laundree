@@ -7,6 +7,7 @@ import UserHandler from '../../../../test_target/handlers/user'
 import * as dbUtils from '../../../db_utils'
 import faker from 'faker'
 import assert from 'assert'
+import { signAppToken } from '../../../../test_target/auth'
 
 let app
 
@@ -165,9 +166,117 @@ describe('controllers', function () {
         const result = await token.verify(res.body.secret.split('.')[2])
         assert(result)
       })
+      it('should succeed calendar', async () => {
+        const {user, tokens} = await dbUtils.populateTokens(1)
+        const res = await request(app)
+          .post(`/users/${user.model.id}/tokens`)
+          .send({name: tokens[0].model.name + ' 2', type: 'calendar'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, tokens[0].secret)
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const id = res.body.id
+        const token = await TokenHandler.lib.findFromId(id)
+        assert(token)
+        const result = await token.toRest()
+        result.secret = res.body.secret
+        assert.deepEqual(res.body, result)
+      })
+
+      it('should succeed calendar 2', async () => {
+        const {user, tokens} = await dbUtils.populateTokens(1)
+        const res = await request(app)
+          .post(`/users/${user.model.id}/tokens`)
+          .send({name: tokens[0].model.name + ' 2', type: 'calendar'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, tokens[0].secret)
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const id = res.body.id
+        const token = await TokenHandler
+          .lib
+          .findFromId(id)
+        const result = await token.verify(res.body.secret)
+        assert(result)
+      })
+      it('should succeed calendar 3', async () => {
+        const {user, tokens} = await dbUtils.populateTokens(1)
+        const res = await request(app)
+          .post(`/users/${user.model.id}/tokens`)
+          .send({name: tokens[0].model.name + ' 2', type: 'calendar'})
+          .set('Accept', 'application/json')
+          .set('Content-Type', 'application/json')
+          .auth(user.model.id, tokens[0].secret)
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const id = res.body.id
+        const token = await TokenHandler.lib.findFromId(id)
+        assert(token)
+        const result = await token.verify(res.body.secret.split('.')[2])
+        assert(result)
+      })
     })
-    // TODO test with calendar token
-    // TODO test verify
+    describe('POST /users/{userId}/tokens/verify', () => {
+      it('should fail on not authenticated', async () => {
+        const {user} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/users/${user.model.id}/tokens/verify`)
+          .expect(401)
+      })
+      it('should fail on not self', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        const [user2] = await dbUtils.populateUsers(1)
+        await request(app)
+          .post(`/users/${user2.model.id}/tokens/verify`)
+          .auth(user.model.id, token.secret)
+          .send({token: 'some token', type: 'auth'})
+          .expect(403)
+      })
+      it('should fail on self with wrong token', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/users/${user.model.id}/tokens/verify`)
+          .auth(user.model.id, token.secret)
+          .send({token: 'some token', type: 'auth'})
+          .expect(400)
+      })
+      it('should fail on self with wrong token type', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/users/${user.model.id}/tokens/verify`)
+          .auth(user.model.id, token.secret)
+          .send({token: token.secret, type: 'calendar'})
+          .expect(400)
+      })
+      it('should succeed on self with right token type', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        await request(app)
+          .post(`/users/${user.model.id}/tokens/verify`)
+          .auth(user.model.id, token.secret)
+          .send({token: token.secret, type: 'auth'})
+          .expect(204)
+      })
+      it('should fail on self with calendar token and wrong token type', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        const calendarToken = await user.generateCalendarToken('Some fancy calendar token')
+        await request(app)
+          .post(`/users/${user.model.id}/tokens/verify`)
+          .auth(user.model.id, token.secret)
+          .send({token: calendarToken.secret, type: 'auth'})
+          .expect(400)
+      })
+      it('should succeed on web with right token type', async () => {
+        const {user, token} = await dbUtils.populateTokens(1)
+        const jwt = await signAppToken('https://web.laundree.io', 'https://api.laundree.io')
+        await request(app)
+          .post(`/users/${user.model.id}/tokens/verify`)
+          .set('Authorization', `Bearer ${jwt}`)
+          .send({token: token.secret, type: 'auth'})
+          .expect(204)
+      })
+    })
     describe('POST /tokens/email-password', () => {
       let user, token
       const name = faker.name.findName()
