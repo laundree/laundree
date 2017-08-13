@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-function finish {
-    pkill -f selenium-standalone || true
-}
-trap finish EXIT
-
 export PATH="$(npm bin):$PATH"
 
 set -e
@@ -25,7 +20,7 @@ nyc report
 if [ -z "$CODECLIMATE_REPO_TOKEN" ]; then
     echo "No code climate token defined. Not uploading coverage."
 else
-    codeclimate-test-reporter < coverage/lcov.info
+    codeclimate-test-reporter < coverage/lcov.info || true
 fi
 
 
