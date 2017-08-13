@@ -14,8 +14,8 @@ spec:
       - name: nginx
         image: nginx
         resources:
-          limits:
-            cpu: 0.1
+          requests:
+            cpu: 0.02
         readinessProbe:
           httpGet:
             path: /
@@ -63,7 +63,7 @@ spec:
           - ". /home/laundree/.nvm/nvm.sh && npm run start:web"
         resources:
           requests:
-            cpu: 0.05
+            cpu: 0.01
         env:
           - name: 'REDIS_HOST'
             value: 'redis'
@@ -181,7 +181,7 @@ spec:
           periodSeconds: 5
         resources:
           requests:
-            cpu: 0.1
+            cpu: 0.02
         env:
           - name: 'REDIS_HOST'
             value: 'redis'
@@ -260,7 +260,7 @@ spec:
         image: laundree/laundree:${TAG}
         resources:
           requests:
-            cpu: 0.1
+            cpu: 0.02
         readinessProbe:
           httpGet:
             path: /
