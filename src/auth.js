@@ -39,7 +39,7 @@ function sign (payload: Payload): Promise<string> {
   })
 }
 
-export function verify (token: string, {audience, subject}: {audience?: Audience, subject?: Subject}) {
+export function verify (token: string, {audience, subject}: { audience?: Audience, subject?: Subject }) {
   return new Promise((resolve, reject) => {
     jwt.verify(
       token,
@@ -57,7 +57,7 @@ export function verify (token: string, {audience, subject}: {audience?: Audience
   })
 }
 
-export async function signAppToken (iss: Issuer, aud: Audience | Audience[], exp: number): Promise<string> {
+export async function signAppToken (iss: Issuer, aud: Audience | Audience[], exp: number = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60): Promise<string> {
   return sign({
     iss,
     iat: Math.ceil(Date.now() / 1000),

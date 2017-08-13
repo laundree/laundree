@@ -608,7 +608,7 @@ paths:
             $ref: "#/definitions/Error"
 
   /users/{userId}/tokens/verify:
-    x-swagger-router-controller: users
+    x-swagger-router-controller: tokens
     post:
       description: Verify a token
       operationId: verifyToken

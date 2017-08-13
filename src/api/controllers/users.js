@@ -25,7 +25,7 @@ async function listUsersF (since, limit, s, params) {
   return {summaries, linkBase: '/api/users'}
 }
 
-async function createUserFromProfileF (s, p) { // TODO test
+async function createUserFromProfileF (s, p) {
   const {createUserFromProfileBody} = api.assertSubjects({
     createUserFromProfileBody: p.createUserFromProfileBody
   })
@@ -33,7 +33,7 @@ async function createUserFromProfileF (s, p) { // TODO test
   return user.toRest()
 }
 
-async function validateCredentialsF (s, p) { // TODO test
+async function validateCredentialsF (s, p) {
   const {validateCredentialsBody} = api.assertSubjects({
     validateCredentialsBody: p.validateCredentialsBody
   })
@@ -165,7 +165,7 @@ async function _tokenExists (name, user) {
   return t
 }
 
-async function createTokenF (subjects, params) { // TODO test
+async function createTokenF (subjects, params) {
   const {user, createTokenBody} = api.assertSubjects({
     user: subjects.user,
     createTokenBody: params.createTokenBody

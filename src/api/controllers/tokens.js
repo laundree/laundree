@@ -19,7 +19,7 @@ async function _tokenExists (name, user) {
   return t
 }
 
-async function verifyTokenAsync (subjects, params) { // TODO test
+async function verifyTokenAsync (subjects, params) {
   const {user, verifyTokenBody} = api.assertSubjects({
     user: subjects.user,
     verifyTokenBody: params.verifyTokenBody
