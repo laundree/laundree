@@ -34,7 +34,7 @@
     "handlebars": "^4.0.10",
     "ical-generator": "^0.2.9",
     "jdenticon": "^1.7.2",
-    "laundree-sdk": "^0.1.5",
+    "laundree-sdk": "^0.2.1",
     "locale": "^0.1.0",
     "mailgun-js": "^0.11.2",
     "moment": "^2.18.1",
