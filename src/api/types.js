@@ -104,7 +104,7 @@ export type ParsedParams = {
   verifyInviteCodeBody?: VerifyInviteCodeBody
 }
 
-type CustomRequestAddendum = {
+type ApiRequestAddendum = {
   userId?: string,
   subject?: 'app' | 'user',
   swagger: {
@@ -113,17 +113,15 @@ type CustomRequestAddendum = {
   }
 }
 
-type CustomResponseAddendum = {
-  renderHb: (file: string, options: Object) => void
-}
+type ApiResponseAddendum = {}
 
-export type Request = Req<CustomRequestAddendum, CustomResponseAddendum> & CustomRequestAddendum
+export type Request = Req<ApiRequestAddendum, ApiResponseAddendum> & ApiRequestAddendum
 
-export type Response = Res<CustomRequestAddendum, CustomResponseAddendum> & CustomResponseAddendum
+export type Response = Res<ApiRequestAddendum, ApiResponseAddendum> & ApiResponseAddendum
 
-export type Application = App<CustomRequestAddendum, CustomResponseAddendum>
+export type ApiApp = App<ApiRequestAddendum, ApiResponseAddendum>
 
-export type Router = R<CustomRequestAddendum, CustomResponseAddendum>
+export type Router = R<ApiRequestAddendum, ApiResponseAddendum>
 
 export function parseParams (p: Params): ParsedParams {
   // $FlowFixMe this is right...

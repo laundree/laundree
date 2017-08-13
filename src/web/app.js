@@ -15,7 +15,7 @@ import Debug from 'debug'
 import sessionSetup from './session'
 import passportSetup from './passport'
 import handlebarsSetup from './handlebars'
-import type { Response, Request, Application } from './types'
+import type { Response, Request, WebApp } from './types'
 import setupSass from 'node-sass-middleware'
 import identicon from './routes/identicon'
 import pdf from './routes/pdf'
@@ -27,7 +27,7 @@ import langRoute from './routes/lang'
 import { signUserToken, verifyExpiration } from '../auth'
 const debug = Debug('laundree.app')
 
-const app: Application = express()
+const app: WebApp = express()
 app.use(compression())
 
 // SETUP FLASH
