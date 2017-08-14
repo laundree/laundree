@@ -60,7 +60,7 @@ class CalendarNavigationElement extends React.Component {
     dates: moment[]
 
   }
-  state = {current: this.firstDate}
+  state = {current: this.firstDate()}
 
   week (mom = moment()) {
     return [
