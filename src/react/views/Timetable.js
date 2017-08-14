@@ -35,9 +35,12 @@ class BookingInfo extends React.Component {
 
   renderActions () {
     if (!this.isOwner()) return null
-    return <button className='red' onClick={this.deleteHandler}>
-      <FormattedMessage id='general.delete-booking' />
-    </button>
+    return (
+      <li>
+        <button className='red' onClick={this.deleteHandler}>
+          <FormattedMessage id='general.delete-booking'/>
+        </button>
+      </li>)
   }
 
   isOwner () {
@@ -53,7 +56,7 @@ class BookingInfo extends React.Component {
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
     return <div id='ActiveBooking'>
-      <img src={owner.photo} className='avatar' />
+      <img src={owner.photo} className='avatar'/>
       <div className='text'>
         <FormattedMessage
           id={owner.id === this.props.currentUser
@@ -68,7 +71,7 @@ class BookingInfo extends React.Component {
               day={today ? undefined : 'numeric'}
               hour='numeric'
               minute='numeric'
-              value={this.props.booking.from} />,
+              value={this.props.booking.from}/>,
             toTime: <FormattedDate
               timeZone={this.props.laundry.timezone}
               weekday={sameDay ? undefined : 'long'}
@@ -76,17 +79,19 @@ class BookingInfo extends React.Component {
               day={sameDay ? undefined : 'numeric'}
               hour='numeric'
               minute='numeric'
-              value={this.props.booking.to} />,
+              value={this.props.booking.to}/>,
             user: owner.displayName
           }}
         />
       </div>
-      <div className='buttonContainer'>
+      <ul className='actionList'>
         {this.renderActions()}
-        <button onClick={this.closeHandler}>
-          <FormattedMessage id='general.close' />
-        </button>
-      </div>
+        <li>
+          <button onClick={this.closeHandler}>
+            <FormattedMessage id='general.close'/>
+          </button>
+        </li>
+      </ul>
     </div>
   }
 
@@ -102,6 +107,7 @@ class BookingInfo extends React.Component {
     </BaseModal>
   }
 }
+
 type TimetableProps = {
   currentUser: string,
   offsetDate: string,
@@ -172,7 +178,7 @@ class Timetable extends React.Component {
     return <main id='TimeTableMain' ref={this.refPuller}>
       <TimetableHeaders
         hoverColumn={this.state.hoverColumn}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines} />
+        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
       <TimetableTables
         onActiveChange={activeBooking => this.setState({activeBooking})}
         currentUser={this.props.currentUser}
@@ -181,7 +187,7 @@ class Timetable extends React.Component {
         onHoverColumn={hoverColumn => this.setState({hoverColumn})}
         hoverColumn={this.state.hoverColumn}
         bookings={this.props.bookings}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines} />
+        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
       <BookingInfo
         onActiveChange={activeBooking => this.setState({activeBooking})}
         currentUser={this.props.currentUser}
@@ -200,7 +206,7 @@ export default class TimetableWrapper extends React.Component {
   renderEmpty () {
     return <main className='naved'>
       <h1 className='alignLeft'>
-        <FormattedMessage id='timetable.no-machines.title' />
+        <FormattedMessage id='timetable.no-machines.title'/>
       </h1>
       {this.isOwner() ? <section>
         <FormattedMessage

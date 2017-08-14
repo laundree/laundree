@@ -565,8 +565,8 @@ form
 
 .buttonContainer
   padding-top: 2em
-  button
-    margin: 0.5em
+  button:not(:first-of-type)
+    margin-left: 1em
 
 svg.step
   +active-step-style
@@ -658,7 +658,8 @@ footer
     padding: 2em
     background-color: #ffffff
     +box-shadow(0 0 1em #37454a)
-
+    button
+      margin: 0.5em
     .message
       text-align: center
     ul.actionList
@@ -667,7 +668,6 @@ footer
       margin: auto
       text-align: center
       li
-        padding-right: 1em
         display: inline-block
         &:last-of-type
           padding-right: 0
