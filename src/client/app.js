@@ -43,6 +43,7 @@ function setup () {
   if (typeof token === 'string') {
     sdk.authenticator = () => Promise.resolve({type: 'bearer', token})
   }
+  sdk.baseUrl = typeof state.config.apiBase === 'string' ? state.config.apiBase : '/api'
 
   ReactDOM.render(
     <BrowserRouter>
