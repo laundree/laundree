@@ -2,7 +2,13 @@
 import { createStore } from 'redux'
 import { redux } from 'laundree-sdk'
 import type { User, Laundry } from 'laundree-sdk/lib/sdk'
-import type { User as ReduxUser, Laundry as ReduxLaundry, Flash, Action, ListLaundriesAction } from 'laundree-sdk/lib/redux'
+import type {
+  User as ReduxUser,
+  Laundry as ReduxLaundry,
+  Flash,
+  Action,
+  ListLaundriesAction
+} from 'laundree-sdk/lib/redux'
 import sdk from './sdk'
 import config from 'config'
 
@@ -51,7 +57,16 @@ function userToReduxUser (user: User): ReduxUser {
 export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', token: string = '') {
   let events: Action[] = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
-  events.push({type: 'CONFIGURE', payload: {locale, googleApiKey: config.get('google.clientApiKey'), apiBase: config.get('api.base'), token}})
+  events.push({
+    type: 'CONFIGURE',
+    payload: {
+      locale,
+      googleApiKey: config.get('google.clientApiKey'),
+      apiBase: config.get('api.base'),
+      socketIoBase: config.get('socket_io.base'),
+      token
+    }
+  })
   if (!currentUser) return events
   const signInAction: Action = {type: 'SIGN_IN_USER', payload: userToReduxUser(currentUser)}
   events.push(signInAction)

@@ -151,6 +151,11 @@ spec:
               configMapKeyRef:
                 name: laundree-${BRANCH}
                 key: apiBase
+          - name: 'SOCKET_IO_BASE'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: socketIoBase
 
         ports:
           - containerPort: 3000

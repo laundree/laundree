@@ -11,14 +11,18 @@ import App from '../react/views/App'
 import ReactGA from 'react-ga'
 import { redux } from 'laundree-sdk'
 import type { State } from 'laundree-sdk/lib/redux'
-import {toLocale} from '../locales'
+import { toLocale } from '../locales'
+
 ReactGA.initialize(window.__GOOGLE_ANALYTICS__TRACKING_ID__)
 
 const debug = Debug('laundree.initializers.app')
 
 function setupStore () {
   const state = window.__REDUX_STATE__
-  const socket = io('/redux', {query: {jwt: state.config.token}})
+  const socketUrl = typeof state.config.socketIoBase === 'string'
+    ? `${state.config.socketIoBase}/redux`
+    : '/redux'
+  const socket = io(socketUrl, {query: {jwt: state.config.token}})
   debug('Setting up store with state', state)
   const store = createStore(redux.reducer, state)
 

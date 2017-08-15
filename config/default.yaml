@@ -4,7 +4,7 @@ web:
   protocol: https
 
 api:
-  base: https://laundree.io/api
+  base: https://api.laundree.io
 
 auth:
   secret: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
@@ -97,3 +97,4 @@ mailgun:
 
 socket_io:
   path: '/socket.io'
+  base: 'https://socket.laundree.io'
