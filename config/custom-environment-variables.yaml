@@ -50,6 +50,7 @@ api:
   base: 'API_BASE'
 
 socket_io:
+  base: 'SOCKET_IO_BASE'
   path: 'SOCKET_IO_PATH'
 
 auth:
