@@ -12,11 +12,14 @@ import { verify } from '../auth'
 import UserHandler from '../handlers/user'
 import {handleError} from './helper'
 import morganSetup from '../morgan'
+import cors from 'cors'
 
 connectMongoose()
 const debug = Debug('laundree:api.app')
 
 const app: ApiApp = express()
+
+app.use(cors())
 
 morganSetup(app)
 
