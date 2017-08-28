@@ -199,7 +199,7 @@ async function addOwnerAsync (subs) {
 async function addUserToLaundryAsync (subs) {
   const {user, laundry} = api.assertSubjects({laundry: subs.laundry, user: subs.user})
   if (laundry.isUser(user)) {
-    throw new StatusError('Not allowed', 403)
+    return
   }
   await laundry.addUser(user)
 }

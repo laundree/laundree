@@ -3,10 +3,10 @@ import * as regex from '../utils/regex'
 import EventEmitter from 'events'
 import { linkEmitter } from '../db/redis'
 import Debug from 'debug'
-import base64UrlSafe from 'urlsafe-base64'
 import type { ObjectId, Model, QueryOptions, QueryConditions } from 'mongoose'
-import type {Resource} from 'laundree-sdk/lib/sdk'
-import type {Action} from 'laundree-sdk/lib/redux'
+import type { Resource } from 'laundree-sdk/lib/sdk'
+import type { Action } from 'laundree-sdk/lib/redux'
+import { longIdToShort } from '../utils/string'
 
 const debug = Debug('laundree.handlers.handler')
 
@@ -67,7 +67,7 @@ export class HandlerLibrary<ReduxModel: {}, M: Model<*>, RestModel: Resource, H:
     })
   }
 
-  async findFromId (id: string) : Promise<?H> {
+  async findFromId (id: string): Promise<?H> {
     if (!regex.mongoDbId.exec(id)) {
       return null
     }
@@ -91,12 +91,8 @@ export class HandlerLibrary<ReduxModel: {}, M: Model<*>, RestModel: Resource, H:
     this.pubEmitter.removeListener(event, callback)
   }
 
-  fetchCount (criteria: QueryConditions = {}) : Promise<number> {
+  fetchCount (criteria: QueryConditions = {}): Promise<number> {
     return this._Model.count(criteria).exec()
-  }
-
-  findFromShortId (shortId: string) {
-    return this.findFromId(base64UrlSafe.decode(shortId).toString('hex'))
   }
 
   emitEvent (event: 'create' | 'update' | 'delete', instance: H) {
@@ -112,7 +108,7 @@ function findLaundries (handler: { model: { _id: ObjectId, laundry?: ObjectId, l
   return []
 }
 
-type UpdateAction<A> =(A) => Promise<A>
+type UpdateAction<A> = (A) => Promise<A>
 
 export class Handler<M: Model<*>, ReduxModel: {}, RestModel: Resource> {
   model: M
@@ -130,7 +126,7 @@ export class Handler<M: Model<*>, ReduxModel: {}, RestModel: Resource> {
   }
 
   shortId (): string {
-    return base64UrlSafe.encode(Buffer.from(this.model.id, 'hex'))
+    return longIdToShort(this.model.id)
   }
 
   /**
