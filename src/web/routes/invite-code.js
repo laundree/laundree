@@ -4,6 +4,7 @@ import base64UrlSafe from 'urlsafe-base64'
 import * as error from '../../utils/error'
 import type { Request } from '../types'
 import sdk from '../sdk'
+import { shortIdToLong } from '../../utils/string'
 
 const router = express.Router()
 
@@ -19,13 +20,14 @@ router.get('/:laundryId/:id', async (req: Request, res, next) => {
   if (user.demo) {
     return next(notFoundError)
   }
+  const laundryIdHex = shortIdToLong(laundryId)
   try {
-    const laundry = await sdk.api.laundry.get(laundryId)
+    const laundry = await sdk.api.laundry.get(laundryIdHex)
     await sdk.api.laundry.verifyInviteCode(laundry.id, {key: id})
     await sdk.api.laundry.addUser(laundry.id, user.id)
     res.redirect(`/laundries/${laundry.id}`)
   } catch (err) {
-    next(err)
+    next()
   }
 })
 

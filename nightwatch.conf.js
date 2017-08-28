@@ -4,7 +4,7 @@
 
 module.exports = {
   'src_folders': [
-    'test/e2e'
+    'test/e2e/laundry/user.tests.js'
   ],
   'output_folder': 'reports',
   'custom_commands_path': '',

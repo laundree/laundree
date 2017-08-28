@@ -58,8 +58,12 @@ passport.serializeUser((user: User, done) => {
 })
 
 passport.deserializeUser(async (userId, done) => {
-  const user = await sdk.api.user.get(userId)
-  done(null, user)
+  try {
+    const user = await sdk.api.user.get(userId)
+    done(null, user)
+  } catch (err) {
+    done(null, false)
+  }
 })
 
 function setup (app: WebApp) {

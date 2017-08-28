@@ -1309,7 +1309,7 @@ paths:
           required: true
           schema:
             required:
-              - code
+              - key
             properties:
               key:
                 type: string
