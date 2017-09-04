@@ -38,10 +38,10 @@ RUN bash -c " \
 &&  nvm install $NODE_VERSION \
 &&  nvm alias default $NODE_VERSION \
 &&  nvm use default \
-&&  npm i -g npm@latest"
+&&  npm i -g npm@5.3.0"
 ADD package.json package-lock.json ./
 RUN  bash -c ". $NVM_DIR/nvm.sh \
-&&  npm install --silent"
+&& npm install --silent"
 ADD . .
 USER root
 RUN chown -R laundree:laundree .
