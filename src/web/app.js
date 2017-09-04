@@ -30,6 +30,7 @@ import helmet from 'helmet'
 const debug = Debug('laundree.app')
 
 const app: WebApp = express()
+app.set('trust proxy', 1)
 app.use(compression())
 app.use(helmet())
 // SETUP FLASH
