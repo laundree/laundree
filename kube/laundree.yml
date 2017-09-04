@@ -76,6 +76,11 @@ spec:
               configMapKeyRef:
                 name: laundree-${BRANCH}
                 key: host
+          - name: 'SESSION_DOMAIN'
+            valueFrom:
+              configMapKeyRef:
+                name: laundree-${BRANCH}
+                key: host
           - name: FACEBOOK_APP_ID
             valueFrom:
               configMapKeyRef:
