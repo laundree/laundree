@@ -29,6 +29,7 @@ google:
 
 session:
   secret: 'SESSION_SECRET'
+  domain: 'SESSION_DOMAIN'
 
 codeClimate:
   repoToken: 'CODECLIMATE_REPO_TOKEN'

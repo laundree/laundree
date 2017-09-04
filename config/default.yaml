@@ -71,6 +71,10 @@ google:
 
 session:
   secret: 'secret1234'
+  name: 'sesh'
+  domain: 'localhost'
+  secure: false
+
 
 security:
   password:

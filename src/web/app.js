@@ -25,11 +25,13 @@ import authRoute from './routes/auth'
 import inviteCodeRoute from './routes/invite-code'
 import langRoute from './routes/lang'
 import { signUserToken, verifyExpiration } from '../auth'
+import helmet from 'helmet'
+
 const debug = Debug('laundree.app')
 
 const app: WebApp = express()
 app.use(compression())
-
+app.use(helmet())
 // SETUP FLASH
 app.use(flash())
 
