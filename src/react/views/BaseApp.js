@@ -13,47 +13,45 @@ import NotFound from '../views/NotFound'
 import LeftNav from '../containers/LeftNav'
 import UserSettings from '../containers/UserSettings'
 import type { Location } from 'react-router'
-import type { Children } from 'react'
 import type { Laundry, User } from 'laundree-sdk/lib/redux'
 
-export default class BaseApp extends React.Component {
-  props: {
-    location: Location,
-    config: {
-      locale: string,
-      returningUser: boolean
-    },
-    children: Children,
-    currentLaundry: string,
-    laundries: { [string]: Laundry },
-    user: User
-  }
+export default class BaseApp extends React.Component<{
+  location: Location,
+  config: {
+    locale: string,
+    returningUser: boolean
+  },
+  children?: *,
+  currentLaundry: string,
+  laundries: { [string]: Laundry },
+  user: User
+}> {
 
   renderContent () {
     return <Switch>
-      <Route exact path='/' component={Home} />
-      <Route path='/about' component={About} />
+      <Route exact path='/' component={Home}/>
+      <Route path='/about' component={About}/>
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/support'
         redirectTo={'/contact'}
-        component={Support} />
+        component={Support}/>
       <StateCheckRedirectRoute
         test={({currentUser}) => !currentUser}
         path='/contact'
         redirectTo={'/support'}
-        component={Contact} />
+        component={Contact}/>
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/laundries/:laundryId'
         redirectTo={'/auth'}
-        component={LeftNav} />
+        component={LeftNav}/>
       <StateCheckRedirectRoute
         test={({currentUser}) => currentUser}
         path='/users/:userId/settings'
         redirectTo={'/auth'}
-        component={UserSettings} />
-      <Route component={NotFound} />
+        component={UserSettings}/>
+      <Route component={NotFound}/>
     </Switch>
   }
 
@@ -65,9 +63,9 @@ export default class BaseApp extends React.Component {
           user={this.props.user}
           location={this.props.location}
           currentLaundry={this.props.currentLaundry}
-          laundries={this.props.laundries} />
+          laundries={this.props.laundries}/>
         {this.renderContent()}
-        {this.props.user ? null : <Footer />}
+        {this.props.user ? null : <Footer/>}
       </div>
     </DocumentTitle>
   }

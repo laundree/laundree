@@ -7,7 +7,7 @@ export type BookingDefinition = {
   docVersion: number,
   from: Date,
   to: Date,
-  oneSignalId?: String,
+  oneSignalId?: string,
   owner: ObjectId,
   machine: ObjectId,
   laundry: ObjectId

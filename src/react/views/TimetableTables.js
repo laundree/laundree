@@ -29,7 +29,7 @@ type TimetableTableProps = {
   bookings: { [string]: Booking },
   activeBooking: ?string,
   onActiveChange: Function,
-  offsetDate: string,
+  offsetDate?: string,
   date: moment,
   onHoverRow: Function,
   hoverRow: number,
@@ -37,16 +37,24 @@ type TimetableTableProps = {
   times: number[]
 }
 
-class TimetableTable extends React.Component {
+type MouseDownStartState = { x: number, y: number, yCorrection?: number, bookingFromY?: number, bookingToY?: number, resizeId?: string }
+
+class TimetableTable extends React.Component<TimetableTableProps, {
+  activeBooking: ?string,
+  nowPosition: number,
+  offLimitsPosition: number,
+  mouseDownStart: ?MouseDownStartState,
+  bookings: { [string]: string }
+}> {
 
   props: TimetableTableProps
   firstBooking = false
-  state = {...this._calcPosition(), bookings: {}, activeBooking: null}
+  state = {...this._calcPosition(), bookings: {}, activeBooking: null, mouseDownStart: null}
   _interval: number
   bodyListener: Function
   bodyRef: HTMLElement
-  ref: HTMLElement
-  tableRef: HTMLTableElement
+  ref: ?HTMLElement
+  tableRef: ?HTMLTableElement
 
   _row (key, tooLate) {
     const machines = this.props.laundry.machines
@@ -159,7 +167,7 @@ class TimetableTable extends React.Component {
   componentDidUpdate () {
     if (this.firstBooking) return
     this.firstBooking = true
-    const ref = this.ref.querySelector('.booking.active')
+    const ref = this.ref && this.ref.querySelector('.booking.active')
     if (!ref) return
     ref.scrollIntoView()
   }
@@ -175,7 +183,7 @@ class TimetableTable extends React.Component {
     const {yCorrection, x: mouseX, y: mouseY, bookingFromY, bookingToY, resizeId} = this.state.mouseDownStart
     const hoverX = this.props.hoverColumn
     const hoverY = this.props.hoverRow
-    if (resizeId && ((yCorrection < 0 && hoverY >= bookingToY) || (yCorrection > 0 && hoverY < bookingFromY))) {
+    if (resizeId && (((yCorrection || 0) < 0 && hoverY >= (bookingToY || 0)) || ((yCorrection || 0) > 0 && hoverY < (bookingFromY || 0)))) {
       return false
     }
     return x >= Math.min(mouseX, hoverX) &&
@@ -192,7 +200,7 @@ class TimetableTable extends React.Component {
     this.setState(this._calcPosition())
   }
 
-  _calcPosition () {
+  _calcPosition (): { nowPosition: number, offLimitsPosition: number } {
     const now = moment().tz(this.props.laundry.timezone)
     const nowBox = now.hours() * 2 + now.minutes() / 30 + this.dayCoefficient(now) * 48
     const startBox = this.props.times[0]
@@ -223,7 +231,8 @@ class TimetableTable extends React.Component {
   }
 
   handleMouseUp (event) {
-    if (!this.state.mouseDownStart) return
+    const mouseDownStart = this.state.mouseDownStart
+    if (!mouseDownStart) return
     let td
     switch (event.target.tagName.toLowerCase()) {
       case 'span':
@@ -236,13 +245,13 @@ class TimetableTable extends React.Component {
       return
     }
     const {x, y} = this.tdToTablePos(td)
-    const {x: fromX, y: fromY, resizeId, yCorrection} = this.state.mouseDownStart
-    const booking = this.props.bookings[resizeId]
+    const {x: fromX, y: fromY, resizeId, yCorrection} = mouseDownStart
+    const booking = this.props.bookings[resizeId || '']
     this.setState({mouseDownStart: null})
-    if (booking && yCorrection < 0 && this.dateToY(moment(booking.from).tz(this.props.laundry.timezone), 0) < y) {
+    if (booking && (yCorrection || 0) < 0 && this.dateToY(moment(booking.from).tz(this.props.laundry.timezone), 0) < y) {
       return this.update(booking, {from: {x, y}})
     }
-    if (booking && yCorrection > 0 && this.dateToY(moment(booking.to).tz(this.props.laundry.timezone), 48) > y) {
+    if (booking && (yCorrection || 0) > 0 && this.dateToY(moment(booking.to).tz(this.props.laundry.timezone), 48) > y) {
       return this.update(booking, {to: {x, y: y + 1}})
     }
     this.book({x: fromX, y: this.lockedY(fromY)}, {y, x: this.lockedX(x)})
@@ -329,7 +338,7 @@ class TimetableTable extends React.Component {
   }
 
   lockedY (y) {
-    return y + (this.state.mouseDownStart.yCorrection || 0)
+    return y + ((this.state.mouseDownStart && this.state.mouseDownStart.yCorrection) || 0)
   }
 
   hoverTd (td) {
@@ -391,20 +400,19 @@ class TimetableTable extends React.Component {
   }
 }
 
-export default class TimetableTables extends React.Component {
+export default class TimetableTables extends React.Component<{
+  onActiveChange: Function,
+  currentUser: string,
+  activeBooking: ?string,
+  offsetDate?: string,
+  onHoverColumn: Function,
+  hoverColumn: number,
+  dates: moment[],
+  laundry: Laundry,
+  machines: { [string]: Machine },
+  bookings: { [string]: Booking }
+}, { hoverRow: number }> {
   state = {hoverRow: -1}
-  props: {
-    onActiveChange: Function,
-    currentUser: string,
-    activeBooking: ?string,
-    offsetDate: string,
-    onHoverColumn: Function,
-    hoverColumn: number,
-    dates: moment[],
-    laundry: Laundry,
-    machines: { [string]: Machine },
-    bookings: { [string]: Booking }
-  }
 
   componentWillReceiveProps ({dates, laundry: {id}}: { dates: moment[], laundry: Laundry }) {
     const oldDates = this.props.dates

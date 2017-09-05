@@ -1,9 +1,8 @@
 // @flow
 import React from 'react'
-import type { Children } from 'react'
 
-export default class Loader extends React.Component<void, {
-  children?: Children,
+export default class Loader extends React.Component<{
+  children?: *,
   loader: Function,
   loaded?: boolean
 }, { loaded: boolean }> {

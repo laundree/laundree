@@ -5,7 +5,7 @@ import DocTitle from 'react-document-title'
 import { injectIntl } from 'react-intl'
 export { default as Modal } from './Modal'
 
-function elementFactory (element, property, defaults = {}): Class<React$Component<*, *, *>> {
+function elementFactory (element, property, defaults = {}): Class<React$Component<*, *>> {
   const Component = props => {
     const newProp = {}
     newProp[property] = props.intl.formatMessage({id: props[property]})

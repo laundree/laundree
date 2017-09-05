@@ -8,15 +8,13 @@ import type { User, Config, Laundry } from 'laundree-sdk/lib/redux'
 import type { Location } from 'react-router'
 import {toLocale} from '../../locales'
 
-export default class TopNav extends React.Component {
-
-  props: {
-    user: User,
+export default class TopNav extends React.Component<{
+  user: User,
     location: Location,
     currentLaundry: string,
     config: Config,
     laundries: { [string]: Laundry }
-  }
+}> {
 
   laundries () {
     return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)

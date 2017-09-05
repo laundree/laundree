@@ -8,16 +8,15 @@ import moment from 'moment'
 import Loader from './Loader'
 import type { User, Laundry, Machine, Booking } from 'laundree-sdk/lib/redux'
 
-class BookingComponent extends React.Component {
+class BookingComponent extends React.Component<{
+  laundry: Laundry,
+  machine: Machine,
+  booking: Booking
+}, { showModal: boolean }> {
   onCloseModal = () => this.setState({showModal: false})
   onDeleteModal = () => sdk.api.booking.del(this.props.booking.id)
   onDeleteClick = () => this.setState({showModal: true})
-  state: { showModal: boolean } = {showModal: false}
-  props: {
-    laundry: Laundry,
-    machine: Machine,
-    booking: Booking
-  }
+  state = {showModal: false}
 
   render () {
     const booking = this.props.booking
@@ -43,36 +42,35 @@ class BookingComponent extends React.Component {
       <div className='time_action_wrapper'>
         <div className='time'>
           <svg>
-            <use xlinkHref='#Time' />
+            <use xlinkHref='#Time'/>
           </svg>
           <FormattedDate
             weekday={today ? undefined : 'long'}
             timeZone={this.props.laundry.timezone}
             month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
-            value={booking.from} />
+            value={booking.from}/>
           <FormattedDate
             timeZone={this.props.laundry.timezone}
             weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
             day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric'
-            value={booking.to} />
+            value={booking.to}/>
         </div>
         <svg className='trash' onClick={this.onDeleteClick}>
-          <use xlinkHref='#Trash' />
+          <use xlinkHref='#Trash'/>
         </svg>
       </div>
     </div>
   }
 }
 
-export default class Bookings extends React.Component {
-  state: { showModal: boolean } = {showModal: false}
-  props: {
-    laundry: Laundry,
-    user: User,
-    userBookings: string[],
-    bookings: { [string]: Booking },
-    machines: { [string]: Machine }
-  }
+export default class Bookings extends React.Component<{
+  laundry: Laundry,
+  user: User,
+  userBookings: string[],
+  bookings: { [string]: Booking },
+  machines: { [string]: Machine }
+}, { showModal: boolean }> {
+  state = {showModal: false}
   onCloseModal = () => this.setState({showModal: false})
 
   renderBookings () {
@@ -80,7 +78,7 @@ export default class Bookings extends React.Component {
     const bookings = this.props.userBookings.map(bookingId => this.renderBooking(this.props.bookings[bookingId])).filter(b => b)
     if (!bookings.length) {
       return <div className='empty_list'>
-        <FormattedMessage id='bookings.no-bookings' />
+        <FormattedMessage id='bookings.no-bookings'/>
       </div>
     }
     return <ul>
@@ -97,7 +95,7 @@ export default class Bookings extends React.Component {
       <BookingComponent
         laundry={this.props.laundry}
         machine={this.props.machines[booking.machine]}
-        booking={booking} />
+        booking={booking}/>
     </li>
   }
 
@@ -113,7 +111,7 @@ export default class Bookings extends React.Component {
       <Loader loader={() => this.load()}>
         <main className='naved'>
           <h1 className='alignLeft'>
-            <FormattedMessage id='bookings.title' />
+            <FormattedMessage id='bookings.title'/>
           </h1>
           <section id='BookingList'>
             {this.renderBookings()}

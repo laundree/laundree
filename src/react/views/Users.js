@@ -56,12 +56,11 @@ class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry,
   }
 }
 
-class QrInvite extends React.Component {
+class QrInvite extends React.Component<{
+  laundry: Laundry,
+  locale: LocaleType
+}, { generating?: boolean, key?: string }> {
   state = {}
-  props: {
-    laundry: Laundry,
-    locale: LocaleType
-  }
 
   async generatePdf () {
     if (this.state.generating) return
@@ -105,17 +104,14 @@ class QrInvite extends React.Component {
   }
 }
 
-class LinkElement extends React.Component {
-  props: { link: string }
-
+class LinkElement extends React.Component<{ link: string }> {
   render () {
     return <div className='link'>{this.props.link}</div>
   }
 }
 
-class LinkInvite extends React.Component {
-  state: { link: ?string } = {link: null}
-  props: { laundry: Laundry }
+class LinkInvite extends React.Component<{ laundry: Laundry }, { link: ?string, generating?: boolean }> {
+  state = {link: null}
 
   generateLink () {
     if (this.state.generating) return
@@ -148,12 +144,11 @@ class LinkInvite extends React.Component {
   }
 }
 
-class UserItem extends React.Component {
-  props: {
-    user: User,
-    laundry: Laundry,
-    currentUser: User
-  }
+class UserItem extends React.Component<{
+  user: User,
+  laundry: Laundry,
+  currentUser: User
+}, { showModal: boolean }> {
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
   onCloseModal = () => this.setState({showModal: false})
@@ -253,15 +248,12 @@ class UserItem extends React.Component {
   }
 }
 
-class InviteItem extends React.Component {
+class InviteItem extends React.Component<{ invite: Invite }, { showModal: boolean }> {
 
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
   onCloseModal = () => this.setState({showModal: false})
   handleDelete = () => sdk.api.invite.del(this.props.invite.id)
-  props: {
-    invite: Invite
-  }
 
   render () {
     return <div>
@@ -286,14 +278,13 @@ class InviteItem extends React.Component {
   }
 }
 
-export default class Users extends React.Component {
-  props: {
-    locale: LocaleType,
-    invites: { [string]: Invite },
-    users: { [string]: User },
-    laundry: Laundry,
-    currentUser: string
-  }
+export default class Users extends React.Component<{
+  locale: LocaleType,
+  invites: { [string]: Invite },
+  users: { [string]: User },
+  laundry: Laundry,
+  currentUser: string
+}> {
 
   renderUsers () {
     return <ul className='bigList'>

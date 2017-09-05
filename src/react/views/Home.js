@@ -8,8 +8,7 @@ import CreateLaundry from '../containers/CreateLaundry'
 import { Redirect } from 'react-router'
 import type {User} from 'laundree-sdk/lib/redux'
 
-class DemoButton extends React.Component {
-
+class DemoButton extends React.Component<{}, {loading: boolean, email: string, password: string}> {
   state = {loading: false, email: '', password: ''}
 
   clickHandler = () => {
@@ -17,10 +16,10 @@ class DemoButton extends React.Component {
     sdk.api.laundry.createDemoLaundry().then(({email, password}) => this.setState({
       email,
       password
-    }, () => this.ref.submit()))
+    }, () => this.ref && this.ref.submit()))
   }
 
-  ref: HTMLFormElement
+  ref: ?HTMLFormElement
 
   render () {
     return <div>

@@ -1,12 +1,10 @@
 // @flow
 import React from 'react'
 
-export default class Switch extends React.Component {
-
-  props: {
-    on: boolean,
+export default class Switch extends React.Component<{
+  on: boolean,
     onChange:(boolean) => void
-  }
+}> {
 
   onClick = () => this.props.onChange(!this.isOn())
 

@@ -54,12 +54,11 @@ const TimetableHeader = (props: TimetableHeaderProps) => {
   </div>
 }
 
-class CalendarNavigationElement extends React.Component {
-  props: {
-    laundry: Laundry,
-    dates: moment[]
+class CalendarNavigationElement extends React.Component<{
+  laundry: Laundry,
+  dates: moment[]
 
-  }
+}, { current: moment, hover?: {start: moment, end: moment} }> {
   state = {current: this.firstDate()}
 
   week (mom = moment()) {
@@ -150,7 +149,7 @@ class CalendarNavigationElement extends React.Component {
           className='arrow right'
           onClick={() => this.setState(({current}) => ({current: current.clone().add(1, 'month')}))}/>
       </nav>
-      <table onMouseOut={() => this.setState({hover: null})}>
+      <table onMouseOut={() => this.setState({hover: undefined})}>
         {this.header()}
         <DropDownCloser>
           {this.renderMonth()}
@@ -160,12 +159,10 @@ class CalendarNavigationElement extends React.Component {
   }
 }
 
-class TimeTableHeaderNav extends React.Component {
-  props: {
-    laundry: Laundry,
-    dates: moment[]
-  }
-
+class TimeTableHeaderNav extends React.Component<{
+  laundry: Laundry,
+  dates: moment[]
+}> {
   firstDate () {
     return this.props.dates[0]
   }

@@ -5,19 +5,18 @@ import { DocumentTitle } from './intl'
 import { FormattedMessage } from 'react-intl'
 import type { User } from 'laundree-sdk/lib/redux'
 
-export default class Support extends React.Component {
-  props: {
-    currentUser: string,
-    users: { [string]: User }
-  }
+export default class Support extends React.Component<{
+  currentUser: string,
+  users: { [string]: User }
+}> {
 
   render () {
     const user = this.props.users[this.props.currentUser]
     return <DocumentTitle title='document-title.signup'>
       <main id='Support' className='topNaved'>
-        <FormattedMessage tagName='h1' id='support.title' />
-        <FormattedMessage tagName='section' id='support.message' />
-        <ContactForm user={user.demo ? undefined : user} />
+        <FormattedMessage tagName='h1' id='support.title'/>
+        <FormattedMessage tagName='section' id='support.message'/>
+        <ContactForm user={user.demo ? undefined : user}/>
       </main>
     </DocumentTitle>
   }

@@ -143,9 +143,8 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
   }
 }
 
-class DeleteUser extends React.Component {
+class DeleteUser extends React.Component<{ user: User }, {modalOpen: boolean}> {
   state = {modalOpen: false}
-  props: { user: User }
   handleDeleteClick = () => this.deleteUser()
   handleCloseModal = () => this.setState({modalOpen: false})
   handleOpenModal = () => this.setState({modalOpen: true})
@@ -181,10 +180,10 @@ type UserSettingsProps = {
   users: { [string]: User }
 }
 
-class UserSettings extends React.Component {
+class UserSettings extends React.Component<UserSettingsProps, {loading: boolean, emails?: string[]}> {
 
-  props: UserSettingsProps
-  state = {}
+  state = {loading: false}
+
   onLoadClick = async () => {
     if (this.state.loading) return
     this.setState({loading: true})

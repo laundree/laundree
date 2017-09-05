@@ -12,7 +12,7 @@ type ModalIntlProps = {
   }
 }
 
-class ModalIntl extends React.Component<*, ModalIntlProps & ModalProps, *> {
+class ModalIntl extends React.Component<ModalIntlProps & ModalProps, *> {
   render () {
     const props = this.props
     const newProps = {

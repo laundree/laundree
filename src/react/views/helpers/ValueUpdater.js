@@ -4,7 +4,7 @@ import React from 'react'
 
 type Notion = { success: boolean, message: string | React$Element<*> }
 
-export default class ValueUpdater<V: {}, Props, State: {}> extends React.Component<void, Props, State & { values: V, sesh: number, notion: ?Notion }> {
+export default class ValueUpdater<V: {}, Props, State: {}> extends React.Component<Props, State & { values: V, sesh: number, notion: ?Notion }> {
   state: State & { values: V, sesh: number, notion: ?Notion } = {
     ...this.initialState(),
     values: this.initialValues(),

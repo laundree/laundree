@@ -1,9 +1,8 @@
 // @flow
 import React from 'react'
 import PropTypes from 'prop-types'
-import type {Children} from 'react'
 
-export default class DropDownCloser extends React.Component<*, {children: Children}, *> {
+export default class DropDownCloser extends React.Component<{children: *}, *> {
 
   generateOnClick = (fn: Function) => (evt: Event) => {
     if (fn) fn(evt)
