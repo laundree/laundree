@@ -1,6 +1,5 @@
 // @flow
 import React from 'react'
-import type {Children} from 'react'
 import { ValidationElement, ValidationForm } from './validation'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
 import { DocumentTitle, Modal, Label, Input, Submit } from './intl'
@@ -9,11 +8,10 @@ import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
 import type { Machine, Laundry, User } from 'laundree-sdk/lib/redux'
 
-class MachineDropdown extends React.Component {
-  props: {
-    onSelect: Function,
-    selected: string
-  }
+class MachineDropdown extends React.Component<{
+  onSelect: Function,
+  selected: string
+}> {
   selectGenerator (value) {
     return () => {
       this.props.onSelect(value)
@@ -63,12 +61,12 @@ type MachineListItemProps = {
   onUpdate: Function,
   machine?: Machine,
   blacklist: string[],
-  children: Children
+  children?: *
 }
 
 type MachineListItemState = { sesh: number, value: string, selected: 'wash' | 'dry', initial: boolean, broken: boolean, showModal: boolean }
 
-class MachineListItem extends React.Component<*, MachineListItemProps, MachineListItemState> {
+class MachineListItem extends React.Component<MachineListItemProps, MachineListItemState> {
 
   state = this.initialState()
 
@@ -208,16 +206,20 @@ class MachineListItem extends React.Component<*, MachineListItemProps, MachineLi
   }
 }
 
-class Machines extends React.Component {
-  state = {}
-  props: {
-    currentLaundry: string,
-    user: User,
-    machines: { [string]: Machine },
-    laundries: { [string]: Laundry }
+class Machines extends React.Component<{
+  currentLaundry: string,
+  user: User,
+  machines: { [string]: Machine },
+  laundries: { [string]: Laundry }
 
-  }
-  creator = (type: 'wash' | 'dry', name: string, broken: boolean) => sdk.api.laundry.createMachine(this.props.currentLaundry, {name, type, broken})
+}, {}> {
+  state = {}
+
+  creator = (type: 'wash' | 'dry', name: string, broken: boolean) => sdk.api.laundry.createMachine(this.props.currentLaundry, {
+    name,
+    type,
+    broken
+  })
 
   laundry () {
     return this.props.laundries[this.props.currentLaundry]

@@ -7,11 +7,13 @@ describe('handlers', () => {
   describe('Handler', () => {
     describe('updateDocument', () => {
       it('should do nothing with no actions', async () => {
+        // $FlowFixMe This is fine
         const handler = new Handler({id: 1, docVersion: 0})
         const h2 = await handler.updateDocument()
         assert.deepEqual(h2, handler)
       })
       it('should update document', async () => {
+        // $FlowFixMe This is fine
         const handler = new Handler({id: 1, docVersion: 0})
         handler.updateActions = [
           (h) => {

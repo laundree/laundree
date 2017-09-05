@@ -3,15 +3,14 @@ import React from 'react'
 import DropDownTitle from './DropDownTitle'
 import DropDownContent from './DropDownContent'
 import PropTypes from 'prop-types'
-import type {Children} from 'react'
 
-export default class DropDown extends React.Component<*, {className: string, children: Children}, *> {
+export default class DropDown extends React.Component<{className?: string, children: *}, *> {
 
   state = {open: false}
   onToggle = () => this.toggle()
-  ref: HTMLElement
+  ref: ?HTMLElement
 
-  refPuller = (r: HTMLElement) => {
+  refPuller = (r: ?HTMLElement) => {
     this.ref = r
   }
   clickListener = (event: Event) => {

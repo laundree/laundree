@@ -1,6 +1,5 @@
 // @flow
 import React from 'react'
-import type { Children } from 'react'
 import * as regex from '../../../utils/regex'
 import PropTypes from 'prop-types'
 
@@ -15,8 +14,8 @@ export type ValidationElementProps<V> = {
   equal?: V,
   not?: V,
   value: V,
-  validator?: (v: V) => boolean,
-  children: Children,
+  validator?: (v: V) => *,
+  children?: *,
   notOneOf?: string[],
   oneOf?: string[],
   nonEmpty?: boolean,
@@ -24,7 +23,7 @@ export type ValidationElementProps<V> = {
   password?: boolean
 }
 
-export default class ValidationElement<V> extends React.Component<*, ValidationElementProps<V>, { initial: boolean }> {
+export default class ValidationElement<V> extends React.Component<ValidationElementProps<V>, { initial: boolean }> {
   initialState = {initial: true}
   state = {initial: true}
   id: number
@@ -64,7 +63,7 @@ export default class ValidationElement<V> extends React.Component<*, ValidationE
       : props.value
     if (props.equal !== undefined) return props.equal === value
     if (props.not !== undefined) return props.not !== value
-    if (props.validator) return props.validator(value)
+    if (props.validator) return Boolean(props.validator(value))
     if (typeof value === 'string') {
       if (props.notOneOf) return props.notOneOf.indexOf(value) < 0
       if (props.oneOf) return props.oneOf.indexOf(value) >= 0

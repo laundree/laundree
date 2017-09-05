@@ -1,5 +1,5 @@
-// flow-typed signature: c0ce3f9bac97fe109ad556ad8c5abb41
-// flow-typed version: 0b37536688/body-parser_v1.x.x/flow_>=v0.30.x
+// flow-typed signature: 18dadbe162b608c79b9b31c3d2f1c822
+// flow-typed version: b43dff3e0e/body-parser_v1.x.x/flow_>=v0.17.x
 
 import type { Middleware, $Request, $Response } from 'express';
 

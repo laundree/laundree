@@ -1,9 +1,8 @@
 // @flow
 import React from 'react'
-import type {Children} from 'react'
 import {Route} from 'react-router'
 
-const Status = ({code, children}: {code: number, children?: Children}) => (
+const Status = ({code, children}: {code: number, children?: *}) => (
   // $FlowFixMe this is present...
   <Route render={({staticContext}) => {
     if (staticContext) {
@@ -13,7 +12,7 @@ const Status = ({code, children}: {code: number, children?: Children}) => (
   }} />
 )
 
-export default class NotFound extends React.Component {
+export default class NotFound extends React.Component<*> {
   componentDidMount () {
     window.location.reload()
   }

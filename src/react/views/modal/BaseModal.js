@@ -1,15 +1,14 @@
 // @flow
 
 import React from 'react'
-import type {Children} from 'react'
 
 type BaseModalProps = {
-  show: boolean,
-  onClose: Function,
-  children: Children
+  show?: boolean,
+  onClose?: Function,
+  children?: *
 }
 
-export default class BaseModal<P> extends React.Component<*, P & BaseModalProps, *> {
+export default class BaseModal<P> extends React.Component<P & BaseModalProps, *> {
   escListener = (event: Event) => {
     if (!this.props.onClose) return
     if (event.keyCode !== 27) return

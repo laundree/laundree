@@ -12,16 +12,15 @@ import { BaseModal } from './modal'
 import Loader from './Loader'
 import type { Machine, User, Booking, Laundry } from 'laundree-sdk/lib/redux'
 
-class BookingInfo extends React.Component {
-  props: {
-    onActiveChange: Function,
-    currentUser: string,
-    offsetDate: string,
-    laundry: Laundry,
-    booking: Booking,
-    machines: { [string]: Machine },
-    users: { [string]: User }
-  }
+class BookingInfo extends React.Component<{
+  onActiveChange: Function,
+  currentUser: string,
+  offsetDate?: string,
+  laundry: Laundry,
+  booking: Booking,
+  machines: { [string]: Machine },
+  users: { [string]: User }
+}> {
 
   deleteHandler = async () => {
     await sdk
@@ -110,19 +109,18 @@ class BookingInfo extends React.Component {
 
 type TimetableProps = {
   currentUser: string,
-  offsetDate: string,
+  offsetDate?: string,
   users: { [string]: User },
   machines: { [string]: Machine },
   bookings: { [string]: Booking },
   laundry: Laundry
 }
 
-class Timetable extends React.Component {
-  state = {numDays: 0, offset: 0, hoverColumn: -1, activeBooking: null}
-  _mainRef: HTMLElement
-  props: TimetableProps
+class Timetable extends React.Component<TimetableProps, { numDays: number, offset: number, hoverColumn: number, activeBooking: ?string, scrolledToNav: boolean }> {
+  state = {numDays: 0, offset: 0, hoverColumn: -1, activeBooking: null, scrolledToNav: false}
+  _mainRef: ?HTMLElement
 
-  refPuller = (ref: HTMLElement) => {
+  refPuller = (ref: ?HTMLElement) => {
     this._mainRef = ref
   }
 
@@ -200,9 +198,7 @@ class Timetable extends React.Component {
   }
 }
 
-export default class TimetableWrapper extends React.Component {
-  props: TimetableProps
-
+export default class TimetableWrapper extends React.Component<TimetableProps> {
   renderEmpty () {
     return <main className='naved'>
       <h1 className='alignLeft'>

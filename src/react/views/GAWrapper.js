@@ -2,14 +2,12 @@
 import ReactGA from 'react-ga'
 import React from 'react'
 import type {Location} from 'react-router'
-import type {Children} from 'react'
 
-class GAWrapper extends React.Component {
-  props: {
-    currentUser: string,
-    children: Children,
+class GAWrapper extends React.Component<{
+  currentUser: string,
+    children: *,
     location: Location
-  }
+}> {
   log () {
     ReactGA.set({
       userId: this.props.currentUser,

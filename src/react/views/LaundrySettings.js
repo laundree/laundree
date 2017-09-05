@@ -107,12 +107,11 @@ class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, Laundr
   }
 }
 
-class DeleteLaundry extends React.Component {
+class DeleteLaundry extends React.Component<{ laundry: Laundry, user: User }, { modalOpen: boolean }> {
   handleDeleteClick = () => this.deleteLaundry()
   handleCloseModal = () => this.setState({modalOpen: false})
   handleOpenModal = () => this.setState({modalOpen: true})
-  state: { modalOpen: boolean } = {modalOpen: false}
-  props: { laundry: Laundry, user: User }
+  state = {modalOpen: false}
 
   deleteLaundry () {
     return sdk.api.laundry.del(this.props.laundry.id)
@@ -148,15 +147,14 @@ class DeleteLaundry extends React.Component {
   }
 }
 
-class LeaveLaundry extends React.Component {
+class LeaveLaundry extends React.Component<{
+  laundry: Laundry,
+  user: User
+}, { modalOpen: boolean }> {
   handleDeleteClick = () => this.removeUser()
   handleCloseModal = () => this.setState({modalOpen: false})
   handleOpenModal = () => this.setState({modalOpen: true})
   state = {modalOpen: false}
-  props: {
-    laundry: Laundry,
-    user: User
-  }
 
   removeUser () {
     return sdk
@@ -389,7 +387,10 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
             id='laundry-settings.booking-rules.daily-max-hours'
             values={{
               hourInput: <input
-                onBlur={this.generateValueUpdater((v, {dailyLimitString}) => ({dailyLimitString: undefined, dailyLimit: numberMap(dailyLimitString)}))}
+                onBlur={this.generateValueUpdater((v, {dailyLimitString}) => ({
+                  dailyLimitString: undefined,
+                  dailyLimit: numberMap(dailyLimitString)
+                }))}
                 type='text' value={this.state.values.dailyLimitString || this.state.values.dailyLimit}
                 onChange={this.generateValueEventUpdater(dailyLimitString => ({dailyLimitString}))}/>,
               hour: this.state.values.dailyLimit || ''
@@ -408,7 +409,10 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
             id='laundry-settings.booking-rules.max-hours'
             values={{
               hourInput: <input
-                onBlur={this.generateValueUpdater((v, {limitString}) => ({limitString: undefined, limit: numberMap(limitString)}))}
+                onBlur={this.generateValueUpdater((v, {limitString}) => ({
+                  limitString: undefined,
+                  limit: numberMap(limitString)
+                }))}
                 type='text' value={this.state.values.limitString || this.state.values.limit}
                 onChange={this.generateValueEventUpdater(limitString => ({limitString}))}/>,
               hour: this.state.values.limit || ''
@@ -422,14 +426,13 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
   }
 }
 
-export default class LaundrySettings extends React.Component {
-  props: {
-    currentLaundry: string,
-    laundries: { [string]: Laundry },
-    locale: LocaleType,
-    googleApiKey: string,
-    user: User
-  }
+export default class LaundrySettings extends React.Component<{
+  currentLaundry: string,
+  laundries: { [string]: Laundry },
+  locale: LocaleType,
+  googleApiKey: string,
+  user: User
+}> {
 
   isOwner () {
     return this.props.user.role === 'admin' || this.laundry().owners.indexOf(this.props.user.id) >= 0

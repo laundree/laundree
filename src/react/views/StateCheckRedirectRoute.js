@@ -1,10 +1,11 @@
 // @flow
 import React from 'react'
 import {Route, Redirect} from 'react-router'
+import type {ComponentType} from 'react'
 
 type StateCheckRedirectRouteProps<T> = {
   path: string,
-  component: ReactClass<*>,
+  component: ComponentType<*>,
   redirectTo?: string,
   test:(T) => boolean,
   state: T

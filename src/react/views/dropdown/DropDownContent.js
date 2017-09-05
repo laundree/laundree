@@ -1,8 +1,7 @@
 // @flow
 import React from 'react'
-import type {Children} from 'react'
 
-export default class DropDownContent extends React.Component<*, {className: string, children: Children}, *> {
+export default class DropDownContent extends React.Component<{className?: string, children?: *}> {
   render () {
     const props = this.props
     return (

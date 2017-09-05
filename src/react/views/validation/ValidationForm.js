@@ -1,21 +1,20 @@
 // @flow
 
 import React from 'react'
-import type { Children } from 'react'
 import PropTypes from 'prop-types'
 
 type ValidationFormProps = {
-  sesh: number,
-  initial: bool,
+  sesh?: number,
+  initial?: bool,
   onSubmit: Function,
-  className: string,
-  id: string,
-  method: string,
-  action: string,
-  children: Children
+  className?: string,
+  id?: string,
+  method?: string,
+  action?: string,
+  children?: *
 }
 
-export default class ValidationForm extends React.Component {
+export default class ValidationForm extends React.Component<ValidationFormProps, {initial: boolean, failed: boolean, valid: {[string]: boolean}}> {
   initialState = {initial: true, failed: false, valid: {}}
   state = this.initialState
   submitHandler = (evt: Event) => {

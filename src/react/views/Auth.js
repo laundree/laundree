@@ -1,6 +1,5 @@
 // @flow
 import React from 'react'
-import type { Children } from 'react'
 import LocaleSelector from './LocaleSelect'
 import Forgot from '../containers/Forgot'
 import SignUp from '../containers/SignUp'
@@ -12,7 +11,7 @@ import { Switch, Route } from 'react-router'
 import type {LocaleType} from '../../locales'
 import type {Location} from 'react-router'
 
-const Auth = ({children, locale, location}: { locale: LocaleType, location: Location, children: Children }) => <div>
+const Auth = ({children, locale, location}: { locale: LocaleType, location: Location, children: * }) => <div>
   <nav id='AuthNav'>
     <LocaleSelector locale={locale} location={location} />
   </nav>

@@ -10,8 +10,7 @@ import type {Stats, Laundry, User} from 'laundree-sdk/lib/redux'
 import type { ListOptions } from 'laundree-sdk/lib/sdk'
 const debug = Debug('laundree.react.views.AdminPanel')
 
-class StatsComponent extends React.Component {
-  props: { stats: Stats }
+class StatsComponent extends React.Component<{stats: Stats}> {
 
   componentDidMount () {
     sdk.updateStats()
@@ -77,7 +76,7 @@ class StatsComponent extends React.Component {
   }
 }
 
-class QueryList<T: { id: string }> extends React.Component<void,
+class QueryList<T: { id: string }> extends React.Component<
   {
     elements: T[],
     totalDemo: ?number,

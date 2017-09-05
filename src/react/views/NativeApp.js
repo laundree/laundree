@@ -4,11 +4,9 @@ import sdk from '../../client/sdk'
 import uuid from 'uuid'
 import type { User } from 'laundree-sdk/lib/redux'
 
-export default class NativeApp extends React.Component {
-  state = {now: null, data: null}
-  _token: ?Promise<*>
-  props: {currentUser: string, users: {[string]: User}}
-  promisedToken () {
+export default class NativeApp extends React.Component<{currentUser: string, users: {[string]: User}}> {
+  _token: ?Promise<{}>
+  async promisedToken () {
     if (this._token) return this._token
     if (!this.props.currentUser) {
       this._token = Promise.resolve({})
@@ -33,13 +31,6 @@ export default class NativeApp extends React.Component {
   }
 
   render () {
-    return <div>
-      <div>
-        {this.state.now}
-      </div>
-      <div>
-        {this.state.data}
-      </div>
-    </div>
+    return <div />
   }
 }
