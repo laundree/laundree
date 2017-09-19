@@ -25,7 +25,7 @@ export async function render (file: string, context: Object, locale: LocaleType)
   const p = path.resolve(__dirname, '..', '..', 'templates', file)
   const cachedTemplate = templateCache[p]
   const messages = locales[locale]
-  const template = await cachedTemplate || readTemplate(p)
+  const template = cachedTemplate || await readTemplate(p)
   return template(Object.assign(context, {messages}))
 }
 
