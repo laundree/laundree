@@ -92,7 +92,7 @@ class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, R
 
 export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, RestLaundry> {
   static restSummary (i: ObjectId | LaundryHandler) {
-    const id = (i.model ? i.model._id : i).toString()
+    const id = Handler.handlerOrObjectIdToString(i)
     return {id, href: '/api/laundries/' + id}
   }
   static lib = new LaundryHandlerLibrary()

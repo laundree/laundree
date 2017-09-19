@@ -6,7 +6,7 @@ import type {ComponentType} from 'react'
 type StateCheckRedirectRouteProps<T> = {
   path: string,
   component: ComponentType<*>,
-  redirectTo?: string,
+  redirectTo: string,
   test:(T) => boolean,
   state: T
 }

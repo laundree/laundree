@@ -20,16 +20,13 @@ function readTemplate (path) {
     })
 }
 
-export function render (file: string, context: Object, locale: LocaleType) {
+export async function render (file: string, context: Object, locale: LocaleType) {
   debug('Rendering template ', file)
   const p = path.resolve(__dirname, '..', '..', 'templates', file)
-  const template = templateCache[p]
+  const cachedTemplate = templateCache[p]
   const messages = locales[locale]
-  return Promise
-    .resolve(template || readTemplate(p))
-    .then(template => {
-      return template(Object.assign(context, {messages}))
-    })
+  const template = await cachedTemplate || readTemplate(p)
+  return template(Object.assign(context, {messages}))
 }
 
 function format (context, options) {

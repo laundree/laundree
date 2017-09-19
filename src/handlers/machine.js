@@ -35,7 +35,7 @@ export default class MachineHandler extends Handler<MachineModel, Machine, RestM
   restUrl: string
 
   static restSummary (i: ObjectId | MachineHandler) {
-    const id = (i.model ? i.model._id : i).toString()
+    const id = Handler.handlerOrObjectIdToString(i)
     return {id, href: '/api/machines/' + id}
   }
 

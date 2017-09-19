@@ -99,7 +99,7 @@ class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, RestBo
 
 export default class BookingHandler extends Handler<BookingModel, Booking, RestBooking> {
   static restSummary (i: ObjectId | BookingHandler) {
-    const id = (i.model ? i.model._id : i).toString()
+    const id = Handler.handlerOrObjectIdToString(i)
     return {id, href: '/api/bookings/' + id}
   }
 

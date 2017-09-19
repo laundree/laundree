@@ -20,6 +20,7 @@ import type {
   ListBookingsAction
 } from 'laundree-sdk/lib/redux'
 import { verify } from '../auth'
+import type { Payload } from '../auth'
 connectMongoose()
 
 const debug = Debug('laundree.lib.socket_io')
@@ -256,9 +257,9 @@ async function authenticateSocket (socket): Promise<?UserHandler> {
   if (jwt) {
     debug('Got jwt', jwt)
     try {
-      const decoded = await verify(jwt, {audience: 'https://socket.laundree.io', subject: 'user'})
+      const decoded : Payload = await verify(jwt, {audience: 'https://socket.laundree.io', subject: 'user'})
       debug('Decoded token to', decoded)
-      const user = await UserHandler.lib.findFromId(decoded.userId)
+      const user = decoded.userId ? await UserHandler.lib.findFromId(decoded.userId) : null
       if (user) {
         debug('Authentication successful')
         user.seen()
