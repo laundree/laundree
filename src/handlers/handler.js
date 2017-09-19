@@ -108,7 +108,7 @@ function findLaundries (handler: { model: { _id: ObjectId, laundry?: ObjectId, l
   return []
 }
 
-type UpdateAction<A> = (A) => Promise<A>
+type UpdateAction<A> = (a: A) => Promise<A>
 
 export class Handler<M: Model<*>, ReduxModel: {}, RestModel: Resource> {
   model: M

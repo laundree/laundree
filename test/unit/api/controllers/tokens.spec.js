@@ -84,7 +84,7 @@ describe('controllers', function () {
     describe('POST /users/:userId/tokens', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .post(`/users/someid/tokens`)
+          .post('/users/someid/tokens')
           .send({name: 'Token 1', type: 'auth'})
           .set('Accept', 'application/json')
           .set('Content-Type', 'application/json')
