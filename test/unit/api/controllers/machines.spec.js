@@ -22,7 +22,7 @@ describe('controllers', function () {
     describe('GET /laundries/{id}/machines', () => {
       it('should fail on not authenticated', () =>
         request(app)
-          .get(`/laundries/lid/machines`)
+          .get('/laundries/lid/machines')
           .set('Accept', 'application/json')
           .expect(401)
           .expect('Content-Type', /json/))

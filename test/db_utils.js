@@ -32,7 +32,7 @@ function generateProfile () {
   }
 }
 
-export function populateUsers (no: number) {
+export function populateUsers (no: number): Promise<UserHandler[]> {
   return Promise.all(range(no).map(generateProfile).map((profile) => UserHandler.lib.createUserFromProfile(profile)))
 }
 

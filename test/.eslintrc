@@ -1,11 +1,20 @@
 {
-  "extends": "standard",
-  "parser": "babel-eslint",
+  "extends": [
+    "standard",
+    "standard-react",
+    "standard-flow"
+  ],
   "rules": {
-    "no-unused-expressions": 0
+    "react/no-unused-prop-types": 0,
+    "react/jsx-space-before-closing": 0,
+    "react/jsx-indent": 0,
+    "react/jsx-tag-spacing": 0,
+    "react/prop-types": 0,
+    "no-var": "error",
+    "generator-star-spacing": 0
   },
   "env": {
-    "node": true,
-    "mocha": true
+    "mocha": true,
+    "node": true
   }
 }
