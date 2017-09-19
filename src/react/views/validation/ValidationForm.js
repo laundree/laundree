@@ -6,7 +6,7 @@ import PropTypes from 'prop-types'
 type ValidationFormProps = {
   sesh?: number,
   initial?: bool,
-  onSubmit: Function,
+  onSubmit?: Function,
   className?: string,
   id?: string,
   method?: string,

@@ -74,11 +74,9 @@ export async function createInitialEvents (currentUser: ?User, successFlash: str
   return events.concat(event)
 }
 
-export function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', token: string = '') {
-  return createInitialEvents(currentUser, successFlash, errorFlash, locale, token)
-    .then((events) => {
-      const store = createStore(redux.reducer)
-      events.forEach((event) => store.dispatch(event))
-      return store
-    })
+export async function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', token: string = '') {
+  const events = await createInitialEvents(currentUser, successFlash, errorFlash, locale, token)
+  const store = createStore(redux.reducer)
+  events.forEach((event) => store.dispatch(event))
+  return store
 }

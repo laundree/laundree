@@ -8,7 +8,7 @@ import UserHandler from './user'
 import type { QueryConditions, ObjectId } from 'mongoose'
 import type { Token as RestToken, TokenWithSecret as RestTokenWithSecret } from 'laundree-sdk/lib/sdk'
 
-class TokenHandlerLibrary extends HandlerLibrary {
+class TokenHandlerLibrary extends HandlerLibrary<{}, TokenModel, RestToken, *> {
 
   constructor () {
     super(TokenHandler, TokenModel)
@@ -62,7 +62,7 @@ class TokenHandlerLibrary extends HandlerLibrary {
 
 export default class TokenHandler extends Handler<TokenModel, *, RestToken> {
   static restSummary (i: ObjectId | TokenHandler) {
-    const id = (i.model ? i.model._id : i).toString()
+    const id = Handler.handlerOrObjectIdToString(i)
     return {id, href: '/api/tokens/' + id}
   }
 

@@ -18,7 +18,7 @@ if (config.get('opbeat.enable')) {
   debug('Opbeat is not enabled.')
 }
 
-export function trackRelease () {
+export function trackRelease (): Promise<void> {
   if (!config.get('opbeat.trackRelease')) return Promise.resolve()
   if (!opbeat) return Promise.resolve()
   return new Promise((resolve, reject) => {

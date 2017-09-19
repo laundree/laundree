@@ -33,7 +33,7 @@ class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvi
 
 export default class LaundryInvitationHandler extends Handler<LaundryInvitationModel, Invite, RestLaundryInvitation> {
   static restSummary (i: ObjectId | LaundryInvitationHandler) {
-    const id = (i.model ? i.model._id : i).toString()
+    const id = Handler.handlerOrObjectIdToString(i)
     return {id, href: '/api/invites/' + id}
   }
 

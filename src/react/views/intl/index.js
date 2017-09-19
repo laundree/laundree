@@ -13,6 +13,7 @@ function elementFactory (element, property, defaults = {}): Class<React$Componen
     delete newProps.intl
     return React.createElement(element, newProps)
   }
+  // $FlowFixMe: Figure something out here!
   return injectIntl(Component)
 }
 

@@ -39,7 +39,7 @@ function sign (payload: Payload): Promise<string> {
   })
 }
 
-export function verify (token: string, {audience, subject}: { audience?: Audience, subject?: Subject }) {
+export async function verify (token: string, {audience, subject}: { audience?: Audience, subject?: Subject }): Promise<Payload> {
   return new Promise((resolve, reject) => {
     jwt.verify(
       token,

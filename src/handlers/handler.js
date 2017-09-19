@@ -119,6 +119,12 @@ export class Handler<M: Model<*>, ReduxModel: {}, RestModel: Resource> {
     this.model = model
   }
 
+  static handlerOrObjectIdToString (i: ObjectId | Handler<*, *, *>): string {
+    // $FlowFixMe This is right
+    const id: ObjectId = (i.model && i.model ? i.model._id : i)
+    return id.toString()
+  }
+
   async save () {
     await this.model.save()
     await this.lib.emitEvent('update', this)

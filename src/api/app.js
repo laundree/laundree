@@ -10,9 +10,10 @@ import type { ApiApp, Request } from './types'
 import Debug from 'debug'
 import { verify } from '../auth'
 import UserHandler from '../handlers/user'
-import {handleError} from './helper'
+import { handleError } from './helper'
 import morganSetup from '../morgan'
 import cors from 'cors'
+import type { Payload } from '../auth'
 
 connectMongoose()
 const debug = Debug('laundree:api.app')
@@ -33,9 +34,9 @@ async function jwt (req, authOrSecDef, scopesOrApiKey, callback) {
     return
   }
   try {
-    const data = await verify(token, {audience: 'https://api.laundree.io'})
+    const data: Payload = await verify(token, {audience: 'https://api.laundree.io'})
     debug('Decoded successfully', data)
-    req.userId = data.userId
+    req.userId = data.userId || null
     req.subject = data.sub
     callback()
   } catch (err) {
@@ -76,7 +77,7 @@ async function basic (req, authOrSecDef, scopesOrApiKey, callback) {
   callback()
 }
 
-export default new Promise((resolve) => {
+const promise: Promise<ApiApp> = new Promise((resolve) => {
   YAML.load(path.join(__dirname, 'swagger', 'swagger.yaml'),
     (result) => {
       result.basePath = '/'
@@ -103,5 +104,7 @@ export default new Promise((resolve) => {
       })
     })
 })
+
+export default promise
 
 trackRelease()

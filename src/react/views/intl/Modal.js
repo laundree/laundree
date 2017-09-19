@@ -6,22 +6,18 @@ import type { ModalProps } from '../modal/Modal'
 
 import { injectIntl } from 'react-intl'
 
-type ModalIntlProps = {
+type ModalIntlProps = ModalProps & {
   intl: {
     formatMessage: Function
   }
 }
 
-class ModalIntl extends React.Component<ModalIntlProps & ModalProps, *> {
-  render () {
-    const props = this.props
-    const newProps = {
-      message: props.intl.formatMessage({id: props.message}),
-      actions: props.actions.map(p => Object.assign({}, p, {label: props.intl.formatMessage({id: p.label})}))
-    }
-    return React.createElement(Modal, Object.assign({}, props, newProps))
+const ModalIntl = (props: ModalIntlProps) => {
+  const newProps = {
+    message: props.intl.formatMessage({id: props.message}),
+    actions: props.actions.map(p => Object.assign({}, p, {label: props.intl.formatMessage({id: p.label})}))
   }
-
+  return React.createElement(Modal, Object.assign({}, props, newProps))
 }
 
 export default injectIntl(ModalIntl)

@@ -199,8 +199,8 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
   lib = UserHandler.lib
 
   static restSummary (i: ObjectId | UserHandler) {
-    const id = (i.model ? i.model._id : i).toString()
-    return {id, href: '/api/users/' + id}
+    const id = Handler.handlerOrObjectIdToString(i)
+    return {id, href: '/api/users/' + id.toString()}
   }
 
   updateActions = [
