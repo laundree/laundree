@@ -24,16 +24,17 @@
     "connect-flash": "^0.1.1",
     "connect-redis": "^3.3.0",
     "cookie-parser": "^1.4.3",
-    "cors": "^2.8.3",
+    "cors": "^2.8.4",
     "debug": "^3.0.0",
     "email-templates": "^2.6.0",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
     "handlebars": "^4.0.10",
+    "helmet": "^3.8.1",
     "ical-generator": "^0.2.9",
     "jdenticon": "^1.7.2",
-    "jsonwebtoken": "^7.4.1",
-    "laundree-sdk": "0.2.1",
+    "jsonwebtoken": "^8.0.1",
+    "laundree-sdk": "0.2.3",
     "locale": "^0.1.0",
     "mailgun-js": "^0.13.1",
     "moment": "^2.18.1",
@@ -67,7 +68,6 @@
     "urlsafe-base64": "^1.0.0",
     "uuid": "^3.1.0",
     "webpack": "^3.2.0",
-    "webpack-dev-middleware": "^1.11.0",
     "webpack-merge": "^4.1.0",
     "yamljs": "^0.3.0"
   },
@@ -92,7 +92,8 @@
     "nyc": "^11.0.3",
     "selenium-standalone": "^6.5.0",
     "sinon": "^3.2.0",
-    "supertest": "^3.0.0"
+    "supertest": "^3.0.0",
+    "webpack-dev-middleware": "^1.11.0"
   },
   "scripts": {
     "test:flow": "flow .",

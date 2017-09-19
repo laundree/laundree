@@ -1,5 +1,5 @@
 sudo: required
-language: node
+language: node_js
 cache:
   directories:
   - node_modules
@@ -17,8 +17,9 @@ env:
   - secure: E4U6xICrj4dQruXseo/lOM1cnCdssj7/2WEI/l6dS5pK82qLIk2X2M0ZfI+OuzIdVjTuRSDq2urTTdwmC46O3seR9fZKKx+dEsXGE+o2lt60BVa5oaQ9oeSuX9A+VISmDYheebWUsEWfWrFxKXye84pUrC058ezBbmyHZdhVngw81fyavKyBYi021ZchOSL7thuMAjwlqqn5irFscC34uIPTE0SuRVBJP0ZHTLLD1djDOp0pIRq7Qf/T5CzT+4KoQU+NbxPjcy2fqrdfydA+A/RLvxPCKYYTGDD8/Xp0XEam8ja7VtAMcfNYy69lPPaqfaqSdTal9IHHsg0Ld/3O853Tg7liXUSbP/jLnCrjvoqEYwfCgf/HEguSPsMakwYGi2KC+c/DYHQ430MbxxTEDHRqEtyM0XN1sqGQ7xj16F3Bpqd4wjYGq/dD27aiSnzNsNPkTO6t3YTCMAWYk9A5nJGdRdmS+xWYkSJlM6rR9mX/mAm2A38yTVSPCuBrzp4hadijJSWEaLpYGn59WyL1tkfLvFA2u9yySm3jtMBBX77szYN6YsIFfh7GnaOdIbUyRdr0yxD8mkRZtCURojd/LUC/avZpi0+G3QSAgro4Du6LHIzijh/2kd2MIgF20RRfMxMulqBo2mrod7FiGlJZ4k+YldbHvlPYa2qitB6oHN4=
 services:
 - docker
+node_js:
+- 8
 before_install:
-- npm install -g npm@5
 - npm install -g greenkeeper-lockfile@1
 - openssl aes-256-cbc -K $encrypted_3c0236424301_key -iv $encrypted_3c0236424301_iv
   -in credentials.tar.gz.enc -out credentials.tar.gz -d
@@ -28,6 +29,7 @@ before_install:
 - tar -xzf credentials.tar.gz
 - ~/google-cloud-sdk/bin/gcloud auth activate-service-account --key-file gcloud-credentials.json
 - docker-compose -f docker-compose.test.yml build
+install: echo "INSTALL!!!"
 before_script: greenkeeper-lockfile-update
 script: ./scripts/travis.sh
 after_script: greenkeeper-lockfile-upload

@@ -29,6 +29,7 @@ google:
 
 session:
   secret: 'SESSION_SECRET'
+  domain: 'SESSION_DOMAIN'
 
 codeClimate:
   repoToken: 'CODECLIMATE_REPO_TOKEN'
@@ -50,6 +51,7 @@ api:
   base: 'API_BASE'
 
 socket_io:
+  base: 'SOCKET_IO_BASE'
   path: 'SOCKET_IO_PATH'
 
 auth:

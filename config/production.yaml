@@ -11,3 +11,7 @@ logging:
     format: 'common'
   error:
     enabled: true
+
+session:
+  domain: 'laundree.io'
+  secure: true

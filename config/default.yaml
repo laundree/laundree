@@ -4,7 +4,7 @@ web:
   protocol: https
 
 api:
-  base: https://laundree.io/api
+  base: https://api.laundree.io
 
 auth:
   secret: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA='
@@ -71,6 +71,10 @@ google:
 
 session:
   secret: 'secret1234'
+  name: 'sesh'
+  domain: 'localhost'
+  secure: false
+
 
 security:
   password:
@@ -97,3 +101,4 @@ mailgun:
 
 socket_io:
   path: '/socket.io'
+  base: 'https://socket.laundree.io'
