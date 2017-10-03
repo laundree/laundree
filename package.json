@@ -69,7 +69,8 @@
     "uuid": "^3.1.0",
     "webpack": "^3.6.0",
     "webpack-merge": "^4.1.0",
-    "yamljs": "^0.3.0"
+    "yamljs": "^0.3.0",
+    "snyk": "^1.42.3"
   },
   "devDependencies": {
     "codeclimate-test-reporter": "^0.5.0",
@@ -118,7 +119,9 @@
     "build": "npm run build:babel && npm run build:client",
     "build:babel": "babel src -d lib --copy-files",
     "build:client": "webpack --env=prod --progress --profile --colors --config webpack.prod.js",
-    "test": "./scripts/test.sh"
+    "test": "./scripts/test.sh",
+    "snyk-protect": "snyk protect",
+    "prepare": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -132,5 +135,6 @@
   "bugs": {
     "url": "https://github.com/laundree/laundree/issues"
   },
-  "homepage": "https://github.com/laundree/laundree#readme"
+  "homepage": "https://github.com/laundree/laundree#readme",
+  "snyk": true
 }
