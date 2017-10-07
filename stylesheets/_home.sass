@@ -1,142 +1,71 @@
-#Home
-  padding-top: 4em
-  header
-    position: relative
-    background: #F3FCFF
-    overflow: hidden
-    > div:first-of-type
-      padding: 8em 0
-      z-index: 10
+#LandingPage
+  padding-top: 5em
+  h1
+    font-family: "Roboto Condensed", sans-serif
+    font-style: italic
+    text-align: left
+    font-size: 2em
+  h2
+    font-family: "Roboto Condensed", sans-serif
+    font-style: italic
+    text-align: left
+    font-size: 1.5em
+    padding-bottom: 0.5em
+  section
+    .container
+      max-width: 100em
+      margin: auto
       position: relative
-
-      > a
-        width: 15em
-        margin: auto
-        display: block
-        svg
-          width: 15em
-          height: logo_ratio_w_to_h(15em)
-          display: block
-      .credit
-        position: absolute
-        bottom: 1em
-        right: 1em
-        color: #b5b5b5
-        font-weight: 300
-        font-size: 0.8em
-        a
-          color: #b5b5b5
-          font-style: italic
-
-      h2
-        display: block
-        font-family: 'Open Sans', sans-serif
-        font-style: italic
-        font-weight: 700
-        font-size: 1em
-
-        margin: auto
-        text-align: center
-        padding: 1em 0
-        line-height: 2em
-        color: #ffffff
-
-    $height: 28.6em
-    $ratio: 1920/1080
-    $width: $height*$ratio
-
-    > div:last-of-type
-      z-index: 0
-      top: 0
-      left: 0
-      right: 0
-      position: absolute
       height: 100%
-      video
-        height: auto
-        width: 100%
-
-        @media (max-width: $width)
-          height: 100%
-          width: auto
-
-  main
-    margin: auto
-    position: relative
-    border-top: 0.5em solid #7FECEC
-
-    #BackgroundArt
-      background:
-        image: url(/images/boxers.svg), url(/images/sock.svg), url(/images/tshirt.svg)
-        size: 11em, 8em, 16em
-        repeat: no-repeat
-        position: 7% 40%, 90% 10%, 94% 70%
+  section.bright
+    background-color: #8fd4db
+  section.intro
+    height: 30em
+    padding: 0
+    div.title
+      width: 20em
+      padding: 8em 0 0 0
+      text-align: left
+      .desc
+        padding: 1em 0
+        font-size: 1.1em
+        font-style: italic
+    div.appLogos
       position: absolute
-      top: 0
-      bottom: 0
-      left: 0
-      right: 0
-      z-index: 0
-      +transition(opacity 0.1s)
-      @media (max-width: 69em)
-        opacity: 0.2
-    a
-      color: #d58948
-      font-weight: 700
-
-    section
-      position: relative
-      z-index: 1
-
-      h1
-        text-align: center
-        padding: 1em 0 2em
-
-      ul
-        list-style-type: none
-
-        li
-          font-weight: bolder
-          font-size: 1em
-          max-width: 37em
-          margin: auto
-          position: relative
-
-          h2
-            font-family: 'Open Sans', sans-serif
-            color: #03414C
-            font-weight: 700
-            text-transform: uppercase
-            padding: 0
-            font-size: 1.1em
-            line-height: 2em
-
-          svg
-            width: 4em
-            height: 4em
-            float: left
-            position: absolute
-            left: 1em
-            top: 2.5em
-
-          div
-            padding: 2em 1em 2.4em 8em
-
-
-    section#StartDemo
-      div
-        padding: 2em 0
+      bottom: 2em
+      img
+        display: inline-block
+        height: 2.5em
+        &:first-of-type
+          margin-right: 1em
+  section.statistics
+    padding: 2em 0
+    .container
+      max-width: 38em
+    .stat
+      width: 15em
+      padding: 2em
+      display: inline-block
+      text-align: center
+      > .subTitle
+        padding: 1em 0
+      > div:not(.subTitle)
+        height: 1em
+        line-height: 1em
+        font-size: 5em
+        svg
+          vertical-align: top
+          margin: 0.2em 0.2em 0 0
+          width: 0.60em
+          height: 0.60em
+          fill: #04414c
+          display: inline-block
         span
-          &.loading
-            &:after
-              +loading_after()
-            &:before
-              +loading_before()
-          position: relative
-          cursor: pointer
-          width: 10em
-          margin: auto
-          display: block
-          svg
-            width: 10em
-            display: block
+          display: inline-block
+          font-family: "Roboto Condensed", sans-serif
+          font-weight: bold
+          color: #e45564
+  section.about
+    .text
+      max-width: 25em
+      padding: 4em 0

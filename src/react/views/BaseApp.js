@@ -1,21 +1,19 @@
 // @flow
 import React from 'react'
 import TopNav from './TopNav'
-import Footer from './Footer'
 import { DocumentTitle } from './intl'
 import { Switch, Route } from 'react-router'
-import About from '../views/About'
-import Home from '../containers/Home'
-import Contact from '../views/Contact'
 import Support from '../containers/Support'
 import StateCheckRedirectRoute from '../containers/StateCheckRedirectRoute'
 import NotFound from '../views/NotFound'
 import LeftNav from '../containers/LeftNav'
 import UserSettings from '../containers/UserSettings'
+import Home from '../containers/Home'
+import LandingPage from './LandingPage'
 import type { Location } from 'react-router'
 import type { Laundry, User } from 'laundree-sdk/lib/redux'
 
-export default class BaseApp extends React.Component<{
+type BaseAppProps = {
   location: Location,
   config: {
     locale: string,
@@ -25,48 +23,43 @@ export default class BaseApp extends React.Component<{
   currentLaundry: string,
   laundries: { [string]: Laundry },
   user: User
-}> {
-
-  renderContent () {
-    return <Switch>
-      <Route exact path='/' component={Home}/>
-      <Route path='/about' component={About}/>
-      <StateCheckRedirectRoute
-        test={({currentUser}) => currentUser}
-        path='/support'
-        redirectTo={'/contact'}
-        component={Support}/>
-      <StateCheckRedirectRoute
-        test={({currentUser}) => !currentUser}
-        path='/contact'
-        redirectTo={'/support'}
-        component={Contact}/>
-      <StateCheckRedirectRoute
-        test={({currentUser}) => currentUser}
-        path='/laundries/:laundryId'
-        redirectTo={'/auth'}
-        component={LeftNav}/>
-      <StateCheckRedirectRoute
-        test={({currentUser}) => currentUser}
-        path='/users/:userId/settings'
-        redirectTo={'/auth'}
-        component={UserSettings}/>
-      <Route component={NotFound}/>
-    </Switch>
-  }
-
-  render () {
-    return <DocumentTitle title='document-title.base'>
-      <div className={this.props.user ? '' : 'footer'}>
-        <TopNav
-          config={this.props.config}
-          user={this.props.user}
-          location={this.props.location}
-          currentLaundry={this.props.currentLaundry}
-          laundries={this.props.laundries}/>
-        {this.renderContent()}
-        {this.props.user ? null : <Footer/>}
-      </div>
-    </DocumentTitle>
-  }
 }
+
+export default (props: BaseAppProps) => (
+  <DocumentTitle title='document-title.base'>
+    <div>
+      <TopNav
+        config={props.config}
+        user={props.user}
+        location={props.location}
+        currentLaundry={props.currentLaundry}
+        laundries={props.laundries} />
+      {
+        props.user
+          ? (
+            <Switch>
+              <Route exact path='/' component={Home} />
+              <StateCheckRedirectRoute
+                test={({currentUser}) => currentUser}
+                path='/support'
+                redirectTo={'/contact'}
+                component={Support} />
+              <StateCheckRedirectRoute
+                test={({currentUser}) => currentUser}
+                path='/laundries/:laundryId'
+                redirectTo={'/auth'}
+                component={LeftNav} />
+              <StateCheckRedirectRoute
+                test={({currentUser}) => currentUser}
+                path='/users/:userId/settings'
+                redirectTo={'/auth'}
+                component={UserSettings} />
+              <Route component={NotFound} />
+            </Switch>
+          )
+          : (
+            <LandingPage />
+          )
+      }
+    </div>
+  </DocumentTitle>)
