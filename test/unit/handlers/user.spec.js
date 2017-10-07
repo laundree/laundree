@@ -261,16 +261,22 @@ describe('handlers', () => {
         .then(assert))
     })
     describe('findAuthTokenFromSecret', () => {
-      it('should right token find', () =>
-        dbUtils.populateTokens(10)
-          .then(({user, tokens}) =>
-            user.findAuthTokenFromSecret(tokens[9].secret)
-              .then((token) => assert.deepEqual(token.model.id, tokens[9].model.id))))
-      it('should right old token find', () =>
-        dbUtils.populateTokens(10)
-          .then(({user, tokens}) =>
-            user.findAuthTokenFromSecret(tokens[9].secret.split('.')[2])
-              .then((token) => assert.deepEqual(token.model.id, tokens[9].model.id))))
+      it('should right token find', async () => {
+        const {user, tokens} = await (dbUtils.populateTokens(10): Promise<*>)
+        const t = tokens[9].secret
+        if (!t) throw new Error('Wat')
+        const token = await (user.findAuthTokenFromSecret(t): Promise<*>)
+        if (!token) throw new Error('Wat')
+        assert.deepEqual(token.model.id, tokens[9].model.id)
+      })
+      it('should right old token find', async () => {
+        const {user, tokens} = await (dbUtils.populateTokens(10): Promise<*>)
+        const t = tokens[9].secret
+        if (!t) throw new Error('Wat')
+        const token = await (user.findAuthTokenFromSecret(t.split('.')[2]) : Promise<*>)
+        if (!token) throw new Error('Wat')
+        assert.deepEqual(token.model.id, tokens[9].model.id)
+      })
     })
   })
 })
