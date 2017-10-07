@@ -43,7 +43,7 @@ export async function createAdministrator (): Promise<{ user: UserHandler, token
   return {user, token}
 }
 
-export async function populateTokens (no: number) {
+export async function populateTokens (no: number) : Promise<{user: UserHandler, tokens: TokenHandler[], token: TokenHandler}> {
   const [user] = await populateUsers(1)
   const tokens = await Promise.all(range(no).map((i) => user.generateAuthToken(faker.name.findName())))
   return {user: user, tokens: tokens, token: tokens[0]}
