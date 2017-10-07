@@ -5,7 +5,21 @@
   z-index: 201
   height: 4em
   background-color: #E55564
+  &.large
+    padding: 0.5em 0
+  .container
+    max-width: 100em
+    position: relative
+    margin: auto
 
+    .logo
+      margin-left: 0
+      svg
+        height: 2em
+        margin: 0.75em 0
+        width: 8em
+        fill: #fff
+        display: block
   .laundries
     max-width: 20em
     position: relative
@@ -56,7 +70,7 @@
       height: $height * 1em
       fill: #ffffff
 
-  > a, > span, .rightNav > a, .rightNav > span
+  > a, > span, .rightNav > a, .rightNav > span, .container > a, .container > span
     line-height: 4em
     color: #ffffff
     display: block

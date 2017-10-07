@@ -6,24 +6,26 @@ import LocaleSelect from './LocaleSelect'
 import { FormattedMessage } from 'react-intl'
 import type { User, Config, Laundry } from 'laundree-sdk/lib/redux'
 import type { Location } from 'react-router'
-import {toLocale} from '../../locales'
+import { toLocale } from '../../locales'
 
 export default class TopNav extends React.Component<{
   user: User,
-    location: Location,
-    currentLaundry: string,
-    config: Config,
-    laundries: { [string]: Laundry }
+  location: Location,
+  currentLaundry: string,
+  config: Config,
+  laundries: { [string]: Laundry }
 }> {
 
   laundries () {
     return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
   }
+
   locale () {
     return toLocale(this.props.config.locale || '', 'en')
   }
+
   renderGlobe () {
-    return <LocaleSelect locale={this.locale()} location={this.props.location}/>
+    return <LocaleSelect locale={this.locale()} location={this.props.location} />
   }
 
   renderLaundries () {
@@ -81,7 +83,7 @@ export default class TopNav extends React.Component<{
               {this.props.user.demo ? null : <li>
                 <DropDownCloser>
                   <NavLink to={`/users/${this.props.user.id}/settings`} activeClassName='active'>
-                    <FormattedMessage id='topnav.manage'/>
+                    <FormattedMessage id='topnav.manage' />
                   </NavLink>
                 </DropDownCloser>
               </li>}
@@ -98,34 +100,35 @@ export default class TopNav extends React.Component<{
   }
 
   renderNotLoggedInMenu () {
-    return <nav id='TopNav'>
-      <NavLink to='/' className='home' activeClassName='active'>
-        <svg>
-          <use xlinkHref='#SmallLogo' />
-        </svg>
-      </NavLink>
-      <NavLink to='/about' className='icon about' activeClassName='active'>
-        <svg>
-          <use xlinkHref='#Info' />
-        </svg>
-        <FormattedMessage id='topnav.about' />
-      </NavLink>
-      <NavLink to='/contact' className='icon contact' activeClassName='active'>
-        <svg>
-          <use xlinkHref='#EMail4' />
-        </svg>
-        <FormattedMessage id='topnav.contact' />
-      </NavLink>
-      <div className='rightNav'>
-        {this.renderGlobe()}
-        <NavLink to='/auth' className='auth'>
-          <FormattedMessage id='topnav.login' />
-        </NavLink>
-        <NavLink to='/auth/sign-up' className='auth signUp'>
-          <FormattedMessage id='topnav.sign-up' />
-        </NavLink>
-      </div>
-    </nav>
+    return (
+      <nav id='TopNav' className='large'>
+        <div className='container'>
+          <NavLink to='/' className='logo'>
+            <svg>
+              <use xlinkHref='#WhiteLogo' />
+            </svg>
+          </NavLink>
+          <NavLink to='/about' className='icon about' activeClassName='active'>
+            <svg>
+              <use xlinkHref='#Info' />
+            </svg>
+            <FormattedMessage id='topnav.about' />
+          </NavLink>
+          <NavLink to='/contact' className='icon contact' activeClassName='active'>
+            <svg>
+              <use xlinkHref='#EMail4' />
+            </svg>
+            <FormattedMessage id='topnav.contact' />
+          </NavLink>
+          <div className='rightNav'>
+            {this.renderGlobe()}
+            <NavLink to='/auth' className='auth signUp'>
+              <FormattedMessage id='topnav.login' />
+            </NavLink>
+          </div>
+        </div>
+      </nav>
+    )
   }
 
   render () {
