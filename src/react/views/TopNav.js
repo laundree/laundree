@@ -7,6 +7,7 @@ import { FormattedMessage } from 'react-intl'
 import type { User, Config, Laundry } from 'laundree-sdk/lib/redux'
 import type { Location } from 'react-router'
 import { toLocale } from '../../locales'
+import {Link as ScrollLink} from 'react-scroll'
 
 export default class TopNav extends React.Component<{
   user: User,
@@ -108,18 +109,18 @@ export default class TopNav extends React.Component<{
               <use xlinkHref='#WhiteLogo' />
             </svg>
           </NavLink>
-          <NavLink to='/about' className='icon about' activeClassName='active'>
+          <ScrollLink to='AboutSection' className='icon about' smooth>
             <svg>
               <use xlinkHref='#Info' />
             </svg>
             <FormattedMessage id='topnav.about' />
-          </NavLink>
-          <NavLink to='/contact' className='icon contact' activeClassName='active'>
+          </ScrollLink>
+          <ScrollLink to='ContactSection' className='icon contact' smooth>
             <svg>
               <use xlinkHref='#EMail4' />
             </svg>
             <FormattedMessage id='topnav.contact' />
-          </NavLink>
+          </ScrollLink>
           <div className='rightNav'>
             {this.renderGlobe()}
             <NavLink to='/auth' className='auth signUp'>
