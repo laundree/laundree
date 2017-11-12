@@ -15,16 +15,31 @@
     .container
       max-width: 100em
       margin: auto
+      padding: 0 1em
       position: relative
       height: 100%
+    .text
+      max-width: 25em
+      padding: 4em 0
   section.bright
     background-color: #8fd4db
   section.intro
-    height: 30em
     padding: 0
+    .screenshot
+      position: absolute
+      bottom: 0
+      left: 28em
+      top: 10em
+      overflow: hidden
+      width: 40em
+      +transition(0.1s opacity)
+      opacity: 1
+    .signUpFormContainer
+      padding: 1em
+
     div.title
       width: 20em
-      padding: 8em 0 0 0
+      padding: 14em 0 0 1em
       text-align: left
       .desc
         padding: 1em 0
@@ -33,14 +48,23 @@
     div.appLogos
       position: absolute
       bottom: 2em
+      left: 1em
       img
         display: inline-block
         height: 2.5em
         &:first-of-type
           margin-right: 1em
+    .signUpContainer
+      width: 25em
+      position: absolute
+      right: 0
+      top: 1em
+
   section.statistics
     padding: 2em 0
     .container
+      text-align: center
+      padding-right: 24em
       max-width: 38em
     .stat
       width: 15em
@@ -65,7 +89,54 @@
           font-family: "Roboto Condensed", sans-serif
           font-weight: bold
           color: #e45564
-  section.about
+  section.contact
     .text
-      max-width: 25em
-      padding: 4em 0
+      h2
+        text-align: center
+    .container
+      max-width: 23em
+      margin: auto
+  section.about
+    .imageContainer
+      padding: 10em 0 10em 25em
+    .text
+      position: absolute
+      left: 0
+      top: 10em
+      padding: 0
+
+@media only screen and (max-width: 80em)
+  #LandingPage
+    section.about
+      .imageContainer
+        padding: 5em 0
+      .text
+        position: relative
+        top: auto
+        left: auto
+        margin: auto
+        padding-top: 5em
+    section.intro
+      .screenshot
+        opacity: 0.1
+
+@media only screen and (max-width: 60em)
+  #LandingPage
+    section.statistics
+      .container
+        padding: 0
+    section.intro
+      .screenshot
+        opacity: 1
+      .signUpContainer
+        position: relative
+        top: auto
+        right: auto
+        margin: auto
+        width: 100%
+
+@media only screen and (max-width: 23em)
+  #LandingPage
+    section.intro
+      .signUpFormContainer
+        padding: 1em 0

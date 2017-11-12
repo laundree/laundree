@@ -317,6 +317,12 @@ input, button, textarea, a.button
     background-color: #e55564
     &:focus
       +box-shadow(0 0 0 0.1em #c54755)
+  &.orange
+    background-color: #E5954C !important
+    &:hover
+      background-color: #f2a04e !important
+    &:focus
+      +box-shadow(0 0 0 0.1em #c77f44)
   &:focus
     outline: 0
     +box-shadow(0 0 0 0.1em #2c829d)
@@ -574,36 +580,6 @@ svg.step
 svg.step.inactive
   +inactive-step-style
 
-footer
-  height: $footer_height
-  width: 100%
-  background-color: #47A0A0
-  font-weight: 400
-  position: absolute
-  bottom: 0
-
-  a
-    color: #fff
-
-  ul
-    overflow: hidden
-    max-width: $max_page_width
-    margin: auto
-    list-style-type: none
-    li
-      color: #69e7e7
-      padding: 2em 1%
-      font-size: 1em
-      width: (100% / 4) - 2
-      float: left
-      text-align: center
-
-      svg
-        display: block
-        margin: 2em auto
-        fill: #66D3D3
-        width: 3em
-        height: 3em
 
 @media only screen and (max-width: 45em)
   #AppRoot > .footer
