@@ -198,7 +198,7 @@ const Contact = () => (
 
 const Footer = () => (
   <footer style={{paddingTop: '5em', height: '20em'}}>
-    <div style={{backgroundColor: '#47A0A0', height: '20em', position: 'absolute', bottom: 0, left: 0, right: 0}}>
+    <div style={{backgroundColor: '#e5944d', height: '20em', position: 'absolute', bottom: 0, left: 0, right: 0}}>
       <div style={{textAlign: 'center', width: '20em', margin: 'auto', padding: '4em 0', color: '#fff'}}>
         <svg style={{fill: '#fff', height: '2em', width: '8em'}}>
           <use xlinkHref={'#WhiteLogo'} />
