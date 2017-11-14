@@ -475,8 +475,8 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
   async addLaundriesFromInvites () {
     const invites = await LaundryInvitationHandler.lib.find({email: {$in: this.model.emails}})
     const laundries = await LaundryHandler.lib.find({_id: {$in: invites.map(({model: {laundry}}) => laundry)}})
-    await Promise.all(laundries.map((laundry) => laundry.addUser(this)))
-    await Promise.all(invites.map((invite) => invite.markUsed()))
+    await Promise.all(laundries.map(laundry => laundry.addUser(this)))
+    await Promise.all(invites.map(invite => invite.markUsed()))
   }
 
   resetPassword (password: string) {

@@ -68,6 +68,11 @@ export default class LaundryInvitationHandler extends Handler<LaundryInvitationM
     return this.save()
   }
 
+  markUnused () {
+    this.model.used = false
+    return this.save()
+  }
+
   reduxModel () {
     return {
       used: this.model.used,

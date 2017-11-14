@@ -19,11 +19,13 @@ describe('handlers', () => {
       emails: [{value: 'bob@example.com'}],
       name: {familyName: 'Bobbesen', givenName: 'Bob'}
     }
-    let user: UserHandler
+    let user: UserHandler, laundry: LaundryHandler
 
     beforeEach(async () => {
       await clearDb()
       user = await UserHandler.lib.createUserFromProfile(profile)
+      const {laundry: l} = await dbUtils.populateLaundries(1)
+      laundry = l
     })
 
     describe('createUserFromProfile', () => {
@@ -244,6 +246,25 @@ describe('handlers', () => {
             .then(r => assert.deepEqual(r, [true, false]))
         }))
     })
+    describe('addLaundriesFromInvites', () => {
+      it('should delete the invitations', async () => {
+        const email = faker.internet.email()
+        const {invite}: {invite?: LaundryInvitationHandler} = await laundry.inviteUserByEmail(email)
+        assert(invite)
+        if (!invite) return
+        assert(!invite.model.used)
+        const u = await UserHandler.lib.createUserFromProfile({...profile, emails: [{value: email}]})
+        assert(u)
+        const invite2 = await LaundryInvitationHandler.lib.findFromId(invite.model.id)
+        assert(invite2)
+        assert(invite2.model.used)
+        await u.deleteUser()
+        const {invite: invite3}: {invite?: LaundryInvitationHandler} = await laundry.inviteUserByEmail(email)
+        assert(!invite3)
+        const invite4 = await LaundryInvitationHandler.lib.findFromId(invite.model.id)
+        assert(!invite4.model.used)
+      })
+    })
     describe('generateCalendarToken', () => {
       it('should generate token', () => user.generateCalendarToken(faker.name.findName())
         .then(assert))
@@ -273,7 +294,7 @@ describe('handlers', () => {
         const {user, tokens} = await (dbUtils.populateTokens(10): Promise<*>)
         const t = tokens[9].secret
         if (!t) throw new Error('Wat')
-        const token = await (user.findAuthTokenFromSecret(t.split('.')[2]) : Promise<*>)
+        const token = await (user.findAuthTokenFromSecret(t.split('.')[2]): Promise<*>)
         if (!token) throw new Error('Wat')
         assert.deepEqual(token.model.id, tokens[9].model.id)
       })
