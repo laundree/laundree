@@ -16,8 +16,8 @@ import moment from 'moment-timezone'
 import { generateBase64UrlSafeCode, hashPassword, comparePassword } from '../utils/password'
 import GoogleMapsClient from '@google/maps'
 import type { EventOption as CalEvent } from 'ical-generator'
-import type {Laundry as RestLaundry} from 'laundree-sdk/lib/sdk'
-import type {Laundry as ReduxLaundry} from 'laundree-sdk/lib/redux'
+import type { Laundry as RestLaundry } from 'laundree-sdk/lib/sdk'
+import type { Laundry as ReduxLaundry } from 'laundree-sdk/lib/redux'
 
 const googleMapsClient = GoogleMapsClient.createClient({key: config.get('google.serverApiKey')})
 const debug = Debug('laundree.handlers.laundry')
@@ -95,6 +95,7 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
     const id = Handler.handlerOrObjectIdToString(i)
     return {id, href: '/api/laundries/' + id}
   }
+
   static lib = new LaundryHandlerLibrary()
   lib = LaundryHandler.lib
   restUrl = `/api/laundries/${this.model.id}`
@@ -332,14 +333,17 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
    * @param {string} email
    * @return {Promise.<{user: UserHandler=, invite: LaundryInvitationHandler=}>}
    */
-  async inviteUserByEmail (email: string): { user?: UserHandler, invite?: LaundryInvitationHandler } {
+  async inviteUserByEmail (email: string): Promise<{ user?: UserHandler, invite?: LaundryInvitationHandler }> {
     const user = await UserHandler.lib.findFromEmail(email)
     if (user) {
       const num = await this.addUser(user)
       return num ? {user} : {}
     }
-    const [i] = await LaundryInvitationHandler.lib.find({email, laundry: this.model._id})
-    if (i) return {}
+    const [i] = await LaundryInvitationHandler.lib.find({email: email.toLowerCase(), laundry: this.model._id})
+    if (i) {
+      await i.markUnused()
+      return {}
+    }
     const invite = await this.createInvitation(email)
     return {invite}
   }
@@ -353,7 +357,7 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
     return invite
   }
 
-  toRest () : RestLaundry {
+  toRest (): RestLaundry {
     return {
       name: this.model.name,
       id: this.model.id,
