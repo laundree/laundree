@@ -32,14 +32,14 @@ const App = (props: { locale: LocaleType, store: Store }) => {
                         component={Auth} />
                       <Route path={`/${locale}/privacy`} component={TermsAndConditions} />
                       <Route path={`/${locale}/terms-and-conditions`} component={TermsAndConditions} />
-                      <Route path={`/${locale}/native-app`} component={NativeApp} />
-                      <Route path={`/${locale}/native-app-v2`} component={NativeAppV2} />
                       <Route path={`/${locale}/laundries/:laundryId`} component={BaseApp} />
                       <Route path={`/${locale}`} component={BaseApp} />
                     </Switch>
                   </IntlProvider>
                 )} />))
             }
+            <Route path={'/native-app'} component={NativeApp} />
+            <Route path={'/native-app-v2'} component={NativeAppV2} />
             <Redirect from={'/'} to={`/${props.locale}`} exact />
             <Route component={NotFound} />
           </Switch>
