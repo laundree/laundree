@@ -30,7 +30,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
       this.reset({
         loading: false,
         notion: {
-          message: <FormattedMessage id='auth.forgot.success'/>,
+          message: <FormattedMessage id='auth.forgot.success' />,
           success: true
         }
       })
@@ -38,7 +38,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
       this.setState({
         loading: false,
         notion: {
-          message: <FormattedMessage id='auth.forgot.error'/>,
+          message: <FormattedMessage id='auth.forgot.error' />,
           success: false
         }
       })
@@ -48,10 +48,10 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
   render () {
     return <DocumentTitle title='document-title.forgot'>
       <div>
-        <FormattedMessage tagName='h1' id='auth.forgot.title'/>
-        <Link to='/' id='Logo'>
+        <FormattedMessage tagName='h1' id='auth.forgot.title' />
+        <Link to={`/${this.props.locale}`} id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <ValidationForm
@@ -70,32 +70,34 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
                 onChange={this.generateValueEventUpdater(email => ({email}))}
                 value={this.state.values.email || ''}
                 type='text' name='email'
-                placeholder='general.email-address'/>
+                placeholder='general.email-address' />
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.reset'/>
+            <Submit value='general.reset' />
           </div>
           <div className='forgot'>
             <div>
               <FormattedMessage
                 id='auth.links.login3'
                 values={{
-                  link: <Link to='/auth'>
-                    <FormattedMessage id='auth.links.login3.link'/>
-                  </Link>
-                }}/>
+                  link: (
+                    <Link to={`/${this.props.locale}/auth`}>
+                      <FormattedMessage id='auth.links.login3.link' />
+                    </Link>)
+                }} />
             </div>
             <div>
               <FormattedMessage
                 id='auth.links.signup'
                 values={{
-                  link: <Link
-                    to='/auth/sign-up'
-                    className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link'/>
-                  </Link>
-                }}/>
+                  link: (
+                    <Link
+                      to={`/${this.props.locale}/auth/sign-up`}
+                      className='forgot'>
+                      <FormattedMessage id='auth.links.signup.link' />
+                    </Link>)
+                }} />
             </div>
           </div>
         </ValidationForm>

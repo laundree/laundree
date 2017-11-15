@@ -91,11 +91,13 @@
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "nightwatch": "^0.9.16",
+    "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "selenium-standalone": "^6.5.0",
     "sinon": "^4.0.1",
     "supertest": "^3.0.0",
-    "webpack-dev-middleware": "^1.11.0"
+    "webpack-dev-middleware": "^1.11.0",
+    "webpack-dev-server": "^2.9.4"
   },
   "scripts": {
     "test:flow": "flow .",
@@ -108,7 +110,7 @@
     "start:lib:api": "node lib/api",
     "start:lib:socket": "node lib/websocket",
     "start:lib-covered": "nyc --reporter=lcov node lib",
-    "start:src": "babel-node src --trace-warnings",
+    "start:src": "nodemon --exec babel-node src",
     "start:src-covered": "nyc --reporter=lcov --require babel-register node src",
     "start:test": "[ \"$LAUNDREE_TEST_TARGET\" = src ] && npm run start:src || npm run start:lib",
     "start:test-covered": "[ \"$LAUNDREE_TEST_TARGET\" = src ] && npm run start:src-covered || npm run start:lib-covered",
@@ -120,7 +122,9 @@
     "build": "npm run build:babel && npm run build:client",
     "build:babel": "babel src -d lib --copy-files",
     "build:client": "webpack --env=prod --progress --profile --colors --config webpack.prod.js",
-    "test": "./scripts/test.sh"
+    "test": "./scripts/test.sh",
+    "start:webpack": "webpack-dev-server --hot --config ./webpack.dev.js",
+    "dev": "NODE_ENV=development npm run start:src & NODE_ENV=development npm run start:webpack"
   },
   "repository": {
     "type": "git",

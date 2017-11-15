@@ -52,7 +52,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     return className
   }
 
-  static errorToNotion (err) {
+  static errorToNotion (err: *) {
     let message
     switch (err.status) {
       case 409:

@@ -11,6 +11,7 @@ import moment from 'moment-timezone'
 import { BaseModal } from './modal'
 import Loader from './Loader'
 import type { Machine, User, Booking, Laundry } from 'laundree-sdk/lib/redux'
+import type { LocaleType } from '../../locales'
 
 class BookingInfo extends React.Component<{
   onActiveChange: Function,
@@ -37,7 +38,7 @@ class BookingInfo extends React.Component<{
     return (
       <li>
         <button className='red' onClick={this.deleteHandler}>
-          <FormattedMessage id='general.delete-booking'/>
+          <FormattedMessage id='general.delete-booking' />
         </button>
       </li>)
   }
@@ -55,7 +56,7 @@ class BookingInfo extends React.Component<{
     const sameDay = new Date(fromDate.getTime()).setHours(0, 0, 0, 0) === new Date(toDate.getTime()).setHours(0, 0, 0, 0)
     const today = new Date().setHours(0, 0, 0, 0) === new Date(fromDate.getTime()).setHours(0, 0, 0, 0)
     return <div id='ActiveBooking'>
-      <img src={owner.photo} className='avatar'/>
+      <img src={owner.photo} className='avatar' />
       <div className='text'>
         <FormattedMessage
           id={owner.id === this.props.currentUser
@@ -70,7 +71,7 @@ class BookingInfo extends React.Component<{
               day={today ? undefined : 'numeric'}
               hour='numeric'
               minute='numeric'
-              value={this.props.booking.from}/>,
+              value={this.props.booking.from} />,
             toTime: <FormattedDate
               timeZone={this.props.laundry.timezone}
               weekday={sameDay ? undefined : 'long'}
@@ -78,7 +79,7 @@ class BookingInfo extends React.Component<{
               day={sameDay ? undefined : 'numeric'}
               hour='numeric'
               minute='numeric'
-              value={this.props.booking.to}/>,
+              value={this.props.booking.to} />,
             user: owner.displayName
           }}
         />
@@ -87,7 +88,7 @@ class BookingInfo extends React.Component<{
         {this.renderActions()}
         <li>
           <button onClick={this.closeHandler}>
-            <FormattedMessage id='general.close'/>
+            <FormattedMessage id='general.close' />
           </button>
         </li>
       </ul>
@@ -109,6 +110,7 @@ class BookingInfo extends React.Component<{
 
 type TimetableProps = {
   currentUser: string,
+  locale: LocaleType,
   offsetDate?: string,
   users: { [string]: User },
   machines: { [string]: Machine },
@@ -176,7 +178,7 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
     return <main id='TimeTableMain' ref={this.refPuller}>
       <TimetableHeaders
         hoverColumn={this.state.hoverColumn}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+        laundry={this.props.laundry} dates={days} machines={this.props.machines} />
       <TimetableTables
         onActiveChange={activeBooking => this.setState({activeBooking})}
         currentUser={this.props.currentUser}
@@ -185,7 +187,7 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
         onHoverColumn={hoverColumn => this.setState({hoverColumn})}
         hoverColumn={this.state.hoverColumn}
         bookings={this.props.bookings}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines}/>
+        laundry={this.props.laundry} dates={days} machines={this.props.machines} />
       <BookingInfo
         onActiveChange={activeBooking => this.setState({activeBooking})}
         currentUser={this.props.currentUser}
@@ -193,7 +195,7 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
         laundry={this.props.laundry}
         offsetDate={offsetDate}
         booking={this.props.bookings[this.state.activeBooking || '']}
-        machines={this.props.machines}/>
+        machines={this.props.machines} />
     </main>
   }
 }
@@ -202,18 +204,19 @@ export default class TimetableWrapper extends React.Component<TimetableProps> {
   renderEmpty () {
     return <main className='naved'>
       <h1 className='alignLeft'>
-        <FormattedMessage id='timetable.no-machines.title'/>
+        <FormattedMessage id='timetable.no-machines.title' />
       </h1>
       {this.isOwner() ? <section>
         <FormattedMessage
           id='timetable.no-machines.action.register'
           values={{
-            link: <Link to={'/laundries/' + this.props.laundry.id + '/machines'}>
-              <FormattedMessage id='timetable.no-machines.action.register.link'/>
-            </Link>
-          }}/>
+            link: (
+              <Link to={`/${this.props.locale}/laundries/${this.props.laundry.id}/machines`}>
+                <FormattedMessage id='timetable.no-machines.action.register.link' />
+              </Link>)
+          }} />
       </section> : <section>
-        <FormattedMessage id='timetable.no-machines.action.wait'/>
+        <FormattedMessage id='timetable.no-machines.action.wait' />
       </section>}
     </main>
   }
@@ -228,6 +231,7 @@ export default class TimetableWrapper extends React.Component<TimetableProps> {
 
   renderTables () {
     return <Timetable
+      locale={this.props.locale}
       users={this.props.users}
       currentUser={this.props.currentUser}
       offsetDate={this.props.offsetDate}

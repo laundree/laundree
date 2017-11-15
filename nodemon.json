@@ -1,3 +1,4 @@
 {
-  "ext": "js jsx"
+  "ext": "js jsx",
+  "delay": 2500
 }

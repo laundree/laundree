@@ -51,7 +51,7 @@ function setup () {
   sdk.baseUrl = typeof state.config.apiBase === 'string' ? state.config.apiBase : '/api'
 
   // $FlowFixMe it is though
-  ReactDOM.render( // TODO use hydrate
+  ReactDOM.hydrate(
     <BrowserRouter>
       <App store={store} locale={locale} />
     </BrowserRouter>,

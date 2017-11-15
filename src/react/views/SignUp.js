@@ -71,19 +71,19 @@ class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
     return <DocumentTitle title='document-title.signup'>
       <div>
         <FormattedMessage id='auth.signup.title' tagName='h1'/>
-        <Link to='/' id='Logo'>
+        <Link to={`/${this.props.locale}/`} id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo'/>
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={'/auth/facebook' + this.query()} className='facebook'>
+          <a href={`/${this.props.locale}/auth/facebook${this.query()}`} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook'/>
             </svg>
             <FormattedMessage id='auth.signup.method.facebook'/>
           </a>
-          <a href={'/auth/google' + this.query()} className='google'>
+          <a href={`/${this.props.locale}/auth/google${this.query()}`} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus'/>
             </svg>
@@ -153,11 +153,11 @@ class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
           <div className='accept'>
             <FormattedMessage id='auth.signup.notice' values={{
               toc: <a
-                href='/terms-and-conditions'
+                href={`/${this.props.locale}/terms-and-conditions`}
                 target='_blank'>
                 <FormattedMessage id='general.toc'/>
               </a>,
-              pp: <a href='/privacy' target='_blank'>
+              pp: <a href={`/${this.props.locale}/privacy`} target='_blank'>
                 <FormattedMessage id='general.privacy-policy'/>
               </a>
             }}/>
@@ -172,7 +172,7 @@ class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
               <FormattedMessage
                 id='auth.links.login'
                 values={{
-                  link: <Link to={'/auth' + this.query()}>
+                  link: <Link to={`/${this.props.locale}/auth${this.query()}`}>
                     <FormattedMessage id='auth.links.login.link'/>
                   </Link>
                 }}/>
@@ -182,7 +182,7 @@ class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
                 id='auth.links.forgot'
                 values={{
                   link: <Link
-                    to='/auth/forgot'
+                    to={`/${this.props.locale}/auth/forgot`}
                     className='forgot'>
                     <FormattedMessage id='auth.links.forgot.link'/>
                   </Link>

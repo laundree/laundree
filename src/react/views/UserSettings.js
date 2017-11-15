@@ -9,6 +9,7 @@ import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
 import NotFound from './NotFound'
 import type { User, Laundry } from 'laundree-sdk/lib/redux'
+import type { LocaleType } from '../../locales'
 
 class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User }, { loading: boolean }> {
   onSubmit = async (event) => {
@@ -176,6 +177,7 @@ class DeleteUser extends React.Component<{ user: User }, {modalOpen: boolean}> {
 type UserSettingsProps = {
   currentUser: string,
   user: string,
+  locale: LocaleType,
   laundries: { [string]: Laundry },
   users: { [string]: User }
 }
@@ -311,7 +313,7 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
         .map(laundry =>
           <li key={laundry.id}>
             <div className='name'>
-              <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
+              <Link to={`/${this.props.locale}/laundries/${laundry.id}`}>{laundry.name}</Link>
             </div>
           </li>)}
     </ul>
