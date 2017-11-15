@@ -7,9 +7,11 @@ import { FormattedMessage, FormattedDate } from 'react-intl'
 import moment from 'moment'
 import Loader from './Loader'
 import type { User, Laundry, Machine, Booking } from 'laundree-sdk/lib/redux'
+import type { LocaleType } from '../../locales'
 
 class BookingComponent extends React.Component<{
   laundry: Laundry,
+  locale: LocaleType,
   machine: Machine,
   booking: Booking
 }, { showModal: boolean }> {
@@ -35,7 +37,7 @@ class BookingComponent extends React.Component<{
       />
       <div className='machineName'>
         <Link
-          to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
+          to={`${this.props.locale}/laundries/${this.props.laundry.id}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
           {this.props.machine.name}
         </Link>
       </div>
@@ -65,6 +67,7 @@ class BookingComponent extends React.Component<{
 
 export default class Bookings extends React.Component<{
   laundry: Laundry,
+  locale: LocaleType,
   user: User,
   userBookings: string[],
   bookings: { [string]: Booking },
@@ -93,6 +96,7 @@ export default class Bookings extends React.Component<{
     }
     return <li key={booking.id}>
       <BookingComponent
+        locale={this.props.locale}
         laundry={this.props.laundry}
         machine={this.props.machines[booking.machine]}
         booking={booking}/>

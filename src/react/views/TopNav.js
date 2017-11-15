@@ -4,29 +4,24 @@ import { NavLink } from 'react-router-dom'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
 import LocaleSelect from './LocaleSelect'
 import { FormattedMessage } from 'react-intl'
-import type { User, Config, Laundry } from 'laundree-sdk/lib/redux'
+import type { User, Laundry } from 'laundree-sdk/lib/redux'
 import type { Location } from 'react-router'
-import { toLocale } from '../../locales'
-import {Link as ScrollLink} from 'react-scroll'
+import { Link as ScrollLink } from 'react-scroll'
+import type { LocaleType } from '../../locales/index'
 
 export default class TopNav extends React.Component<{
   user: User,
   location: Location,
+  locale: LocaleType,
   currentLaundry: string,
-  config: Config,
   laundries: { [string]: Laundry }
 }> {
-
   laundries () {
     return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
   }
 
-  locale () {
-    return toLocale(this.props.config.locale || '', 'en')
-  }
-
   renderGlobe () {
-    return <LocaleSelect locale={this.locale()} location={this.props.location} />
+    return <LocaleSelect locale={this.props.locale} location={this.props.location} />
   }
 
   renderLaundries () {
@@ -48,7 +43,7 @@ export default class TopNav extends React.Component<{
                 .map(({id, name}) =>
                   <li key={id} className={id === this.props.currentLaundry ? 'active' : ''}>
                     <DropDownCloser>
-                      <a href={'/laundries/' + id}>{name}</a>
+                      <a href={`/${this.props.locale}/laundries/${id}`}>{name}</a>
                     </DropDownCloser>
                   </li>)}
             </ul>
@@ -59,7 +54,7 @@ export default class TopNav extends React.Component<{
 
   renderUserLoggedInMenu () {
     return <nav id='TopNav'>
-      <NavLink to='/' className='home' activeClassName='active'>
+      <NavLink to={`/${this.props.locale}`} className='home' activeClassName='active'>
         <svg>
           <use xlinkHref='#SmallLogo' />
         </svg>
@@ -67,7 +62,7 @@ export default class TopNav extends React.Component<{
       <div className='laundries'>
         {this.renderLaundries()}
       </div>
-      <NavLink to='/support' className='icon help' activeClassName='active'>
+      <NavLink to={`/${this.props.locale}/support`} className='icon help' activeClassName='active'>
         <svg>
           <use xlinkHref='#LifeBuoy' />
         </svg>
@@ -83,13 +78,13 @@ export default class TopNav extends React.Component<{
             <ul className='dropDownList'>
               {this.props.user.demo ? null : <li>
                 <DropDownCloser>
-                  <NavLink to={`/users/${this.props.user.id}/settings`} activeClassName='active'>
+                  <NavLink to={`/${this.props.locale}/users/${this.props.user.id}/settings`} activeClassName='active'>
                     <FormattedMessage id='topnav.manage' />
                   </NavLink>
                 </DropDownCloser>
               </li>}
               <li>
-                <a href='/logout'>
+                <a href={`/${this.props.locale}/logout`}>
                   <FormattedMessage id='topnav.logout' />
                 </a>
               </li>
@@ -104,7 +99,7 @@ export default class TopNav extends React.Component<{
     return (
       <nav id='TopNav' className='large'>
         <div className='container'>
-          <NavLink to='/' className='logo'>
+          <NavLink to={`/${this.props.locale}`} className='logo'>
             <svg>
               <use xlinkHref='#WhiteLogo' />
             </svg>
@@ -123,7 +118,7 @@ export default class TopNav extends React.Component<{
           </ScrollLink>
           <div className='rightNav'>
             {this.renderGlobe()}
-            <NavLink to='/auth' className='auth signUp'>
+            <NavLink to={`/${this.props.locale}/auth`} className='auth signUp'>
               <FormattedMessage id='topnav.login' />
             </NavLink>
           </div>
@@ -133,6 +128,8 @@ export default class TopNav extends React.Component<{
   }
 
   render () {
-    return this.props.user ? this.renderUserLoggedInMenu() : this.renderNotLoggedInMenu()
+    return this.props.user
+      ? this.renderUserLoggedInMenu()
+      : this.renderNotLoggedInMenu()
   }
 }

@@ -6,10 +6,12 @@ import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import { FormattedMessage } from 'react-intl'
 import type { Flash } from 'laundree-sdk/lib/redux'
+import type { LocaleType } from '../../locales'
 
 type LoginProps = {
   to?: string,
-  flash: Flash[]
+  flash: Flash[],
+  locale: LocaleType
 }
 
 type LoginValues = {
@@ -34,8 +36,8 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
       <FormattedMessage
         id={message}
         values={{
-          link: <Link to='/auth/verification'><FormattedMessage id='auth.error.not-verified.link'/></Link>
-        }}/>
+          link: <Link to={`/${this.props.locale}/auth/verification`}><FormattedMessage id='auth.error.not-verified.link' /></Link>
+        }} />
     </div>
   }
 
@@ -47,28 +49,28 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     const query = this.query()
     return <DocumentTitle title='document-title.login'>
       <div>
-        <FormattedMessage tagName='h1' id='auth.login.title'/>
-        <Link to='/' id='Logo'>
+        <FormattedMessage tagName='h1' id='auth.login.title' />
+        <Link to={`/${this.props.locale}/`} id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={'/auth/facebook' + query} className='facebook'>
+          <a href={`/${this.props.locale}/auth/facebook${query}`} className='facebook'>
             <svg>
-              <use xlinkHref='#Facebook'/>
+              <use xlinkHref='#Facebook' />
             </svg>
-            <FormattedMessage id='auth.login.method.facebook'/>
+            <FormattedMessage id='auth.login.method.facebook' />
           </a>
-          <a href={'/auth/google' + query} className='google'>
+          <a href={`/${this.props.locale}/auth/google${query}`} className='google'>
             <svg>
-              <use xlinkHref='#GooglePlus'/>
+              <use xlinkHref='#GooglePlus' />
             </svg>
-            <FormattedMessage id='auth.login.method.google'/>
+            <FormattedMessage id='auth.login.method.google' />
           </a>
         </div>
         <div className='or'>
-          <FormattedMessage id='general.or'/>
+          <FormattedMessage id='general.or' />
         </div>
         <ValidationForm id='SignIn' method='post' action={'/auth/local' + query}>
           {this.handleNotion()}
@@ -80,7 +82,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                 name='username'
                 placeholder='general.email-address'
                 value={this.state.values.email || ''}
-                onChange={this.generateValueEventUpdater(email => ({email}))}/>
+                onChange={this.generateValueEventUpdater(email => ({email}))} />
             </Label>
           </ValidationElement>
           <ValidationElement
@@ -91,11 +93,11 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
               <Input
                 type='password' name='password' placeholder='general.password'
                 value={this.state.values.password || ''}
-                onChange={this.generateValueEventUpdater(password => ({password}))}/>
+                onChange={this.generateValueEventUpdater(password => ({password}))} />
             </Label>
           </ValidationElement>
           <div className='buttons'>
-            <Submit value='general.login'/>
+            <Submit value='general.login' />
           </div>
           <div className='forgot'>
             <div>
@@ -103,36 +105,36 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                 id='auth.links.forgot'
                 values={{
                   link: <Link
-                    to='/auth/forgot'
+                    to={`/${this.props.locale}/auth/forgot`}
                     className='forgot'>
-                    <FormattedMessage id='auth.links.forgot.link'/>
+                    <FormattedMessage id='auth.links.forgot.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
             <div>
               <FormattedMessage
                 id='auth.links.signup'
                 values={{
                   link: <Link
-                    to='/auth/sign-up'
+                    to={`/${this.props.locale}/auth/sign-up`}
                     className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link'/>
+                    <FormattedMessage id='auth.links.signup.link' />
                   </Link>
-                }}/>
+                }} />
             </div>
           </div>
         </ValidationForm>
         <div className='notice'>
           <FormattedMessage id='auth.login.notice' values={{
             toc: <a
-              href='/terms-and-conditions'
+              href={`/${this.props.locale}/terms-and-conditions`}
               target='_blank'>
-              <FormattedMessage id='general.toc'/>
+              <FormattedMessage id='general.toc' />
             </a>,
-            pp: <a href='/privacy' target='_blank'>
-              <FormattedMessage id='general.privacy-policy'/>
+            pp: <a href={`/${this.props.locale}/privacy`} target='_blank'>
+              <FormattedMessage id='general.privacy-policy' />
             </a>
-          }}/>
+          }} />
         </div>
       </div>
     </DocumentTitle>

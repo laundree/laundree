@@ -8,7 +8,7 @@ import flash from 'connect-flash'
 import morganSetup from '../morgan'
 import * as error from '../utils/error'
 import locale from 'locale'
-import { toLocale, supported } from '../locales/index'
+import { supported } from '../locales/index'
 import config from 'config'
 import compression from 'compression'
 import Debug from 'debug'
@@ -20,7 +20,6 @@ import setupSass from 'node-sass-middleware'
 import identicon from './routes/identicon'
 import pdf from './routes/pdf'
 import reactRouter from './routes/react'
-import logoutRoute from './routes/logout'
 import authRoute from './routes/auth'
 import inviteCodeRoute from './routes/invite-code'
 import langRoute from './routes/lang'
@@ -76,13 +75,7 @@ passportSetup(app)
 
 // SETUP LOCALE
 app.use(locale(supported))
-app.use((req: Request, res: Response, next) => {
-  let locale = req.session.locale || req.locale
-  locale = toLocale(locale, 'en')
-  req.locale = locale
-  res.set('Content-Language', locale)
-  next()
-})
+app.use('/', langRoute)
 
 app.use(async (req: Request, res: Response, next) => {
   if (!req.user) {
@@ -105,11 +98,16 @@ handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
-
-app.use('/logout', logoutRoute)
+supported.forEach(locale => {
+  app.use(`/${locale}/logout`, (req: Request, res) => {
+    req.logout()
+    req.session.token = undefined
+    res.redirect(`/${locale}/`)
+  })
+  app.use(`/${locale}/auth`, authRoute)
+})
 app.use('/auth', authRoute)
 app.use('/s', inviteCodeRoute)
-app.use('/lang', langRoute)
 app.use('/', reactRouter)
 app.get('/err', (req: Request, res, next) => {
   next(new Error('This is a test error'))

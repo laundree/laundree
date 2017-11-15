@@ -10,7 +10,7 @@ import type { LocaleType } from '../../locales/index'
 
 type VerificationValues = { email: string }
 
-export default class Verification extends ValueUpdater<VerificationValues, {locale: LocaleType}, { loading: boolean }> {
+export default class Verification extends ValueUpdater<VerificationValues, { locale: LocaleType }, { loading: boolean }> {
 
   submitHandler = async (evt: Event) => {
     this.setState({loading: true})
@@ -19,12 +19,12 @@ export default class Verification extends ValueUpdater<VerificationValues, {loca
       await sdk.api.user.startEmailVerification({email: this.state.values.email, locale: this.props.locale})
       this.reset({
         loading: false,
-        notion: {message: <FormattedMessage id='auth.verification.success'/>, success: true}
+        notion: {message: <FormattedMessage id='auth.verification.success' />, success: true}
       })
     } catch (err) {
       this.setState({
         loading: false,
-        notion: {message: <FormattedMessage id='auth.verification.error'/>, success: false}
+        notion: {message: <FormattedMessage id='auth.verification.error' />, success: false}
       })
     }
   }
@@ -41,7 +41,7 @@ export default class Verification extends ValueUpdater<VerificationValues, {loca
     return <DocumentTitle title='document-title.resend-verification'>
       <div>
         <FormattedMessage id='auth.verification.title' tagName='h1' />
-        <Link to='/' id='Logo'>
+        <Link to={`/${this.props.locale}/`} id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo' />
           </svg>
@@ -75,20 +75,22 @@ export default class Verification extends ValueUpdater<VerificationValues, {loca
               <FormattedMessage
                 id='auth.links.login2'
                 values={{
-                  link: <Link to={'/auth'}>
-                    <FormattedMessage id='auth.links.login2.link'/>
-                  </Link>
+                  link: (
+                    <Link to={`/${this.props.locale}/auth`}>
+                      <FormattedMessage id='auth.links.login2.link' />
+                    </Link>)
                 }} />
             </div>
             <div>
               <FormattedMessage
                 id='auth.links.signup'
                 values={{
-                  link: <Link
-                    to='/auth/sign-up'
-                    className='forgot'>
-                    <FormattedMessage id='auth.links.signup.link' />
-                  </Link>
+                  link: (
+                    <Link
+                      to={`/${this.props.locale}/auth/sign-up`}
+                      className='forgot'>
+                      <FormattedMessage id='auth.links.signup.link' />
+                    </Link>)
                 }} />
             </div>
           </div>

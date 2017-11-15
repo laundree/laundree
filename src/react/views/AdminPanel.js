@@ -8,6 +8,7 @@ import Switch from './Switch'
 import Debug from 'debug'
 import type {Stats, Laundry, User} from 'laundree-sdk/lib/redux'
 import type { ListOptions } from 'laundree-sdk/lib/sdk'
+import type { LocaleType } from '../../locales'
 const debug = Debug('laundree.react.views.AdminPanel')
 
 class StatsComponent extends React.Component<{stats: Stats}> {
@@ -80,6 +81,7 @@ class QueryList<T: { id: string }> extends React.Component<
   {
     elements: T[],
     totalDemo: ?number,
+    locale: LocaleType,
     total: ?number
   },
   { loaded: boolean, page: number, q: ? string, demoOn: boolean }> {
@@ -211,7 +213,7 @@ class LaundryList extends QueryList<Laundry> {
 
   renderElement (l: Laundry) {
     return <div className='name'>
-      <Link to={`/laundries/${l.id}`}>
+      <Link to={`/${this.props.locale}/laundries/${l.id}`}>
         {l.name}
       </Link>
     </div>
@@ -245,7 +247,7 @@ class UserList extends QueryList<User> {
 
   renderElement ({id, photo, displayName}: User) {
     return <div className='name'>
-      <Link to={`/users/${id}/settings`}>
+      <Link to={`/${this.props.locale}/users/${id}/settings`}>
         <img src={photo} className='avatar' />
         {displayName}
       </Link>
@@ -261,8 +263,9 @@ class UserList extends QueryList<User> {
   }
 }
 
-const AdminPanel = ({stats, laundries, users, userList, laundryList}: {
+const AdminPanel = ({stats, laundries, users, userList, laundryList, locale}: {
   stats: Stats,
+  locale: LocaleType,
   laundries: { [string]: Laundry },
   users: { [string]: User },
   userList: string[],
@@ -274,8 +277,8 @@ const AdminPanel = ({stats, laundries, users, userList, laundryList}: {
     <main id='AdminPanel' className='topNaved'>
       <FormattedMessage id='admin-panel.title' tagName='h1' />
       <StatsComponent stats={stats} />
-      <LaundryList elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
-      <UserList elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
+      <LaundryList locale={locale} elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
+      <UserList locale={locale} elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
     </main>
   </DocumentTitle>
 }

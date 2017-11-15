@@ -30,3 +30,10 @@ export function toLocale<A> (locale: A, def: LocaleType): LocaleType {
       return def
   }
 }
+
+export function localeFromLocation ({pathname}: {pathname: string}): LocaleType {
+  const pattern = new RegExp(`(^\\/(${supported.join('|')})\\/)|(^\\/(${supported.join('|')})$)`)
+  const matches = pathname.match(pattern)
+  const result = (matches && (matches[2] || matches[4])) || null
+  return toLocale(result, 'en')
+}

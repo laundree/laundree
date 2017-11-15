@@ -3,8 +3,9 @@ import React from 'react'
 import { FormattedMessage } from 'react-intl'
 import ContactForm from './ContactForm'
 import { Link } from 'react-router-dom'
+import type { LocaleType } from '../../locales'
 
-const SignUpForm = () => (
+const SignUpForm = ({locale}: { locale: LocaleType }) => (
   <div style={{backgroundColor: '#dddddd', color: '#595959'}}>
     <div className='signUpFormContainer' style={{
       backgroundColor: '#bababa',
@@ -14,7 +15,7 @@ const SignUpForm = () => (
       <div style={{width: '10em'}}>
         Bruger din egendom allerede Laundree?
       </div>
-      <Link to={'/auth/sign-up'} className='button' style={{
+      <Link to={`/${locale}/auth/sign-up`} className='button' style={{
         backgroundColor: '#939393',
         position: 'absolute',
         top: '1em',
@@ -67,7 +68,7 @@ const SignUpForm = () => (
   </div>
 )
 
-const IntroSection = () => (
+const IntroSection = ({locale}: { locale: LocaleType }) => (
   <section className='intro bright'>
     <div className='container' style={{padding: 0}}>
       <div style={{overflow: 'hidden', position: 'relative', height: '38em'}}>
@@ -95,7 +96,7 @@ const IntroSection = () => (
       </div>
       <div className='signUpContainer'>
         <div>
-          <SignUpForm />
+          <SignUpForm locale={locale} />
         </div>
       </div>
     </div>
@@ -225,9 +226,9 @@ const Footer = () => (
   </footer>
 )
 
-export default () => (
+export default ({locale}: { locale: LocaleType }) => (
   <main id='LandingPage'>
-    <IntroSection />
+    <IntroSection locale={locale} />
     <Statistics />
     <About />
     <Contact />
