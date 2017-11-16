@@ -53,7 +53,7 @@ spec:
         image: laundree/laundree:${TAG}
         readinessProbe:
           httpGet:
-            path: /
+            path: /en
             port: 3000
           initialDelaySeconds: 10
           periodSeconds: 5
