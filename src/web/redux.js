@@ -11,6 +11,8 @@ import type {
 } from 'laundree-sdk/lib/redux'
 import sdk from './sdk'
 import config from 'config'
+import type { Config } from '../react/views/types'
+import type { LocaleType } from '../locales/index'
 
 function mapFlash (flashArray, type) {
   return flashArray
@@ -54,18 +56,19 @@ function userToReduxUser (user: User): ReduxUser {
 /**
  * Create initial store
  */
-export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', token: string = '') {
+export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: LocaleType = 'en', token: string = '') {
   let events: Action[] = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
+  const payload: Config = {
+    locale,
+    googleApiKey: config.get('google.clientApiKey'),
+    apiBase: config.get('api.base'),
+    socketIoBase: config.get('socket_io.base'),
+    token
+  }
   events.push({
     type: 'CONFIGURE',
-    payload: {
-      locale,
-      googleApiKey: config.get('google.clientApiKey'),
-      apiBase: config.get('api.base'),
-      socketIoBase: config.get('socket_io.base'),
-      token
-    }
+    payload
   })
   if (!currentUser) return events
   const signInAction: Action = {type: 'SIGN_IN_USER', payload: userToReduxUser(currentUser)}
@@ -74,7 +77,7 @@ export async function createInitialEvents (currentUser: ?User, successFlash: str
   return events.concat(event)
 }
 
-export async function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: string = 'en', token: string = '') {
+export async function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: LocaleType = 'en', token: string = '') {
   const events = await createInitialEvents(currentUser, successFlash, errorFlash, locale, token)
   const store = createStore(redux.reducer)
   events.forEach((event) => store.dispatch(event))

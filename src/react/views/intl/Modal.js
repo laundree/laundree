@@ -7,9 +7,7 @@ import type { ModalProps } from '../modal/Modal'
 import { injectIntl } from 'react-intl'
 
 type ModalIntlProps = ModalProps & {
-  intl: {
-    formatMessage: Function
-  }
+  intl: $npm$ReactIntl$IntlShape
 }
 
 const ModalIntl = (props: ModalIntlProps) => {

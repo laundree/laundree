@@ -8,8 +8,8 @@ import { DocumentTitle, Modal, Submit, Input, Label } from './intl'
 import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
 import NotFound from './NotFound'
-import type { User, Laundry } from 'laundree-sdk/lib/redux'
-import type { LocaleType } from '../../locales'
+import { connect } from 'react-redux'
+import type { User, Laundry, State } from 'laundree-sdk/lib/redux'
 
 class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User }, { loading: boolean }> {
   onSubmit = async (event) => {
@@ -45,11 +45,11 @@ class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User },
         <label>
           <input
             onChange={this.generateValueEventUpdater(displayName => ({displayName}))}
-            type='text' value={this.state.values.displayName}/>
+            type='text' value={this.state.values.displayName} />
         </label>
       </ValidationElement>
       <div className='buttons'>
-        <Submit value='general.update'/>
+        <Submit value='general.update' />
       </div>
     </ValidationForm>
   }
@@ -69,7 +69,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
       this.reset({
         loading: false,
         notion: {
-          message: <FormattedMessage id='user-settings.change-password.success'/>,
+          message: <FormattedMessage id='user-settings.change-password.success' />,
           success: true
         }
       })
@@ -80,7 +80,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           success: false,
           message: <FormattedMessage id={err.status === 403
             ? 'user-settings.change-password.error.invalid'
-            : 'user-settings.change-password.error'}/>
+            : 'user-settings.change-password.error'} />
         }
       })
     }
@@ -112,7 +112,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           <Input
             value={this.state.values.currentPassword}
             onChange={this.generateValueEventUpdater(currentPassword => ({currentPassword}))}
-            type='password' placeholder='general.current-password'/>
+            type='password' placeholder='general.current-password' />
         </Label>
       </ValidationElement>
       <ValidationElement
@@ -123,7 +123,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           <Input
             value={this.state.values.newPassword}
             onChange={this.generateValueEventUpdater(newPassword => ({newPassword}))}
-            type='password' placeholder='general.new-password'/>
+            type='password' placeholder='general.new-password' />
         </Label>
       </ValidationElement>
       <ValidationElement
@@ -134,17 +134,17 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           <Input
             value={this.state.values.newPasswordRepeat}
             onChange={this.generateValueEventUpdater(newPasswordRepeat => ({newPasswordRepeat}))}
-            type='password' placeholder='general.repeat-password'/>
+            type='password' placeholder='general.repeat-password' />
         </Label>
       </ValidationElement>
       <div className='buttons'>
-        <Submit value='general.change-password'/>
+        <Submit value='general.change-password' />
       </div>
     </ValidationForm>
   }
 }
 
-class DeleteUser extends React.Component<{ user: User }, {modalOpen: boolean}> {
+class DeleteUser extends React.Component<{ user: User }, { modalOpen: boolean }> {
   state = {modalOpen: false}
   handleDeleteClick = () => this.deleteUser()
   handleCloseModal = () => this.setState({modalOpen: false})
@@ -164,10 +164,10 @@ class DeleteUser extends React.Component<{ user: User }, {modalOpen: boolean}> {
         actions={[
           {label: 'general.yes', className: 'delete red', action: this.handleDeleteClick},
           {label: 'general.no', action: this.handleCloseModal}
-        ]}/>
+        ]} />
       <div className='buttonContainer'>
         <button onClick={this.handleOpenModal} className='red'>
-          <FormattedMessage id='general.delete-account'/>
+          <FormattedMessage id='general.delete-account' />
         </button>
       </div>
     </div>
@@ -177,12 +177,11 @@ class DeleteUser extends React.Component<{ user: User }, {modalOpen: boolean}> {
 type UserSettingsProps = {
   currentUser: string,
   user: string,
-  locale: LocaleType,
   laundries: { [string]: Laundry },
   users: { [string]: User }
 }
 
-class UserSettings extends React.Component<UserSettingsProps, {loading: boolean, emails?: string[]}> {
+class UserSettings extends React.Component<UserSettingsProps, { loading: boolean, emails?: string[] }> {
 
   state = {loading: false}
 
@@ -196,8 +195,8 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
   renderPassword () {
     if (this.isAdmin() && !this.isSelf()) return null
     return <section>
-      <FormattedMessage id='user-settings.change-password.title' tagName='h2'/>
-      <UserPasswordForm user={this.user()}/>
+      <FormattedMessage id='user-settings.change-password.title' tagName='h2' />
+      <UserPasswordForm user={this.user()} />
     </section>
   }
 
@@ -227,7 +226,7 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
 
   renderDelete () {
     return <section>
-      <FormattedMessage id='user-settings.delete-account.title' tagName='h2'/>
+      <FormattedMessage id='user-settings.delete-account.title' tagName='h2' />
       {this.renderDeleteText()}
     </section>
   }
@@ -236,15 +235,15 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
     if (this.isOwner()) {
       return <div className='text'>
         <FormattedMessage
-          values={{nl: <br/>}}
-          id='user-settings.delete-account.message.owner'/>
+          values={{nl: <br />}}
+          id='user-settings.delete-account.message.owner' />
       </div>
     }
     return <div className='text'>
       <FormattedMessage
-        values={{nl: <br/>}}
-        id='user-settings.delete-account.message.user'/>
-      <DeleteUser user={this.user()}/>
+        values={{nl: <br />}}
+        id='user-settings.delete-account.message.user' />
+      <DeleteUser user={this.user()} />
     </div>
   }
 
@@ -253,7 +252,7 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
       return <div className='bigListMessage email'>
         <button className={this.state.loading ? 'grey' : ''} onClick={this.onLoadClick}>
           <FormattedMessage
-            id={this.state.loading ? 'user-settings.email-addresses.loading' : 'user-settings.email-addresses.load'}/>
+            id={this.state.loading ? 'user-settings.email-addresses.loading' : 'user-settings.email-addresses.load'} />
         </button>
       </div>
     }
@@ -271,7 +270,7 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
   renderEmails () {
     if (!this.isAdmin() && !this.isSelf()) return
     return <section>
-      <FormattedMessage id='user-settings.email-addresses.title' tagName='h2'/>
+      <FormattedMessage id='user-settings.email-addresses.title' tagName='h2' />
       <div className='text'>
         {this.renderEmailList()}
       </div>
@@ -282,16 +281,16 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
     const user = this.user()
     return <DocumentTitle title='document-title.profile-settings'>
       <main className='topNaved' id='Settings'>
-        <FormattedMessage tagName='h1' id='user-settings.title'/>
+        <FormattedMessage tagName='h1' id='user-settings.title' />
         <section>
-          <FormattedMessage tagName='h2' id='user-settings.basic-info.title'/>
-          <UserNameForm user={user}/>
+          <FormattedMessage tagName='h2' id='user-settings.basic-info.title' />
+          <UserNameForm user={user} />
         </section>
         {this.renderEmails()}
         {this.renderPassword()}
         {this.renderDelete()}
         <section>
-          <FormattedMessage tagName='h2' id='user-settings.laundries.title'/>
+          <FormattedMessage tagName='h2' id='user-settings.laundries.title' />
           <div className='text'>
             {this.renderLaundries(user)}
           </div>
@@ -303,7 +302,7 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
   renderLaundries (user) {
     if (user.laundries.length === 0) {
       return <div className='bigListMessage'>
-        <FormattedMessage id='user-settings.laundries.no-laundries'/>
+        <FormattedMessage id='user-settings.laundries.no-laundries' />
       </div>
     }
     return <ul className='bigList'>
@@ -313,7 +312,7 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
         .map(laundry =>
           <li key={laundry.id}>
             <div className='name'>
-              <Link to={`/${this.props.locale}/laundries/${laundry.id}`}>{laundry.name}</Link>
+              <Link to={`/laundries/${laundry.id}`}>{laundry.name}</Link>
             </div>
           </li>)}
     </ul>
@@ -322,21 +321,34 @@ class UserSettings extends React.Component<UserSettingsProps, {loading: boolean,
 
 const UserSettingsWrapper = (props: UserSettingsProps) => {
   if (!props.users[props.user]) {
-    return <NotFound/>
+    return <NotFound />
   }
   return <UserSettings {...props} />
 }
 
-UserSettingsWrapper.propTypes = UserSettings.propTypes
+type UserSettingsLoaderWrapperProps = {
+  currentUser: ?string,
+  user: string,
+  laundries: { [string]: Laundry },
+  users: { [string]: User }
+}
 
-const UserSettingsLoaderWrapper = (props: UserSettingsProps) => {
-  const cUser = props.users[props.currentUser]
-  if (cUser.role !== 'admin') {
-    return <UserSettingsWrapper {...props} />
+const UserSettingsLoaderWrapper = (props: UserSettingsLoaderWrapperProps) => {
+  const {currentUser, user, laundries, users} = props
+  if (!currentUser) {
+    return null
   }
-  return <Loader loader={() => sdk.fetchUser(props.user)}>
-    <UserSettingsWrapper {...props} />
+  const cUser = props.users[currentUser]
+  if (cUser.role !== 'admin') {
+    return <UserSettingsWrapper user={user} laundries={laundries} users={users} currentUser={currentUser} />
+  }
+  return <Loader loader={() => sdk.fetchUser(user)}>
+    <UserSettingsWrapper user={user} laundries={laundries} users={users} currentUser={currentUser} />
   </Loader>
 }
 
-export default UserSettingsLoaderWrapper
+const mapStateToProps = ({users, laundries, currentUser}: State, {match: {params: {userId}}}): UserSettingsLoaderWrapper => {
+  return {currentUser, user: userId, users, laundries}
+}
+
+export default connect(mapStateToProps)(UserSettingsLoaderWrapper)

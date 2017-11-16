@@ -3,9 +3,12 @@
 import React from 'react'
 import sdk from '../../client/sdk'
 import uuid from 'uuid'
-import type {User} from 'laundree-sdk/lib/redux'
+import type { User, State } from 'laundree-sdk/lib/redux'
+import { connect } from 'react-redux'
 
-export default class NativeApp extends React.Component<{currentUser: string, users: {[string]: User}}> {
+type NativeAppProps = { currentUser: ?string, users: { [string]: User } }
+
+class NativeApp extends React.Component<NativeAppProps> {
 
   componentDidMount () {
     if (!this.props.currentUser) {
@@ -15,7 +18,13 @@ export default class NativeApp extends React.Component<{currentUser: string, use
   }
 
   async setupToken () {
-    const {secret, owner} = await sdk.api.user.createToken(this.props.currentUser, {name: `app-${uuid.v4()}`, type: 'auth'})
+    if (!this.props.currentUser) {
+      return
+    }
+    const {secret, owner} = await sdk.api.user.createToken(this.props.currentUser, {
+      name: `app-${uuid.v4()}`,
+      type: 'auth'
+    })
     window.location = `laundree://auth/${owner.id}/${secret}`
   }
 
@@ -23,3 +32,7 @@ export default class NativeApp extends React.Component<{currentUser: string, use
     return null
   }
 }
+
+export default connect(({users, currentUser}: State): NativeAppProps => ({
+  currentUser, users
+}))(NativeApp)

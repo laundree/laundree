@@ -68,6 +68,7 @@
 =loading_before()
   content: ""
   background-color: rgba(102, 211, 211, 0.81)
+  +box-shadow(0 0 0 0.1em rgba(102, 211, 211, 0.81))
   top: 0
   left: 0
   right: 0
@@ -307,7 +308,7 @@ div.userInput
     line-height: 1em
     float: left
 
-input, button, textarea, a.button
+input, button, textarea, a.button, input[type=submit]
   +border-radius(0.2em)
   cursor: pointer
   border-width: 0
@@ -541,9 +542,8 @@ form
     font-family: 'Roboto Condensed', sans-serif
     padding: 0.5em 1em
     background-color: #CC8D3C
-    +box-shadow(0 0 0.2em #585858)
     color: #fff
-    +border-radius(0.1em)
+    +border-radius(0.2em)
     text-align: center
     margin: 0.5em 0
     a

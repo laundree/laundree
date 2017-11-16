@@ -4,28 +4,27 @@ import { NavLink } from 'react-router-dom'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
 import LocaleSelect from './LocaleSelect'
 import { FormattedMessage } from 'react-intl'
-import type { User, Laundry } from 'laundree-sdk/lib/redux'
-import type { Location } from 'react-router'
+import type { User, Laundry, State } from 'laundree-sdk/lib/redux'
 import { Link as ScrollLink } from 'react-scroll'
-import type { LocaleType } from '../../locales/index'
+import { connect } from 'react-redux'
 
-export default class TopNav extends React.Component<{
-  user: User,
-  location: Location,
-  locale: LocaleType,
+type TopNavProps = {
+  user: ?User,
   currentLaundry: string,
   laundries: { [string]: Laundry }
-}> {
-  laundries () {
-    return this.props.user.laundries.map(id => this.props.laundries[id]).filter(l => l)
+}
+
+class TopNav extends React.Component<TopNavProps> {
+  laundries (user: User) {
+    return user.laundries.map(id => this.props.laundries[id]).filter(l => l)
   }
 
   renderGlobe () {
-    return <LocaleSelect locale={this.props.locale} location={this.props.location} />
+    return <LocaleSelect />
   }
 
-  renderLaundries () {
-    const laundries = this.laundries()
+  renderLaundries (user: User) {
+    const laundries = this.laundries(user)
     const currentLaundry = this.props.laundries[this.props.currentLaundry]
     if (!currentLaundry) return null
     switch (laundries.length) {
@@ -43,7 +42,7 @@ export default class TopNav extends React.Component<{
                 .map(({id, name}) =>
                   <li key={id} className={id === this.props.currentLaundry ? 'active' : ''}>
                     <DropDownCloser>
-                      <a href={`/${this.props.locale}/laundries/${id}`}>{name}</a>
+                      <a href={`/laundries/${id}`}>{name}</a>
                     </DropDownCloser>
                   </li>)}
             </ul>
@@ -52,17 +51,17 @@ export default class TopNav extends React.Component<{
     }
   }
 
-  renderUserLoggedInMenu () {
+  renderUserLoggedInMenu (user: User) {
     return <nav id='TopNav'>
-      <NavLink to={`/${this.props.locale}`} className='home' activeClassName='active'>
+      <NavLink to={''} className='home' activeClassName='active'>
         <svg>
           <use xlinkHref='#SmallLogo' />
         </svg>
       </NavLink>
       <div className='laundries'>
-        {this.renderLaundries()}
+        {this.renderLaundries(user)}
       </div>
-      <NavLink to={`/${this.props.locale}/support`} className='icon help' activeClassName='active'>
+      <NavLink to={'/support'} className='icon help' activeClassName='active'>
         <svg>
           <use xlinkHref='#LifeBuoy' />
         </svg>
@@ -72,19 +71,19 @@ export default class TopNav extends React.Component<{
         {this.renderGlobe()}
         <DropDown className='user'>
           <DropDownTitle>
-            <img src={this.props.user.photo} className='avatar' />
+            <img src={user.photo} className='avatar' />
           </DropDownTitle>
           <DropDownContent className='right'>
             <ul className='dropDownList'>
-              {this.props.user.demo ? null : <li>
+              {user.demo ? null : <li>
                 <DropDownCloser>
-                  <NavLink to={`/${this.props.locale}/users/${this.props.user.id}/settings`} activeClassName='active'>
+                  <NavLink to={`/users/${user.id}/settings`} activeClassName='active'>
                     <FormattedMessage id='topnav.manage' />
                   </NavLink>
                 </DropDownCloser>
               </li>}
               <li>
-                <a href={`/${this.props.locale}/logout`}>
+                <a href={'/logout'}>
                   <FormattedMessage id='topnav.logout' />
                 </a>
               </li>
@@ -99,7 +98,7 @@ export default class TopNav extends React.Component<{
     return (
       <nav id='TopNav' className='large'>
         <div className='container'>
-          <NavLink to={`/${this.props.locale}`} className='logo'>
+          <NavLink to={''} className='logo'>
             <svg>
               <use xlinkHref='#WhiteLogo' />
             </svg>
@@ -118,7 +117,7 @@ export default class TopNav extends React.Component<{
           </ScrollLink>
           <div className='rightNav'>
             {this.renderGlobe()}
-            <NavLink to={`/${this.props.locale}/auth`} className='auth signUp'>
+            <NavLink to={'/auth'} className='auth signUp'>
               <FormattedMessage id='topnav.login' />
             </NavLink>
           </div>
@@ -128,8 +127,15 @@ export default class TopNav extends React.Component<{
   }
 
   render () {
-    return this.props.user
-      ? this.renderUserLoggedInMenu()
+    const user = this.props.user
+    return user
+      ? this.renderUserLoggedInMenu(user)
       : this.renderNotLoggedInMenu()
   }
 }
+
+export default connect(({users, currentUser, laundries}: State, {match: {params: {laundryId}}}): TopNavProps => ({
+  laundries,
+  currentLaundry: laundryId,
+  user: (currentUser && users[currentUser]) || null
+}))(TopNav)

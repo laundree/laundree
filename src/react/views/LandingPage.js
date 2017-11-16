@@ -1,74 +1,56 @@
 // @flow
 import React from 'react'
 import { FormattedMessage } from 'react-intl'
+import SignUpUserForm from './SignUpForm'
 import ContactForm from './ContactForm'
-import { Link } from 'react-router-dom'
-import type { LocaleType } from '../../locales'
 
-const SignUpForm = ({locale}: { locale: LocaleType }) => (
-  <div style={{backgroundColor: '#dddddd', color: '#595959'}}>
-    <div className='signUpFormContainer' style={{
-      backgroundColor: '#bababa',
-      position: 'relative',
-      borderBottom: '0.1em solid #898989'
-    }}>
-      <div style={{width: '10em'}}>
-        Bruger din egendom allerede Laundree?
-      </div>
-      <Link to={`/${locale}/auth/sign-up`} className='button' style={{
-        backgroundColor: '#939393',
-        position: 'absolute',
-        top: '1em',
-        right: '1em'
-      }}>
-        Tilmeld dig
-      </Link>
-    </div>
-    <div className='signUpFormContainer'>
-      <h2
-        style={{
-          padding: '0.5em 0',
-          fontSize: '1.2em',
-          color: '#000',
-          fontStyle: 'normal'
-        }}
-      >Opret vaskeri</h2>
-      <p>
-        Ønsker din egendom at bruge Laundree til at administere jeres vaskeri?
-      </p>
-      <form>
-        <label>
-          <input type='text' placeholder={'Dit navn'} />
-        </label>
-        <label>
-          <input type='text' placeholder={'Din email-adresse'} />
-        </label>
-        <label>
-          <input type='text' placeholder={'Kodeord'} />
-        </label>
-        <label>
-          <input type='text' placeholder={'Gentag kodeord'} />
-        </label>
-        <div style={{paddingTop: '1em'}}>
-          <label>
-            <input type='text' placeholder={'Vaskeri navn'} />
-          </label>
-          <label>
-            <input type='text' placeholder={'Adresse'} />
-          </label>
-          <div style={{fontSize: '0.9em', padding: '1em 0 0 0'}}>
-            Bemærk: Ved tilmelding accepterer du vores Vilkår og betingelser samt Privatlivspolitik.
+class SignUpForm extends React.Component<{}, { choice: 'laundry' | 'user' }> {
+  state = {choice: 'laundry'}
+
+  render () {
+    return (
+      <div style={{backgroundColor: '#f7f7f7', color: '#595959'}}>
+        <div className='signUpChooser'>
+          <div
+            className={this.state.choice === 'laundry' ? 'active' : ''}
+            onClick={() => this.setState({choice: 'laundry'})}>
+            <FormattedMessage id={'landing-page.create-laundry'} />
           </div>
-          <div className='buttons'>
-            <input type='submit' className='orange' value='Opret vaskeri' />
+          <div className={this.state.choice === 'user' ? 'active' : ''} onClick={() => this.setState({choice: 'user'})}>
+            <FormattedMessage id={'landing-page.create-user'} />
           </div>
         </div>
-      </form>
-    </div>
-  </div>
-)
+        <div className='signUpFormContainer'>
+          <FormattedMessage tagName='p' id={
+            this.state.choice === 'laundry'
+              ? 'landing-page.create-laundry.guide'
+              : 'landing-page.create-user.guide'} />
 
-const IntroSection = ({locale}: { locale: LocaleType }) => (
+          <SignUpUserForm createLaundry={this.state.choice === 'laundry'} />
+        </div>
+        <div style={{borderTop: '0.1em solid #eaeaea', color: '#aaa', padding: '1em'}}>
+          <div style={{fontSize: '0.8em'}}>
+            <FormattedMessage id='auth.signup.notice' values={{
+              toc: <a
+                style={{color: 'inherit'}}
+                href={'/terms-and-conditions'}
+                target='_blank'>
+                <FormattedMessage id='general.toc' />
+              </a>,
+              pp: <a
+                style={{color: 'inherit'}}
+                href={'/privacy'} target='_blank'>
+                <FormattedMessage id='general.privacy-policy' />
+              </a>
+            }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+const IntroSection = () => (
   <section className='intro bright'>
     <div className='container' style={{padding: 0}}>
       <div style={{overflow: 'hidden', position: 'relative', height: '38em'}}>
@@ -96,7 +78,7 @@ const IntroSection = ({locale}: { locale: LocaleType }) => (
       </div>
       <div className='signUpContainer'>
         <div>
-          <SignUpForm locale={locale} />
+          <SignUpForm />
         </div>
       </div>
     </div>
@@ -116,7 +98,7 @@ const Statistics = () => (
         </span>
         </div>
         <div className='subTitle'>
-          brugere er oprettet
+          <FormattedMessage id={'landing-page.users-created'} />
         </div>
       </div>
       <div className='stat'>
@@ -129,7 +111,7 @@ const Statistics = () => (
         </span>
         </div>
         <div className='subTitle'>
-          bookinger foretaget
+          <FormattedMessage id={'landing-page.bookings-created'} />
         </div>
       </div>
     </div>
@@ -205,7 +187,7 @@ const Footer = () => (
           <use xlinkHref={'#WhiteLogo'} />
         </svg>
         <p style={{padding: '0.5em 0 1em 0'}}>
-          A site by Bookrs IVS
+          <FormattedMessage id='landing-page.footer.site' />
         </p>
         <div style={{padding: '2em 0'}}>
           <a href='https://github.com/laundree' style={{padding: '0 1em', display: 'inline-block'}} target='_blank'>
@@ -226,9 +208,9 @@ const Footer = () => (
   </footer>
 )
 
-export default ({locale}: { locale: LocaleType }) => (
+export default () => (
   <main id='LandingPage'>
-    <IntroSection locale={locale} />
+    <IntroSection />
     <Statistics />
     <About />
     <Contact />

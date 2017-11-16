@@ -1,67 +1,11 @@
 // @flow
 import React from 'react'
-import { DocumentTitle, Input, Submit, Label } from './intl'
+import { DocumentTitle } from './intl'
 import { Link } from 'react-router-dom'
-import { ValidationForm, ValidationElement } from './validation'
-import ValueUpdater from './helpers/ValueUpdater'
-import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
-import type { LocaleType } from '../../locales/index'
+import SignUpForm from './SignUpForm'
 
-type SignUpState = {
-  loading: boolean
-}
-
-type SignUpProps = {
-  locale: LocaleType,
-  to?: string
-}
-
-type SignUpValues = {
-  name: string,
-  email: string,
-  password: string,
-  password2: string
-}
-
-class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
-
-  initialState () {
-    return {loading: false}
-  }
-
-  initialValues () {
-    return {name: '', email: '', password: '', password2: ''}
-  }
-
-  submitHandler = async (evt: Event) => {
-    this.setState({loading: true})
-    evt.preventDefault()
-    try {
-      await sdk.api.user.signUpUser(
-        {
-          displayName: this.state.values.name,
-          email: this.state.values.email,
-          password: this.state.values.password,
-          locale: this.props.locale
-        }
-      )
-      this.reset({
-        loading: false,
-        notion: {message: <FormattedMessage id='auth.signup.success'/>, success: true}
-      })
-    } catch (err) {
-      this.setState({
-        loading: false,
-        notion: {
-          success: false,
-          message: <FormattedMessage id={err.status === 409
-            ? 'auth.signup.error.already-exists'
-            : 'auth.signup.error'}/>
-        }
-      })
-    }
-  }
+class SignUp extends React.Component<{to: string}> {
 
   query () {
     return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
@@ -70,126 +14,64 @@ class SignUp extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
   render () {
     return <DocumentTitle title='document-title.signup'>
       <div>
-        <FormattedMessage id='auth.signup.title' tagName='h1'/>
-        <Link to={`/${this.props.locale}/`} id='Logo'>
+        <FormattedMessage id='auth.signup.title' tagName='h1' />
+        <Link to={'/'} id='Logo'>
           <svg>
-            <use xlinkHref='#MediaLogo'/>
+            <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={`/${this.props.locale}/auth/facebook${this.query()}`} className='facebook'>
+          <a href={`/auth/facebook${this.query()}`} className='facebook'>
             <svg>
-              <use xlinkHref='#Facebook'/>
+              <use xlinkHref='#Facebook' />
             </svg>
-            <FormattedMessage id='auth.signup.method.facebook'/>
+            <FormattedMessage id='auth.signup.method.facebook' />
           </a>
-          <a href={`/${this.props.locale}/auth/google${this.query()}`} className='google'>
+          <a href={`/auth/google${this.query()}`} className='google'>
             <svg>
-              <use xlinkHref='#GooglePlus'/>
+              <use xlinkHref='#GooglePlus' />
             </svg>
-            <FormattedMessage id='auth.signup.method.google'/>
+            <FormattedMessage id='auth.signup.method.google' />
           </a>
         </div>
         <div className='or'>
-          <FormattedMessage id='general.or'/>
+          <FormattedMessage id='general.or' />
         </div>
-        <ValidationForm
-          sesh={this.state.sesh}
-          className={this.state.loading ? 'blur' : ''}
-          onSubmit={this.submitHandler}>
-          {this.renderNotion()}
-          <ValidationElement
-            nonEmpty
-            trim sesh={this.state.sesh}
-            initial={this.state.values.name === undefined}
-            value={this.state.values.name || ''}>
-            <Label data-validate-error='auth.error.no-full-name'>
-              <Input
-                type='text'
-                name='name'
-                placeholder='general.full-name'
-                value={this.state.values.name || ''}
-                onChange={this.generateValueEventUpdater(name => ({name}))}
-              />
-            </Label>
-          </ValidationElement>
-          <ValidationElement
-            email
-            trim sesh={this.state.sesh}
-            initial={this.state.values.email === undefined}
-            value={this.state.values.email || ''}>
-            <Label
-              data-validate-error='auth.error.invalid-email'>
-              <Input
-                value={this.state.values.email || ''}
-                onChange={this.generateValueEventUpdater(email => ({email}))}
-                type='text' name='email' placeholder='general.email-address'/>
-            </Label>
-          </ValidationElement>
-          <ValidationElement
-            initial={this.state.values.password === undefined}
-            password
-            trim sesh={this.state.sesh}
-            value={this.state.values.password || ''}>
-            <Label data-validate-error='auth.error.invalid-password'>
-              <Input
-                value={this.state.values.password || ''}
-                onChange={this.generateValueEventUpdater(password => ({password}))}
-                type='password' name='password' placeholder='general.password'/>
-            </Label>
-          </ValidationElement>
-          <ValidationElement
-            initial={this.state.values.password2 === undefined}
-            sesh={this.state.sesh}
-            validator={() => this.state.values.password === this.state.values.password2 && this.state.values.password2}
-            value={this.state.values.password2 || ''}>
-            <Label data-validate-error='auth.error.invalid-repeated-password'>
-              <Input
-                value={this.state.values.password2 || ''}
-                onChange={this.generateValueEventUpdater(password2 => ({password2}))}
-                type='password' name='password2' placeholder='general.repeat-password'/>
-            </Label>
-          </ValidationElement>
-          <div className='accept'>
-            <FormattedMessage id='auth.signup.notice' values={{
-              toc: <a
-                href={`/${this.props.locale}/terms-and-conditions`}
-                target='_blank'>
-                <FormattedMessage id='general.toc'/>
-              </a>,
-              pp: <a href={`/${this.props.locale}/privacy`} target='_blank'>
-                <FormattedMessage id='general.privacy-policy'/>
-              </a>
-            }}/>
+        <SignUpForm/>
+        <div className='forgot'>
+          <div>
+            <FormattedMessage
+              id='auth.links.login'
+              values={{
+                link: <Link to={`/auth${this.query()}`}>
+                  <FormattedMessage id='auth.links.login.link' />
+                </Link>
+              }} />
           </div>
-          <div className='buttons'>
-            <Submit
-              value='general.create-account'
-              className='create'/>
+          <div>
+            <FormattedMessage
+              id='auth.links.forgot'
+              values={{
+                link: <Link
+                  to={'/auth/forgot'}
+                  className='forgot'>
+                  <FormattedMessage id='auth.links.forgot.link' />
+                </Link>
+              }} />
           </div>
-          <div className='forgot'>
-            <div>
-              <FormattedMessage
-                id='auth.links.login'
-                values={{
-                  link: <Link to={`/${this.props.locale}/auth${this.query()}`}>
-                    <FormattedMessage id='auth.links.login.link'/>
-                  </Link>
-                }}/>
-            </div>
-            <div>
-              <FormattedMessage
-                id='auth.links.forgot'
-                values={{
-                  link: <Link
-                    to={`/${this.props.locale}/auth/forgot`}
-                    className='forgot'>
-                    <FormattedMessage id='auth.links.forgot.link'/>
-                  </Link>
-                }}/>
-            </div>
-          </div>
-        </ValidationForm>
+        </div>
+        <div className='notice'>
+          <FormattedMessage id='auth.signup.notice' values={{
+            toc: <a
+              href={'/terms-and-conditions'}
+              target='_blank'>
+              <FormattedMessage id='general.toc' />
+            </a>,
+            pp: <a href={'/privacy'} target='_blank'>
+              <FormattedMessage id='general.privacy-policy' />
+            </a>
+          }} />
+        </div>
       </div>
     </DocumentTitle>
   }

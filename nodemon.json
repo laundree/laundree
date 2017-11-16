@@ -1,4 +1,5 @@
 {
   "ext": "js jsx",
-  "delay": 2500
+  "delay": 5000,
+  "watch": false
 }

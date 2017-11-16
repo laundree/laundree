@@ -6,14 +6,7 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, Submit, DocumentTitle } from './intl'
 import LocationSelector from './LocationSelector'
-import type {LocaleType} from '../../locales'
-import type {User} from 'laundree-sdk/lib/redux'
 
-type CreateLaundryProps = {
-  user: User,
-  googleApiKey: string,
-  locale: LocaleType
-}
 type CreateLaundryState = {
   createExpanded: boolean,
   loading: boolean,
@@ -21,7 +14,7 @@ type CreateLaundryState = {
 }
 type CreateLaundryFormValues = { name: string, placeId: string }
 
-export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, CreateLaundryProps, CreateLaundryState> {
+export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaundryState> {
 
   initialValues () {
     return {name: '', placeId: ''}
@@ -90,8 +83,6 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
               <ValidationElement value={this.state.values.placeId} nonEmpty>
                 <Label data-validate-error='home.logged-in.error.invalid-laundry-address'>
                   <LocationSelector
-                    locale={this.props.locale}
-                    googleApiKey={this.props.googleApiKey}
                     value={this.state.values.placeId}
                     onChange={this.valueUpdaterPlaceId} />
                 </Label>

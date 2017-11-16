@@ -5,7 +5,10 @@ import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, TextArea, Submit } from './intl'
-import type {User} from 'laundree-sdk/lib/redux'
+import type { User, State } from 'laundree-sdk/lib/redux'
+import type { LocaleType } from '../../locales/index'
+import { connect } from 'react-redux'
+import type { StateAddendum } from './types'
 
 const UserInput = ({user: {photo, displayName}}: { user: User }) => <div className='userInput'>
   <img className='avatar' src={photo} />
@@ -18,10 +21,10 @@ type ContactFormValues = {
   message: string,
   email: string
 }
-type ContactFormProps = { user?: User }
+type ContactFormProps = { user: ?User, locale: LocaleType }
 type ContactFormState = { loading: boolean, sent: boolean }
 
-export default class ContactForm extends ValueUpdater<ContactFormValues, ContactFormProps, ContactFormState> {
+class ContactForm extends ValueUpdater<ContactFormValues, ContactFormProps, ContactFormState> {
 
   initialValues () {
     return {
@@ -47,7 +50,11 @@ export default class ContactForm extends ValueUpdater<ContactFormValues, Contact
   async submit () {
     this.setState({loading: true})
     const {email, name, subject, message} = this.state.values
-    await sdk.api.contact.sendMessage({name: name || undefined, email: email || undefined, message, subject})
+    if (this.props.user) {
+      await sdk.api.contact.sendSupportMessage({message, subject, locale: this.props.locale})
+    } else {
+      await sdk.api.contact.sendMessage({name, email, message, subject, locale: this.props.locale})
+    }
     this.reset({loading: false, sent: true})
   }
 
@@ -113,3 +120,9 @@ export default class ContactForm extends ValueUpdater<ContactFormValues, Contact
     </ValidationForm>
   }
 }
+
+export default connect(({users, currentUser, config: {locale}}: State & StateAddendum): ContactFormProps => (
+  {
+    user: (currentUser && users[currentUser]) || null,
+    locale
+  }))(ContactForm)

@@ -861,6 +861,53 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /laundries/with-user:
+    post:
+      tags:
+        - Laundries
+        - Users
+      security: []
+      description: Create a laundry and user
+      operationId: createLaundryWithUser
+      parameters:
+        - name: createLaundryWithUserBody
+          in: body
+          schema:
+            required:
+              - name
+              - googlePlaceId
+              - displayName
+              - email
+              - password
+            properties:
+              displayName:
+                $ref: "#/definitions/nonEmpty"
+              email:
+                type: string
+                format: email
+              password:
+                $ref: "#/definitions/password"
+              name:
+                $ref: "#/definitions/name"
+              googlePlaceId:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/LaundryAndUser"
+        "409":
+          description: Conflict
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /laundries/demo:
     x-swagger-router-controller: laundries
     post:
@@ -1720,6 +1767,8 @@ paths:
             required:
               - message
               - subject
+              - name
+              - email
             properties:
               message:
                 $ref: "#/definitions/nonEmpty"
@@ -1744,6 +1793,53 @@ paths:
           schema:
             $ref: "#/definitions/Error"
 
+  /contact/support:
+    x-swagger-router-controller: contact
+    post:
+      operationId: contactSupport
+      tags:
+        - Contact
+      parameters:
+        - name: contactSupportBody
+          in: body
+          required: true
+          schema:
+            required:
+              - message
+              - subject
+            properties:
+              message:
+                $ref: "#/definitions/nonEmpty"
+              subject:
+                $ref: "#/definitions/nonEmpty"
+              locale:
+                $ref: "#/definitions/locale"
+      responses:
+        "204":
+          description: Success
+        "400":
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /statistics:
+    x-swagger-router-controller: statistics
+    get:
+      operationId: statistics
+      tags:
+        - Statistics
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/Statistics"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
 
   /swagger:
     x-swagger-pipe: swagger_raw
@@ -1800,6 +1896,15 @@ definitions:
         type: array
         items:
           $ref: "#/definitions/Summary"
+  LaundryAndUser:
+    required:
+      - laundry
+      - user
+    properties:
+      laundry:
+        $ref: "#/definitions/Laundry"
+      user:
+        $ref: "#/definitions/User"
 
   Laundry:
     required:
@@ -1999,7 +2104,21 @@ definitions:
         enum:
           - 0
           - 30
-
+  Statistics:
+    required:
+      - laundryCount
+      - userCount
+      - bookingCount
+      - machineCount
+    properties:
+      laundryCount:
+        type: integer
+      userCount:
+        type: integer
+      machineCount:
+        type: integer
+      bookingCount:
+        type: integer
   Error:
     required:
       - message

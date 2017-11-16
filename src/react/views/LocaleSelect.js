@@ -2,30 +2,39 @@
 import React from 'react'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
 import * as locales from '../../locales'
-import type { Location } from 'react-router'
+import { Route } from 'react-router'
+import type { LocaleType } from '../../locales'
+import { connect } from 'react-redux'
+import type { StateAddendum } from './types'
 
-const LocaleSelect = (props: { location: Location }) => {
-  const locale = locales.localeFromLocation(props.location)
+type LocaleSelectType = { locale: LocaleType }
+
+const LocaleSelect = ({locale}: LocaleSelectType) => {
   return (
     <DropDown className='language'>
       <DropDownTitle>
         <svg>
-          <use xlinkHref='#Globe'/>
+          <use xlinkHref='#Globe' />
         </svg>
       </DropDownTitle>
       <DropDownContent className='right'>
-        <ul className='dropDownList'>
-          {locales.supported.map(l => <li key={l} className={locale === l ? 'active' : ''}>
-            <DropDownCloser>
-              <a
-                href={`/${l}${props.location.pathname.substr(3)}`}
-                className='link'>{locales.names[l]}</a>
-            </DropDownCloser>
-          </li>)}
-        </ul>
+        <Route render={({location}) => (
+          <ul className='dropDownList'>
+            {locales.supported.map(l => (
+              <li key={l} className={locale === l ? 'active' : ''}>
+                <DropDownCloser>
+                  <a
+                    href={`/${l}${location.pathname}`}
+                    className='link'>{locales.names[l]}</a>
+                </DropDownCloser>
+              </li>))}
+          </ul>
+        )} />
       </DropDownContent>
     </DropDown>
   )
 }
 
-export default LocaleSelect
+export default connect(({config: {locale}}: StateAddendum): LocaleSelectType => ({
+  locale
+}))(LocaleSelect)

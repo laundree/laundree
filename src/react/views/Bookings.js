@@ -6,12 +6,11 @@ import sdk from '../../client/sdk'
 import { FormattedMessage, FormattedDate } from 'react-intl'
 import moment from 'moment'
 import Loader from './Loader'
-import type { User, Laundry, Machine, Booking } from 'laundree-sdk/lib/redux'
-import type { LocaleType } from '../../locales'
+import type { User, Laundry, Machine, Booking, State } from 'laundree-sdk/lib/redux'
+import { connect } from 'react-redux'
 
 class BookingComponent extends React.Component<{
   laundry: Laundry,
-  locale: LocaleType,
   machine: Machine,
   booking: Booking
 }, { showModal: boolean }> {
@@ -37,51 +36,51 @@ class BookingComponent extends React.Component<{
       />
       <div className='machineName'>
         <Link
-          to={`${this.props.locale}/laundries/${this.props.laundry.id}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
+          to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${moment(fromDate).format('YYYY-MM-DD')}`}>
           {this.props.machine.name}
         </Link>
       </div>
       <div className='time_action_wrapper'>
         <div className='time'>
           <svg>
-            <use xlinkHref='#Time'/>
+            <use xlinkHref='#Time' />
           </svg>
           <FormattedDate
             weekday={today ? undefined : 'long'}
             timeZone={this.props.laundry.timezone}
             month={today ? undefined : 'numeric'} day={today ? undefined : 'numeric'} hour='numeric' minute='numeric'
-            value={booking.from}/>
+            value={booking.from} />
           <FormattedDate
             timeZone={this.props.laundry.timezone}
             weekday={sameDay ? undefined : 'long'} month={sameDay ? undefined : 'numeric'}
             day={sameDay ? undefined : 'numeric'} hour='numeric' minute='numeric'
-            value={booking.to}/>
+            value={booking.to} />
         </div>
         <svg className='trash' onClick={this.onDeleteClick}>
-          <use xlinkHref='#Trash'/>
+          <use xlinkHref='#Trash' />
         </svg>
       </div>
     </div>
   }
 }
 
-export default class Bookings extends React.Component<{
+type BookingsProps = {
   laundry: Laundry,
-  locale: LocaleType,
-  user: User,
-  userBookings: string[],
+  user: ?User,
+  userBookings: ?Array<string>,
   bookings: { [string]: Booking },
   machines: { [string]: Machine }
-}, { showModal: boolean }> {
+}
+
+class Bookings extends React.Component<BookingsProps, { showModal: boolean }> {
   state = {showModal: false}
-  onCloseModal = () => this.setState({showModal: false})
 
   renderBookings () {
     if (!this.props.userBookings) return null
     const bookings = this.props.userBookings.map(bookingId => this.renderBooking(this.props.bookings[bookingId])).filter(b => b)
     if (!bookings.length) {
       return <div className='empty_list'>
-        <FormattedMessage id='bookings.no-bookings'/>
+        <FormattedMessage id='bookings.no-bookings' />
       </div>
     }
     return <ul>
@@ -96,14 +95,16 @@ export default class Bookings extends React.Component<{
     }
     return <li key={booking.id}>
       <BookingComponent
-        locale={this.props.locale}
         laundry={this.props.laundry}
         machine={this.props.machines[booking.machine]}
-        booking={booking}/>
+        booking={booking} />
     </li>
   }
 
   load () {
+    if (!this.props.user) {
+      throw new Error('Found no user')
+    }
     return Promise.all([
       sdk.listBookingsForUser(this.props.laundry.id, this.props.user.id, {to: {$gte: new Date()}}),
       sdk.listMachines(this.props.laundry.id)
@@ -115,7 +116,7 @@ export default class Bookings extends React.Component<{
       <Loader loader={() => this.load()}>
         <main className='naved'>
           <h1 className='alignLeft'>
-            <FormattedMessage id='bookings.title'/>
+            <FormattedMessage id='bookings.title' />
           </h1>
           <section id='BookingList'>
             {this.renderBookings()}
@@ -125,3 +126,13 @@ export default class Bookings extends React.Component<{
     </DocumentTitle>
   }
 }
+
+export default connect(({users, laundries, machines, currentUser, bookings, userBookings}: State,
+                        {match: {params: {laundryId}}}): BookingsProps => (
+  {
+    user: (currentUser && users[currentUser]) || null,
+    laundry: laundries[laundryId],
+    machines,
+    bookings,
+    userBookings: userBookings ? userBookings.bookings : null
+  }))(Bookings)

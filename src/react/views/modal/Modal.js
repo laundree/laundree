@@ -4,7 +4,7 @@ import BaseModal from './BaseModal'
 
 export type ModalProps = {
   message: string,
-  actions: {label: string, className: string, action: Function}[]
+  actions: {label: string, className?: string, action: Function}[]
 }
 
 export default class Modal extends BaseModal<ModalProps> {

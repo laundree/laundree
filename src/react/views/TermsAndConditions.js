@@ -1,8 +1,12 @@
 // @flow
 import React from 'react'
-import {Redirect} from 'react-router'
+import { Redirect } from 'react-router'
 import type { LocaleType } from '../../locales/index'
+import { connect } from 'react-redux'
 
-const TermsAndConditions = ({locale}: {locale: LocaleType}) => (<Redirect to={`https://laundree.github.io/tos/${locale}/current`}/>)
+type TermsAndConditionsProps = { locale: LocaleType }
 
-export default TermsAndConditions
+const TermsAndConditions = ({locale}: TermsAndConditionsProps) => (
+  <Redirect to={`https://laundree.github.io/tos/${locale}/current`} />)
+
+export default connect(({config: {locale}}): TermsAndConditionsProps => ({locale}))(TermsAndConditions)

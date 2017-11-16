@@ -49,7 +49,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
     return <DocumentTitle title='document-title.forgot'>
       <div>
         <FormattedMessage tagName='h1' id='auth.forgot.title' />
-        <Link to={`/${this.props.locale}`} id='Logo'>
+        <Link to={'/'} id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo' />
           </svg>
@@ -82,7 +82,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
                 id='auth.links.login3'
                 values={{
                   link: (
-                    <Link to={`/${this.props.locale}/auth`}>
+                    <Link to={'/auth'}>
                       <FormattedMessage id='auth.links.login3.link' />
                     </Link>)
                 }} />
@@ -93,7 +93,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
                 values={{
                   link: (
                     <Link
-                      to={`/${this.props.locale}/auth/sign-up`}
+                      to={'/auth/sign-up'}
                       className='forgot'>
                       <FormattedMessage id='auth.links.signup.link' />
                     </Link>)

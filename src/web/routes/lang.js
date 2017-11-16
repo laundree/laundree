@@ -1,13 +1,13 @@
 // @flow
 import express from 'express'
-import { supported } from '../../locales/index'
 import { logError } from '../../utils/error'
 import type { Request } from '../types'
 import sdk from './../sdk'
+import type { LocaleType } from '../../locales/index'
 
-const router = express.Router()
+export default (locale: LocaleType) => {
+  const router = express.Router()
 
-supported.forEach(locale => {
   router.get(`/${locale}`, (req: Request, res, next) => {
     req.session.locale = locale
     req.locale = locale
@@ -18,5 +18,6 @@ supported.forEach(locale => {
     }
     next()
   })
-})
-export default router
+  return router
+}
+

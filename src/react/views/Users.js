@@ -8,8 +8,10 @@ import sdk from '../../client/sdk'
 import Loader from './Loader'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
 import { Link } from 'react-router-dom'
-import type { Laundry, User, Invite } from 'laundree-sdk/lib/redux'
+import type { Laundry, State, User, Invite } from 'laundree-sdk/lib/redux'
 import type { LocaleType } from '../../locales'
+import type { StateAddendum } from './types'
+import { connect } from 'react-redux'
 
 class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry, locale: LocaleType }, {}> {
   submitHandler = async (evt: Event) => {
@@ -58,7 +60,6 @@ class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry,
 
 class QrInvite extends React.Component<{
   laundry: Laundry,
-  locale: LocaleType
 }, { generating?: boolean, key?: string }> {
   state = {}
 
@@ -146,9 +147,8 @@ class LinkInvite extends React.Component<{ laundry: Laundry }, { link: ?string, 
 
 class UserItem extends React.Component<{
   user: User,
-  locale: LocaleType,
   laundry: Laundry,
-  currentUser: User
+  currentUser: ?User
 }, { showModal: boolean }> {
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
@@ -164,7 +164,8 @@ class UserItem extends React.Component<{
   }
 
   isCurrentUser () {
-    return this.props.user.id === this.props.currentUser.id
+    const currentUser = this.props.currentUser
+    return currentUser && this.props.user.id === currentUser.id
   }
 
   renderRole () {
@@ -211,7 +212,7 @@ class UserItem extends React.Component<{
   renderName () {
     if (!this.addUserLink()) return this.props.user.displayName
     return (
-      <Link to={`/${this.props.locale}/users/${this.props.user.id}/settings`}>
+      <Link to={`/users/${this.props.user.id}/settings`}>
         {this.props.user.displayName}
       </Link>)
   }
@@ -220,7 +221,7 @@ class UserItem extends React.Component<{
     const avatarImage = <img className='avatar' src={this.props.user.photo} />
     if (!this.addUserLink()) return avatarImage
     return (
-      <Link to={`/${this.props.locale}/users/${this.props.user.id}/settings`}>
+      <Link to={`/users/${this.props.user.id}/settings`}>
         {avatarImage}
       </Link>)
   }
@@ -247,7 +248,8 @@ class UserItem extends React.Component<{
   }
 
   addUserLink () {
-    return this.props.user.id === this.props.currentUser.id || this.props.currentUser.role === 'admin'
+    const currentUser = this.props.currentUser
+    return currentUser && (this.props.user.id === currentUser.id || currentUser.role === 'admin')
   }
 }
 
@@ -281,68 +283,80 @@ class InviteItem extends React.Component<{ invite: Invite }, { showModal: boolea
   }
 }
 
-export default class Users extends React.Component<{
-  locale: LocaleType,
+type UsersProps = {
   invites: { [string]: Invite },
   users: { [string]: User },
-  laundry: Laundry,
-  currentUser: string
-}> {
+  laundry: ?Laundry,
+  currentUser: ?string,
+  locale: LocaleType
+}
 
-  renderUsers () {
+class Users extends React.Component<UsersProps> {
+
+  renderUsers (laundry: Laundry) {
     return <ul className='bigList'>
-      {this.users().map(user => (
+      {this.users(laundry).map(user => (
         <li key={user.id}>
           <UserItem
             user={user}
-            locale={this.props.locale}
             currentUser={this.currentUser()}
-            laundry={this.props.laundry} />
+            laundry={laundry} />
         </li>))}
-      {this.invites().map(invite => <li key={invite.id}><InviteItem invite={invite} /></li>)}
+      {this.invites(laundry).map(invite => <li key={invite.id}><InviteItem invite={invite} /></li>)}
     </ul>
   }
 
-  load () {
-    return sdk.listUsersAndInvites(this.props.laundry.id)
+  load (laundry: Laundry) {
+    return sdk.listUsersAndInvites(laundry.id)
   }
 
-  users () {
-    return this.props.laundry.users.map(id => this.props.users[id]).filter(u => u)
+  users (laundry: Laundry) {
+    return laundry.users.map(id => this.props.users[id]).filter(u => u)
   }
 
-  invites () {
-    return this.props.laundry.invites.map((id) => this.props.invites[id]).filter((i) => i).filter(({used}) => !used)
+  invites (laundry: Laundry) {
+    return laundry.invites.map((id) => this.props.invites[id]).filter((i) => i).filter(({used}) => !used)
   }
 
   currentUser () {
-    return this.props.users[this.props.currentUser]
+    const currentUser = this.props.currentUser
+    return (currentUser && this.props.users[currentUser]) || null
   }
 
   render () {
+    const laundry = this.props.laundry
+    if (!laundry) return null
     return <DocumentTitle title='document-title.laundry-users'>
-      <Loader loader={() => this.load()}>
+      <Loader loader={() => this.load(laundry)}>
         <main className='naved' id='Users'>
           <h1 className='alignLeft'>
             <FormattedMessage id='users.title' />
           </h1>
           <section id='UserList'>
-            {this.renderUsers()}
+            {this.renderUsers(laundry)}
           </section>
           <section id='InviteUserForm'>
             <FormattedMessage id='users.invite-from-email' tagName='h2' />
-            <InviteUserForm laundry={this.props.laundry} locale={this.props.locale} />
+            <InviteUserForm laundry={laundry} locale={this.props.locale} />
           </section>
           <section id='QrInviteSection'>
             <FormattedMessage id='users.invite-from-qr' tagName='h2' />
-            <QrInvite laundry={this.props.laundry} locale={this.props.locale} />
+            <QrInvite laundry={laundry} />
           </section>
           <section id='LinkInviteSection'>
             <FormattedMessage id='users.invite-from-link' tagName='h2' />
-            <LinkInvite laundry={this.props.laundry} />
+            <LinkInvite laundry={laundry} />
           </section>
         </main>
       </Loader>
     </DocumentTitle>
   }
 }
+
+export default connect(({config: {locale}, laundries, users, invites, currentUser}: State & StateAddendum, {match: {params: {laundryId}}}): UsersProps => ({
+  laundry: (laundryId && laundries[laundryId]) || null,
+  users,
+  invites,
+  locale,
+  currentUser
+}))(Users)
