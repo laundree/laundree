@@ -56,7 +56,7 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
     return <DocumentTitle title='document-title.reset-password'>
       <div>
         <FormattedMessage tagName='h1' id='auth.forgot.title' />
-        <Link to={`/${this.props.locale}/`} id='Logo'>
+        <Link to={'/'} id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo' />
           </svg>
@@ -85,7 +85,7 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
                 id='auth.links.login3'
                 values={{
                   link: (
-                    <Link to={`/${this.props.locale}/auth`}>
+                    <Link to={'/auth'}>
                       <FormattedMessage id='auth.links.login3.link' />
                     </Link>)
                 }} />
@@ -96,7 +96,7 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
                 values={{
                   link: (
                     <Link
-                      to={`/${this.props.locale}/auth/sign-up`}
+                      to={'/auth/sign-up'}
                       className='forgot'>
                       <FormattedMessage id='auth.links.signup.link' />
                     </Link>)

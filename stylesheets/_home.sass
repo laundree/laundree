@@ -35,8 +35,10 @@
       +transition(0.1s opacity)
       opacity: 1
     .signUpFormContainer
-      padding: 1em
-
+      padding: 2em 1em
+      > form.blur:before
+        background-color: rgba(247, 247, 247, 0.81)
+        +box-shadow(0 0 0 0.1em rgba(247, 247, 247, 0.81))
     div.title
       width: 20em
       padding: 14em 0 0 1em
@@ -55,10 +57,30 @@
         &:first-of-type
           margin-right: 1em
     .signUpContainer
-      width: 25em
+      max-width: 25em
       position: absolute
+      z-index: 10
       right: 0
       top: 1em
+      input:not([type=submit])
+        +box-shadow(0 0 0 0.1em #e4e4e4)
+      .signUpChooser
+        height: 4em
+        > div
+          &.active
+            background-color: #f7f7f7
+          &:not(.active)
+            &:hover
+              background-color: #dbdbdb
+          background-color: #d0d0d0
+          +transition(0.1s background-color)
+          float: left
+          width: 50%
+          font-weight: bold
+          font-family: "Roboto Condensed", sans-serif
+          line-height: 4em
+          cursor: pointer
+          text-align: center
 
   section.statistics
     padding: 2em 0
@@ -133,7 +155,10 @@
         top: auto
         right: auto
         margin: auto
-        width: 100%
+        max-width: 100%
+        .signUpFormContainer
+          max-width: 23em
+          margin: auto
 
 @media only screen and (max-width: 23em)
   #LandingPage

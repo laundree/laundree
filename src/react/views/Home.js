@@ -1,16 +1,16 @@
 // @flow
 import React from 'react'
-import AdminPanel from '../containers/AdminPanel'
-import CreateLaundry from '../containers/CreateLaundry'
+import AdminPanel from './AdminPanel'
+import CreateLaundry from './CreateLaundry'
 import { Redirect } from 'react-router'
 import type { User } from 'laundree-sdk/lib/redux'
-import type { LocaleType } from '../../locales'
+import { connect } from 'react-redux'
 
-const Home = ({users, currentUser, locale}: { locale: LocaleType, users: { [string]: User }, currentUser: string }) => {
-  const user = users[currentUser]
-  if (user.role === 'admin') return <AdminPanel locale={locale} />
+const Home = ({user}: { user: ?User }) => {
+  if (!user) throw new Error('User not found')
+  if (user.role === 'admin') return <AdminPanel />
   if (!user.laundries.length) return <CreateLaundry />
-  return <Redirect to={`/${locale}/laundries/${user.laundries[0]}/timetable`} />
+  return <Redirect to={`/laundries/${user.laundries[0]}/timetable`} />
 }
 
-export default Home
+export default connect(({users, currentUser}): { user: ?User } => ({user: (currentUser && users[currentUser]) || null}))(Home)

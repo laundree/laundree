@@ -41,7 +41,7 @@ export default class Verification extends ValueUpdater<VerificationValues, { loc
     return <DocumentTitle title='document-title.resend-verification'>
       <div>
         <FormattedMessage id='auth.verification.title' tagName='h1' />
-        <Link to={`/${this.props.locale}/`} id='Logo'>
+        <Link to={'/'} id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo' />
           </svg>
@@ -76,7 +76,7 @@ export default class Verification extends ValueUpdater<VerificationValues, { loc
                 id='auth.links.login2'
                 values={{
                   link: (
-                    <Link to={`/${this.props.locale}/auth`}>
+                    <Link to={'/auth'}>
                       <FormattedMessage id='auth.links.login2.link' />
                     </Link>)
                 }} />
@@ -87,7 +87,7 @@ export default class Verification extends ValueUpdater<VerificationValues, { loc
                 values={{
                   link: (
                     <Link
-                      to={`/${this.props.locale}/auth/sign-up`}
+                      to={'/auth/sign-up'}
                       className='forgot'>
                       <FormattedMessage id='auth.links.signup.link' />
                     </Link>)

@@ -10,8 +10,9 @@ import sdk from '../../client/sdk'
 import moment from 'moment-timezone'
 import { BaseModal } from './modal'
 import Loader from './Loader'
-import type { Machine, User, Booking, Laundry } from 'laundree-sdk/lib/redux'
-import type { LocaleType } from '../../locales'
+import type { Machine, User, Booking, Laundry, State } from 'laundree-sdk/lib/redux'
+import queryString from 'querystring'
+import { connect } from 'react-redux'
 
 class BookingInfo extends React.Component<{
   onActiveChange: Function,
@@ -109,8 +110,7 @@ class BookingInfo extends React.Component<{
 }
 
 type TimetableProps = {
-  currentUser: string,
-  locale: LocaleType,
+  currentUser: ?string,
   offsetDate?: string,
   users: { [string]: User },
   machines: { [string]: Machine },
@@ -173,6 +173,10 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
   }
 
   render () {
+    const currentUser = this.props.currentUser
+    if (!currentUser) {
+      return null
+    }
     const days = this.days()
     const offsetDate = this.offsetDate()
     return <main id='TimeTableMain' ref={this.refPuller}>
@@ -181,7 +185,7 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
         laundry={this.props.laundry} dates={days} machines={this.props.machines} />
       <TimetableTables
         onActiveChange={activeBooking => this.setState({activeBooking})}
-        currentUser={this.props.currentUser}
+        currentUser={currentUser}
         activeBooking={this.state.activeBooking}
         offsetDate={offsetDate}
         onHoverColumn={hoverColumn => this.setState({hoverColumn})}
@@ -190,7 +194,7 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
         laundry={this.props.laundry} dates={days} machines={this.props.machines} />
       <BookingInfo
         onActiveChange={activeBooking => this.setState({activeBooking})}
-        currentUser={this.props.currentUser}
+        currentUser={currentUser}
         users={this.props.users}
         laundry={this.props.laundry}
         offsetDate={offsetDate}
@@ -200,7 +204,7 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
   }
 }
 
-export default class TimetableWrapper extends React.Component<TimetableProps> {
+class TimetableWrapper extends React.Component<TimetableProps> {
   renderEmpty () {
     return <main className='naved'>
       <h1 className='alignLeft'>
@@ -211,7 +215,7 @@ export default class TimetableWrapper extends React.Component<TimetableProps> {
           id='timetable.no-machines.action.register'
           values={{
             link: (
-              <Link to={`/${this.props.locale}/laundries/${this.props.laundry.id}/machines`}>
+              <Link to={`/laundries/${this.props.laundry.id}/machines`}>
                 <FormattedMessage id='timetable.no-machines.action.register.link' />
               </Link>)
           }} />
@@ -226,12 +230,12 @@ export default class TimetableWrapper extends React.Component<TimetableProps> {
   }
 
   isOwner () {
-    return this.props.laundry.owners.indexOf(this.props.currentUser) >= 0
+    const currentUser = this.props.currentUser
+    return currentUser && this.props.laundry.owners.indexOf(currentUser) >= 0
   }
 
   renderTables () {
     return <Timetable
-      locale={this.props.locale}
       users={this.props.users}
       currentUser={this.props.currentUser}
       offsetDate={this.props.offsetDate}
@@ -249,3 +253,8 @@ export default class TimetableWrapper extends React.Component<TimetableProps> {
     </DocumentTitle>
   }
 }
+
+export default connect(({laundries, machines, bookings, currentUser, users}: State, {match: {params: {laundryId}}, location: {search}}): TimetableProps => {
+  const {offsetDate} = queryString.parse(search && search.substr(1))
+  return {laundry: laundries[laundryId], machines, bookings, offsetDate, currentUser, users}
+})(TimetableWrapper)

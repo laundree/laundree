@@ -1,66 +1,59 @@
 // @flow
 import React from 'react'
-import TopNav from './TopNav'
 import { DocumentTitle } from './intl'
 import { Switch, Route } from 'react-router'
-import Support from '../containers/Support'
-import StateCheckRedirectRoute from '../containers/StateCheckRedirectRoute'
+import Support from './Support'
+import StateCheckRedirectRoute from './StateCheckRedirectRoute'
 import NotFound from '../views/NotFound'
-import LeftNav from '../containers/LeftNav'
-import UserSettings from '../containers/UserSettings'
-import Home from '../containers/Home'
+import LeftNav from './LeftNav'
+import UserSettings from './UserSettings'
+import Home from './Home'
 import LandingPage from './LandingPage'
-import type { Location, Match } from 'react-router'
-import type { Laundry, User } from 'laundree-sdk/lib/redux'
-import { localeFromLocation } from '../../locales'
+import type { User, State } from 'laundree-sdk/lib/redux'
+import TopNav from './TopNav'
+import { connect } from 'react-redux'
 
 type BaseAppProps = {
-  location: Location,
-  match: Match,
   children?: *,
-  currentLaundry: string,
-  laundries: { [string]: Laundry },
-  user: User
+  user: ?User
 }
 
-export default (props: BaseAppProps) => {
-  const locale = localeFromLocation(props.location)
+const BaseApp = (props: BaseAppProps) => {
   return (
     <DocumentTitle title='document-title.base'>
       <div>
-        <TopNav
-          user={props.user}
-          locale={locale}
-          location={props.location}
-          currentLaundry={props.currentLaundry}
-          laundries={props.laundries} />
+        <Route component={TopNav} />
         {
           props.user
             ? (
               <Switch>
-                <Route exact path={`/${locale}/`} component={Home} />
+                <Route exact path={'/'} component={Home} />
                 <StateCheckRedirectRoute
-                  test={({currentUser}) => currentUser}
-                  path={`/${locale}/support`}
-                  redirectTo={`/${locale}/`}
+                  test={({currentUser}) => Boolean(currentUser)}
+                  path={'/support'}
+                  redirectTo={'/'}
                   component={Support} />
                 <StateCheckRedirectRoute
-                  test={({currentUser}) => currentUser}
-                  path={`/${locale}/laundries/:laundryId`}
-                  redirectTo={`/${locale}/auth`}
+                  test={({currentUser}) => Boolean(currentUser)}
+                  path={'/laundries/:laundryId'}
+                  redirectTo={'/auth'}
                   component={LeftNav} />
                 <StateCheckRedirectRoute
-                  test={({currentUser}) => currentUser}
-                  path={`/${locale}/users/:userId/settings`}
-                  redirectTo={`/${locale}/auth`}
+                  test={({currentUser}) => Boolean(currentUser)}
+                  path={'/users/:userId/settings'}
+                  redirectTo={'/auth'}
                   component={UserSettings} />
                 <Route component={NotFound} />
               </Switch>
             )
             : (
-              <LandingPage locale={locale} />
+              <LandingPage />
             )
         }
       </div>
     </DocumentTitle>)
 }
+
+export default connect(({users, currentUser}: State): BaseAppProps => ({
+  user: (currentUser && users[currentUser]) || null
+}))(BaseApp)

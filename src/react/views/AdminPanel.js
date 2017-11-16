@@ -6,12 +6,14 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import Switch from './Switch'
 import Debug from 'debug'
-import type {Stats, Laundry, User} from 'laundree-sdk/lib/redux'
+import type { Stats, Laundry, User } from 'laundree-sdk/lib/redux'
 import type { ListOptions } from 'laundree-sdk/lib/sdk'
-import type { LocaleType } from '../../locales'
+import { connect } from 'react-redux'
+import type { State } from '../../../node_modules/laundree-sdk/lib/redux'
+
 const debug = Debug('laundree.react.views.AdminPanel')
 
-class StatsComponent extends React.Component<{stats: Stats}> {
+class StatsComponent extends React.Component<{ stats: ?Stats }> {
 
   componentDidMount () {
     sdk.updateStats()
@@ -77,13 +79,11 @@ class StatsComponent extends React.Component<{stats: Stats}> {
   }
 }
 
-class QueryList<T: { id: string }> extends React.Component<
-  {
-    elements: T[],
-    totalDemo: ?number,
-    locale: LocaleType,
-    total: ?number
-  },
+class QueryList<T: { id: string }> extends React.Component<{
+  elements: T[],
+  totalDemo: ?number,
+  total: ?number
+},
   { loaded: boolean, page: number, q: ? string, demoOn: boolean }> {
 
   limit = 10
@@ -192,7 +192,7 @@ class QueryList<T: { id: string }> extends React.Component<
       </div>
       {this.props.elements.length
         ? <ul className='bigList'>
-          { this.props.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
+          {this.props.elements.map(element => <li key={element.id}>{this.renderElement(element)}</li>)}
         </ul>
         : <div className='bigListMessage'>
           {this.renderEmpty()}
@@ -213,7 +213,7 @@ class LaundryList extends QueryList<Laundry> {
 
   renderElement (l: Laundry) {
     return <div className='name'>
-      <Link to={`/${this.props.locale}/laundries/${l.id}`}>
+      <Link to={`/laundries/${l.id}`}>
         {l.name}
       </Link>
     </div>
@@ -247,7 +247,7 @@ class UserList extends QueryList<User> {
 
   renderElement ({id, photo, displayName}: User) {
     return <div className='name'>
-      <Link to={`/${this.props.locale}/users/${id}/settings`}>
+      <Link to={`/users/${id}/settings`}>
         <img src={photo} className='avatar' />
         {displayName}
       </Link>
@@ -263,24 +263,30 @@ class UserList extends QueryList<User> {
   }
 }
 
-const AdminPanel = ({stats, laundries, users, userList, laundryList, locale}: {
-  stats: Stats,
-  locale: LocaleType,
+type AdminPanelProps = {
+  stats: ?Stats,
   laundries: { [string]: Laundry },
   users: { [string]: User },
   userList: string[],
   laundryList: string[]
-}) => {
+}
+const AdminPanel = ({stats, laundries, users, userList, laundryList}: AdminPanelProps) => {
   const ls: Laundry[] = laundryList.map(id => laundries[id]).filter((l: ?Laundry) => l)
   const us: User[] = userList.map(id => users[id]).filter(u => u)
   return <DocumentTitle title='document-title.administrator-panel'>
     <main id='AdminPanel' className='topNaved'>
       <FormattedMessage id='admin-panel.title' tagName='h1' />
       <StatsComponent stats={stats} />
-      <LaundryList locale={locale} elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
-      <UserList locale={locale} elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
+      <LaundryList elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
+      <UserList elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
     </main>
   </DocumentTitle>
 }
 
-export default AdminPanel
+export default connect(({users, userList, stats, laundries, laundryList}: State, _: {}): AdminPanelProps => ({
+  stats,
+  laundries,
+  users,
+  userList,
+  laundryList
+}))(AdminPanel)

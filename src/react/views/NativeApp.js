@@ -2,10 +2,14 @@
 import React from 'react'
 import sdk from '../../client/sdk'
 import uuid from 'uuid'
-import type { User } from 'laundree-sdk/lib/redux'
+import type { User, State } from 'laundree-sdk/lib/redux'
+import { connect } from 'react-redux'
 
-export default class NativeApp extends React.Component<{currentUser: string, users: {[string]: User}}> {
+type NativeAppProps = { currentUser: ?string, users: { [string]: User } }
+
+class NativeApp extends React.Component<NativeAppProps> {
   _token: ?Promise<{}>
+
   async promisedToken () {
     if (this._token) return this._token
     if (!this.props.currentUser) {
@@ -34,3 +38,7 @@ export default class NativeApp extends React.Component<{currentUser: string, use
     return <div />
   }
 }
+
+export default connect(({users, currentUser}: State): NativeAppProps => ({
+  currentUser, users
+}))(NativeApp)

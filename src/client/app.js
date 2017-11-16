@@ -52,7 +52,7 @@ function setup () {
 
   // $FlowFixMe it is though
   ReactDOM.hydrate(
-    <BrowserRouter>
+    <BrowserRouter basename={`/${locale}`}>
       <App store={store} locale={locale} />
     </BrowserRouter>,
     rootElement)

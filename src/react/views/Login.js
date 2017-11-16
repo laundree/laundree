@@ -5,13 +5,13 @@ import { Link } from 'react-router-dom'
 import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import { FormattedMessage } from 'react-intl'
-import type { Flash } from 'laundree-sdk/lib/redux'
-import type { LocaleType } from '../../locales'
+import type { Flash, State } from 'laundree-sdk/lib/redux'
+import { connect } from 'react-redux'
+import queryString from 'querystring'
 
 type LoginProps = {
   to?: string,
-  flash: Flash[],
-  locale: LocaleType
+  flash: Flash[]
 }
 
 type LoginValues = {
@@ -19,7 +19,7 @@ type LoginValues = {
   password: string
 }
 
-export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
+class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
 
   initialState () {
     return {}
@@ -36,7 +36,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
       <FormattedMessage
         id={message}
         values={{
-          link: <Link to={`/${this.props.locale}/auth/verification`}><FormattedMessage id='auth.error.not-verified.link' /></Link>
+          link: <Link to={'/auth/verification'}><FormattedMessage id='auth.error.not-verified.link' /></Link>
         }} />
     </div>
   }
@@ -50,19 +50,19 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     return <DocumentTitle title='document-title.login'>
       <div>
         <FormattedMessage tagName='h1' id='auth.login.title' />
-        <Link to={`/${this.props.locale}/`} id='Logo'>
+        <Link to={'/'} id='Logo'>
           <svg>
             <use xlinkHref='#MediaLogo' />
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={`/${this.props.locale}/auth/facebook${query}`} className='facebook'>
+          <a href={`/auth/facebook${query}`} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook' />
             </svg>
             <FormattedMessage id='auth.login.method.facebook' />
           </a>
-          <a href={`/${this.props.locale}/auth/google${query}`} className='google'>
+          <a href={`/auth/google${query}`} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus' />
             </svg>
@@ -105,7 +105,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                 id='auth.links.forgot'
                 values={{
                   link: <Link
-                    to={`/${this.props.locale}/auth/forgot`}
+                    to={'/auth/forgot'}
                     className='forgot'>
                     <FormattedMessage id='auth.links.forgot.link' />
                   </Link>
@@ -116,7 +116,7 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
                 id='auth.links.signup'
                 values={{
                   link: <Link
-                    to={`/${this.props.locale}/auth/sign-up`}
+                    to={'/auth/sign-up'}
                     className='forgot'>
                     <FormattedMessage id='auth.links.signup.link' />
                   </Link>
@@ -127,11 +127,11 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
         <div className='notice'>
           <FormattedMessage id='auth.login.notice' values={{
             toc: <a
-              href={`/${this.props.locale}/terms-and-conditions`}
+              href={'/terms-and-conditions'}
               target='_blank'>
               <FormattedMessage id='general.toc' />
             </a>,
-            pp: <a href={`/${this.props.locale}/privacy`} target='_blank'>
+            pp: <a href={'/privacy'} target='_blank'>
               <FormattedMessage id='general.privacy-policy' />
             </a>
           }} />
@@ -140,3 +140,10 @@ export default class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     </DocumentTitle>
   }
 }
+
+export default connect(({flash}: State, {location}): LoginProps => (
+  {
+    flash,
+    to: location && location.search && queryString.parse(location.search.substr(1)).to
+  })
+)(Login)

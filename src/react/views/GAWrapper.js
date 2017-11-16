@@ -1,13 +1,17 @@
 // @flow
 import ReactGA from 'react-ga'
 import React from 'react'
-import type {Location} from 'react-router'
+import type { Location } from 'react-router'
+import type { State } from 'laundree-sdk/lib/redux'
+import { connect } from 'react-redux'
 
-class GAWrapper extends React.Component<{
-  currentUser: string,
-    children: *,
-    location: Location
-}> {
+type GAWrapperProps = {
+  currentUser: ?string,
+  children: *,
+  location: Location
+}
+
+class GAWrapper extends React.Component<GAWrapperProps> {
   log () {
     ReactGA.set({
       userId: this.props.currentUser,
@@ -29,4 +33,4 @@ class GAWrapper extends React.Component<{
   }
 }
 
-export default GAWrapper
+export default connect(({currentUser}: State): { currentUser: ?string } => ({currentUser}))(GAWrapper)

@@ -25,6 +25,7 @@ import inviteCodeRoute from './routes/invite-code'
 import langRoute from './routes/lang'
 import { signUserToken, verifyExpiration } from '../auth'
 import helmet from 'helmet'
+import logoutRoute from './routes/logoutRoute'
 
 const debug = Debug('laundree.app')
 
@@ -75,7 +76,6 @@ passportSetup(app)
 
 // SETUP LOCALE
 app.use(locale(supported))
-app.use('/', langRoute)
 
 app.use(async (req: Request, res: Response, next) => {
   if (!req.user) {
@@ -98,20 +98,22 @@ handlebarsSetup(app).then(() => debug('Partials is setup'), error.logError)
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
-supported.forEach(locale => {
-  app.use(`/${locale}/logout`, (req: Request, res) => {
-    req.logout()
-    req.session.token = undefined
-    res.redirect(`/${locale}/`)
-  })
-  app.use(`/${locale}/auth`, authRoute)
-})
 app.use('/auth', authRoute)
+app.use('/logout', logoutRoute)
 app.use('/s', inviteCodeRoute)
-app.use('/', reactRouter)
+supported.forEach(locale => {
+  const router = express.Router()
+  router.use('/', langRoute(locale))
+  router.use('/s', inviteCodeRoute)
+  router.use('/', reactRouter(locale))
+  app.use(`/${locale}`, router)
+})
+
 app.get('/err', (req: Request, res, next) => {
   next(new Error('This is a test error'))
 })
+
+app.get('/', (req: Request, res) => res.redirect(`/${req.locale || 'en'}`))
 
 app.use(function (req: Request, res, next) {
   next(new error.StatusError('Not found', 404))

@@ -4,30 +4,41 @@ import { sendEmail } from '../../utils/mail'
 import config from 'config'
 import { StatusError } from '../../utils/error'
 
-async function contactF ({currentUser}, params) {
+async function contactF (_, params) {
   const {contactBody} = api.assertSubjects({contactBody: params.contactBody})
   const {message, subject, email, name, locale} = contactBody
-  let template, receiver, sender, userId, senderEmail, senderName
-  if (currentUser) {
-    senderEmail = currentUser.model.emails[0]
-    senderName = currentUser.model.displayName
-    sender = `"${currentUser.model.displayName}" <${senderEmail}>`
-    template = 'support'
-    receiver = config.get('emails.support')
-    userId = currentUser.model.id
-  } else {
-    if (!name) {
-      throw new StatusError('Name is required', 400)
-    }
-    if (!email) {
-      throw new StatusError('E-mail is required', 400)
-    }
-    senderName = name
-    senderEmail = email
-    sender = `"${name}" <${email}>`
-    template = 'contact'
-    receiver = config.get('emails.contact')
+  if (!name) {
+    throw new StatusError('Name is required', 400)
   }
+  if (!email) {
+    throw new StatusError('E-mail is required', 400)
+  }
+  const senderName = name
+  const senderEmail = email
+  const sender = `"${name}" <${email}>`
+  const template = 'contact'
+  const receiver = config.get('emails.contact')
+  await sendEmail({
+    message,
+    subject,
+    email: senderEmail,
+    name: senderName
+  }, template, receiver, {locale: locale || 'en'})
+  await sendEmail({message, subject, name: senderName}, 'contact-receipt', sender, {locale: locale || 'en'})
+}
+
+async function contactSupportF (subjects, params) {
+  const {currentUser, contactSupportBody} = api.assertSubjects({
+    currentUser: subjects.currentUser,
+    contactSupportBody: params.contactSupportBody
+  })
+  const {message, subject, locale} = contactSupportBody
+  const senderEmail = currentUser.model.emails[0]
+  const senderName = currentUser.model.displayName
+  const sender = `"${currentUser.model.displayName}" <${senderEmail}>`
+  const template = 'support'
+  const receiver = config.get('emails.support')
+  const userId = currentUser.model.id
   await sendEmail({
     message,
     subject,
@@ -39,3 +50,4 @@ async function contactF ({currentUser}, params) {
 }
 
 export const contact = api.wrap(contactF, api.securityNoop)
+export const contactSupport = api.wrap(contactSupportF, api.securityNoop)

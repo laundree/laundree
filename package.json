@@ -35,7 +35,7 @@
     "ical-generator": "^0.2.9",
     "jdenticon": "^1.7.2",
     "jsonwebtoken": "^8.0.1",
-    "laundree-sdk": "^0.2.4",
+    "laundree-sdk": "^0.3.0",
     "locale": "^0.1.0",
     "mailgun-js": "^0.13.1",
     "moment": "^2.18.1",
@@ -124,7 +124,7 @@
     "build:client": "webpack --env=prod --progress --profile --colors --config webpack.prod.js",
     "test": "./scripts/test.sh",
     "start:webpack": "webpack-dev-server --hot --config ./webpack.dev.js",
-    "dev": "NODE_ENV=development npm run start:src & NODE_ENV=development npm run start:webpack"
+    "dev": "NODE_ENV=development npm run start:webpack & NODE_ENV=development npm run start:src"
   },
   "repository": {
     "type": "git",
