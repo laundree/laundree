@@ -190,7 +190,8 @@ const Footer = () => (
       position: 'absolute',
       bottom: 0,
       left: 0,
-      right: 0
+      right: 0,
+      borderTop: '0.4em solid #dd8c4d'
     }}>
       <div style={{textAlign: 'center', width: '20em', margin: 'auto', padding: '4em 0', color: '#fff'}}>
         <svg style={{fill: '#fff', height: '3em', width: '12em'}}>
