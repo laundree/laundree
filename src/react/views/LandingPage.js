@@ -181,9 +181,19 @@ const Contact = () => (
 
 const Footer = () => (
   <footer style={{paddingTop: '5em', height: '20em'}}>
-    <div style={{backgroundColor: '#e5944d', height: '20em', position: 'absolute', bottom: 0, left: 0, right: 0}}>
+    <div style={{
+      backgroundImage: 'url(/images/socksbg.svg)',
+      backgroundSize: '10em',
+      backgroundPosition: 'center',
+      backgroundColor: '#e5944d',
+      height: '20em',
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0
+    }}>
       <div style={{textAlign: 'center', width: '20em', margin: 'auto', padding: '4em 0', color: '#fff'}}>
-        <svg style={{fill: '#fff', height: '2em', width: '8em'}}>
+        <svg style={{fill: '#fff', height: '3em', width: '12em'}}>
           <use xlinkHref={'#WhiteLogo'} />
         </svg>
         <p style={{padding: '0.5em 0 1em 0'}}>
