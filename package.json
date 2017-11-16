@@ -34,7 +34,7 @@
     "ical-generator": "^0.2.9",
     "jdenticon": "^1.7.2",
     "jsonwebtoken": "^8.0.1",
-    "laundree-sdk": "^0.2.4",
+    "laundree-sdk": "^0.3.0",
     "locale": "^0.1.0",
     "mailgun-js": "^0.13.1",
     "moment": "^2.18.1",
