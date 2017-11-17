@@ -26,7 +26,10 @@ async function listLaundriesAsync (since, limit, subjects) {
 }
 
 async function createLaundryAsync (subjects, params) {
-  const {currentUser, createLaundryBody} = api.assertSubjects({createLaundryBody: params.createLaundryBody, currentUser: subjects.currentUser})
+  const {currentUser, createLaundryBody} = api.assertSubjects({
+    createLaundryBody: params.createLaundryBody,
+    currentUser: subjects.currentUser
+  })
   const {name, googlePlaceId} = createLaundryBody
   if (currentUser.isDemo()) {
     throw new StatusError('Not allowed', 403)
@@ -108,7 +111,10 @@ function validateRules (body) {
 }
 
 async function updateLaundryAsync (subs, params) {
-  const {updateLaundryBody, laundry} = api.assertSubjects({laundry: subs.laundry, updateLaundryBody: params.updateLaundryBody})
+  const {updateLaundryBody, laundry} = api.assertSubjects({
+    laundry: subs.laundry,
+    updateLaundryBody: params.updateLaundryBody
+  })
   const body = sanitizeBody(updateLaundryBody)
   validateRules(body)
   await validateLaundryName(laundry, body)
@@ -132,7 +138,10 @@ async function deleteLaundryAsync (subs) {
 }
 
 async function inviteUserByEmailAsync (subs, params) {
-  const {laundry, inviteUserByEmailBody} = api.assertSubjects({laundry: subs.laundry, inviteUserByEmailBody: params.inviteUserByEmailBody})
+  const {laundry, inviteUserByEmailBody} = api.assertSubjects({
+    laundry: subs.laundry,
+    inviteUserByEmailBody: params.inviteUserByEmailBody
+  })
   const email = inviteUserByEmailBody.email
   const locale = inviteUserByEmailBody.locale || 'en'
   if (laundry.isDemo()) {
@@ -181,7 +190,10 @@ async function createInviteCodeAsync (subs) {
 }
 
 async function verifyInviteCodeAsync (subs, p) {
-  const {laundry, verifyInviteCodeBody} = api.assertSubjects({laundry: subs.laundry, verifyInviteCodeBody: p.verifyInviteCodeBody})
+  const {laundry, verifyInviteCodeBody} = api.assertSubjects({
+    laundry: subs.laundry,
+    verifyInviteCodeBody: p.verifyInviteCodeBody
+  })
   const result = await laundry.verifyInviteCode(verifyInviteCodeBody.key)
   if (!result) {
     throw new StatusError('Not found', 404)
@@ -216,7 +228,11 @@ async function removeOwnerAsync (subs) {
 }
 
 async function addUserFromCodeAsync (subs, params) {
-  const {addUserFromCodeBody, laundry, currentUser} = api.assertSubjects({addUserFromCodeBody: params.addUserFromCodeBody, laundry: subs.laundry, currentUser: subs.currentUser})
+  const {addUserFromCodeBody, laundry, currentUser} = api.assertSubjects({
+    addUserFromCodeBody: params.addUserFromCodeBody,
+    laundry: subs.laundry,
+    currentUser: subs.currentUser
+  })
   const {key} = addUserFromCodeBody
   const result = await laundry.verifyInviteCode(key)
   if (!result) {
@@ -225,6 +241,11 @@ async function addUserFromCodeAsync (subs, params) {
   await laundry.addUser(currentUser)
 }
 
+async function createLaundryWithUserBodyF () {
+  // TODO implement + test
+}
+
+export const createLaundryWithUserBody = api.wrap(createLaundryWithUserBodyF, api.securityNoop)
 export const addUserFromCode = api.wrap(addUserFromCodeAsync, api.securityUserAccess)
 export const createDemoLaundry = api.wrap(createDemoLaundryAsync, api.securityNoop)
 export const inviteUserByEmail = api.wrap(inviteUserByEmailAsync, api.securityLaundryOwner, api.securityAdministrator)

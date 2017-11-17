@@ -102,9 +102,8 @@
   "scripts": {
     "test:flow": "flow .",
     "test:lint": "eslint .",
-    "test:unit": "mocha --exit --require babel-register test/**/*.spec.js",
-    "test:unit-covered": "nyc --reporter=lcov --require babel-register mocha test/**/*.spec.js",
-    "test:nightwatch": "babel-node scripts/run-nightwatch.js",
+    "test:unit": "NODE_ENV=test mocha --exit --require babel-register test/**/*.spec.js",
+    "test:nightwatch": "NODE_ENV=test babel-node scripts/run-nightwatch.js",
     "start:lib": "node lib",
     "start:lib:web": "node lib/web",
     "start:lib:api": "node lib/api",
