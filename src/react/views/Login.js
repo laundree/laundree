@@ -7,10 +7,8 @@ import ValueUpdater from './helpers/ValueUpdater'
 import { FormattedMessage } from 'react-intl'
 import type { Flash, State } from 'laundree-sdk/lib/redux'
 import { connect } from 'react-redux'
-import queryString from 'querystring'
 
 type LoginProps = {
-  to?: string,
   flash: Flash[]
 }
 
@@ -41,12 +39,7 @@ class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
     </div>
   }
 
-  query () {
-    return this.props.to ? `?to=${encodeURIComponent(this.props.to)}` : ''
-  }
-
   render () {
-    const query = this.query()
     return <DocumentTitle title='document-title.login'>
       <div>
         <FormattedMessage tagName='h1' id='auth.login.title' />
@@ -56,13 +49,13 @@ class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
           </svg>
         </Link>
         <div className='auth_alternatives'>
-          <a href={`/auth/facebook${query}`} className='facebook'>
+          <a href={'/auth/facebook'} className='facebook'>
             <svg>
               <use xlinkHref='#Facebook' />
             </svg>
             <FormattedMessage id='auth.login.method.facebook' />
           </a>
-          <a href={`/auth/google${query}`} className='google'>
+          <a href={'/auth/google'} className='google'>
             <svg>
               <use xlinkHref='#GooglePlus' />
             </svg>
@@ -72,7 +65,7 @@ class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
         <div className='or'>
           <FormattedMessage id='general.or' />
         </div>
-        <ValidationForm id='SignIn' method='post' action={'/auth/local' + query}>
+        <ValidationForm id='SignIn' method='post' action={'/auth/local'}>
           {this.handleNotion()}
           <ValidationElement email trim value={this.state.values.email || ''}>
             <Label
@@ -142,8 +135,5 @@ class Login extends ValueUpdater<LoginValues, LoginProps, {}> {
 }
 
 export default connect(({flash}: State, {location}): LoginProps => (
-  {
-    flash,
-    to: location && location.search && queryString.parse(location.search.substr(1)).to
-  })
+  {flash})
 )(Login)

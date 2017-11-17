@@ -28,15 +28,15 @@ router.get('/verify', async (req: Request, res) => {
   return res.redirect(`/${locale}/auth/`)
 })
 
-function findRedirect (req: Request): { to: string, errorTo?: string } {
-  const {mode, to} = req.query
+function findRedirect (req: Request): { to?: string, errorTo?: string } {
+  const {mode} = req.query
   switch (mode) {
     case 'native-app':
       return {to: '/native-app', errorTo: '/native-app'}
     case 'native-app-v2':
       return {to: '/native-app-v2', errorTo: '/native-app-v2'}
     default:
-      return {to: to ? decodeURIComponent(to) : '/'}
+      return {}
   }
 }
 
