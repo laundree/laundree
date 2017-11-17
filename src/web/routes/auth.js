@@ -29,12 +29,17 @@ router.get('/verify', async (req: Request, res) => {
 })
 
 function findRedirect (req: Request): { to?: string, errorTo?: string } {
-  const {mode} = req.query
+  const {mode, key, laundryId} = req.query
   switch (mode) {
     case 'native-app':
       return {to: '/native-app', errorTo: '/native-app'}
     case 'native-app-v2':
       return {to: '/native-app-v2', errorTo: '/native-app-v2'}
+    case 'laundry':
+      if (!key || !laundryId) {
+        return {}
+      }
+      return ({to: `/s/${encodeURIComponent(laundryId)}/${encodeURIComponent(key)}`, errorTo: `/${req.locale || 'en'}/laundries/${encodeURIComponent(laundryId)}/${encodeURIComponent(key)}`})
     default:
       return {}
   }
@@ -80,8 +85,8 @@ setupCallback(router, 'google')
 
 router.post('/local', function (req: Request) {
   passport.authenticate('local', {
-    failureRedirect: `${req.baseUrl}`,
-    successRedirect: findRedirect(req).to,
+    failureRedirect: `/${req.locale || 'en'}/auth`,
+    successRedirect: findRedirect(req).to || '/',
     failureFlash: true
   }).apply(null, arguments)
 })
