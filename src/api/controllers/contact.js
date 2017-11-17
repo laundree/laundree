@@ -2,17 +2,10 @@
 import * as api from '../helper'
 import { sendEmail } from '../../utils/mail'
 import config from 'config'
-import { StatusError } from '../../utils/error'
 
 async function contactF (_, params) {
   const {contactBody} = api.assertSubjects({contactBody: params.contactBody})
   const {message, subject, email, name, locale} = contactBody
-  if (!name) {
-    throw new StatusError('Name is required', 400)
-  }
-  if (!email) {
-    throw new StatusError('E-mail is required', 400)
-  }
   const senderName = name
   const senderEmail = email
   const sender = `"${name}" <${email}>`
