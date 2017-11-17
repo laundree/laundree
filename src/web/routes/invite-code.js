@@ -12,11 +12,14 @@ const notFoundError = new error.StatusError('Not found', 404)
 
 router.get('/:laundryId/:id', async (req: Request, res, next) => {
   const {id, laundryId} = req.params
+  const locale = req.locale || 'en'
   if (!base64UrlSafe.validate(id) || !base64UrlSafe.validate(laundryId)) {
     return next(notFoundError)
   }
   const user = req.user
-  if (!user) return res.redirect(`/auth?to=${encodeURIComponent(req.originalUrl)}`)
+  if (!user) {
+    return res.redirect(`/${locale}/auth/laundries/${laundryId}/${id}`)
+  }
   if (user.demo) {
     return next(notFoundError)
   }
@@ -25,7 +28,7 @@ router.get('/:laundryId/:id', async (req: Request, res, next) => {
     const laundry = await sdk.api.laundry.get(laundryIdHex)
     await sdk.api.laundry.verifyInviteCode(laundry.id, {key: id})
     await sdk.api.laundry.addUser(laundry.id, user.id)
-    res.redirect(`/laundries/${laundry.id}`)
+    res.redirect(`/${locale}/laundries/${laundry.id}`)
   } catch (err) {
     next()
   }
