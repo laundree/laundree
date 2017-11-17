@@ -181,6 +181,16 @@ async function createTokenF (subjects, params) {
   return token.toSecretRest()
 }
 
+async function createUserWithNewLaundryF () {
+  // TODO implement + test
+}
+
+async function createUserWithLaundryF () {
+  // TODO implement + test
+}
+
+export const createUserWithNewLaundry = api.wrap(createUserWithNewLaundryF, api.securityNoop)
+export const createUserWithLaundry = api.wrap(createUserWithLaundryF, api.securityNoop)
 export const getUser = api.wrap(getUserF, api.securityNoop)
 export const listUsers = api.wrap(api.paginate(listUsersF), api.securityNoop)
 export const createUser = api.wrap(createUserF, api.securityNoop)

@@ -241,11 +241,6 @@ async function addUserFromCodeAsync (subs, params) {
   await laundry.addUser(currentUser)
 }
 
-async function createLaundryWithUserBodyF () {
-  // TODO implement + test
-}
-
-export const createLaundryWithUserBody = api.wrap(createLaundryWithUserBodyF, api.securityNoop)
 export const addUserFromCode = api.wrap(addUserFromCodeAsync, api.securityUserAccess)
 export const createDemoLaundry = api.wrap(createDemoLaundryAsync, api.securityNoop)
 export const inviteUserByEmail = api.wrap(inviteUserByEmailAsync, api.securityLaundryOwner, api.securityAdministrator)
