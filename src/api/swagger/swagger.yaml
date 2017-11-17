@@ -106,6 +106,100 @@ paths:
           description: Error
           schema:
             $ref: "#/definitions/Error"
+  /users/with-new-laundry:
+    post:
+      tags:
+        - Laundries
+        - Users
+      security: []
+      description: Create a laundry and user
+      operationId: createUserWithNewLaundry
+      parameters:
+        - name: createUserWithNewLaundryBody
+          in: body
+          schema:
+            required:
+              - name
+              - googlePlaceId
+              - displayName
+              - email
+              - password
+            properties:
+              displayName:
+                $ref: "#/definitions/nonEmpty"
+              email:
+                type: string
+                format: email
+              password:
+                $ref: "#/definitions/password"
+              name:
+                $ref: "#/definitions/name"
+              googlePlaceId:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/LaundryAndUser"
+        "409":
+          description: Conflict
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
+  /users/with-laundry:
+    post:
+      tags:
+        - Laundries
+        - Users
+      security: []
+      description: Create user and attach a laundry
+      operationId: createUserWithLaundry
+      parameters:
+        - name: createUserWithLaundryBody
+          in: body
+          schema:
+            required:
+              - laundryId
+              - key
+              - displayName
+              - email
+              - password
+            properties:
+              displayName:
+                $ref: "#/definitions/nonEmpty"
+              email:
+                type: string
+                format: email
+              password:
+                $ref: "#/definitions/password"
+              laundryId:
+                type: string
+              key:
+                type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/LaundryAndUser"
+        "409":
+          description: Conflict
+          schema:
+            $ref: "#/definitions/Error"
+        "403":
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/Error"
   /users/profile:
     x-swagger-router-controller: users
     post:
@@ -849,53 +943,6 @@ paths:
           description: Success
           schema:
             $ref: "#/definitions/Laundry"
-        "409":
-          description: Conflict
-          schema:
-            $ref: "#/definitions/Error"
-        "403":
-          description: Unauthorized
-          schema:
-            $ref: "#/definitions/Error"
-        default:
-          description: Error
-          schema:
-            $ref: "#/definitions/Error"
-  /laundries/with-user:
-    post:
-      tags:
-        - Laundries
-        - Users
-      security: []
-      description: Create a laundry and user
-      operationId: createLaundryWithUser
-      parameters:
-        - name: createLaundryWithUserBody
-          in: body
-          schema:
-            required:
-              - name
-              - googlePlaceId
-              - displayName
-              - email
-              - password
-            properties:
-              displayName:
-                $ref: "#/definitions/nonEmpty"
-              email:
-                type: string
-                format: email
-              password:
-                $ref: "#/definitions/password"
-              name:
-                $ref: "#/definitions/name"
-              googlePlaceId:
-                type: string
-      responses:
-        "200":
-          description: Success
-          schema:
-            $ref: "#/definitions/LaundryAndUser"
         "409":
           description: Conflict
           schema:
