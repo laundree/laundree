@@ -13,18 +13,19 @@ router.get('/verify', async (req: Request, res) => {
   const user = req.query.user
   const token = req.query.token
   const email = req.query.email
+  const locale = req.locale || 'en'
   if (!user || !token || !email) {
     req.flash('error', INVALID_VERIFICATION_LINK)
-    return res.redirect(req.baseUrl + '/')
+    return res.redirect(`/${locale}/auth/`)
   }
   try {
     await sdk.api.user.verifyEmail(user, {email, token})
   } catch (err) {
     req.flash('error', INVALID_VERIFICATION_LINK)
-    return res.redirect(req.baseUrl + '/')
+    return res.redirect(`/${locale}/auth/`)
   }
   req.flash('success', EMAIL_VERIFIED)
-  return res.redirect(req.baseUrl + '/')
+  return res.redirect(`/${locale}/auth/`)
 })
 
 function findRedirect (req: Request): { to: string, errorTo?: string } {
