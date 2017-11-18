@@ -6,6 +6,7 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, Submit, DocumentTitle } from './intl'
 import LocationSelector from './LocationSelector'
+import { signUpStore } from '../../client/store'
 
 type CreateLaundryState = {
   createExpanded: boolean,
@@ -14,7 +15,7 @@ type CreateLaundryState = {
 }
 type CreateLaundryFormValues = { name: string, placeId: string }
 
-export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaundryState> {
+class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaundryState> {
 
   initialValues () {
     return {name: '', placeId: ''}
@@ -60,7 +61,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     return {success: false, message}
   }
 
-  valueUpdaterPlaceId:(string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
+  valueUpdaterPlaceId: (string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
 
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
@@ -101,5 +102,25 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
         </section>
       </main>
     </DocumentTitle>
+  }
+}
+
+export default class CreateLaundryWrapper extends React.Component<{}, { signUp?: { email: string, laundryId: string, key: string } }> {
+  state = {}
+
+  componentDidMount () {
+    const signUp = signUpStore.get()
+    if (!signUp) {
+      return
+    }
+    this.setState({signUp})
+  }
+
+  render () {
+    return (
+      this.state.signUp
+        ? <pre>{JSON.stringify(this.state.signUp, null, 2)}</pre>
+        : <CreateLaundry />
+    )
   }
 }

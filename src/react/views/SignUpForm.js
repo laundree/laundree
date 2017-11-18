@@ -9,6 +9,9 @@ import { Input, Label, Submit } from './intl'
 import LocationSelector from './LocationSelector'
 import { connect } from 'react-redux'
 import type { StateAddendum } from './types'
+import Debug from 'debug'
+
+const debug = Debug('laundree.react.views.signupform')
 
 type SignUpState = {
   loading: boolean,
@@ -39,7 +42,7 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
   }
 
   initialValues () {
-    return {name: '', email: '', password: '', password2: ''}
+    return {name: '', email: '', password: '', password2: '', placeId: '', laundryName: ''}
   }
 
   componentWillReceiveProps ({createLaundry}) {
@@ -61,11 +64,13 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
           locale: this.props.locale
         }
       )
+      this.props.onSignUp && this.props.onSignUp(this.state.values)
       this.reset({
         loading: false,
         notion: {message: <FormattedMessage id='auth.signup.success' />, success: true}
       })
     } catch (err) {
+      debug('Something went wrong when creating user', err)
       this.setState({
         loading: false,
         notion: {

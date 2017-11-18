@@ -8,7 +8,7 @@ import qs from 'querystring'
 import SignUpForm from './SignUpForm'
 import SocialButton from './SocialButton'
 import { Link } from 'react-router-dom'
-import { signUpStore } from '../../client'
+import { signUpStore } from '../../client/store'
 
 export default ({match, location}: { match: Match, location: Location }) => {
   const {laundryId, key} = match.params
