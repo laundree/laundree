@@ -483,7 +483,7 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
    * @returns {Promise.<string>}
    */
   createInviteCode () {
-    return generateBase64UrlSafeCode(6)
+    return generateBase64UrlSafeCode(16)
       .then(code => hashPassword(code)
         .then(hash => {
           this.model.signUpCodes.push(hash)

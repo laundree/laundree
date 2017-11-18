@@ -37,7 +37,7 @@ export function comparePassword (password: string, hash: string): Promise<boolea
  * @return {Promise.<string>}
  */
 export function generateToken (): Promise<string> {
-  return new Promise((resolve, reject) => crypto.randomBytes(20, (err, buffer) => {
+  return new Promise((resolve, reject) => crypto.randomBytes(32, (err, buffer) => {
     if (err) return reject(err)
     resolve(buffer.toString('hex'))
   }))

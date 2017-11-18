@@ -6,9 +6,10 @@ import SignUp from './SignUp'
 import Reset from './Reset'
 import Verification from './Verification'
 import Login from './Login'
-import LaundryAuth from './LaundryAuth'
 import NotFound from './NotFound'
 import { Switch, Route } from 'react-router'
+import AuthLaundrySignUp from './AuthLaundrySignUp'
+import AuthLaundryLogin from './AuthLaundryLogin'
 
 const Auth = ({children}: { children: * }) => (
   <div>
@@ -24,7 +25,8 @@ const Auth = ({children}: { children: * }) => (
           <Route path={'/auth/sign-up'} component={SignUp} />
           <Route path={'/auth/reset'} component={Reset} />
           <Route path={'/auth/verification'} component={Verification} />
-          <Route path={'/auth/laundries/:laundryId/:key'} component={LaundryAuth}/>
+          <Route path={'/auth/laundries/:laundryId/:key'} exact component={AuthLaundrySignUp}/>
+          <Route path={'/auth/laundries/:laundryId/:key/login'} component={AuthLaundryLogin}/>
           <Route component={NotFound} />
         </Switch>
       </section>

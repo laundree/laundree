@@ -16,21 +16,24 @@ router.get('/:laundryId/:id', async (req: Request, res, next) => {
   if (!base64UrlSafe.validate(id) || !base64UrlSafe.validate(laundryId)) {
     return next(notFoundError)
   }
+  const laundryIdHex = shortIdToLong(laundryId)
+  const laundry = await sdk.api.laundry.get(laundryIdHex).catch(() => null)
+  if (!laundry) {
+    return next(notFoundError)
+  }
   const user = req.user
   if (!user) {
-    return res.redirect(`/${locale}/auth/laundries/${laundryId}/${id}`)
+    return res.redirect(`/${locale}/auth/laundries/${laundryId}/${id}/?laundryName=${encodeURIComponent(laundry.name)}`)
   }
   if (user.demo) {
     return next(notFoundError)
   }
-  const laundryIdHex = shortIdToLong(laundryId)
   try {
-    const laundry = await sdk.api.laundry.get(laundryIdHex)
     await sdk.api.laundry.verifyInviteCode(laundry.id, {key: id})
     await sdk.api.laundry.addUser(laundry.id, user.id)
     res.redirect(`/${locale}/laundries/${laundry.id}`)
   } catch (err) {
-    next()
+    next(err)
   }
 })
 

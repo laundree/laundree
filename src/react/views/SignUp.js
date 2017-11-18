@@ -4,6 +4,7 @@ import { DocumentTitle } from './intl'
 import { Link } from 'react-router-dom'
 import { FormattedMessage } from 'react-intl'
 import SignUpForm from './SignUpForm'
+import SocialButton from './SocialButton'
 
 export default () => (
   <DocumentTitle title='document-title.signup'>
@@ -15,18 +16,8 @@ export default () => (
         </svg>
       </Link>
       <div className='auth_alternatives'>
-        <a href={'/auth/facebook'} className='facebook'>
-          <svg>
-            <use xlinkHref='#Facebook' />
-          </svg>
-          <FormattedMessage id='auth.signup.method.facebook' />
-        </a>
-        <a href={'/auth/google'} className='google'>
-          <svg>
-            <use xlinkHref='#GooglePlus' />
-          </svg>
-          <FormattedMessage id='auth.signup.method.google' />
-        </a>
+        <SocialButton type={'facebook'} signUp/>
+        <SocialButton type={'google'} signUp/>
       </div>
       <div className='or'>
         <FormattedMessage id='general.or' />
