@@ -68,10 +68,12 @@
         height: 4em
         > div
           &.active
+            border-color: transparent
             background-color: #f7f7f7
           &:not(.active)
             &:hover
               background-color: #dbdbdb
+          border-bottom: 0.1em solid #aaa
           background-color: #d0d0d0
           +transition(0.1s background-color)
           float: left

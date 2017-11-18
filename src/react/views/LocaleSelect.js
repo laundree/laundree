@@ -24,7 +24,7 @@ const LocaleSelect = ({locale}: LocaleSelectType) => {
               <li key={l} className={locale === l ? 'active' : ''}>
                 <DropDownCloser>
                   <a
-                    href={`/${l}${location.pathname}`}
+                    href={`/${l}${location.pathname}${location.search}`}
                     className='link'>{locales.names[l]}</a>
                 </DropDownCloser>
               </li>))}

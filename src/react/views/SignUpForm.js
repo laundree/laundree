@@ -14,12 +14,7 @@ type SignUpState = {
   loading: boolean,
   sesh: number
 }
-type SignUpProps = {
-  locale: LocaleType,
-  createLaundry: boolean,
-  locale: LocaleType,
-  googleApiKey: string
-}
+
 type SignUpValues = {
   name: string,
   email: string,
@@ -27,6 +22,14 @@ type SignUpValues = {
   password2: string,
   placeId: string,
   laundryName: string
+}
+
+type SignUpProps = {
+  locale: LocaleType,
+  createLaundry: boolean,
+  onSignUp?: (v: SignUpValues) => *,
+  locale: LocaleType,
+  googleApiKey: string
 }
 
 class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
