@@ -6,8 +6,7 @@ import { DocumentTitle, Modal, Label, Input, Submit } from './intl'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
-import type { Machine, Laundry, User } from 'laundree-sdk/lib/redux'
-import type { State } from 'laundree-sdk/lib/redux'
+import type { State, Machine, Laundry, User } from 'laundree-sdk/lib/redux'
 import { connect } from 'react-redux'
 
 class MachineDropdown extends React.Component<{
