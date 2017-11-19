@@ -6,10 +6,9 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import Switch from './Switch'
 import Debug from 'debug'
-import type { Stats, Laundry, User } from 'laundree-sdk/lib/redux'
+import type { Stats, Laundry, User, State } from 'laundree-sdk/lib/redux'
 import type { ListOptions } from 'laundree-sdk/lib/sdk'
 import { connect } from 'react-redux'
-import type { State } from '../../../node_modules/laundree-sdk/lib/redux'
 
 const debug = Debug('laundree.react.views.AdminPanel')
 

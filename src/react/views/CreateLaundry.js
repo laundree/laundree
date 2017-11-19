@@ -60,7 +60,7 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     return {success: false, message}
   }
 
-  valueUpdaterPlaceId: (string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
+  valueUpdaterPlaceId: (s: string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
 
   render () {
     return <DocumentTitle title='document-title.create-laundry'>
