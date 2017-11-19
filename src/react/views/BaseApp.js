@@ -12,6 +12,7 @@ import LandingPage from './LandingPage'
 import type { User, State } from 'laundree-sdk/lib/redux'
 import TopNav from './TopNav'
 import { connect } from 'react-redux'
+import LaundryAdder from './LaundryAdder'
 
 type BaseAppProps = {
   children?: *,
@@ -22,6 +23,7 @@ const BaseApp = (props: BaseAppProps) => {
   return (
     <DocumentTitle title='document-title.base'>
       <div>
+        {props.user ? <LaundryAdder /> : null}
         <Route component={TopNav} />
         {
           props.user
