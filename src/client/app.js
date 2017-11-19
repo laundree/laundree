@@ -40,7 +40,6 @@ function setupStore () {
 function setup () {
   const rootElement = document.querySelector('#AppRoot')
   if (!rootElement) return
-  rootElement.innerHTML = '' // TODO fix
   const store = setupStore()
   const state: State = store.getState()
   const locale = toLocale(state.config.locale || '', 'en')
