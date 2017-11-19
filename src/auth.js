@@ -75,7 +75,7 @@ export function verifyExpiration (token: string | Payload, maxAge: number): bool
   return Math.min(token.exp, token.iat + maxAge) > nowInSeconds
 }
 
-export async function signUserToken (userId: string, iss: Issuer, aud: Audience | Audience[], exp: number): Promise<string> {
+export async function signUserToken (userId: string, iss: Issuer, aud: Audience | Audience[], exp: number = Math.floor(Date.now() / 1000) + 7 * 24 * 60 * 60): Promise<string> {
   return sign({
     iss,
     iat: Math.ceil(Date.now() / 1000),

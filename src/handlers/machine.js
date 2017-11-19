@@ -9,6 +9,7 @@ import type UserHandler from './user'
 import type {Machine} from 'laundree-sdk/lib/redux'
 import type {Machine as RestMachine} from 'laundree-sdk/lib/sdk'
 import type { ObjectId } from 'mongoose'
+import config from 'config'
 
 class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, RestMachine, *> {
 
@@ -29,6 +30,8 @@ class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, RestMa
 
 }
 
+const restUrlPrefix = `${config.get('api.base')}/machines/`
+
 export default class MachineHandler extends Handler<MachineModel, Machine, RestMachine> {
   static lib = new MachineHandlerLibrary()
   lib = MachineHandler.lib
@@ -36,12 +39,12 @@ export default class MachineHandler extends Handler<MachineModel, Machine, RestM
 
   static restSummary (i: ObjectId | MachineHandler) {
     const id = Handler.handlerOrObjectIdToString(i)
-    return {id, href: '/api/machines/' + id}
+    return {id, href: restUrlPrefix + id}
   }
 
   constructor (model: MachineModel) {
     super(model)
-    this.restUrl = `/machines/${this.model.id}`
+    this.restUrl = restUrlPrefix + this.model.id
   }
 
   /**

@@ -3,6 +3,8 @@ import React from 'react'
 import { FormattedMessage } from 'react-intl'
 import SignUpUserForm from './SignUpForm'
 import ContactForm from './ContactForm'
+import { connect } from 'react-redux'
+import type { StateAddendum } from './types'
 
 class SignUpForm extends React.Component<{}, { choice: 'laundry' | 'user' }> {
   state = {choice: 'laundry'}
@@ -85,7 +87,7 @@ const IntroSection = () => (
   </section>
 )
 
-const Statistics = () => (
+const Statistics = ({userCount, bookingCount}: { userCount: number, bookingCount: number }) => (
   <section className='statistics'>
     <div className='container'>
       <div className='stat'>
@@ -94,7 +96,7 @@ const Statistics = () => (
             <use xlinkHref='#AvatarUsers' />
           </svg>
           <span>
-          300
+            {userCount}
         </span>
         </div>
         <div className='subTitle'>
@@ -107,7 +109,7 @@ const Statistics = () => (
             <use xlinkHref='#Calendar' />
           </svg>
           <span>
-          5172
+            {bookingCount}
         </span>
         </div>
         <div className='subTitle'>
@@ -218,13 +220,16 @@ const Footer = () => (
     </div>
   </footer>
 )
+type LandingPageProps = { userCount: number, bookingCount: number }
 
-export default () => (
+const LandingPage = (p: LandingPageProps) => (
   <main id='LandingPage'>
     <IntroSection />
-    <Statistics />
+    <Statistics {...p} />
     <About />
     <Contact />
     <Footer />
   </main>
 )
+
+export default connect(({config: {statistics}}: StateAddendum): LandingPageProps => statistics)(LandingPage)

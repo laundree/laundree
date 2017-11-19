@@ -8,8 +8,9 @@ import type UserHandler from './user'
 import type { QueryOptions, QueryConditions, ObjectId } from 'mongoose'
 import MachineHandler from './machine'
 import LaundryHandler from './laundry'
-import type {Booking} from 'laundree-sdk/lib/redux'
-import type {Booking as RestBooking} from 'laundree-sdk/lib/sdk'
+import type { Booking } from 'laundree-sdk/lib/redux'
+import type { Booking as RestBooking } from 'laundree-sdk/lib/sdk'
+import config from 'config'
 
 class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, RestBooking, *> {
 
@@ -97,10 +98,12 @@ class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, RestBo
   }
 }
 
+const restUrlPrefix = `${config.get('api.base')}/bookings/`
+
 export default class BookingHandler extends Handler<BookingModel, Booking, RestBooking> {
   static restSummary (i: ObjectId | BookingHandler) {
     const id = Handler.handlerOrObjectIdToString(i)
-    return {id, href: '/api/bookings/' + id}
+    return {id, href: restUrlPrefix + id}
   }
 
   static lib = new BookingHandlerLibrary()
@@ -122,7 +125,7 @@ export default class BookingHandler extends Handler<BookingModel, Booking, RestB
 
   constructor (model: BookingModel) {
     super(model)
-    this.restUrl = `/api/bookings/${this.model.id}`
+    this.restUrl = restUrlPrefix + this.model.id
   }
 
   async _updateNotification (playerIds: string[]) {

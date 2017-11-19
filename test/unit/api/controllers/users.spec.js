@@ -4,12 +4,15 @@ import request from 'supertest'
 import promisedApp from '../../../../test_target/api/app'
 import * as dbUtils from '../../../db_utils'
 import UserHandler from '../../../../test_target/handlers/user'
+import LaundryHandler from '../../../../test_target/handlers/laundry'
 import TokenHandler from '../../../../test_target/handlers/token'
 import UserModel from '../../../../test_target/db/models/user'
 import assert from 'assert'
 import { signAppToken } from '../../../../test_target/auth'
+import faker from 'faker'
 
 let app
+const googlePlaceId = 'ChIJs4G9sJQ_TEYRHG0LNOr0w-I'
 describe('controllers', function () {
   beforeEach(async () => {
     await dbUtils.clearDb()
@@ -505,6 +508,114 @@ describe('controllers', function () {
           .set('Accept', 'application/json')
           .expect('Content-Type', /json/)
           .expect(400))
+    })
+
+    describe('POST /users/with-laundry', () => {
+      it('should succeed with right body', async () => {
+        const res = await request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: 'Bob Bobbesen',
+            email: 'bob@example.com',
+            password: 'password1234',
+            name: faker.company.companyName(),
+            googlePlaceId
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(200)
+        const {user, laundry} = res.body
+        assert(user)
+        assert(laundry)
+        assert(await UserHandler.lib.findFromId(user.id))
+        assert(await LaundryHandler.lib.findFromId(laundry.id))
+      })
+      it('should fail on invalid email', async () => {
+        await request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: 'Bob Bobbesen',
+            email: 'bobexample.com',
+            password: 'password1234',
+            name: faker.company.companyName(),
+            googlePlaceId
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400)
+      })
+      it('should fail on invalid name in body', () =>
+        request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: '',
+            email: 'a@example.com',
+            password: 'password1234',
+            name: faker.company.companyName(),
+            googlePlaceId
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400))
+
+      it('should fail on invalid password in body', () =>
+        request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: 'Bob',
+            email: 'a@example.com',
+            password: 'asdfg',
+            name: faker.company.companyName(),
+            googlePlaceId
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400))
+
+      it('should fail on invalid google place id', () =>
+        request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: 'Bob',
+            email: 'a@example.com',
+            password: 'asdfg',
+            name: faker.company.companyName(),
+            googlePlaceId: 'foobar'
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(400))
+
+      it('should fail on duplicate email', async () => {
+        const [user] = await dbUtils.populateUsers(1)
+        await request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: 'Bob',
+            email: user.model.emails[0],
+            password: 'password1234',
+            name: faker.company.companyName(),
+            googlePlaceId
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(409)
+      })
+      it('should fail on duplicate laundry', async () => {
+        const {laundry} = await dbUtils.populateLaundries(1)
+        await request(app)
+          .post('/users/with-laundry')
+          .send({
+            displayName: 'Bob',
+            email: faker.internet.email(),
+            password: 'password1234',
+            name: laundry.model.name,
+            googlePlaceId
+          })
+          .set('Accept', 'application/json')
+          .expect('Content-Type', /json/)
+          .expect(409)
+      })
     })
     describe('GET /users/{id}/emails', () => {
       it('should succeed on self', () => dbUtils

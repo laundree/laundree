@@ -120,7 +120,7 @@ class UserHandlerLibrary extends HandlerLibrary<User, UserModel, RestUser, *> {
    * @param {String} password
    * @returns {Promise.<UserHandler>}
    */
-  async createUserWithPassword (displayName: string, email: string, password: string) {
+  async createUserWithPassword (displayName: string, email: string, password: string): Promise<?UserHandler> {
     displayName = displayName.split(' ').filter((name) => name.length).join(' ')
 
     const profile = {
@@ -193,6 +193,7 @@ function displayNameToName (displayName) {
 /**
  * @typedef {{provider: string, id: string, displayName: string, name: {familyName: string=, middleName: string=, givenName: string=}, emails: {value: string, type: string=}[], photos: {value: string}[]=}} Profile
  */
+const restUrlPrefix = `${config.get('api.base')}/users/`
 
 export default class UserHandler extends Handler<UserModel, User, RestUser> {
   static lib = new UserHandlerLibrary()
@@ -200,7 +201,7 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
 
   static restSummary (i: ObjectId | UserHandler) {
     const id = Handler.handlerOrObjectIdToString(i)
-    return {id, href: '/api/users/' + id.toString()}
+    return {id, href: restUrlPrefix + id.toString()}
   }
 
   updateActions = [
@@ -547,7 +548,7 @@ export default class UserHandler extends Handler<UserModel, User, RestUser> {
     return date
   }
 
-  restUrl = `/api/users/${this.model.id}`
+  restUrl = `/users/${this.model.id}`
 
   photo (): ?string {
     const profile = this.model.latestProfile

@@ -20,7 +20,7 @@ describe('utils', () => {
     })
     describe('generateToken', () => {
       it('should generate hex string', async () => {
-        assert((await password.generateToken()).match(/^[a-f0-9]{40}$/))
+        assert((await password.generateToken()).match(/^[a-f0-9]{64}$/))
       })
     })
   })

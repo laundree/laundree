@@ -7,6 +7,7 @@ import type { TokenType } from '../db/models/token'
 import UserHandler from './user'
 import type { QueryConditions, ObjectId } from 'mongoose'
 import type { Token as RestToken, TokenWithSecret as RestTokenWithSecret } from 'laundree-sdk/lib/sdk'
+import config from 'config'
 
 class TokenHandlerLibrary extends HandlerLibrary<{}, TokenModel, RestToken, *> {
 
@@ -60,10 +61,12 @@ class TokenHandlerLibrary extends HandlerLibrary<{}, TokenModel, RestToken, *> {
 
 }
 
+const restUrlPrefix = `${config.get('api.base')}/tokens/`
+
 export default class TokenHandler extends Handler<TokenModel, *, RestToken> {
   static restSummary (i: ObjectId | TokenHandler) {
     const id = Handler.handlerOrObjectIdToString(i)
-    return {id, href: '/api/tokens/' + id}
+    return {id, href: restUrlPrefix + id}
   }
 
   static lib = new TokenHandlerLibrary()
@@ -74,7 +77,7 @@ export default class TokenHandler extends Handler<TokenModel, *, RestToken> {
   constructor (model: TokenModel, secret?: string) {
     super(model)
     this.secret = secret ? `v2.${this.model.id}.${secret}` : null
-    this.restUrl = `/api/tokens/${this.model.id}`
+    this.restUrl = restUrlPrefix + this.model.id
   }
 
   async seen () {

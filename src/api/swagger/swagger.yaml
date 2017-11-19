@@ -107,6 +107,7 @@ paths:
           schema:
             $ref: "#/definitions/Error"
   /users/with-laundry:
+    x-swagger-router-controller: users
     post:
       tags:
         - Laundries
@@ -1828,7 +1829,7 @@ paths:
   /statistics:
     x-swagger-router-controller: statistics
     get:
-      operationId: statistics
+      operationId: fetchStatistics
       tags:
         - Statistics
       responses:

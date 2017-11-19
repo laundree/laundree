@@ -7,8 +7,8 @@ export type Config = {
   googleApiKey: string,
   apiBase: string,
   socketIoBase: string,
+  statistics: {userCount: number, bookingCount: number},
   token: string
-
 }
 
 export type StateAddendum = {

@@ -53,18 +53,33 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
     this.setState(({sesh}) => ({sesh: sesh + 1, notion: null}))
   }
 
+  async apiCall () {
+    if (this.props.createLaundry) {
+      const {user} = await sdk.api.user.createUserWithLaundry({
+        displayName: this.state.values.name,
+        email: this.state.values.email,
+        password: this.state.values.password,
+        googlePlaceId: this.state.values.placeId,
+        name: this.state.values.laundryName
+      })
+      await sdk.api.user._startEmailVerification(user.id, {email: this.state.values.email, locale: this.props.locale})
+      return user
+    }
+    return sdk.api.user.signUpUser(
+      {
+        displayName: this.state.values.name,
+        email: this.state.values.email,
+        password: this.state.values.password,
+        locale: this.props.locale
+      }
+    )
+  }
+
   submitHandler = async (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()
     try {
-      const user = await sdk.api.user.signUpUser(
-        {
-          displayName: this.state.values.name,
-          email: this.state.values.email,
-          password: this.state.values.password,
-          locale: this.props.locale
-        }
-      )
+      const user = await this.apiCall()
       this.props.onSignUp && this.props.onSignUp(user)
       this.reset({
         loading: false,
@@ -77,7 +92,9 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
         notion: {
           success: false,
           message: <FormattedMessage id={err.status === 409
-            ? 'auth.signup.error.already-exists'
+            ? (err.response.body.message.toLowerCase().indexOf('laundry') >= 0
+              ? 'laundry-settings.name-or-place.error.duplicate'
+              : 'auth.signup.error.already-exists')
             : 'auth.signup.error'} />
         }
       })
