@@ -3,9 +3,10 @@
 import LaundryHandler from './laundry'
 import { Handler, HandlerLibrary } from './handler'
 import LaundryInvitationModel from '../db/models/laundry_invitation'
-import type {Invite} from 'laundree-sdk/lib/redux'
+import type { Invite } from 'laundree-sdk/lib/redux'
 import type { ObjectId } from 'mongoose'
-import type {LaundryInvitation as RestLaundryInvitation} from 'laundree-sdk/lib/sdk'
+import type { LaundryInvitation as RestLaundryInvitation } from 'laundree-sdk/lib/sdk'
+import config from 'config'
 
 class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, RestLaundryInvitation, *> {
 
@@ -31,10 +32,12 @@ class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvi
 
 }
 
+const restUrlPrefix = `${config.get('api.base')}/invites/`
+
 export default class LaundryInvitationHandler extends Handler<LaundryInvitationModel, Invite, RestLaundryInvitation> {
   static restSummary (i: ObjectId | LaundryInvitationHandler) {
     const id = Handler.handlerOrObjectIdToString(i)
-    return {id, href: '/api/invites/' + id}
+    return {id, href: restUrlPrefix + id}
   }
 
   static lib = new LaundryInvitationHandlerLibrary()
@@ -43,7 +46,7 @@ export default class LaundryInvitationHandler extends Handler<LaundryInvitationM
 
   constructor (model: LaundryInvitationModel) {
     super(model)
-    this.href = `/api/invites/${this.model.id}`
+    this.href = restUrlPrefix + this.model.id
   }
 
   _deleteInvite () {

@@ -56,11 +56,12 @@ function userToReduxUser (user: User): ReduxUser {
 /**
  * Create initial store
  */
-export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: LocaleType = 'en', token: string = '') {
+export async function createInitialEvents (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: LocaleType = 'en', token: string = '', statistics: {userCount: number, bookingCount: number}) {
   let events: Action[] = mapFlash(successFlash, 'success')
   events = events.concat(mapFlash(errorFlash, 'error'))
   const payload: Config = {
     locale,
+    statistics,
     googleApiKey: config.get('google.clientApiKey'),
     apiBase: config.get('api.base'),
     socketIoBase: config.get('socket_io.base'),
@@ -77,8 +78,8 @@ export async function createInitialEvents (currentUser: ?User, successFlash: str
   return events.concat(event)
 }
 
-export async function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: LocaleType = 'en', token: string = '') {
-  const events = await createInitialEvents(currentUser, successFlash, errorFlash, locale, token)
+export async function createInitialStore (currentUser: ?User, successFlash: string[] = [], errorFlash: string[] = [], locale: LocaleType = 'en', token: string = '', statistics: {userCount: number, bookingCount: number}) {
+  const events = await createInitialEvents(currentUser, successFlash, errorFlash, locale, token, statistics)
   const store = createStore(redux.reducer)
   events.forEach((event) => store.dispatch(event))
   return store

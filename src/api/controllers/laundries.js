@@ -5,6 +5,7 @@ import UserHandler from '../../handlers/user'
 import * as api from '../helper'
 import * as mail from '../../utils/mail'
 import { StatusError, logError } from '../../utils/error'
+import { checkLaundryCreate } from '../checks'
 
 /**
  * Created by budde on 02/06/16.
@@ -30,24 +31,11 @@ async function createLaundryAsync (subjects, params) {
     createLaundryBody: params.createLaundryBody,
     currentUser: subjects.currentUser
   })
-  const {name, googlePlaceId} = createLaundryBody
   if (currentUser.isDemo()) {
     throw new StatusError('Not allowed', 403)
   }
-  const timezone = await LaundryHandler
-    .lib
-    .timeZoneFromGooglePlaceId(googlePlaceId)
-
-  if (!timezone) {
-    throw new StatusError('Invalid place-id', 400)
-  }
-  const [l] = await LaundryHandler
-    .lib
-    .find({name: name.trim()})
-
-  if (l) {
-    throw new StatusError('Laundry already exists', 409, {Location: l.restUrl})
-  }
+  const {timezone} = await checkLaundryCreate(createLaundryBody)
+  const {name, googlePlaceId} = createLaundryBody
   const laundry = await currentUser.createLaundry(name.trim(), timezone, googlePlaceId)
   return laundry.toRest()
 }

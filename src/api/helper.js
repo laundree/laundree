@@ -143,7 +143,9 @@ function buildSecurityFunction (securities: Security[]): (params: ParsedParams, 
 type Middleware = (subjects: Subjects, p: ParsedParams, req: Request, res: Response) => Promise<?ApiResult>
 
 export function handleError (res: Response, err: Error) {
-  const status = (typeof err.status === 'number' && err.status) || res.statusCode || 500
+  const status = (typeof err.status === 'number' && err.status) ||
+    (res.statusCode >= 400 && res.statusCode) ||
+    500
   res.status(status)
   const headers: Object = (typeof err.headers === 'object') && err.headers ? err.headers : {}
   Object.keys(headers).forEach(key => res.set(key, headers[key]))

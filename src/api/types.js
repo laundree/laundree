@@ -23,6 +23,7 @@ import type {
   AddOneSignalPlayerIdBody,
   ValidateCredentialsBody,
   CreateUserFromProfileBody,
+  CreateUserWithLaundryBody,
   VerifyInviteCodeBody,
   VerifyTokenBody
 } from 'laundree-sdk/lib/sdk'
@@ -62,6 +63,7 @@ export type Params = {
   changeUserPasswordBody?: Param<ChangeUserPasswordBody>,
   addOneSignalPlayerIdBody?: Param<AddOneSignalPlayerIdBody>,
   validateCredentialsBody?: Param<ValidateCredentialsBody>,
+  createUserWithLaundryBody?: Param<CreateUserWithLaundryBody>,
   createUserFromProfileBody?: Param<CreateUserFromProfileBody>,
   verifyInviteCodeBody?: Param<VerifyInviteCodeBody>,
   verifyTokenBody?: Param<VerifyTokenBody>
@@ -104,6 +106,7 @@ export type ParsedParams = {
   validateCredentialsBody?: ValidateCredentialsBody,
   createUserFromProfileBody?: CreateUserFromProfileBody,
   createUserBody?: CreateUserBody,
+  createUserWithLaundryBody?: CreateUserWithLaundryBody,
   verifyInviteCodeBody?: VerifyInviteCodeBody
 }
 

@@ -5,6 +5,8 @@ import * as mail from '../../utils/mail'
 import { StatusError } from '../../utils/error'
 import UserHandler from '../../handlers/user'
 import TokenHandler from '../../handlers/token'
+import { checkLaundryCreate, checkUserCreate } from '../checks'
+import type { LaundryAndUser } from 'laundree-sdk/lib/sdk'
 
 async function getUserF (subjects) {
   const user = api.assert(subjects.user)
@@ -53,16 +55,11 @@ async function validateCredentialsF (s, p) {
 }
 
 async function createUserF (subjects, p) {
-  const {createUserBody} = api.assertSubjects({
+  const {createUserBody: {displayName, email, password}} = api.assertSubjects({
     createUserBody: p.createUserBody
   })
-  const {email, displayName, password} = createUserBody
-  const user = await UserHandler.lib.findFromEmail(email)
-  if (user) {
-    throw new StatusError('Email address already exists.', 409, {Location: user.restUrl})
-  }
-  const newUser = await UserHandler.lib.createUserWithPassword(displayName, email, password)
-  return newUser.toRest()
+  await checkUserCreate({email})
+  return UserHandler.lib.createUserWithPassword(displayName, email, password).toRest()
 }
 
 async function startPasswordResetF (subjects, params) {
@@ -181,8 +178,16 @@ async function createTokenF (subjects, params) {
   return token.toSecretRest()
 }
 
-async function createUserWithLaundryF () {
-  // TODO implement + test
+async function createUserWithLaundryF (subjects, params): Promise<LaundryAndUser> {
+  const {createUserWithLaundryBody} = api.assertSubjects({
+    createUserWithLaundryBody: params.createUserWithLaundryBody
+  })
+  await checkUserCreate(createUserWithLaundryBody)
+  const {timezone} = await checkLaundryCreate(createUserWithLaundryBody)
+  const {email, displayName, password, name, googlePlaceId} = createUserWithLaundryBody
+  const user = await UserHandler.lib.createUserWithPassword(displayName, email, password)
+  const laundry = await user.createLaundry(name, timezone, googlePlaceId)
+  return {user: user.toRest(), laundry: laundry.toRest()}
 }
 
 export const createUserWithLaundry = api.wrap(createUserWithLaundryF, api.securityNoop)

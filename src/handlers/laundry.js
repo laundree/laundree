@@ -90,15 +90,17 @@ class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, R
 
 }
 
+const restUrlPrefix = `${config.get('api.base')}/laundries/`
+
 export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, RestLaundry> {
   static restSummary (i: ObjectId | LaundryHandler) {
     const id = Handler.handlerOrObjectIdToString(i)
-    return {id, href: '/api/laundries/' + id}
+    return {id, href: restUrlPrefix + id}
   }
 
   static lib = new LaundryHandlerLibrary()
   lib = LaundryHandler.lib
-  restUrl = `/api/laundries/${this.model.id}`
+  restUrl = restUrlPrefix + this.model.id
 
   /**
    * Delete the Laundry
