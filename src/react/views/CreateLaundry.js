@@ -6,7 +6,6 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, Submit, DocumentTitle } from './intl'
 import LocationSelector from './LocationSelector'
-import { signUpStore } from '../../client/store'
 
 type CreateLaundryState = {
   createExpanded: boolean,
@@ -15,7 +14,7 @@ type CreateLaundryState = {
 }
 type CreateLaundryFormValues = { name: string, placeId: string }
 
-class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaundryState> {
+export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaundryState> {
 
   initialValues () {
     return {name: '', placeId: ''}
@@ -102,25 +101,5 @@ class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaun
         </section>
       </main>
     </DocumentTitle>
-  }
-}
-
-export default class CreateLaundryWrapper extends React.Component<{}, { signUp?: { email: string, laundryId: string, key: string } }> {
-  state = {}
-
-  componentDidMount () {
-    const signUp = signUpStore.get()
-    if (!signUp) {
-      return
-    }
-    this.setState({signUp})
-  }
-
-  render () {
-    return (
-      this.state.signUp
-        ? <pre>{JSON.stringify(this.state.signUp, null, 2)}</pre>
-        : <CreateLaundry />
-    )
   }
 }

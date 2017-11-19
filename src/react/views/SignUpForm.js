@@ -10,6 +10,7 @@ import LocationSelector from './LocationSelector'
 import { connect } from 'react-redux'
 import type { StateAddendum } from './types'
 import Debug from 'debug'
+import type { User } from 'laundree-sdk/lib/sdk'
 
 const debug = Debug('laundree.react.views.signupform')
 
@@ -30,7 +31,7 @@ type SignUpValues = {
 type SignUpProps = {
   locale: LocaleType,
   createLaundry: boolean,
-  onSignUp?: (v: SignUpValues) => *,
+  onSignUp?: (v: User) => *,
   locale: LocaleType,
   googleApiKey: string
 }
@@ -56,7 +57,7 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
     this.setState({loading: true})
     evt.preventDefault()
     try {
-      await sdk.api.user.signUpUser(
+      const user = await sdk.api.user.signUpUser(
         {
           displayName: this.state.values.name,
           email: this.state.values.email,
@@ -64,7 +65,7 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
           locale: this.props.locale
         }
       )
-      this.props.onSignUp && this.props.onSignUp(this.state.values)
+      this.props.onSignUp && this.props.onSignUp(user)
       this.reset({
         loading: false,
         notion: {message: <FormattedMessage id='auth.signup.success' />, success: true}

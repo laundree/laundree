@@ -29,4 +29,4 @@ class LocalStore<V> {
   }
 }
 
-export const signUpStore: LocalStore<{ laundryId: string, key: string, email: string }> = new LocalStore('laundry.signup')
+export const signUpStore: LocalStore<{ laundryId: string, key: string, userId: string }> = new LocalStore('laundry.signup')

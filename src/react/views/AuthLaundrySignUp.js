@@ -36,7 +36,7 @@ export default ({match, location}: { match: Match, location: Location }) => {
         <div className='or'>
           <FormattedMessage id='general.or' />
         </div>
-        <SignUpForm onSignUp={({email}) => signUpStore.set({email, laundryId, key})} />
+        <SignUpForm onSignUp={({id: userId}) => signUpStore.set({userId, laundryId, key})} />
         <div className='forgot'>
           <div>
             <FormattedMessage
