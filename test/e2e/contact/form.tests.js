@@ -19,3 +19,7 @@ module.exports = {
       .waitForElementVisible('div.contactForm.sent', timeout)
       .end()
 }
+// TODO test support
+
+// TODO test invite flow
+

@@ -4,7 +4,7 @@ import type { User } from 'laundree-sdk/lib/redux'
 import { connect } from 'react-redux'
 import { signUpStore } from '../../client/store'
 import { shortIdToLong } from '../../utils/string'
-import request from 'superagent'
+import sdk from '../../client/sdk'
 import Debug from 'debug'
 
 const debug = Debug('laundree.react.views.LaundryAdder')
@@ -12,7 +12,7 @@ const debug = Debug('laundree.react.views.LaundryAdder')
 class LaundryAdder extends React.Component<{ user: ?User }, { signUp?: { userId: string, laundryId: string, key: string } }> {
   state = {}
 
-  componentDidMount () {
+  async componentDidMount () {
     const signUp = signUpStore.get()
     if (!signUp) {
       return
@@ -25,12 +25,16 @@ class LaundryAdder extends React.Component<{ user: ?User }, { signUp?: { userId:
       return
     }
     signUpStore.del()
-    if (user.laundries.indexOf(shortIdToLong(signUp.laundryId)) >= 0) {
+    const longId = shortIdToLong(signUp.laundryId)
+    if (user.laundries.indexOf(longId) >= 0) {
       return
     }
-    request
-      .get(`/s/${signUp.laundryId}/${signUp.key}`)
-      .catch(err => debug('Got error following invite link', err))
+    try {
+      await sdk.api.laundry.addFromCode(longId, {key: signUp.key})
+      debug('Added laundry!')
+    } catch (err) {
+      debug('Failed to add user to laundry... ', err)
+    }
   }
 
   render () {
