@@ -5,10 +5,10 @@ import promisedApp from '../../../../test_target/api/app'
 import { signAppToken, signUserToken } from '../../../../test_target/auth'
 import request from 'supertest'
 import assert from 'assert'
-import LaundryHandler from '../../../../src/handlers/laundry'
-import UserHandler from '../../../../src/handlers/user'
-import MachineHandler from '../../../../src/handlers/machine'
-import BookingHandler from '../../../../src/handlers/booking'
+import LaundryHandler from '../../../../test_target/handlers/laundry'
+import UserHandler from '../../../../test_target/handlers/user'
+import MachineHandler from '../../../../test_target/handlers/machine'
+import BookingHandler from '../../../../test_target/handlers/booking'
 let app
 
 describe('controllers', function () {
