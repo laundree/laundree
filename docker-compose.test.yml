@@ -1,6 +1,54 @@
 version: '2'
 services:
   web:
+    ports:
+      - 3000:3000
+    environment:
+      - DEBUG=laundree*
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - NODE_ENV=development
+      - API_BASE=http://api:3000
+      - SOCKET_IO_BASE=http://socket:3000
+      - GOOGLE_CLIENT_API_KEY
+    build: .
+    links:
+      - redis
+    command:
+      - "-c"
+      - ". /home/laundree/.nvm/nvm.sh && npm run start:web"
+  api:
+    environment:
+      - DEBUG=laundree*
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - MONGO_URL=mongodb://mongo/test
+      - NODE_ENV=development
+      - GOOGLE_SERVER_API_KEY
+    build: .
+    links:
+      - redis
+      - mongo
+    command:
+      - "-c"
+      - ". /home/laundree/.nvm/nvm.sh && npm run start:api"
+  socket:
+    environment:
+      - SOCKET_IO_PATH=/
+      - DEBUG=laundree*
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - API_BASE=http://api:3000
+      - MONGO_URL=mongodb://mongo/test
+      - NODE_ENV=development
+    build: .
+    links:
+      - redis
+      - mongo
+    command:
+      - "-c"
+      - ". /home/laundree/.nvm/nvm.sh && npm run start:socket"
+  laundree:
     mem_limit: 4g
     environment:
       - NODE_ENV=test
@@ -13,17 +61,25 @@ services:
       - NIGHTWATCH_LAUNCH_URL=http://web:3000/
       - CODECLIMATE_REPO_TOKEN
       - LAUNDREE_START_SERVER=false
-      - API_BASE=http://web:3000/api
-      - SOCKET_IO_BASE=http://web:3000
+      - API_BASE=http://api:3000
+      - SOCKET_IO_BASE=http://socket:3000
       - SESSION_DOMAIN=web
     build: .
     links:
       - redis
       - mongo
       - selenium
+      - api
+      - web
+      - socket
   redis:
     image: redis
   mongo:
     image: mongo
   selenium:
-    image: selenium/standalone-chrome:3.0.1
+    image: selenium/standalone-chrome:3.7.1
+    shm_size: 1G
+    links:
+      - api
+      - web
+      - socket
