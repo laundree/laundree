@@ -11,8 +11,8 @@ module.exports = {
       .click('#TopNav .language .dropDownTitle')
       .waitForElementVisible('#TopNav .language .dropDownContent', timeout)
       .click('#TopNav .language .dropDownContent li:nth-of-type(2) a')
-      .waitForElementVisible('#Home header h2', timeout)
-      .expect.element('#Home header h2').text.to.contain('nemt og gratis')
+      .waitForElementVisible('#LandingPage .intro h1', timeout)
+      .expect.element('#LandingPage .intro h1').text.to.contain('fællesvaskeri')
     client.end()
   },
   'Can change locale on auth': client => {
@@ -25,7 +25,7 @@ module.exports = {
       .waitForElementVisible('#AuthNav .language .dropDownContent', timeout)
       .click('#AuthNav .language .dropDownContent li:nth-of-type(2) a')
       .waitForElementVisible('#Auth h1', timeout)
-      .expect.element('#Auth h1').text.to.contain('Opret en konto')
+      .expect.element('#Auth h1').text.to.contain('Log ind på')
     client.end()
   }
 }

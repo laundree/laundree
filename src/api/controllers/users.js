@@ -59,7 +59,7 @@ async function createUserF (subjects, p) {
     createUserBody: p.createUserBody
   })
   await checkUserCreate({email})
-  return UserHandler.lib.createUserWithPassword(displayName, email, password).toRest()
+  return (await UserHandler.lib.createUserWithPassword(displayName, email, password)).toRest()
 }
 
 async function startPasswordResetF (subjects, params) {

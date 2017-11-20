@@ -105,7 +105,7 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
     return (
       <ValidationForm
         sesh={this.state.sesh}
-        className={this.state.loading ? 'blur' : ''}
+        className={(this.state.loading ? 'blur' : '') + ' signUpForm'}
         onSubmit={this.submitHandler}>
         {this.renderNotion()}
         <ValidationElement

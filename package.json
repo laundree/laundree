@@ -121,7 +121,7 @@
     "build": "npm run build:babel && npm run build:client",
     "build:babel": "babel src -d lib --copy-files",
     "build:client": "webpack --env=prod --progress --profile --colors --config webpack.prod.js",
-    "test": "./scripts/test.sh",
+    "test": "NODE_ENV=test ./scripts/test.sh",
     "start:webpack": "webpack-dev-server --hot --config ./webpack.dev.js",
     "dev": "NODE_ENV=development npm run start:webpack & NODE_ENV=development npm run start:src"
   },
