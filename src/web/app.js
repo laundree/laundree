@@ -8,7 +8,7 @@ import flash from 'connect-flash'
 import morganSetup from '../morgan'
 import * as error from '../utils/error'
 import locale from 'locale'
-import { supported } from '../locales/index'
+import { supported, toLocale } from '../locales/index'
 import config from 'config'
 import compression from 'compression'
 import Debug from 'debug'
@@ -76,7 +76,10 @@ passportSetup(app)
 
 // SETUP LOCALE
 app.use(locale(supported))
-
+app.use((req: Request, res, next) => {
+  req.locale = toLocale(req.locale, 'en')
+  next()
+})
 app.use(async (req: Request, res: Response, next) => {
   if (!req.user) {
     return next()
