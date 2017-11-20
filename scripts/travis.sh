@@ -13,7 +13,7 @@ fi
 
 docker-compose -f docker-compose.test.yml up -d
 
-docker-compose -f docker-compose.test.yml exec web bash -c '. /home/laundree/.nvm/nvm.sh && npm test'
+docker-compose -f docker-compose.test.yml exec laundree bash -c '. /home/laundree/.nvm/nvm.sh && npm test'
 
 echo "Test done. Stopping..."
 

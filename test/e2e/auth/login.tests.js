@@ -17,12 +17,6 @@ module.exports = {
       .createUserWithPassword(faker.name.findName(), email, password)
     done()
   },
-  'Can not login un-verified': client => {
-    signIn(client.url(client.launch_url), email, password)
-      .waitForElementVisible('#SignIn .error.notion', timeout)
-    client.expect.element('#SignIn .error.notion').text.to.contain('The email provided isn\'t verified.')
-    client.end()
-  },
   'Can login verified': client => {
     client
       .url(client.launch_url)
@@ -34,6 +28,12 @@ module.exports = {
           .waitForElementVisible('#CreateLaundry', timeout)
           .end()
       })
+  },
+  'Can not login un-verified': client => {
+    signIn(client.url(client.launch_url), email, password)
+      .waitForElementVisible('#SignIn .error.notion', timeout)
+    client.expect.element('#SignIn .error.notion').text.to.contain('The email provided isn\'t verified.')
+    client.end()
   },
   'Can reset password': client => {
     client
