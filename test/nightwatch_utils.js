@@ -12,8 +12,6 @@ const timeout = config.get('sauceLabs.timeout')
 function signIn (client, username, password) {
   return client
     .click('#TopNav a.auth.signUp')
-    .waitForElementPresent('#Auth', timeout)
-    .click('#Auth .forgot div:first-of-type a')
     .waitForElementPresent('#SignIn', timeout)
     .setValue('#SignIn label:nth-of-type(1) input', username)
     .setValue('#SignIn label:nth-of-type(2) input', password)

@@ -40,7 +40,7 @@ module.exports = {
       .url(client.launch_url)
       .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
-      .click('#Auth  .forgot div:last-of-type a')
+      .click('#Auth  .forgot div:first-of-type a')
       .waitForElementPresent('#ForgotPassword', timeout)
       .setValue('#ForgotPassword input[type=text]', email.toUpperCase())
       .submitForm('#ForgotPassword')
@@ -52,7 +52,7 @@ module.exports = {
       .url(client.launch_url)
       .click('#TopNav a.auth.signUp')
       .waitForElementPresent('#Auth', timeout)
-      .click('#Auth  .forgot div:last-of-type a')
+      .click('#Auth  .forgot div:first-of-type a')
       .waitForElementPresent('#ForgotPassword', timeout)
       .setValue('#ForgotPassword input[type=text]', 'foo' + email.toUpperCase())
       .submitForm('#ForgotPassword')
@@ -66,6 +66,8 @@ module.exports = {
     client
       .url(client.launch_url)
       .click('#TopNav a.auth.signUp')
+      .waitForElementPresent('#Auth', timeout)
+      .click('#Auth  .forgot div:last-of-type a')
       .waitForElementPresent('#Auth form', timeout)
       .setValue('#Auth form label:nth-of-type(1) input', name)
       .setValue('#Auth form label:nth-of-type(2) input', email)
@@ -83,3 +85,5 @@ module.exports = {
     client.end()
   }
 }
+
+// TODO test invite flow

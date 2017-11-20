@@ -52,7 +52,7 @@ module.exports = {
       .click('#LaundrySettingsNameOrPlace form .locationSelector .dropDownContent ul li span')
       .submitForm('#LaundrySettingsNameOrPlace form')
       .pause(timeout)
-      .url(`${client.launch_url}laundries/${laundry.model.id}/settings`)
+      .url(`${client.launch_url}en/laundries/${laundry.model.id}/settings`)
       .pause(timeout)
     client.assert.valueContains('#LaundrySettingsNameOrPlace form .locationSelector input[type=text]', name)
     client.end()
