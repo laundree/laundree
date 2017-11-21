@@ -37,5 +37,7 @@ export function toTerritory (l: LocaleType): string {
       return 'en_US'
     case 'da':
       return 'da_DK'
+    default:
+      throw new Error('Invalid locale')
   }
 }
