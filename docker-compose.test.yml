@@ -26,6 +26,5 @@ services:
   mongo:
     image: mongo
   selenium:
-    image: selenium/standalone-chrome:3.0.1
+    image: selenium/standalone-chrome:3.7.1
     shm_size: 1G
-
