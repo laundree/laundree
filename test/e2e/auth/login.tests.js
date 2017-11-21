@@ -83,7 +83,51 @@ module.exports = {
       .waitForElementVisible('#Auth form .notion.error', timeout)
     client.expect.element('#Auth form .error.notion').text.to.contain('A user with this email already exists')
     client.end()
+  },
+  'Can sign-up from landing page': client => {
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    const name = faker.name.findName()
+    client
+      .url(client.launch_url)
+      .waitForElementPresent('#LandingPage', timeout)
+      .click('#LandingPage .intro .signUpChooser div:nth-of-type(2)')
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(1) input', name)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(2) input', email)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(3) input', password)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(4) input', password)
+      .submitForm('#LandingPage .intro form.signUpForm')
+      .waitForElementVisible('#LandingPage .intro form.signUpForm .notion.success', timeout)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(1) input', name)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(2) input', email)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(3) input', password)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(4) input', password)
+      .submitForm('#LandingPage .intro form.signUpForm')
+      .waitForElementVisible('#LandingPage .intro form.signUpForm .notion.error', timeout)
+    client.expect.element('#LandingPage .intro form.signUpForm .notion.error').text.to.contain('A user with this email already exists')
+    client.end()
+  },
+  'Can sign-up with laundry': client => {
+    const email = faker.internet.email()
+    const password = faker.internet.password()
+    const name = faker.name.findName()
+    const laundryName = faker.company.companyName()
+    client
+      .url(client.launch_url)
+      .waitForElementPresent('#LandingPage', timeout)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(1) input', name)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(2) input', email)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(3) input', password)
+      .setValue('#LandingPage .intro form.signUpForm label:nth-of-type(4) input', password)
+      .submitForm('#LandingPage .intro form.signUpForm')
+      .waitForElementVisible('#LandingPage .intro form.signUpForm.invalid', timeout)
+      .setValue('#LandingPage .intro form.signUpForm div:nth-child(5) label:nth-child(1) input', laundryName)
+      .setValue('#LandingPage .intro form.signUpForm div:nth-child(5) label:nth-child(2) input', 'cuba')
+      .waitForElementVisible('#LandingPage .intro form.signUpForm .locationSelector .dropDownContent ul li span', timeout * 5)
+      .click('#LandingPage .intro form.signUpForm .locationSelector .dropDownContent ul li span')
+      .submitForm('#LandingPage .intro form.signUpForm')
+      .waitForElementVisible('#LandingPage .intro form.signUpForm .notion.success', timeout)
+    client.end()
   }
 }
 
-// TODO test invite flow
