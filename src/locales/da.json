@@ -288,5 +288,8 @@
     "auth.laundry.login.title.short": "Login",
     "auth.laundry.login.title": "Login på {laundryName}",
     "about.image.title": "Laundree holdet",
-    "meta.description": "Laundree er en app for booking af delte vaskefaciliteter. Du kan reservere dine maskiner fra din mobil. Start online nu!"
+    "meta.description": "Laundree er en app for booking af delte vaskefaciliteter. Du kan reservere dine maskiner fra din mobil. Start online nu!",
+    "meta.login.description": "Login på Laundree og begynd at administrere dine bookinger",
+    "meta.signup.description": "Tilmeld dig Laundree og begynd at administrere dine bookinger",
+    "meta.forgot.description": "Har du glemt dit kodeord? Indtast din email adresse herunder for at nulstille den"
 }
