@@ -8,7 +8,6 @@ import Auth from './Auth'
 import BaseApp from './BaseApp'
 import NativeApp from './NativeApp'
 import NativeAppV2 from './NativeAppV2'
-import TermsAndConditions from './TermsAndConditions'
 import StateCheckRedirectRoute from './StateCheckRedirectRoute'
 import GAWrapper from './GAWrapper'
 import type { LocaleType } from './../../locales'
@@ -26,12 +25,10 @@ const App = (props: { locale: LocaleType, store: Store }) => {
                 test={({currentUser}) => !currentUser}
                 path={'/auth'}
                 component={Auth} />
-              <Route path={'/privacy'} component={TermsAndConditions} />
-              <Route path={'/terms-and-conditions'} component={TermsAndConditions} />
               <Route path={'/laundries/:laundryId'} component={BaseApp} />
-              <Route path={'/'} component={BaseApp} />
               <Route path={'/native-app'} component={NativeApp} />
               <Route path={'/native-app-v2'} component={NativeAppV2} />
+              <Route path={'/'} component={BaseApp} />
               <Route component={NotFound} />
             </Switch>
           </IntlProvider>

@@ -102,6 +102,8 @@ app.use('/logout', logoutRoute)
 app.use('/s', inviteCodeRoute)
 supported.forEach(locale => {
   const router = express.Router()
+  router.get('/privacy', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale}/current`))
+  router.get('/terms-and-conditions', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale}/current`))
   router.use('/', langRoute(locale))
   router.use('/s', inviteCodeRoute)
   router.use('/', reactRouter(locale))

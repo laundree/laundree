@@ -32,9 +32,9 @@ function findRedirect (req: Request): { to?: string, errorTo?: string } {
   const {mode, key, laundryId} = req.query
   switch (mode) {
     case 'native-app':
-      return {to: '/native-app', errorTo: '/native-app'}
+      return {to: `/${req.locale || 'en'}/native-app`, errorTo: `/${req.locale || 'en'}/native-app`}
     case 'native-app-v2':
-      return {to: '/native-app-v2', errorTo: '/native-app-v2'}
+      return {to: `/${req.locale || 'en'}/native-app-v2`, errorTo: `/${req.locale || 'en'}/native-app-v2`}
     case 'laundry':
       if (!key || !laundryId) {
         return {}

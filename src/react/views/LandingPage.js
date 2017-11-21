@@ -5,8 +5,9 @@ import SignUpUserForm from './SignUpForm'
 import ContactForm from './ContactForm'
 import { connect } from 'react-redux'
 import type { StateAddendum } from './types'
+import type { LocaleType } from '../../locales/index'
 
-class SignUpForm extends React.Component<{}, { choice: 'laundry' | 'user' }> {
+class SignUpForm extends React.Component<{ locale: LocaleType }, { choice: 'laundry' | 'user' }> {
   state = {choice: 'laundry'}
 
   render () {
@@ -35,13 +36,13 @@ class SignUpForm extends React.Component<{}, { choice: 'laundry' | 'user' }> {
             <FormattedMessage id='auth.signup.notice' values={{
               toc: <a
                 style={{color: 'inherit'}}
-                href={'/terms-and-conditions'}
+                href={`/${this.props.locale}/terms-and-conditions`}
                 target='_blank'>
                 <FormattedMessage id='general.toc' />
               </a>,
               pp: <a
                 style={{color: 'inherit'}}
-                href={'/privacy'} target='_blank'>
+                href={`/${this.props.locale}/privacy`} target='_blank'>
                 <FormattedMessage id='general.privacy-policy' />
               </a>
             }} />
@@ -52,7 +53,7 @@ class SignUpForm extends React.Component<{}, { choice: 'laundry' | 'user' }> {
   }
 }
 
-const IntroSection = () => (
+const IntroSection = ({locale}: { locale: LocaleType }) => (
   <section className='intro bright'>
     <div className='container' style={{padding: 0}}>
       <div style={{overflow: 'hidden', position: 'relative', height: '38em'}}>
@@ -80,7 +81,7 @@ const IntroSection = () => (
       </div>
       <div className='signUpContainer'>
         <div>
-          <SignUpForm />
+          <SignUpForm locale={locale}/>
         </div>
       </div>
     </div>
@@ -220,11 +221,11 @@ const Footer = () => (
     </div>
   </footer>
 )
-type LandingPageProps = { userCount: number, bookingCount: number }
+type LandingPageProps = { userCount: number, bookingCount: number, locale: LocaleType }
 
 const LandingPage = (p: LandingPageProps) => (
   <main id='LandingPage'>
-    <IntroSection />
+    <IntroSection locale={p.locale} />
     <Statistics {...p} />
     <About />
     <Contact />
@@ -232,4 +233,7 @@ const LandingPage = (p: LandingPageProps) => (
   </main>
 )
 
-export default connect(({config: {statistics}}: StateAddendum): LandingPageProps => statistics)(LandingPage)
+export default connect(({config: {statistics, locale}}: StateAddendum): LandingPageProps => ({
+  ...statistics,
+  locale
+}))(LandingPage)
