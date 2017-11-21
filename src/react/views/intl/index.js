@@ -27,6 +27,10 @@ export const Meta: React.ComponentType<{ title?: string, description?: string }>
       {t ? <meta property='og:title' content={t} /> : null}
       {d ? <meta property='description' content={d} /> : null }
       {d ? <meta property='og:description' content={d} /> : null }
+      <meta property='og:image' content={'https://laundree.io/images/cover.png'} />
+      <meta property='og:image:type' content={'image/png'} />
+      <meta property='og:image:width' content={'1280'} />
+      <meta property='og:image:height' content={'720'} />
       <meta property='og:logo' content={'https://laundree.io/images/small-logo.png'} />
       <meta property='og:locale' content={toTerritory(toLocale(intl.locale, 'en'))} />
     </Helmet>)
