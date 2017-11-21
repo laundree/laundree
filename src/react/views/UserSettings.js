@@ -15,7 +15,7 @@ class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User },
   onSubmit = async (event) => {
     this.setState({loading: true})
     event.preventDefault()
-    await sdk.api.user.updateUser(this.props.user.id, {displayName: this.state.values.displayName})
+    await sdk.api.user.updateUser(this.props.user.id, {name: this.state.values.displayName})
     this.setState({loading: false})
   }
 
