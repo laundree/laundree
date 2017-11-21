@@ -26,6 +26,7 @@ import langRoute from './routes/lang'
 import { signUserToken, verifyExpiration } from '../auth'
 import helmet from 'helmet'
 import logoutRoute from './routes/logoutRoute'
+import seo from './routes/seo'
 
 const debug = Debug('laundree.app')
 
@@ -35,13 +36,13 @@ app.use(compression())
 app.use(helmet())
 // SETUP FLASH
 app.use(flash())
-
 // SETUP MORGAN
 morganSetup(app)
 
 // SETUP STATIC + PSEUDO-STATIC ROUTES
 app.use('/identicon', identicon)
 app.use('/pdf', pdf)
+app.use(seo)
 app.use(setupSass({
   src: path.join(__dirname, '..', '..', 'stylesheets'),
   dest: path.join(__dirname, '..', '..', 'dist', 'stylesheets'),
@@ -63,11 +64,6 @@ app.use(setupSass({
   sourceMap: true
 }))
 
-app.get('/robots.txt', (req: Request, res: Response) => {
-  res.type('text/plain')
-  const sitemapUrl = `${config.get('web.protocol')}://${config.get('web.host')}/sitemap.txt`
-  res.send(`User-agent: *\nAllow: /\nSitemap: ${sitemapUrl}`)
-})
 // SETUP SESSION
 app.use(sessionSetup)
 
