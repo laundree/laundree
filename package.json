@@ -27,7 +27,7 @@
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
     "debug": "^3.0.0",
-    "email-templates": "^2.6.0",
+    "email-templates": "^3.1.7",
     "express": "^4.15.3",
     "express-session": "^1.15.3",
     "handlebars": "^4.0.10",
@@ -76,7 +76,7 @@
   },
   "devDependencies": {
     "codeclimate-test-reporter": "^0.5.0",
-    "eslint": "^3.19.0",
+    "eslint": "^4.11.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-config-standard-flow": "^1.0.1",
     "eslint-config-standard-jsx": "^4.0.2",
