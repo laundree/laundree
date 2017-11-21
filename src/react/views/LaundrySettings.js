@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import { Modal, Label, Submit, DocumentTitle } from './intl'
+import { Modal, Label, Submit, Meta } from './intl'
 import ValueUpdater from './helpers/ValueUpdater'
 import { ValidationForm, ValidationElement } from './validation'
 import sdk from '../../client/sdk'
@@ -469,14 +469,14 @@ class LaundrySettings extends React.Component<LaundrySettingsProps> {
     const user = this.props.user
     if (!this.laundry()) return null
     if (!user) return null
-    return <DocumentTitle title='document-title.laundry-settings'>
+    return (
       <main className='naved' id='LaundrySettings'>
+        <Meta title={'document-title.laundry-settings'} />
         <FormattedMessage id='laundry-settings.title' tagName='h1' />
         {this.isOwner(user)
           ? this.renderOwnerSettings(user)
           : this.renderUserSettings(user)}
-      </main>
-    </DocumentTitle>
+      </main>)
   }
 }
 

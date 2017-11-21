@@ -5,13 +5,13 @@ import { renderToString } from 'react-dom/server'
 import { StaticRouter } from 'react-router'
 import { createInitialStore } from '../redux'
 import * as error from '../../utils/error'
-import DocumentTitle from 'react-document-title'
 import config from 'config'
 import App from '../../react/views/App'
 import type { Request, Router } from '../types'
 import type { LocaleType } from '../../locales/index'
 import sdk from '../sdk'
 import type { Statistics } from 'laundree-sdk/lib/sdk'
+import {Helmet} from 'react-helmet'
 
 let statsCache: ?{ stats: Statistics, ttl: number }
 
@@ -40,6 +40,7 @@ export default (locale: LocaleType) => {
         <StaticRouter basename={`/${locale}`} context={context} location={req.originalUrl}>
           <App locale={locale} store={store} />
         </StaticRouter>)
+      const head = Helmet.renderStatic()
       if (context.url) {
         return res.redirect(302, context.url)
       }
@@ -47,12 +48,10 @@ export default (locale: LocaleType) => {
         const err = new error.StatusError('Not found', 404)
         return next(err)
       }
-      const title = DocumentTitle.rewind()
       res.renderHb('app.hbs', {
         html,
-        title,
+        head: Object.keys(head).reduce((acc, k) => acc + head[k].toString(), ''),
         googleAnalyticsTrackingId: config.get('google.trackingId'),
-        intlTitle: 'general.empty',
         state: JSON.stringify(store.getState())
       })
     } catch (err) {

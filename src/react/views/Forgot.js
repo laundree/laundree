@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import { DocumentTitle, Input, Label, Submit } from './intl'
+import { Meta, Input, Label, Submit } from './intl'
 import { Link } from 'react-router-dom'
 import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
@@ -46,8 +46,9 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
   }
 
   render () {
-    return <DocumentTitle title='document-title.forgot'>
+    return (
       <div>
+        <Meta title={'document-title.forgot'} description={'meta.forgot.description'}/>
         <FormattedMessage tagName='h1' id='auth.forgot.title' />
         <Link to={'/'} id='Logo'>
           <svg>
@@ -101,8 +102,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
             </div>
           </div>
         </ValidationForm>
-      </div>
-    </DocumentTitle>
+      </div>)
   }
 }
 

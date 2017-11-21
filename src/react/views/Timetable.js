@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import { DocumentTitle } from './intl'
+import { Meta } from './intl'
 import TimetableTables from './TimetableTables'
 import TimetableHeaders from './TimetableHeaders'
 import { Link } from 'react-router-dom'
@@ -246,11 +246,11 @@ class TimetableWrapper extends React.Component<TimetableProps> {
   }
 
   render () {
-    return <DocumentTitle title='document-title.timetable'>
+    return (
       <Loader loader={() => this.load()}>
+        <Meta title={'document-title.timetable'} />
         {this.props.laundry.machines.length ? this.renderTables() : this.renderEmpty()}
-      </Loader>
-    </DocumentTitle>
+      </Loader>)
   }
 }
 

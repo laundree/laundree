@@ -1,6 +1,5 @@
 // @flow
 import React from 'react'
-import { DocumentTitle } from './intl'
 import { Link } from 'react-router-dom'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
@@ -9,6 +8,7 @@ import Debug from 'debug'
 import type { Stats, Laundry, User, State } from 'laundree-sdk/lib/redux'
 import type { ListOptions } from 'laundree-sdk/lib/sdk'
 import { connect } from 'react-redux'
+import { Meta } from './intl'
 
 const debug = Debug('laundree.react.views.AdminPanel')
 
@@ -272,14 +272,14 @@ type AdminPanelProps = {
 const AdminPanel = ({stats, laundries, users, userList, laundryList}: AdminPanelProps) => {
   const ls: Laundry[] = laundryList.map(id => laundries[id]).filter((l: ?Laundry) => l)
   const us: User[] = userList.map(id => users[id]).filter(u => u)
-  return <DocumentTitle title='document-title.administrator-panel'>
+  return (
     <main id='AdminPanel' className='topNaved'>
+      <Meta title='document-title.administrator-panel' />
       <FormattedMessage id='admin-panel.title' tagName='h1' />
       <StatsComponent stats={stats} />
       <LaundryList elements={ls} totalDemo={stats && stats.demoLaundryCount} total={stats && stats.laundryCount} />
       <UserList elements={us} totalDemo={stats && stats.demoUserCount} total={stats && stats.userCount} />
-    </main>
-  </DocumentTitle>
+    </main>)
 }
 
 export default connect(({users, userList, stats, laundries, laundryList}: State, _: {}): AdminPanelProps => ({

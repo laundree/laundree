@@ -8,7 +8,7 @@ import flash from 'connect-flash'
 import morganSetup from '../morgan'
 import * as error from '../utils/error'
 import locale from 'locale'
-import { supported, toLocale } from '../locales/index'
+import * as locales from '../locales/index'
 import config from 'config'
 import compression from 'compression'
 import Debug from 'debug'
@@ -71,9 +71,9 @@ app.use(sessionSetup)
 passportSetup(app)
 
 // SETUP LOCALE
-app.use(locale(supported))
+app.use(locale(locales.supported))
 app.use((req: Request, res, next) => {
-  req.locale = toLocale(req.locale, 'en')
+  req.locale = locales.toLocale(req.locale, 'en')
   next()
 })
 app.use(async (req: Request, res: Response, next) => {
@@ -100,7 +100,7 @@ app.use(cookieParser())
 app.use('/auth', authRoute)
 app.use('/logout', logoutRoute)
 app.use('/s', inviteCodeRoute)
-supported.forEach(locale => {
+locales.supported.forEach(locale => {
   const router = express.Router()
   router.get('/privacy', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale}/current`))
   router.get('/terms-and-conditions', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale}/current`))
@@ -125,7 +125,8 @@ app.use((err, req: Request, res, next) => {
     case 404:
       res.status(404)
       res.renderHb('error-404.hbs', {
-        intlTitle: 'document-title.not-found', styles: ['/stylesheets/error.css']
+        head: `<title>${locales[req.locale || 'en']['document-title.not-found']}</title>`,
+        styles: ['/stylesheets/error.css']
       })
       break
     default:
@@ -141,7 +142,7 @@ app.use((err, req: Request, res, next) => {
   error.logError(err)
   res.renderHb('error-500.hbs', {
     message: err.message,
-    intlTitle: 'document-title.internal-error',
+    head: `<title>${locales[req.locale || 'en']['document-title.internal-error']}</title>`,
     styles: ['/stylesheets/error.css']
   })
 })
