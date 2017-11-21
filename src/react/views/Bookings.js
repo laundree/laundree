@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import { Link } from 'react-router-dom'
-import { Modal, DocumentTitle } from './intl'
+import { Modal, Meta } from './intl'
 import sdk from '../../client/sdk'
 import { FormattedMessage, FormattedDate } from 'react-intl'
 import moment from 'moment'
@@ -112,8 +112,9 @@ class Bookings extends React.Component<BookingsProps, { showModal: boolean }> {
   }
 
   render () {
-    return <DocumentTitle title='document-title.bookings'>
+    return (
       <Loader loader={() => this.load()}>
+        <Meta title='document-title.bookings' />
         <main className='naved'>
           <h1 className='alignLeft'>
             <FormattedMessage id='bookings.title' />
@@ -122,8 +123,7 @@ class Bookings extends React.Component<BookingsProps, { showModal: boolean }> {
             {this.renderBookings()}
           </section>
         </main>
-      </Loader>
-    </DocumentTitle>
+      </Loader>)
   }
 }
 

@@ -2,7 +2,7 @@
 import React from 'react'
 import { ValidationElement, ValidationForm } from './validation'
 import { DropDown, DropDownTitle, DropDownContent, DropDownCloser } from './dropdown'
-import { DocumentTitle, Modal, Label, Input, Submit } from './intl'
+import { Meta, Modal, Label, Input, Submit } from './intl'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
@@ -21,37 +21,38 @@ class MachineDropdown extends React.Component<{
   }
 
   render () {
-    return <DropDown>
-      <DropDownTitle>
-        <svg>
-          <use xlinkHref={this.props.selected === 'wash' ? '#Drop' : '#Waves'} />
-        </svg>
-      </DropDownTitle>
-      <DropDownContent>
-        <ul className='dropDownList'>
-          <DropDownCloser>
-            <li className={this.props.selected === 'wash' ? 'active' : ''} onClick={this.selectGenerator('wash')}>
+    return (
+      <DropDown>
+        <DropDownTitle>
+          <svg>
+            <use xlinkHref={this.props.selected === 'wash' ? '#Drop' : '#Waves'} />
+          </svg>
+        </DropDownTitle>
+        <DropDownContent>
+          <ul className='dropDownList'>
+            <DropDownCloser>
+              <li className={this.props.selected === 'wash' ? 'active' : ''} onClick={this.selectGenerator('wash')}>
               <span className='link'>
                 <svg>
                   <use xlinkHref='#Drop' />
                 </svg>
                 <FormattedMessage id='machines.washing-machine' />
               </span>
-            </li>
-          </DropDownCloser>
-          <DropDownCloser>
-            <li className={this.props.selected === 'dry' ? 'active' : ''} onClick={this.selectGenerator('dry')}>
+              </li>
+            </DropDownCloser>
+            <DropDownCloser>
+              <li className={this.props.selected === 'dry' ? 'active' : ''} onClick={this.selectGenerator('dry')}>
               <span className='link'>
                 <svg>
                   <use xlinkHref='#Waves' />
                 </svg>
                 <FormattedMessage id='machines.dryer' />
               </span>
-            </li>
-          </DropDownCloser>
-        </ul>
-      </DropDownContent>
-    </DropDown>
+              </li>
+            </DropDownCloser>
+          </ul>
+        </DropDownContent>
+      </DropDown>)
   }
 }
 
@@ -263,9 +264,10 @@ class Machines extends React.Component<MachinesProps, {}> {
   render () {
     const currentLaundry = this.props.currentLaundry
     if (!currentLaundry) return null
-    return <DocumentTitle title='document-title.machines'>
+    return (
       <Loader loader={() => this.load(currentLaundry)}>
         <main className='naved' id='LaundryMain'>
+          <Meta title={'document-title.machines'} />
           <FormattedMessage id='machines.title' tagName='h1' />
           {this.renderMachineList(currentLaundry)}
           <div className='create_machine'>
@@ -282,8 +284,7 @@ class Machines extends React.Component<MachinesProps, {}> {
             </MachineListItem>
           </div>
         </main>
-      </Loader>
-    </DocumentTitle>
+      </Loader>)
   }
 }
 

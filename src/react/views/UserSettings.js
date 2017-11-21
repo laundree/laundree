@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { ValidationElement, ValidationForm } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
-import { DocumentTitle, Modal, Submit, Input, Label } from './intl'
+import { Meta, Modal, Submit, Input, Label } from './intl'
 import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
 import NotFound from './NotFound'
@@ -279,8 +279,9 @@ class UserSettings extends React.Component<UserSettingsProps, { loading: boolean
 
   render () {
     const user = this.user()
-    return <DocumentTitle title='document-title.profile-settings'>
+    return (
       <main className='topNaved' id='Settings'>
+        <Meta title='document-title.profile-settings' />
         <FormattedMessage tagName='h1' id='user-settings.title' />
         <section>
           <FormattedMessage tagName='h2' id='user-settings.basic-info.title' />
@@ -295,8 +296,7 @@ class UserSettings extends React.Component<UserSettingsProps, { loading: boolean
             {this.renderLaundries(user)}
           </div>
         </section>
-      </main>
-    </DocumentTitle>
+      </main>)
   }
 
   renderLaundries (user) {

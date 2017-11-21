@@ -16,7 +16,7 @@ export const supported: LocaleType[] = ['en', 'da']
 
 export const locales: { [LocaleType]: Object } = {en, da}
 
-export const names: {[LocaleType]: string} = {
+export const names: { [LocaleType]: string } = {
   en: 'English',
   da: 'Dansk'
 }
@@ -28,5 +28,14 @@ export function toLocale<A> (locale: A, def: LocaleType): LocaleType {
       return locale
     default:
       return def
+  }
+}
+
+export function toTerritory (l: LocaleType): string {
+  switch (l) {
+    case 'en':
+      return 'en_US'
+    case 'da':
+      return 'da_DK'
   }
 }

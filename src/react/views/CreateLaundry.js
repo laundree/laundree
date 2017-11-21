@@ -4,7 +4,7 @@ import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
-import { Input, Label, Submit, DocumentTitle } from './intl'
+import { Input, Label, Submit, Meta } from './intl'
 import LocationSelector from './LocationSelector'
 
 type CreateLaundryState = {
@@ -63,8 +63,9 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
   valueUpdaterPlaceId: (s: string) => void = this.generateValueUpdater((placeId: string) => ({placeId}))
 
   render () {
-    return <DocumentTitle title='document-title.create-laundry'>
+    return (
       <main id='CreateLaundry'>
+        <Meta title='document-title.create-laundry' />
         <FormattedMessage id='home.logged-in.title' tagName='h1' />
         <section>
           <FormattedMessage tagName='div' id='home.logged-in.message' />
@@ -99,7 +100,6 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
           </div>
           <FormattedMessage tagName='div' id='home.logged-in.message.tenant' />
         </section>
-      </main>
-    </DocumentTitle>
+      </main>)
   }
 }

@@ -1,18 +1,18 @@
 // @flow
 import React from 'react'
 import ContactForm from './ContactForm'
-import { DocumentTitle } from './intl'
+import { Meta } from './intl'
 import { FormattedMessage } from 'react-intl'
 
 export default class Support extends React.Component<{}> {
 
   render () {
-    return <DocumentTitle title='document-title.signup'>
+    return (
       <main id='Support' className='topNaved'>
-        <FormattedMessage tagName='h1' id='support.title'/>
-        <FormattedMessage tagName='section' id='support.message'/>
-        <ContactForm/>
-      </main>
-    </DocumentTitle>
+        <Meta title={'document-title.support'} />
+        <FormattedMessage tagName='h1' id='support.title' />
+        <FormattedMessage tagName='section' id='support.message' />
+        <ContactForm />
+      </main>)
   }
 }

@@ -2,7 +2,7 @@
 import React from 'react'
 import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
-import { DocumentTitle, Modal, Label, Input, Submit } from './intl'
+import { Meta, Modal, Label, Input, Submit } from './intl'
 import { FormattedMessage } from 'react-intl'
 import sdk from '../../client/sdk'
 import Loader from './Loader'
@@ -326,9 +326,10 @@ class Users extends React.Component<UsersProps> {
   render () {
     const laundry = this.props.laundry
     if (!laundry) return null
-    return <DocumentTitle title='document-title.laundry-users'>
+    return (
       <Loader loader={() => this.load(laundry)}>
         <main className='naved' id='Users'>
+          <Meta title={'document-title.laundry-users'}/>
           <h1 className='alignLeft'>
             <FormattedMessage id='users.title' />
           </h1>
@@ -348,8 +349,7 @@ class Users extends React.Component<UsersProps> {
             <LinkInvite laundry={laundry} />
           </section>
         </main>
-      </Loader>
-    </DocumentTitle>
+      </Loader>)
   }
 }
 

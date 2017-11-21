@@ -283,5 +283,8 @@
     "auth.error.invalid-verification-link": "Invalid verification link",
     "auth.success.email-verified": "Your email has been verified, please login",
     "admin-panel.show-demo": "Show demo",
-    "meta.description": "Laundree is an app for booking of shared laundry facilities. You can reserve your machines from the mobile. Get started online now!"
+    "meta.description": "Laundree is an app for booking of shared laundry facilities. You can reserve your machines from the mobile. Get started online now!",
+    "meta.login.description": "Login to Laundree and start managing your bookings",
+    "meta.signup.description": "Sign-up to Laundree and start managing your bookings",
+    "meta.forgot.description": "Forgot your passowrd? Enter your email to reset it."
 }

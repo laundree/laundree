@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 import { ValidationForm, ValidationElement } from './validation'
 import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
-import { Label, Input, Submit, DocumentTitle } from './intl'
+import { Label, Input, Submit, Meta } from './intl'
 import { FormattedMessage } from 'react-intl'
 import type { LocaleType } from '../../locales/index'
 
@@ -38,8 +38,9 @@ export default class Verification extends ValueUpdater<VerificationValues, { loc
   }
 
   render () {
-    return <DocumentTitle title='document-title.resend-verification'>
+    return (
       <div>
+        <Meta title={'document-title.resend-verification'} />
         <FormattedMessage id='auth.verification.title' tagName='h1' />
         <Link to={'/'} id='Logo'>
           <svg>
@@ -95,8 +96,7 @@ export default class Verification extends ValueUpdater<VerificationValues, { loc
             </div>
           </div>
         </ValidationForm>
-      </div>
-    </DocumentTitle>
+      </div>)
   }
 }
 
