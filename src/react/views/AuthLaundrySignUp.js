@@ -9,8 +9,10 @@ import SignUpForm from './SignUpForm'
 import SocialButton from './SocialButton'
 import { Link } from 'react-router-dom'
 import { signUpStore } from '../../client/store'
+import { connect } from 'react-redux'
+import type { LocaleType } from '../../locales/index'
 
-export default ({match, location}: { match: Match, location: Location }) => {
+const AuthLaundrySignUp = ({match, location, locale}: { locale: LocaleType, match: Match, location: Location }) => {
   const {laundryId, key} = match.params
   if (!laundryId || !key) {
     return null
@@ -52,11 +54,11 @@ export default ({match, location}: { match: Match, location: Location }) => {
         <div className='notice'>
           <FormattedMessage id='auth.signup.notice' values={{
             toc: <a
-              href={'/terms-and-conditions'}
+              href={`/${locale}/terms-and-conditions`}
               target='_blank'>
               <FormattedMessage id='general.toc' />
             </a>,
-            pp: <a href={'/privacy'} target='_blank'>
+            pp: <a href={`/${locale}/privacy`} target='_blank'>
               <FormattedMessage id='general.privacy-policy' />
             </a>
           }} />
@@ -65,3 +67,5 @@ export default ({match, location}: { match: Match, location: Location }) => {
     </DocumentTitle>
   )
 }
+
+export default connect(({config: {locale}}): { locale: LocaleType } => ({locale}))(AuthLaundrySignUp)

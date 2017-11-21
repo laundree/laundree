@@ -5,8 +5,10 @@ import { Link } from 'react-router-dom'
 import { FormattedMessage } from 'react-intl'
 import SignUpForm from './SignUpForm'
 import SocialButton from './SocialButton'
+import type { LocaleType } from '../../locales/index'
+import { connect } from 'react-redux'
 
-export default () => (
+const SignUp = ({locale}: {locale: LocaleType}) => (
   <DocumentTitle title='document-title.signup'>
     <div>
       <FormattedMessage id='auth.signup.title' tagName='h1' />
@@ -48,11 +50,11 @@ export default () => (
       <div className='notice'>
         <FormattedMessage id='auth.signup.notice' values={{
           toc: <a
-            href={'/terms-and-conditions'}
+            href={`/${locale}/terms-and-conditions`}
             target='_blank'>
             <FormattedMessage id='general.toc' />
           </a>,
-          pp: <a href={'/privacy'} target='_blank'>
+          pp: <a href={`/${locale}/privacy`} target='_blank'>
             <FormattedMessage id='general.privacy-policy' />
           </a>
         }} />
@@ -60,3 +62,5 @@ export default () => (
     </div>
   </DocumentTitle>
 )
+
+export default connect(({config: {locale}}): { locale: LocaleType } => ({locale}))(SignUp)
