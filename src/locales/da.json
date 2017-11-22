@@ -291,5 +291,7 @@
     "meta.description": "Laundree er en app for booking af delte vaskefaciliteter. Du kan reservere dine maskiner fra din mobil. Start online nu!",
     "meta.login.description": "Login på Laundree og begynd at administrere dine bookinger",
     "meta.signup.description": "Tilmeld dig Laundree og begynd at administrere dine bookinger",
-    "meta.forgot.description": "Har du glemt dit kodeord? Indtast din email adresse herunder for at nulstille den"
+    "meta.forgot.description": "Har du glemt dit kodeord? Indtast din email adresse herunder for at nulstille den",
+    "landing-page.intro.title": "Et gratis booking system til dit fællesvaskeri",
+    "landing-page.intro.subtitle": "Book vasketid ligemeget hvor du er!"
 }
