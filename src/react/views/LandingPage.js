@@ -58,11 +58,9 @@ const IntroSection = ({locale}: { locale: LocaleType }) => (
     <div className='container' style={{padding: 0}}>
       <div style={{overflow: 'hidden', position: 'relative', height: '38em'}}>
         <div className='title'>
-          <h1>
-            Et gratis booking system til dit fællesvaskeri
-          </h1>
+          <FormattedMessage id={'landing-page.intro.title'} tagName={'h1'}/>
           <div className='desc'>
-            Book vasketid ligemeget hvor du er!
+            <FormattedMessage id={'landing-page.intro.subtitle'}/>
           </div>
         </div>
         <div className='appLogos'>
