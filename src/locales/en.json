@@ -286,5 +286,7 @@
     "meta.description": "Laundree is an app for booking of shared laundry facilities. You can reserve your machines from the mobile. Get started online now!",
     "meta.login.description": "Login to Laundree and start managing your bookings",
     "meta.signup.description": "Sign-up to Laundree and start managing your bookings",
-    "meta.forgot.description": "Forgot your passowrd? Enter your email to reset it."
+    "meta.forgot.description": "Forgot your passowrd? Enter your email to reset it.",
+    "landing-page.intro.title":"A free booking system for your laundry",
+    "landing-page.intro.subtitle": "Book your machines directly on your device!"
 }
