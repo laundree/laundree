@@ -11,6 +11,7 @@ import { connect } from 'react-redux'
 import type { StateAddendum } from './types'
 import Debug from 'debug'
 import type { User } from 'laundree-sdk/lib/sdk'
+import ReactGA from 'react-ga'
 
 const debug = Debug('laundree.react.views.signupform')
 
@@ -63,9 +64,10 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
         name: this.state.values.laundryName
       })
       await sdk.api.user._startEmailVerification(user.id, {email: this.state.values.email, locale: this.props.locale})
+      ReactGA.event({category: 'User', action: 'Create user with laundry'})
       return user
     }
-    return sdk.api.user.signUpUser(
+    const u = await sdk.api.user.signUpUser(
       {
         displayName: this.state.values.name,
         email: this.state.values.email,
@@ -73,6 +75,8 @@ class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
         locale: this.props.locale
       }
     )
+    ReactGA.event({category: 'User', action: 'Create user'})
+    return u
   }
 
   submitHandler = async (evt: Event) => {

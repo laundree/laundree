@@ -9,6 +9,7 @@ import type { User, State } from 'laundree-sdk/lib/redux'
 import type { LocaleType } from '../../locales/index'
 import { connect } from 'react-redux'
 import type { StateAddendum } from './types'
+import ReactGA from 'react-ga'
 
 const UserInput = ({user: {photo, displayName}}: { user: User }) => <div className='userInput'>
   <img className='avatar' src={photo} />
@@ -52,8 +53,10 @@ class ContactForm extends ValueUpdater<ContactFormValues, ContactFormProps, Cont
     const {email, name, subject, message} = this.state.values
     if (this.props.user) {
       await sdk.api.contact.sendSupportMessage({message, subject, locale: this.props.locale})
+      ReactGA.event({category: 'Support', action: 'Send message'})
     } else {
       await sdk.api.contact.sendMessage({name, email, message, subject, locale: this.props.locale})
+      ReactGA.event({category: 'Contact', action: 'Send message'})
     }
     this.reset({loading: false, sent: true})
   }

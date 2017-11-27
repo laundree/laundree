@@ -10,6 +10,7 @@ import Loader from './Loader'
 import NotFound from './NotFound'
 import { connect } from 'react-redux'
 import type { User, Laundry, State } from 'laundree-sdk/lib/redux'
+import ReactGA from 'react-ga'
 
 class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User }, { loading: boolean }> {
   onSubmit = async (event) => {
@@ -66,6 +67,7 @@ class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPasswo
           currentPassword: this.state.values.currentPassword,
           newPassword: this.state.values.newPassword
         })
+      ReactGA.event({category: 'User', action: 'Update password'})
       this.reset({
         loading: false,
         notion: {
@@ -152,6 +154,7 @@ class DeleteUser extends React.Component<{ user: User }, { modalOpen: boolean }>
 
   async deleteUser () {
     await sdk.api.user.del(this.props.user.id)
+    ReactGA.event({category: 'User', action: 'Delete user'})
     window.location = '/'
   }
 
@@ -189,6 +192,7 @@ class UserSettings extends React.Component<UserSettingsProps, { loading: boolean
     if (this.state.loading) return
     this.setState({loading: true})
     const emails = await sdk.api.user.listEmails(this.props.user)
+    ReactGA.event({category: 'User', action: 'List emails'})
     this.setState({loading: false, emails})
   }
 

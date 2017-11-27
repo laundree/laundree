@@ -9,6 +9,7 @@ import { FormattedMessage } from 'react-intl'
 import type { Location } from 'react-router'
 import queryString from 'querystring'
 import type { LocaleType } from '../../locales'
+import ReactGA from 'react-ga'
 
 type ResetValues = {
   password: string
@@ -40,6 +41,7 @@ export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetSt
     evt.preventDefault()
     try {
       await sdk.api.user.resetPassword(user, {token, password: this.state.values.password})
+      ReactGA.event({category: 'User', action: 'Reset password'})
       this.reset({
         loading: false,
         notion: {message: <FormattedMessage id='auth.reset.success' />, success: true}

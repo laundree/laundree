@@ -6,6 +6,7 @@ import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import { Input, Label, Submit, Meta } from './intl'
 import LocationSelector from './LocationSelector'
+import ReactGA from 'react-ga'
 
 type CreateLaundryState = {
   createExpanded: boolean,
@@ -30,12 +31,16 @@ export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues,
     }
     this.setState(({createExpanded}) => ({createExpanded: !createExpanded}))
   }
-  onSubmit = (event: Event) => {
+  onSubmit = async (event: Event) => {
     event.preventDefault()
     this.setState({loading: true})
-    sdk.api.laundry
-      .createLaundry({name: this.state.values.name.trim(), googlePlaceId: this.state.values.placeId})
-      .catch((err) => this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)}))
+    try {
+      await sdk.api.laundry
+        .createLaundry({name: this.state.values.name.trim(), googlePlaceId: this.state.values.placeId})
+    } catch (err) {
+      this.setState({loading: false, notion: CreateLaundry.errorToNotion(err)})
+    }
+    ReactGA.event({category: 'Laundry', action: 'Create laundry'})
   }
 
   calculateClassName () {
