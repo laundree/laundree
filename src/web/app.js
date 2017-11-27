@@ -99,6 +99,9 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use('/auth', authRoute)
 app.use('/logout', logoutRoute)
+app.use('/contact', (req, res: Response) => {
+  res.redirect('/')
+})
 app.use('/s', inviteCodeRoute)
 locales.supported.forEach(locale => {
   const router = express.Router()
