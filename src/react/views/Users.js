@@ -12,12 +12,14 @@ import type { Laundry, State, User, Invite } from 'laundree-sdk/lib/redux'
 import type { LocaleType } from '../../locales'
 import type { StateAddendum } from './types'
 import { connect } from 'react-redux'
+import ReactGA from 'react-ga'
 
 class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry, locale: LocaleType }, {}> {
   submitHandler = async (evt: Event) => {
     evt.preventDefault()
     await sdk.api.laundry
       .inviteUserByEmail(this.props.laundry.id, {email: this.state.values.email, locale: this.props.locale})
+    ReactGA.event({category: 'Laundry', action: 'Invite user by email'})
     this.reset()
   }
 
@@ -67,6 +69,7 @@ class QrInvite extends React.Component<{
     if (this.state.generating) return
     this.setState({generating: true})
     const {key} = await sdk.api.laundry.createInviteCode(this.props.laundry.id)
+    ReactGA.event({category: 'Laundry', action: 'Create invite code'})
     this.setState({key, generating: false})
   }
 
@@ -114,12 +117,13 @@ class LinkElement extends React.Component<{ link: string }> {
 class LinkInvite extends React.Component<{ laundry: Laundry }, { link: ?string, generating?: boolean }> {
   state = {link: null}
 
-  generateLink () {
+  async generateLink () {
     if (this.state.generating) return
     this.setState({generating: true})
-    sdk.api.laundry
+    const {href} = await sdk.api.laundry
       .createInviteCode(this.props.laundry.id)
-      .then(({href}) => this.setState({link: href, generating: false}))
+    ReactGA.event({category: 'Laundry', action: 'Create invite code'})
+    this.setState({link: href, generating: false})
   }
 
   renderLink () {
@@ -153,14 +157,22 @@ class UserItem extends React.Component<{
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
   onCloseModal = () => this.setState({showModal: false})
-  handleDelete = () => sdk.api.laundry.removeUserFromLaundry(this.props.laundry.id, this.props.user.id)
-
-  makeOwner () {
-    sdk.api.laundry.addOwner(this.props.laundry.id, this.props.user.id)
+  handleDelete = async () => {
+    const r = await sdk.api.laundry.removeUserFromLaundry(this.props.laundry.id, this.props.user.id)
+    ReactGA.event({category: 'Laundry', action: 'Remove user from laundry'})
+    return r
   }
 
-  makeUser () {
-    sdk.api.laundry.removeOwner(this.props.laundry.id, this.props.user.id)
+  async makeOwner () {
+    const r = await sdk.api.laundry.addOwner(this.props.laundry.id, this.props.user.id)
+    ReactGA.event({category: 'Laundry', action: 'Add owner'})
+    return r
+  }
+
+  async makeUser () {
+    const r = await sdk.api.laundry.removeOwner(this.props.laundry.id, this.props.user.id)
+    ReactGA.event({category: 'Laundry', action: 'Remove owner'})
+    return r
   }
 
   isCurrentUser () {
@@ -258,7 +270,11 @@ class InviteItem extends React.Component<{ invite: Invite }, { showModal: boolea
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
   onCloseModal = () => this.setState({showModal: false})
-  handleDelete = () => sdk.api.invite.del(this.props.invite.id)
+  handleDelete = async () => {
+    const r = await sdk.api.invite.del(this.props.invite.id)
+    ReactGA.event({category: 'Laundry', action: 'Invite user'})
+    return r
+  }
 
   render () {
     return <div>
@@ -329,7 +345,7 @@ class Users extends React.Component<UsersProps> {
     return (
       <Loader loader={() => this.load(laundry)}>
         <main className='naved' id='Users'>
-          <Meta title={'document-title.laundry-users'}/>
+          <Meta title={'document-title.laundry-users'} />
           <h1 className='alignLeft'>
             <FormattedMessage id='users.title' />
           </h1>

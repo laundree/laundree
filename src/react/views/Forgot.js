@@ -7,6 +7,7 @@ import ValueUpdater from './helpers/ValueUpdater'
 import sdk from '../../client/sdk'
 import { FormattedMessage } from 'react-intl'
 import type { LocaleType } from '../../locales/index'
+import ReactGA from 'react-ga'
 
 type ForgotValues = { email: string }
 type ForgotProps = { locale: LocaleType }
@@ -27,6 +28,7 @@ class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
     evt.preventDefault()
     try {
       await sdk.api.user.forgotPassword({email: this.state.values.email.toLowerCase(), locale: this.props.locale})
+      ReactGA.event({category: 'User', action: 'Forgot password'})
       this.reset({
         loading: false,
         notion: {

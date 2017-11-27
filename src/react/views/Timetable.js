@@ -13,6 +13,7 @@ import Loader from './Loader'
 import type { Machine, User, Booking, Laundry, State } from 'laundree-sdk/lib/redux'
 import queryString from 'querystring'
 import { connect } from 'react-redux'
+import ReactGA from 'react-ga'
 
 class BookingInfo extends React.Component<{
   onActiveChange: Function,
@@ -29,6 +30,7 @@ class BookingInfo extends React.Component<{
       .api
       .booking
       .del(this.props.booking.id)
+    ReactGA.event({category: 'Booking', action: 'Delete booking'})
     this.close()
   }
 

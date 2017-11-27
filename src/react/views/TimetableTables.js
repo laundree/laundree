@@ -4,6 +4,7 @@ import { range } from '../../utils/array'
 import sdk from '../../client/sdk'
 import moment from 'moment-timezone'
 import type { Machine, Laundry, Booking } from 'laundree-sdk/lib/redux'
+import ReactGA from 'react-ga'
 
 function maxMin (value, max, min) {
   return Math.max(Math.min(value, max), min)
@@ -261,17 +262,21 @@ class TimetableTable extends React.Component<TimetableTableProps, {
     const {max, min} = TimetableTable._fixPos(from, to)
     const maxExclusive = {x: max.x + 1, y: max.y + 1}
     return Promise.all(range(min.x, maxExclusive.x)
-      .map(x => {
+      .map(async x => {
         const machine = this.props.machines[this.props.laundry.machines[x]]
         if (machine.broken) return
-        return sdk.api.machine.createBooking(machine.id, {from: this.posToDate(min), to: this.posToDate(maxExclusive)})
+        const r = await sdk.api.machine.createBooking(machine.id, {from: this.posToDate(min), to: this.posToDate(maxExclusive)})
+        ReactGA.event({category: 'Booking', action: 'Create booking'})
+        return r
       }))
   }
 
-  update (booking, {from, to}: { from?: *, to?: * }) {
+  async update (booking, {from, to}: { from?: *, to?: * }) {
     const machine = this.props.machines[booking.machine]
     if (machine.broken) return
-    return sdk.api.booking.updateBooking(booking.id, {from: from && this.posToDate(from), to: to && this.posToDate(to)})
+    const r = sdk.api.booking.updateBooking(booking.id, {from: from && this.posToDate(from), to: to && this.posToDate(to)})
+    ReactGA.event({category: 'Booking', action: 'Update booking'})
+    return r
   }
 
   tdToTablePos (td) {

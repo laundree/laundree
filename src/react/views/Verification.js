@@ -7,6 +7,7 @@ import sdk from '../../client/sdk'
 import { Label, Input, Submit, Meta } from './intl'
 import { FormattedMessage } from 'react-intl'
 import type { LocaleType } from '../../locales/index'
+import ReactGA from 'react-ga'
 
 type VerificationValues = { email: string }
 
@@ -17,6 +18,7 @@ export default class Verification extends ValueUpdater<VerificationValues, { loc
     evt.preventDefault()
     try {
       await sdk.api.user.startEmailVerification({email: this.state.values.email, locale: this.props.locale})
+      ReactGA.event({category: 'User', action: 'Start email verification'})
       this.reset({
         loading: false,
         notion: {message: <FormattedMessage id='auth.verification.success' />, success: true}

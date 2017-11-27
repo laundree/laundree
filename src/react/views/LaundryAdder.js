@@ -6,6 +6,7 @@ import { signUpStore } from '../../client/store'
 import { shortIdToLong } from '../../utils/string'
 import sdk from '../../client/sdk'
 import Debug from 'debug'
+import ReactGA from 'react-ga'
 
 const debug = Debug('laundree.react.views.LaundryAdder')
 
@@ -31,6 +32,7 @@ class LaundryAdder extends React.Component<{ user: ?User }, { signUp?: { userId:
     }
     try {
       await sdk.api.laundry.addFromCode(longId, {key: signUp.key})
+      ReactGA.event({category: 'User', action: 'Add laundry from code'})
       debug('Added laundry!')
     } catch (err) {
       debug('Failed to add user to laundry... ', err)

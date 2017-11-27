@@ -10,6 +10,7 @@ import type { Laundry, User, State } from 'laundree-sdk/lib/redux'
 import type { Time } from 'laundree-sdk/lib/sdk'
 import LocationSelector from './LocationSelector'
 import { connect } from 'react-redux'
+import ReactGA from 'react-ga'
 
 type LaundrySettingsFormValues = {
   name: string,
@@ -110,8 +111,9 @@ class DeleteLaundry extends React.Component<{ laundry: Laundry, user: User }, { 
   handleOpenModal = () => this.setState({modalOpen: true})
   state = {modalOpen: false}
 
-  deleteLaundry () {
-    return sdk.api.laundry.del(this.props.laundry.id)
+  async deleteLaundry () {
+    await sdk.api.laundry.del(this.props.laundry.id)
+    ReactGA.event({category: 'Laundry', action: 'Delete laundry'})
   }
 
   render () {
@@ -153,11 +155,12 @@ class LeaveLaundry extends React.Component<{
   handleOpenModal = () => this.setState({modalOpen: true})
   state = {modalOpen: false}
 
-  removeUser () {
-    return sdk
+  async removeUser () {
+    await sdk
       .api
       .laundry
       .removeUserFromLaundry(this.props.laundry.id, this.props.user.id)
+    ReactGA.event({category: 'User', action: 'Leave laundry'})
   }
 
   render () {
@@ -309,9 +312,10 @@ class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, B
     this.reset({values: rulesToInitialValues(rules)})
   }
 
-  submit () {
+  async submit () {
     const modifier = this.rules()
-    sdk.api.laundry.updateLaundry(this.props.laundry.id, modifier)
+    await sdk.api.laundry.updateLaundry(this.props.laundry.id, modifier)
+    ReactGA.event({category: 'Laundry', action: 'Update laundry'})
   }
 
   rules () {

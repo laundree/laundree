@@ -8,6 +8,7 @@ import { FormattedMessage } from 'react-intl'
 import Loader from './Loader'
 import type { State, Machine, Laundry, User } from 'laundree-sdk/lib/redux'
 import { connect } from 'react-redux'
+import ReactGA from 'react-ga'
 
 class MachineDropdown extends React.Component<{
   onSelect: Function,
@@ -255,8 +256,14 @@ class Machines extends React.Component<MachinesProps, {}> {
           onRepair={() => {}}
           blacklist={this.blacklist(laundry)}
           machine={this.props.machines[machineId]}
-          onUpdate={params => sdk.api.machine.updateMachine(machineId, params)}
-          onDelete={() => sdk.api.machine.del(machineId)} />
+          onUpdate={async params => {
+            await sdk.api.machine.updateMachine(machineId, params)
+            ReactGA.event({category: 'Machine', action: 'Update machine'})
+          }}
+          onDelete={async () => {
+            await sdk.api.machine.del(machineId)
+            ReactGA.event({category: 'Machine', action: 'Delete machine'})
+          }} />
       </li>)}
     </ul>
   }
