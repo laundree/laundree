@@ -4,6 +4,7 @@ exclude_paths:
 - 'templates'
 - 'src/react/**.js'
 - 'src/**/index.js'
+- 'flow-typed'
 engines:
   scss-lint:
     enabled: true
