@@ -9,7 +9,13 @@ const router = express.Router()
 const hostname = `${config.get('web.protocol')}://${config.get('web.host')}`
 router.get('/robots.txt', (req: Request, res: Response) => {
   res.type('text/plain')
-  res.send(`User-agent: *\nAllow: /\nSitemap: ${hostname}/sitemap.xml`)
+  res.send('User-agent: *\n\n' +
+    'Disallow: /auth/sign-up\n' +
+    'Disallow: /contact\n' +
+    'Disallow: /privacy\n' +
+    'Disallow: /terms-and-conditions\n' +
+    'Disallow: /about\n\n' +
+    `Sitemap: ${hostname}/sitemap.xml`)
 })
 
 const urlTemplates = [
