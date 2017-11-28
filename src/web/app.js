@@ -100,20 +100,20 @@ app.use(cookieParser())
 app.use('/auth', authRoute)
 app.use('/logout', logoutRoute)
 const redirectToRootMiddleware = (req, res: Response) => res.redirect('/')
-
+const redirectToTos = (locale) => (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale || req.locale || 'en'}/current`)
 // Begin legacy routes
 app.use('/contact', redirectToRootMiddleware)
 app.use('/about', redirectToRootMiddleware)
 app.use('/auth/sign-up', (req, res: Response) => res.redirect(`/${req.locale || 'en'}/auth/sign-up`))
-app.get('/privacy', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${req.locale || 'en'}/current`))
-app.get('/terms-and-conditions', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${req.locale || 'en'}/current`))
+app.get('/privacy', redirectToTos())
+app.get('/terms-and-conditions', redirectToTos())
 // End legacy routes
 
 app.use('/s', inviteCodeRoute)
 locales.supported.forEach(locale => {
   const router = express.Router()
-  router.get('/privacy', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale}/current`))
-  router.get('/terms-and-conditions', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale}/current`))
+  router.get('/privacy', redirectToTos(locale))
+  router.get('/terms-and-conditions', redirectToTos(locale))
   router.use('/', langRoute(locale))
   router.use('/s', inviteCodeRoute)
   router.use('/', reactRouter(locale))
