@@ -99,9 +99,16 @@ app.use(bodyParser.urlencoded({extended: false}))
 app.use(cookieParser())
 app.use('/auth', authRoute)
 app.use('/logout', logoutRoute)
-app.use('/contact', (req, res: Response) => {
-  res.redirect('/')
-})
+const redirectToRootMiddleware = (req, res: Response) => res.redirect('/')
+
+// Begin legacy routes
+app.use('/contact', redirectToRootMiddleware)
+app.use('/about', redirectToRootMiddleware)
+app.use('/auth/sign-up', (req, res: Response) => res.redirect(`/${req.locale || 'en'}/auth/sign-up`))
+app.get('/privacy', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${req.locale || 'en'}/current`))
+app.get('/terms-and-conditions', (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${req.locale || 'en'}/current`))
+// End legacy routes
+
 app.use('/s', inviteCodeRoute)
 locales.supported.forEach(locale => {
   const router = express.Router()
