@@ -101,10 +101,12 @@ app.use('/auth', authRoute)
 app.use('/logout', logoutRoute)
 const redirectToRootMiddleware = (req, res: Response) => res.redirect('/')
 const redirectToTos = (locale) => (req, res: Response) => res.redirect(`https://laundree.github.io/tos/${locale || req.locale || 'en'}/current`)
+const redirectToLocale = (path) => (req, res: Response) => res.redirect(`/${req.locale || 'en'}${path}`)
 // Begin legacy routes
 app.use('/contact', redirectToRootMiddleware)
 app.use('/about', redirectToRootMiddleware)
-app.use('/auth/sign-up', (req, res: Response) => res.redirect(`/${req.locale || 'en'}/auth/sign-up`))
+app.use('/auth/sign-up', redirectToLocale('/auth/sign-up'))
+app.use('/auth/forgot', redirectToLocale('/auth/forgot'))
 app.get('/privacy', redirectToTos())
 app.get('/terms-and-conditions', redirectToTos())
 // End legacy routes
