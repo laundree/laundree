@@ -185,7 +185,6 @@ function setupFunctions (socket) {
       if (!from) return []
       const to = validateDate(toO)
       if (!to) return []
-      console.log(from, to)
       const bookings = await laundry.fetchBookings(from, to)
       return [actionListBookings(bookings)]
     })
