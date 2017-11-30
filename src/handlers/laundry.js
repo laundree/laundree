@@ -28,6 +28,8 @@ function objToMintues ({hour, minute}) {
 
 export type DateTimeObject = { year: number, month: number, day: number, hour: number, minute: number }
 
+export type DateObject = { year: number, month: number, day: number }
+
 class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, RestLaundry, *> {
 
   constructor () {
@@ -168,7 +170,7 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
    * @param {{year: int, month: int, day: int, hour: int=, minute: int=}} object
    * @return {Date}
    */
-  dateFromObject (object: DateTimeObject) {
+  dateFromObject (object: DateObject | DateTimeObject) {
     const mom = moment.tz(object, this.timezone())
     return mom.toDate()
   }
@@ -319,7 +321,7 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
    * @param {{year: int, month: int, day: int}} to
    * @return {BookingHandler[]}
    */
-  fetchBookings (from: DateTimeObject, to: DateTimeObject) {
+  fetchBookings (from: DateObject | DateTimeObject, to: DateObject | DateTimeObject) {
     return BookingHandler.lib._fetchBookings(
       this.dateFromObject(from),
       this.dateFromObject(to),

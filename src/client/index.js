@@ -10,4 +10,6 @@ debug('┬┴┬┴┤ ͜ʖ ͡°) ├┬┴┬┴')
 
 app()
 
+window.sdk = s
+
 export const sdk = s
