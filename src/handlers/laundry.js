@@ -170,9 +170,13 @@ export default class LaundryHandler extends Handler<LaundryModel, ReduxLaundry, 
    * @param {{year: int, month: int, day: int, hour: int=, minute: int=}} object
    * @return {Date}
    */
-  dateFromObject (object: DateObject | DateTimeObject) {
+  dateFromObject (object: DateObject | DateTimeObject): Date {
     const mom = moment.tz(object, this.timezone())
-    return mom.toDate()
+    const date = mom.toDate()
+    if (isNaN(date.getTime())) {
+      throw new Error('Invalid date object')
+    }
+    return date
   }
 
   /**
