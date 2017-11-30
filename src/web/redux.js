@@ -64,6 +64,7 @@ export async function createInitialEvents (currentUser: ?User, successFlash: str
     statistics,
     googleApiKey: config.get('google.clientApiKey'),
     apiBase: config.get('api.base'),
+    webBase: `${config.get('web.protocol')}://${config.get('web.host')}`,
     socketIoBase: config.get('socket_io.base'),
     token
   }
