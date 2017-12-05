@@ -1,14 +1,12 @@
 // @flow
 
 import path from 'path'
-import { EmailTemplate } from 'email-templates'
 import config from 'config'
 import Debug from 'debug'
-import { locales } from '../locales'
 import type { LocaleType } from '../locales'
 import Mailgun from 'mailgun-js'
 import MailComposer from 'nodemailer/lib/mail-composer'
-import {setupHandlebarsHelpers} from '../utils/handlebars'
+import { setupHandlebarsHelpers, render as renderHb } from '../utils/handlebars'
 
 setupHandlebarsHelpers()
 const mailgun = Mailgun(config.get('mailgun'))
@@ -23,17 +21,17 @@ type MailContent = { html: string, text: string, subject: string }
  * @param {string} locale
  * @return {Promise.<{html:string, text: string, subject:string}>}
  */
-export function render (data: Object, template: string, locale: LocaleType): Promise<MailContent> {
+export async function render (data: Object, template: string, locale: LocaleType): Promise<MailContent> {
   debug('Rendering email')
-  const messages = locales[locale]
-  const t = new EmailTemplate(
-    path.join(__dirname, '..', '..', 'templates', 'email', template))
-  return t.render({...data, messages})
+  const htmlP = renderHb(path.join('email', template, 'html.hbs'), data, locale)
+  const textP = renderHb(path.join('email', template, 'text.hbs'), data, locale)
+  const subjectP = renderHb(path.join('email', template, 'subject.hbs'), data, locale)
+  return {
+    html: await htmlP,
+    text: await textP,
+    subject: await subjectP
+  }
 }
-
-type TransporterOptions = { from: string, to: string } & MailContent
-
-type Transporter = { sendMail: (options: TransporterOptions, callback: (err: ?Error, data: ?Object) => void) => void }
 
 /**
  * Send email
@@ -98,7 +96,7 @@ function sendMailgunMail (to, message) {
  * @param {string=} locale
  * @returns {Promise}
  */
-export async function sendEmail (data: Object, template: string, to: string, {locale = 'en', from = config.get('emails.from')}: { locale?: LocaleType, from?: string, transporter?: Transporter } = {}) {
+export async function sendEmail (data: Object, template: string, to: string, {locale = 'en', from = config.get('emails.from')}: { locale?: LocaleType, from?: string } = {}) {
   debug(`Sending email to ${to}`)
   const rendered = await render(data, template, locale)
   return sendRenderedEmail(to, rendered, from)
