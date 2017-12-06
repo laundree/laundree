@@ -197,7 +197,7 @@ spec:
             cpu: 0.02
         env:
           - name: 'REDIS_HOST'
-            value: 'redis'
+            value: 'redis.default'
           - name: 'REDIS_PORT'
             value: '6379'
           - name: 'NODE_ENV'
@@ -283,7 +283,7 @@ spec:
           periodSeconds: 5
         env:
           - name: 'REDIS_HOST'
-            value: 'redis'
+            value: 'redis.default'
           - name: 'REDIS_PORT'
             value: '6379'
           - name: 'NODE_ENV'
