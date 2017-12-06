@@ -8,7 +8,7 @@ docker tag laundree/laundree:${TRAVIS_COMMIT} laundree/laundree:${TRAVIS_BRANCH}
 docker push laundree/laundree:${TRAVIS_COMMIT}
 docker push laundree/laundree:${TRAVIS_BRANCH}
 
-TAG=${TRAVIS_COMMIT} envsubst < kube/laundree.yml > laundree-deployment.yml
+NAMESPACE=${TRAVIS_BRANCH} TAG=${TRAVIS_COMMIT} envsubst < kube/laundree.yml > laundree-deployment.yml
 
 ~/google-cloud-sdk/bin/gcloud container clusters get-credentials cluster-1 \
     --zone europe-west1-b --project laundree-io

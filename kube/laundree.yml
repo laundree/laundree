@@ -2,6 +2,7 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: ${NAMESPACE}
   name: laundree
 spec:
   replicas: 1
@@ -40,6 +41,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: ${NAMESPACE}
   name: web
 spec:
   replicas: 2
@@ -168,6 +170,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: ${NAMESPACE}
   name: api
 spec:
   replicas: 1
@@ -252,6 +255,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
+  namespace: ${NAMESPACE}
   name: socket
 spec:
   replicas: 1
@@ -316,6 +320,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: ${NAMESPACE}
   name: laundree
   labels:
     app: laundree
@@ -333,6 +338,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: ${NAMESPACE}
   name: web
   labels:
     app: web
@@ -350,6 +356,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: ${NAMESPACE}
   name: api
   labels:
     app: api
@@ -367,6 +374,7 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
+  namespace: ${NAMESPACE}
   name: socket
   labels:
     app: socket
