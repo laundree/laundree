@@ -205,6 +205,7 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  namespace: beta
   name: beta-laundree-io
   annotations:
     kubernetes.io/tls-acme: "true"
@@ -213,20 +214,21 @@ spec:
   tls:
   - hosts:
     - beta.laundree.io
-    secretName: beta-laundree-io-tls
+    secretName: laundree-io-tls
   rules:
   - host: beta.laundree.io
     http:
       paths:
         - backend:
-            serviceName: laundree-beta
+            serviceName: laundree
             servicePort: 3000
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: api-beta-laundree-io
+  namespace: beta
+  name: api-laundree-io
   annotations:
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
@@ -234,20 +236,21 @@ spec:
   tls:
   - hosts:
     - api.beta.laundree.io
-    secretName: api-beta-laundree-io-tls
+    secretName: api-laundree-io-tls
   rules:
   - host: api.beta.laundree.io
     http:
       paths:
         - backend:
-            serviceName: api-beta
+            serviceName: api
             servicePort: 3000
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: socket-beta-laundree-io
+  namespace: beta
+  name: socket-laundree-io
   annotations:
     kubernetes.io/tls-acme: "true"
     kubernetes.io/ingress.class: "nginx"
@@ -255,19 +258,20 @@ spec:
   tls:
   - hosts:
     - socket.beta.laundree.io
-    secretName: socket-beta-laundree-io-tls
+    secretName: socket-laundree-io-tls
   rules:
   - host: socket.beta.laundree.io
     http:
       paths:
         - backend:
-            serviceName: socket-beta
+            serviceName: socket
             servicePort: 3000
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  namespace: master
   name: laundree-io
   annotations:
     kubernetes.io/tls-acme: "true"
@@ -282,12 +286,13 @@ spec:
     http:
       paths:
         - backend:
-            serviceName: laundree-master
+            serviceName: laundree
             servicePort: 3000
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  namespace: master
   name: api-laundree-io
   annotations:
     kubernetes.io/tls-acme: "true"
@@ -302,12 +307,13 @@ spec:
     http:
       paths:
         - backend:
-            serviceName: api-master
+            serviceName: api
             servicePort: 3000
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
+  namespace: master
   name: socket-laundree-io
   annotations:
     kubernetes.io/tls-acme: "true"
@@ -322,5 +328,5 @@ spec:
     http:
       paths:
         - backend:
-            serviceName: socket-master
+            serviceName: socket
             servicePort: 3000
