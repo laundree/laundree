@@ -3,10 +3,11 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: laundree-master
+  namespace: master
+  name: laundree
 data:
   host: laundree.io
-  mongoUrl: "mongodb://mongo/laundree"
+  mongoUrl: "mongodb://mongo.default/laundree"
   opbeatAppId: '71392cdc57'
   opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
   facebookAppId: '1044245498966904'
@@ -22,10 +23,11 @@ data:
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: laundree-beta
+  namespace: beta
+  name: laundree
 data:
   host: beta.laundree.io
-  mongoUrl: "mongodb://mongo/laundree-beta"
+  mongoUrl: "mongodb://mongo.default/laundree-beta"
   opbeatAppId: '2843b6b20b'
   opbeatOrgId: '269d8b7d5eca44c2bb850e06a5316184'
   googleTrackingId: ''
