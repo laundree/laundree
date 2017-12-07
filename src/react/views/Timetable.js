@@ -3,7 +3,6 @@ import React from 'react'
 import { Meta } from './intl'
 import TimetableTables from './TimetableTables'
 import TimetableHeaders from './TimetableHeaders'
-import { Link } from 'react-router-dom'
 import { FormattedDate, FormattedMessage } from 'react-intl'
 import { range } from '../../utils/array'
 import sdk from '../../client/sdk'
@@ -206,24 +205,28 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
   }
 }
 
-class TimetableWrapper extends React.Component<TimetableProps> {
+class TimetableWrapper extends React.Component<TimetableProps & {onStartTour: () => *}> {
   renderEmpty () {
     return <main className='naved'>
       <h1 className='alignLeft'>
         <FormattedMessage id='timetable.no-machines.title' />
       </h1>
-      {this.isOwner() ? <section>
-        <FormattedMessage
-          id='timetable.no-machines.action.register'
-          values={{
-            link: (
-              <Link to={`/laundries/${this.props.laundry.id}/machines`}>
-                <FormattedMessage id='timetable.no-machines.action.register.link' />
-              </Link>)
-          }} />
-      </section> : <section>
-        <FormattedMessage id='timetable.no-machines.action.wait' />
-      </section>}
+      {this.isOwner()
+        ? (
+          <section>
+            <FormattedMessage
+              id='timetable.start-guide'
+              values={{nl: <br />}} />
+            <div style={{paddingTop: '2em'}}>
+              <button onClick={this.props.onStartTour}>
+                <FormattedMessage id='timetable.guide' />
+              </button>
+            </div>
+          </section>)
+        : (
+          <section>
+            <FormattedMessage id='timetable.no-machines.action.wait' />
+          </section>)}
     </main>
   }
 

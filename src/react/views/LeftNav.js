@@ -28,9 +28,96 @@ type LeftNavProps = {
   currentLaundry: string
 }
 
-class LeftNav extends React.Component<LeftNavProps, { expanded: boolean }> {
+type Pos = { top: number, left: number }
 
-  state = {expanded: false}
+class TourElement extends React.PureComponent<{ onNext: () => void, onPrev: () => void, onPositionChange: (p: ?Pos) => void, title: string, initPosition?: Pos }> {
+  componentDidMount () {
+    this.props.onPositionChange(this.props.initPosition || null)
+  }
+
+  render () {
+    return null
+  }
+}
+
+class Tour extends React.PureComponent<{ children: *, onClose: () => * }, { step: number, position: ?Pos }> {
+  state = {step: 0}
+  _onNext = () => this.setState(({step}) => ({step: step + 1, position: null}))
+  _onPrev = () => this.setState(({step}) => ({step: step - 1, position: null}))
+
+  _navContainerStyle = {
+    position: 'absolute',
+    zIndex: 400,
+    backgroundColor: '#aaa',
+    bottom: 0,
+    width: '100%'
+  }
+
+  _navStyle = {
+    padding: '1em 1em',
+    color: '#fff'
+  }
+
+  _buttonStyle = {
+    display: 'inline-block'
+  }
+
+  _cardStyle = {
+    position: 'absolute',
+    backgroundColor: '#fff',
+    zIndex: 400,
+    padding: '2em 1em',
+    borderRadius: '0.3em'
+  }
+
+  _onPositionChange = position => this.setState({position})
+
+  render () {
+    const children = React.Children.toArray(this.props.children)
+    const child = children[0]
+    if (!child) {
+      return null
+    }
+    return (
+      <div>
+        <div style={{...this._cardStyle, ...(this.state.position || {display: 'none'})}}>
+          {React.cloneElement(child, {
+            onNext: this._onNext,
+            onPrev: this._onPrev,
+            onPositionChange: this._onPositionChange
+          })}
+        </div>
+        <div style={this._navContainerStyle}>
+          <div style={this._navStyle}>
+            <div style={{float: 'right'}}>
+              <button
+                onClick={this.props.onClose}
+                style={this._buttonStyle}
+                className={'red'}>
+                Stop tour
+              </button>
+            </div>
+            <span style={{padding: '0 2em'}}>
+              {child.props.title} (Step {this.state.step + 1} of {children.length})
+            </span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+}
+
+class MachineTourElement extends TourElement {
+  render () {
+    return <div>
+      Hello world!
+    </div>
+  }
+}
+
+class LeftNav extends React.Component<LeftNavProps, { expanded: boolean, tour: boolean }> {
+
+  state = {expanded: false, tour: false}
 
   toggleHandler = () => this.setState(({expanded}) => ({expanded: !expanded}))
 
@@ -120,16 +207,37 @@ class LeftNav extends React.Component<LeftNavProps, { expanded: boolean }> {
           </ul>
         </nav>
       </div>
+      {this._renderTour()}
       {this.renderContent(user)}
     </div>
   }
+
+  _renderTour () {
+    if (!this.state.tour) {
+      return null
+    }
+    return (
+      <Tour onClose={this._onStopTour}>
+        <MachineTourElement title={'Create machines'} initPosition={{top: 100, left: 100}} />
+        <TourElement title={'Set booking rules'} />
+        <TourElement title={'Invite users'} />
+      </Tour>
+    )
+  }
+
+  _onStartTour = () => this.setState({tour: true})
+  _onStopTour = () => this.setState({tour: false})
+
+  _renderTimeTable = props => (
+    <Timetable {...props} onStartTour={this._onStartTour} />
+  )
 
   renderContent (user: User) {
     const laundry = this.laundry()
     return (
       <Switch>
         <Redirect exact from={'/laundries/:laundryId'} to={`/laundries/${this.laundry().id}/timetable`} />
-        <Route path={'/laundries/:laundryId/timetable'} component={Timetable} />
+        <Route path={'/laundries/:laundryId/timetable'} render={this._renderTimeTable} />
         <Route path={'/laundries/:laundryId/bookings'} component={Bookings} />
         <Route path={'/laundries/:laundryId/settings'} component={LaundrySettings} />
         <OwnerCheckRoute
@@ -148,8 +256,7 @@ class LeftNav extends React.Component<LeftNavProps, { expanded: boolean }> {
   }
 
   load () {
-    return sdk
-      .fetchLaundry(this.props.currentLaundry)
+    return sdk.fetchLaundry(this.props.currentLaundry)
   }
 
   render () {

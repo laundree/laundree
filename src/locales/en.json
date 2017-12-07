@@ -98,6 +98,8 @@
     "timetable.no-machines.title": "There are no machines registered",
     "timetable.no-machines.action.register": "Please register your machines {link}.",
     "timetable.no-machines.action.register.link": "here",
+    "timetable.start-guide": "You have successfully created a laundry!{nl} Take the tour to start using it.",
+    "timetable.guide": "Take tour",
     "timetable.no-machines.action.wait": "Please tell your landlord to register some machines.",
     "document-title.resend-verification": "Resend verification e-mail",
     "auth.verification.title": "Re-send verification email",
