@@ -17,8 +17,9 @@ export default class Loader extends React.Component<{
   }
 
   render () {
-    return <div className={(this.state.loaded ? '' : 'loading blur') + ' loader'}>
-      {this.state.loaded ? this.props.children : null}
-    </div>
+    return (
+      <div className={(this.state.loaded ? '' : 'loading blur') + ' loader'}>
+        {this.state.loaded ? this.props.children : null}
+      </div>)
   }
 }
