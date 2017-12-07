@@ -11,7 +11,7 @@ import type {
 } from 'laundree-sdk/lib/redux'
 import sdk from './sdk'
 import config from 'config'
-import type { Config } from '../react/views/types'
+import type { Config } from '../react/types'
 import type { LocaleType } from '../locales/index'
 
 function mapFlash (flashArray, type) {
