@@ -14,7 +14,7 @@ type ValidationFormProps = {
   children?: *
 }
 
-export default class ValidationForm extends React.Component<ValidationFormProps, {initial: boolean, failed: boolean, valid: {[string]: boolean}}> {
+export default class ValidationForm extends React.Component<ValidationFormProps, { initial: boolean, failed: boolean, valid: { [string]: boolean } }> {
   initialState = {initial: true, failed: false, valid: {}}
   state = this.initialState
   submitHandler = (evt: Event) => {
@@ -32,17 +32,15 @@ export default class ValidationForm extends React.Component<ValidationFormProps,
     this.setState(this.initialState)
   }
 
-  generateValidationHandler () {
-    return (name: string, valid: boolean, initial: boolean) => {
-      this.setState((prevState) => {
-        const valids = prevState.valid
-        const obj = {}
-        obj[name] = valid
-        const resultObj = {valid: Object.assign({}, valids, obj)}
-        if (initial) return Object.assign({}, resultObj)
-        return {...{initial: false}, ...resultObj}
-      })
-    }
+  _validationHandler = (name: string, valid: boolean, initial: boolean) => {
+    this.setState((prevState) => {
+      const valids = prevState.valid
+      const obj = {}
+      obj[name] = valid
+      const resultObj = {valid: Object.assign({}, valids, obj)}
+      if (initial) return Object.assign({}, resultObj)
+      return {...{initial: false}, ...resultObj}
+    })
   }
 
   valid () {
@@ -62,7 +60,7 @@ export default class ValidationForm extends React.Component<ValidationFormProps,
   }
 
   getChildContext () {
-    return {validation: {handler: this.generateValidationHandler()}}
+    return {validation: {handler: this._validationHandler}}
   }
 
   className () {

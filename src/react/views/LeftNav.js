@@ -30,13 +30,52 @@ type LeftNavProps = {
 
 type Pos = { top: number, left: number }
 
-class TourElement extends React.PureComponent<{ onNext: () => void, onPrev: () => void, onPositionChange: (p: ?Pos) => void, title: string, initPosition?: Pos }> {
+type NavFunction = () => void
+
+type TourElementProps = {
+  onNext?: NavFunction,
+  onPrev?: NavFunction,
+  onPositionChange: (p: ?Pos) => void,
+  children?: *,
+  title: string,
+  render?: (prev: NavFunction, next: NavFunction) => *, // TODO find type
+  linkRef: *
+}
+
+class TourStep<T: {}> extends React.PureComponent<TourElementProps & T> {
+  _updatePosition () {
+    const ref = this.props.linkRef
+    if (!ref) {
+      return
+    }
+    const {top, right} = ref.getBoundingClientRect()
+    this.props.onPositionChange({top: top, left: right})
+  }
+
   componentDidMount () {
-    this.props.onPositionChange(this.props.initPosition || null)
+    this._updatePosition()
+  }
+
+  componentWillReceiveProps ({linkRef}) {
+    if (linkRef === this.props.linkRef) {
+      return
+    }
+    this._updatePosition()
+  }
+
+  _renderContent () {
+    if (this.props.children) {
+      return this.props.children
+    }
+    const {onPrev, onNext, render} = this.props
+    if (!onPrev || !onNext || !render) return null
+    return render(onPrev, onNext)
   }
 
   render () {
-    return null
+    return (
+      <div>{this._renderContent()}</div>
+    )
   }
 }
 
@@ -107,14 +146,6 @@ class Tour extends React.PureComponent<{ children: *, onClose: () => * }, { step
   }
 }
 
-class MachineTourElement extends TourElement {
-  render () {
-    return <div>
-      Hello world!
-    </div>
-  }
-}
-
 class LeftNav extends React.Component<LeftNavProps, { expanded: boolean, tour: boolean }> {
 
   state = {expanded: false, tour: false}
@@ -129,6 +160,12 @@ class LeftNav extends React.Component<LeftNavProps, { expanded: boolean, tour: b
 
   laundry () {
     return this.props.laundries[this.props.currentLaundry]
+  }
+
+  _machineRef
+
+  _machineRefPuller = ref => {
+    this._machineRef = ref
   }
 
   renderNav (user: User) {
@@ -168,7 +205,7 @@ class LeftNav extends React.Component<LeftNavProps, { expanded: boolean, tour: b
               </NavLink>
             </li>
             {owner
-              ? <li>
+              ? <li ref={this._machineRefPuller}>
                 <NavLink
                   to={`/laundries/${laundry.id}/machines`} activeClassName='active'
                   onClick={this.closeHandler}>
@@ -218,9 +255,16 @@ class LeftNav extends React.Component<LeftNavProps, { expanded: boolean, tour: b
     }
     return (
       <Tour onClose={this._onStopTour}>
-        <MachineTourElement title={'Create machines'} initPosition={{top: 100, left: 100}} />
-        <TourElement title={'Set booking rules'} />
-        <TourElement title={'Invite users'} />
+        <TourStep title={'Create machines'} linkRef={this._machineRef}>
+          <div>
+            <b>Create machines</b>
+            <div>
+              Start by creating some machines for your laundry.
+            </div>
+          </div>
+        </TourStep>
+        <TourStep title={'Set booking rules'} />
+        <TourStep title={'Invite users'} />
       </Tour>
     )
   }
