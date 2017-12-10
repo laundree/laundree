@@ -2,6 +2,7 @@
 import mongoose from 'mongoose'
 import type { ObjectId } from 'mongoose'
 import { union } from '../../utils/array'
+
 const Schema = mongoose.Schema
 
 export type UserRole = 'user' | 'admin'
@@ -88,7 +89,7 @@ const userSchema: Schema<UserDefinition> = new Schema({
     emails: [{value: String, type: {type: String}}],
     photos: [{value: String}]
   }]
-}, {timestamps: true})
+}, {timestamps: true, usePushEach: true})
 
 userSchema.index({'profiles.emails.value': 1})
 userSchema

@@ -1,6 +1,7 @@
 // @flow
 import mongoose from 'mongoose'
 import type { ObjectId } from 'mongoose'
+
 const {Schema} = mongoose
 
 export type LaundryRules = {
@@ -43,7 +44,7 @@ const laundrySchema: Schema<LaundryDefinition> = new Schema({
   googlePlaceId: {type: String},
   timezone: {type: String},
   signUpCodes: [String]
-}, {timestamps: true})
+}, {timestamps: true, usePushEach: true})
 
 laundrySchema.index({'name': 1})
 laundrySchema.index({'users': 1})
