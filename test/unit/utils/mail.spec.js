@@ -12,7 +12,7 @@ describe('utils', () => {
             token: 'token123'
           }, 'password-reset', 'test@example.com', {})
         const message = info.toString()
-        assert(message.match(/https:\/\/laundree\.io\/auth\/reset\?user=someFancyUserId&token=token123/))
+        assert(message.match(/https:\/\/laundree\.io\/en\/auth\/reset\?user=someFancyUserId&token=token123/))
         assert(message.match(/Bob Bobbesen/))
         assert(message.match(/someFancyUserId/))
       })
