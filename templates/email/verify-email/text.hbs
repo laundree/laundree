@@ -4,8 +4,9 @@
         name=user.displayName
         email=(format '"{email}"' email=email)
         link=(format
-                'https://laundree.io/auth/verify?user={userId}&email={email}&token={token}'
+                'https://laundree.io/{locale}/auth/verify?user={userId}&email={email}&token={token}'
                 userId=user.id
+                locale=locale
                 email=emailEncoded
                 token=token)
         nl='' }}
