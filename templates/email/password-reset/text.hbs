@@ -3,8 +3,9 @@
         messages=messages
         name=user.displayName
         link=(format
-                'https://laundree.io/auth/reset?user={userId}&token={token}'
+                'https://laundree.io/{locale}/auth/reset?user={userId}&token={token}'
                 userId=user.id
+                locale=locale
                 token=token)
         nl='' }}
 

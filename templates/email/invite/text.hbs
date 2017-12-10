@@ -3,7 +3,7 @@
         messages=messages
         name=(format '"{name}"' name=laundry.name)
         link='https://laundree.io'
-        signup='https://laundree.io/auth/sign-up'
+        signup=(format 'https://laundree.io/{locale}/auth/sign-up' locale=locale)
         nl='' }}
 
 {{ formatIntl
