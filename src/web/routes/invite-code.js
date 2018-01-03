@@ -13,11 +13,15 @@ const notFoundError = new error.StatusError('Not found', 404)
 router.get('/:laundryId/:id', async (req: Request, res, next) => {
   const {id, laundryId} = req.params
   const locale = req.locale || 'en'
-  if (!base64UrlSafe.validate(id) || !base64UrlSafe.validate(laundryId)) {
+  if (!base64UrlSafe.validate(id)) {
     return next(notFoundError)
   }
-  const laundryIdHex = shortIdToLong(laundryId)
-  const laundry = await sdk.api.laundry.get(laundryIdHex).catch(() => null)
+
+  const [l1, l2] = await Promise.all([
+    await sdk.api.laundry.get(shortIdToLong(laundryId)).catch(() => null),
+    await sdk.api.laundry.get(laundryId).catch(() => null)
+  ])
+  const laundry = l1 || l2
   if (!laundry) {
     return next(notFoundError)
   }
