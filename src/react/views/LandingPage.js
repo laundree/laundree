@@ -108,7 +108,7 @@ const Statistics = ({userCount, bookingCount}: { userCount: number, bookingCount
             <use xlinkHref='#Calendar' />
           </svg>
           <span>
-            {bookingCount}
+            { bookingCount > 1000 ? `${Math.floor(bookingCount / 1000)}K` : bookingCount }
         </span>
         </div>
         <div className='subTitle'>
