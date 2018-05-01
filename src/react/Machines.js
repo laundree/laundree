@@ -13,7 +13,7 @@ import ReactGA from 'react-ga'
 class MachineDropdown extends React.Component<{
   onSelect: Function,
   selected: string
-}> {
+  }> {
   selectGenerator (value) {
     return () => {
       this.props.onSelect(value)
@@ -33,22 +33,22 @@ class MachineDropdown extends React.Component<{
           <ul className='dropDownList'>
             <DropDownCloser>
               <li className={this.props.selected === 'wash' ? 'active' : ''} onClick={this.selectGenerator('wash')}>
-              <span className='link'>
-                <svg>
-                  <use xlinkHref='#Drop' />
-                </svg>
-                <FormattedMessage id='machines.washing-machine' />
-              </span>
+                <span className='link'>
+                  <svg>
+                    <use xlinkHref='#Drop' />
+                  </svg>
+                  <FormattedMessage id='machines.washing-machine' />
+                </span>
               </li>
             </DropDownCloser>
             <DropDownCloser>
               <li className={this.props.selected === 'dry' ? 'active' : ''} onClick={this.selectGenerator('dry')}>
-              <span className='link'>
-                <svg>
-                  <use xlinkHref='#Waves' />
-                </svg>
-                <FormattedMessage id='machines.dryer' />
-              </span>
+                <span className='link'>
+                  <svg>
+                    <use xlinkHref='#Waves' />
+                  </svg>
+                  <FormattedMessage id='machines.dryer' />
+                </span>
               </li>
             </DropDownCloser>
           </ul>
@@ -70,7 +70,6 @@ type MachineListItemProps = {
 type MachineListItemState = { sesh: number, value: string, selected: 'wash' | 'dry', initial: boolean, broken: boolean, showModal: boolean }
 
 class MachineListItem extends React.Component<MachineListItemProps, MachineListItemState> {
-
   state = this.initialState()
 
   onSelect = (selected) => {

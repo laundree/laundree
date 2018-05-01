@@ -3,7 +3,6 @@ import React from 'react'
 import PropTypes from 'prop-types'
 
 export default class DropDownCloser extends React.Component<{children: *}, *> {
-
   generateOnClick = (fn: Function) => (evt: Event) => {
     if (fn) fn(evt)
     this.context.closeDropDown()

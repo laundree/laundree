@@ -12,7 +12,6 @@ import type { ObjectId } from 'mongoose'
 import config from 'config'
 
 class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, RestMachine, *> {
-
   constructor () {
     super(MachineHandler, MachineModel, {
       create: obj => typeof obj === 'string' ? null : {type: 'CREATE_MACHINE', payload: obj.reduxModel()},
@@ -27,7 +26,6 @@ class MachineHandlerLibrary extends HandlerLibrary<Machine, MachineModel, RestMa
     this.emitEvent('create', machine)
     return machine
   }
-
 }
 
 const restUrlPrefix = `${config.get('api.base')}/machines/`
@@ -65,7 +63,7 @@ export default class MachineHandler extends Handler<MachineModel, Machine, RestM
   async _findAdjacentBookings (user: UserHandler, from: Date, to: Date) {
     const [{before, after}, laundry] = await (
       Promise.all([
-        this.findAdjacentBookingsOfUser(user, from, to),  // Find bookings that should be merged
+        this.findAdjacentBookingsOfUser(user, from, to), // Find bookings that should be merged
         this.fetchLaundry()
       ])
     )

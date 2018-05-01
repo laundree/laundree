@@ -96,7 +96,7 @@ const Statistics = ({userCount, bookingCount}: { userCount: number, bookingCount
           </svg>
           <span>
             {userCount}
-        </span>
+          </span>
         </div>
         <div className='subTitle'>
           <FormattedMessage id={'landing-page.users-created'} />
@@ -109,7 +109,7 @@ const Statistics = ({userCount, bookingCount}: { userCount: number, bookingCount
           </svg>
           <span>
             { bookingCount > 1000 ? `${Math.floor(bookingCount / 1000)}K` : bookingCount }
-        </span>
+          </span>
         </div>
         <div className='subTitle'>
           <FormattedMessage id={'landing-page.bookings-created'} />

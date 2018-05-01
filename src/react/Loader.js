@@ -5,8 +5,7 @@ export default class Loader extends React.Component<{
   children?: *,
   loader: Function,
   loaded?: boolean
-}, { loaded: boolean }> {
-
+  }, { loaded: boolean }> {
   state: { loaded: boolean } = {loaded: Boolean(this.props.loaded)}
 
   componentDidMount () {

@@ -5,7 +5,6 @@ import DropDownContent from './DropDownContent'
 import PropTypes from 'prop-types'
 
 export default class DropDown extends React.Component<{className?: string, children: *}, *> {
-
   state = {open: false}
   onToggle = () => this.toggle()
   ref: ?HTMLElement

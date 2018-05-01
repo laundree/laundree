@@ -38,7 +38,6 @@ type SignUpProps = {
 }
 
 class SignUpForm extends ValueUpdater<SignUpValues, SignUpProps, SignUpState> {
-
   initialState () {
     return {loading: false, sesh: 0}
   }

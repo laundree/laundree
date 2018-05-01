@@ -16,7 +16,6 @@ type CreateLaundryState = {
 type CreateLaundryFormValues = { name: string, placeId: string }
 
 export default class CreateLaundry extends ValueUpdater<CreateLaundryFormValues, {}, CreateLaundryState> {
-
   initialValues () {
     return {name: '', placeId: ''}
   }

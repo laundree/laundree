@@ -12,7 +12,6 @@ import ReactGA from 'react-ga'
 type VerificationValues = { email: string }
 
 export default class Verification extends ValueUpdater<VerificationValues, { locale: LocaleType }, { loading: boolean }> {
-
   submitHandler = async (evt: Event) => {
     this.setState({loading: true})
     evt.preventDefault()

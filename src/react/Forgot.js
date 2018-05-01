@@ -14,7 +14,6 @@ type ForgotProps = { locale: LocaleType }
 type ForgotState = { loading: boolean }
 
 class Forgot extends ValueUpdater<ForgotValues, ForgotProps, ForgotState> {
-
   initialState () {
     return {loading: false}
   }

@@ -26,7 +26,6 @@ type ContactFormProps = { user: ?User, locale: LocaleType }
 type ContactFormState = { loading: boolean, sent: boolean }
 
 class ContactForm extends ValueUpdater<ContactFormValues, ContactFormProps, ContactFormState> {
-
   initialValues () {
     return {
       name: '',

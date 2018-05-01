@@ -57,7 +57,6 @@ class UserNameForm extends ValueUpdater<{ displayName: string }, { user: User },
 }
 
 class UserPasswordForm extends ValueUpdater<{ currentPassword: string, newPassword: string, newPasswordRepeat: string }, { user: User }, { loading: boolean }> {
-
   onSubmit = async (event) => {
     this.setState({loading: true})
     event.preventDefault()
@@ -185,7 +184,6 @@ type UserSettingsProps = {
 }
 
 class UserSettings extends React.Component<UserSettingsProps, { loading: boolean, emails?: string[] }> {
-
   state = {loading: false}
 
   onLoadClick = async () => {
