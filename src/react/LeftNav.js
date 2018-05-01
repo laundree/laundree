@@ -127,23 +127,25 @@ class LeftNav extends React.Component<LeftNavProps, { expanded: boolean }> {
   renderContent (user: User) {
     const laundry = this.laundry()
     return (
-      <Switch>
-        <Redirect exact from={'/laundries/:laundryId'} to={`/laundries/${this.laundry().id}/timetable`} />
-        <Route path={'/laundries/:laundryId/timetable'} component={Timetable} />
-        <Route path={'/laundries/:laundryId/bookings'} component={Bookings} />
-        <Route path={'/laundries/:laundryId/settings'} component={LaundrySettings} />
-        <OwnerCheckRoute
-          user={user}
-          laundry={laundry}
-          render={props => <Machines {...props} />}
-          path={'/laundries/:laundryId/machines'} />
-        <OwnerCheckRoute
-          user={user}
-          laundry={laundry}
-          render={props => <Users {...props} />}
-          path={'/laundries/:laundryId/users'} />
-        <Route component={NotFound} />
-      </Switch>
+      <div>
+        <Switch>
+          <Redirect exact from={'/laundries/:laundryId'} to={`/laundries/${this.laundry().id}/timetable`} />
+          <Route path={'/laundries/:laundryId/timetable'} component={Timetable} />
+          <Route path={'/laundries/:laundryId/bookings'} component={Bookings} />
+          <Route path={'/laundries/:laundryId/settings'} component={LaundrySettings} />
+          <OwnerCheckRoute
+            user={user}
+            laundry={laundry}
+            render={props => <Machines {...props} />}
+            path={'/laundries/:laundryId/machines'} />
+          <OwnerCheckRoute
+            user={user}
+            laundry={laundry}
+            render={props => <Users {...props} />}
+            path={'/laundries/:laundryId/users'} />
+          <Route component={NotFound} />
+        </Switch>
+      </div>
     )
   }
 

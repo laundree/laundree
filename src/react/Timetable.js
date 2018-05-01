@@ -181,28 +181,29 @@ class Timetable extends React.Component<TimetableProps, { numDays: number, offse
     }
     const days = this.days()
     const offsetDate = this.offsetDate()
-    return <main id='TimeTableMain' ref={this.refPuller}>
-      <TimetableHeaders
-        hoverColumn={this.state.hoverColumn}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines} />
-      <TimetableTables
-        onActiveChange={activeBooking => this.setState({activeBooking})}
-        currentUser={currentUser}
-        activeBooking={this.state.activeBooking}
-        offsetDate={offsetDate}
-        onHoverColumn={hoverColumn => this.setState({hoverColumn})}
-        hoverColumn={this.state.hoverColumn}
-        bookings={this.props.bookings}
-        laundry={this.props.laundry} dates={days} machines={this.props.machines} />
-      <BookingInfo
-        onActiveChange={activeBooking => this.setState({activeBooking})}
-        currentUser={currentUser}
-        users={this.props.users}
-        laundry={this.props.laundry}
-        offsetDate={offsetDate}
-        booking={this.props.bookings[this.state.activeBooking || '']}
-        machines={this.props.machines} />
-    </main>
+    return (
+      <main id='TimeTableMain' ref={this.refPuller}>
+        <TimetableHeaders
+          hoverColumn={this.state.hoverColumn}
+          laundry={this.props.laundry} dates={days} machines={this.props.machines} />
+        <TimetableTables
+          onActiveChange={activeBooking => this.setState({activeBooking})}
+          currentUser={currentUser}
+          activeBooking={this.state.activeBooking}
+          offsetDate={offsetDate}
+          onHoverColumn={hoverColumn => this.setState({hoverColumn})}
+          hoverColumn={this.state.hoverColumn}
+          bookings={this.props.bookings}
+          laundry={this.props.laundry} dates={days} machines={this.props.machines} />
+        <BookingInfo
+          onActiveChange={activeBooking => this.setState({activeBooking})}
+          currentUser={currentUser}
+          users={this.props.users}
+          laundry={this.props.laundry}
+          offsetDate={offsetDate}
+          booking={this.props.bookings[this.state.activeBooking || '']}
+          machines={this.props.machines} />
+      </main>)
   }
 }
 
