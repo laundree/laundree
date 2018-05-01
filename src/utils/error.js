@@ -1,11 +1,9 @@
 // @flow
 import config from 'config'
-import {opbeat} from '../opbeat'
 
 export function logError (err: ?Error): void {
   if (!err) return
   if (config.get('logging.error.enabled')) console.error(err)
-  if (opbeat) opbeat.captureError(err)
 }
 
 type HeaderName = 'Location'

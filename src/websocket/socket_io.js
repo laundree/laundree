@@ -1,6 +1,5 @@
 // @flow
 import connectMongoose from '../db/mongoose'
-import { opbeat, trackRelease } from '../opbeat'
 import socketIo from 'socket.io'
 import UserHandler from '../handlers/user'
 import LaundryHandler from '../handlers/laundry'
@@ -65,7 +64,7 @@ function socketOn (socket, event, action: (n: number, ...mixed[]) => Promise<*>)
     if (jobId === null) {
       return
     }
-    const trans = opbeat ? opbeat.startTransaction(`WS ${event}`, 'web.websocket') : mockTransaction
+    const trans = mockTransaction
     try {
       await action(jobId, ...rest)
     } catch (err) {
@@ -434,5 +433,3 @@ function setupUser (socket, userUpdateEmitter, u: ?UserHandler) {
 }
 
 export default setupSocket
-
-trackRelease()

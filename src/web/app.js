@@ -1,5 +1,4 @@
 // @flow
-import { opbeat, trackRelease } from '../opbeat'
 import express from 'express'
 import path from 'path'
 import cookieParser from 'cookie-parser'
@@ -146,8 +145,6 @@ app.use((err, req: Request, res, next) => {
   }
 })
 
-if (opbeat) app.use(opbeat.middleware.express())
-
 app.use((err, req: Request, res, next) => {
   const status = (typeof err.status === 'number' && err.status) || 500
   res.status(status)
@@ -158,6 +155,5 @@ app.use((err, req: Request, res, next) => {
     styles: ['/stylesheets/error.css']
   })
 })
-trackRelease()
 
 export default app
