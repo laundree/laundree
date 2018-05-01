@@ -13,7 +13,6 @@ import type { Booking as RestBooking } from 'laundree-sdk/lib/sdk'
 import config from 'config'
 
 class BookingHandlerLibrary extends HandlerLibrary<Booking, BookingModel, RestBooking, *> {
-
   constructor () {
     super(BookingHandler, BookingModel, {
       create: obj => typeof obj === 'string' ? null : ({type: 'CREATE_BOOKING', payload: obj.reduxModel()}),

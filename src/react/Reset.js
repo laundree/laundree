@@ -25,7 +25,6 @@ type ResetState = {
 }
 
 export default class Reset extends ValueUpdater<ResetValues, ResetProps, ResetState> {
-
   initialState (): ResetState {
     return {loading: false}
   }

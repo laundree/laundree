@@ -23,8 +23,7 @@ class BookingInfo extends React.Component<{
   booking: Booking,
   machines: { [string]: Machine },
   users: { [string]: User }
-}> {
-
+  }> {
   deleteHandler = async () => {
     await sdk
       .api

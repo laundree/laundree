@@ -29,7 +29,6 @@ type LeftNavProps = {
 }
 
 class LeftNav extends React.Component<LeftNavProps, { expanded: boolean }> {
-
   state = {expanded: false}
 
   toggleHandler = () => this.setState(({expanded}) => ({expanded: !expanded}))

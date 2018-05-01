@@ -9,7 +9,6 @@ import { connect } from 'react-redux'
 type NativeAppProps = { currentUser: ?string, users: { [string]: User } }
 
 class NativeApp extends React.Component<NativeAppProps> {
-
   componentDidMount () {
     if (!this.props.currentUser) {
       return

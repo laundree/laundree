@@ -27,28 +27,28 @@ const TimetableHeader = (props: TimetableHeaderProps) => {
     </div>
     <table className={machines.length > 5 ? 'compressed' : ''}>
       <tbody>
-      <tr className='machines'>
-        {machines
-          .map((machine, i) => <td
-            key={machine.id}
-            className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '') + (machine.broken ? ' broken' : '')}>
-            <svg>
-              <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}/>
-            </svg>
-            {machine.broken ? <svg className='broken'>
-              <use xlinkHref='#CloseX'/>
-            </svg> : null}
-          </td>)}
-      </tr>
-      <tr className='labels'>
-        {machines
-          .map((machine, i) => <td
-            key={machine.id}
-            className={(props.hoverColumn === i ? ' hoverColumn' : '') + (machine.broken ? ' broken' : '')}>
-            <div><span className='longName'>{machine.name}</span><span
-              className='shortName'>{string.shortName(machine.name)}</span></div>
-          </td>)}
-      </tr>
+        <tr className='machines'>
+          {machines
+            .map((machine, i) => <td
+              key={machine.id}
+              className={machine.type + (props.hoverColumn === i ? ' hoverColumn' : '') + (machine.broken ? ' broken' : '')}>
+              <svg>
+                <use xlinkHref={machine.type === 'dry' ? '#Waves' : '#Drop'}/>
+              </svg>
+              {machine.broken ? <svg className='broken'>
+                <use xlinkHref='#CloseX'/>
+              </svg> : null}
+            </td>)}
+        </tr>
+        <tr className='labels'>
+          {machines
+            .map((machine, i) => <td
+              key={machine.id}
+              className={(props.hoverColumn === i ? ' hoverColumn' : '') + (machine.broken ? ' broken' : '')}>
+              <div><span className='longName'>{machine.name}</span><span
+                className='shortName'>{string.shortName(machine.name)}</span></div>
+            </td>)}
+        </tr>
       </tbody>
     </table>
   </div>
@@ -58,7 +58,7 @@ class CalendarNavigationElement extends React.Component<{
   laundry: Laundry,
   dates: moment[]
 
-}, { current: moment, hover?: {start: moment, end: moment} }> {
+  }, { current: moment, hover?: {start: moment, end: moment} }> {
   state = {current: this.firstDate()}
 
   week (mom = moment()) {
@@ -94,9 +94,9 @@ class CalendarNavigationElement extends React.Component<{
 
   header () {
     return <thead>
-    <tr>
-      {this.week().map(d => <th key={d.unix()}><FormattedDate weekday='narrow' value={d.toDate()}/></th>)}
-    </tr>
+      <tr>
+        {this.week().map(d => <th key={d.unix()}><FormattedDate weekday='narrow' value={d.toDate()}/></th>)}
+      </tr>
     </thead>
   }
 
@@ -119,22 +119,22 @@ class CalendarNavigationElement extends React.Component<{
   renderMonth () {
     const now = moment()
     return <tbody>
-    {this
-      .month(this.state.current)
-      .map(week => <tr key={`${week[0].month()}-${week[0].date()}`}>
-        {week.map(day => <td
-          onMouseOver={() => this.setState({
-            hover: {
-              start: day,
-              end: day.clone().add(this.props.dates.length - 1, 'days')
-            }
-          })}
-          key={day.date()} className={this.generateClassName(now, day)}>
-          <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${day.format('YYYY-MM-DD')}`}>
-            {day.date()}
-          </Link>
-        </td>)}
-      </tr>)}
+      {this
+        .month(this.state.current)
+        .map(week => <tr key={`${week[0].month()}-${week[0].date()}`}>
+          {week.map(day => <td
+            onMouseOver={() => this.setState({
+              hover: {
+                start: day,
+                end: day.clone().add(this.props.dates.length - 1, 'days')
+              }
+            })}
+            key={day.date()} className={this.generateClassName(now, day)}>
+            <Link to={`/laundries/${this.props.laundry.id}/timetable?offsetDate=${day.format('YYYY-MM-DD')}`}>
+              {day.date()}
+            </Link>
+          </td>)}
+        </tr>)}
     </tbody>
   }
 
@@ -162,7 +162,7 @@ class CalendarNavigationElement extends React.Component<{
 class TimeTableHeaderNav extends React.Component<{
   laundry: Laundry,
   dates: moment[]
-}> {
+  }> {
   firstDate () {
     return this.props.dates[0]
   }

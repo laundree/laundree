@@ -122,11 +122,11 @@ class LocationSelector extends ValueUpdater<LocationSelectorValues, LocationSele
       return <ul className='dropDownList'>
         {this.state.results
           .map(result => <li key={result} className={this.props.value === result ? 'active' : ''}>
-              <span
-                className='link'
-                onMouseDown={() => this.updatePlace(result)}>
-                  {this.state.formattedAddresses[result]}
-                </span>
+            <span
+              className='link'
+              onMouseDown={() => this.updatePlace(result)}>
+              {this.state.formattedAddresses[result]}
+            </span>
           </li>)}
       </ul>
     }

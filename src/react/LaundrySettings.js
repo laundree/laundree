@@ -25,7 +25,6 @@ type LaundrySettingsFormState = {
 }
 
 class LaundrySettingsForm extends ValueUpdater<LaundrySettingsFormValues, LaundrySettingsFormProps, LaundrySettingsFormState> {
-
   onSubmit = (evt: Event) => {
     evt.preventDefault()
     this.setState({loading: true})
@@ -149,7 +148,7 @@ class DeleteLaundry extends React.Component<{ laundry: Laundry, user: User }, { 
 class LeaveLaundry extends React.Component<{
   laundry: Laundry,
   user: User
-}, { modalOpen: boolean }> {
+  }, { modalOpen: boolean }> {
   handleDeleteClick = () => this.removeUser()
   handleCloseModal = () => this.setState({modalOpen: false})
   handleOpenModal = () => this.setState({modalOpen: true})
@@ -265,17 +264,16 @@ function numberMap (number) {
 }
 
 class BookingRules extends ValueUpdater<BookingRulesValues, BookingRulesProps, BookingRulesState> {
-
   fromToValidator = ({from, to}) => timeStringToMinutes(to) > timeStringToMinutes(from)
   validateValues = ({
-                      timeLimitEnable,
-                      dailyLimitEnable,
-                      limitEnable,
-                      timeLimitFrom,
-                      timeLimitTo,
-                      dailyLimit,
-                      limit
-                    }) => {
+    timeLimitEnable,
+    dailyLimitEnable,
+    limitEnable,
+    timeLimitFrom,
+    timeLimitTo,
+    dailyLimit,
+    limit
+  }) => {
     const values = this.initialValues()
     return timeLimitEnable !== values.timeLimitEnable ||
       dailyLimitEnable !== values.dailyLimitEnable ||
@@ -434,7 +432,6 @@ type LaundrySettingsProps = {
 }
 
 class LaundrySettings extends React.Component<LaundrySettingsProps> {
-
   isOwner (user: User) {
     return user.role === 'admin' || this.laundry().owners.indexOf(user.id) >= 0
   }

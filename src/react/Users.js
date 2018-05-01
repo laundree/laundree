@@ -62,7 +62,7 @@ class InviteUserForm extends ValueUpdater<{ email: string }, { laundry: Laundry,
 
 class QrInvite extends React.Component<{
   laundry: Laundry,
-}, { generating?: boolean, key?: string }> {
+  }, { generating?: boolean, key?: string }> {
   state = {}
 
   async generatePdf () {
@@ -153,7 +153,7 @@ class UserItem extends React.Component<{
   user: User,
   laundry: Laundry,
   currentUser: ?User
-}, { showModal: boolean }> {
+  }, { showModal: boolean }> {
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
   onCloseModal = () => this.setState({showModal: false})
@@ -187,9 +187,9 @@ class UserItem extends React.Component<{
     }
     return <DropDown>
       <DropDownTitle>
-          <span className='owner'>
-            <FormattedMessage id={isOwner ? 'users.owner' : 'users.user'} />
-          </span>
+        <span className='owner'>
+          <FormattedMessage id={isOwner ? 'users.owner' : 'users.user'} />
+        </span>
       </DropDownTitle>
       <DropDownContent>
         <ul className='dropDownList'>
@@ -266,7 +266,6 @@ class UserItem extends React.Component<{
 }
 
 class InviteItem extends React.Component<{ invite: Invite }, { showModal: boolean }> {
-
   state = {showModal: false}
   onShowModal = () => this.setState({showModal: true})
   onCloseModal = () => this.setState({showModal: false})
@@ -308,7 +307,6 @@ type UsersProps = {
 }
 
 class Users extends React.Component<UsersProps> {
-
   renderUsers (laundry: Laundry) {
     return <ul className='bigList'>
       {this.users(laundry).map(user => (

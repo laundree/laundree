@@ -10,7 +10,6 @@ import type { Token as RestToken, TokenWithSecret as RestTokenWithSecret } from 
 import config from 'config'
 
 class TokenHandlerLibrary extends HandlerLibrary<{}, TokenModel, RestToken, *> {
-
   constructor () {
     super(TokenHandler, TokenModel)
   }
@@ -58,7 +57,6 @@ class TokenHandlerLibrary extends HandlerLibrary<{}, TokenModel, RestToken, *> {
       .save()
     return new TokenHandler(model, token)
   }
-
 }
 
 const restUrlPrefix = `${config.get('api.base')}/tokens/`
@@ -148,5 +146,4 @@ export default class TokenHandler extends Handler<TokenModel, *, RestToken> {
       href: this.restUrl
     }
   }
-
 }

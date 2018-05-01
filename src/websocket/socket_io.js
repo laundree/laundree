@@ -200,7 +200,7 @@ function setupFunctions (socket) {
         .lib
         .find(Object.assign({}, filter,
           {machine: {$in: laundry.model.machines}, owner: uid}),
-          {sort: {from: 1, to: 1}})
+        {sort: {from: 1, to: 1}})
       return [
         {
           type: 'LIST_BOOKINGS_FOR_USER',

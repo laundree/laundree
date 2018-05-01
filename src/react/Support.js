@@ -5,7 +5,6 @@ import { Meta } from './intl'
 import { FormattedMessage } from 'react-intl'
 
 export default class Support extends React.Component<{}> {
-
   render () {
     return (
       <main id='Support' className='topNaved'>

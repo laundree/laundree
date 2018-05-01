@@ -20,7 +20,6 @@ type LoginValues = {
 }
 
 class LoginForm extends ValueUpdater<LoginValues, LoginProps, {}> {
-
   initialState () {
     return {}
   }

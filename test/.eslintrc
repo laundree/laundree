@@ -11,7 +11,9 @@
     "react/jsx-tag-spacing": 0,
     "react/prop-types": 0,
     "no-var": "error",
-    "generator-star-spacing": 0
+    "generator-star-spacing": 0,
+    "no-undef": 0,
+    "no-unused-vars": 0
   },
   "env": {
     "mocha": true,

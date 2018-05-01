@@ -46,8 +46,7 @@ class TimetableTable extends React.Component<TimetableTableProps, {
   offLimitsPosition: number,
   mouseDownStart: ?MouseDownStartState,
   bookings: { [string]: string }
-}> {
-
+  }> {
   props: TimetableTableProps
   firstBooking = false
   state = {...this._calcPosition(), bookings: {}, activeBooking: null, mouseDownStart: null}
@@ -398,7 +397,7 @@ class TimetableTable extends React.Component<TimetableTableProps, {
         onMouseDown={event => this.handleMouseDown(event)}
         onMouseUp={event => this.handleMouseUp(event)}>
         <tbody>
-        {this.props.times.map((key) => this._row(key, tooLateKey >= key))}
+          {this.props.times.map((key) => this._row(key, tooLateKey >= key))}
         </tbody>
       </table>
     </div>
@@ -416,7 +415,7 @@ export default class TimetableTables extends React.Component<{
   laundry: Laundry,
   machines: { [string]: Machine },
   bookings: { [string]: Booking }
-}, { hoverRow: number }> {
+  }, { hoverRow: number }> {
   state = {hoverRow: -1}
 
   componentWillReceiveProps ({dates, laundry: {id}}: { dates: moment[], laundry: Laundry }) {

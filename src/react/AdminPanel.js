@@ -13,7 +13,6 @@ import { Meta } from './intl'
 const debug = Debug('laundree.react.AdminPanel')
 
 class StatsComponent extends React.Component<{ stats: ?Stats }> {
-
   componentDidMount () {
     sdk.updateStats()
   }
@@ -82,9 +81,8 @@ class QueryList<T: { id: string }> extends React.Component<{
   elements: T[],
   totalDemo: ?number,
   total: ?number
-},
+  },
   { loaded: boolean, page: number, q: ? string, demoOn: boolean }> {
-
   limit = 10
   state = {
     loaded: false,
@@ -201,7 +199,6 @@ class QueryList<T: { id: string }> extends React.Component<{
 }
 
 class LaundryList extends QueryList<Laundry> {
-
   renderLoading () {
     return <FormattedMessage id='admin-panel.loading' />
   }
@@ -231,7 +228,6 @@ class LaundryList extends QueryList<Laundry> {
 }
 
 class UserList extends QueryList<User> {
-
   load (options: ListOptions) {
     return sdk.listUsers(options)
   }

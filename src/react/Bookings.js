@@ -13,7 +13,7 @@ class BookingComponent extends React.Component<{
   laundry: Laundry,
   machine: Machine,
   booking: Booking
-}, { showModal: boolean }> {
+  }, { showModal: boolean }> {
   onCloseModal = () => this.setState({showModal: false})
   onDeleteModal = () => sdk.api.booking.del(this.props.booking.id)
   onDeleteClick = () => this.setState({showModal: true})
@@ -128,7 +128,7 @@ class Bookings extends React.Component<BookingsProps, { showModal: boolean }> {
 }
 
 export default connect(({users, laundries, machines, currentUser, bookings, userBookings}: State,
-                        {match: {params: {laundryId}}}): BookingsProps => (
+  {match: {params: {laundryId}}}): BookingsProps => (
   {
     user: (currentUser && users[currentUser]) || null,
     laundry: laundries[laundryId],

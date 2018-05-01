@@ -8,7 +8,6 @@ export type ModalProps = {
 }
 
 export default class Modal extends BaseModal<ModalProps> {
-
   renderContent () {
     const actions = this.props.actions || []
     return <div>

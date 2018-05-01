@@ -22,7 +22,6 @@ import type { LocaleType } from '../locales'
 const debug = Debug('laundree.handlers.user')
 
 class UserHandlerLibrary extends HandlerLibrary<User, UserModel, RestUser, *> {
-
   constructor () {
     super(UserHandler, UserModel, {
       update: (obj) => typeof obj === 'string' ? null : {type: 'UPDATE_USER', payload: obj.reduxModel()}

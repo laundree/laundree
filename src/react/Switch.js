@@ -3,9 +3,8 @@ import React from 'react'
 
 export default class Switch extends React.Component<{
   on: boolean,
-    onChange:(boolean) => void
-}> {
-
+  onChange:(boolean) => void
+  }> {
   onClick = () => this.props.onChange(!this.isOn())
 
   isOn () {
