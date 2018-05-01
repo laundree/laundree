@@ -93,7 +93,7 @@
     "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "selenium-standalone": "^6.5.0",
-    "sinon": "^4.0.1",
+    "sinon": "^5.0.2",
     "supertest": "^3.0.0",
     "webpack-dev-middleware": "^1.11.0",
     "webpack-dev-server": "^2.9.4"
