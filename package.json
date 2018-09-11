@@ -31,7 +31,7 @@
     "express-session": "^1.15.3",
     "handlebars": "^4.0.10",
     "helmet": "^3.8.1",
-    "ical-generator": "^0.2.9",
+    "ical-generator": "^1.1.0",
     "jdenticon": "^1.7.2",
     "jsonwebtoken": "^8.0.1",
     "laundree-sdk": "^0.3.3",
