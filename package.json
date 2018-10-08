@@ -73,7 +73,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "codeclimate-test-reporter": "^0.5.0",
+    "codeclimate-test-reporter": "^0.5.1",
     "eslint": "^4.19.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-config-standard-flow": "^1.0.1",
