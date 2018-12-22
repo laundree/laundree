@@ -32,7 +32,7 @@
     "handlebars": "^4.0.10",
     "helmet": "^3.8.1",
     "ical-generator": "^0.2.9",
-    "jdenticon": "^1.7.2",
+    "jdenticon": "^2.1.1",
     "jsonwebtoken": "^8.0.1",
     "laundree-sdk": "^0.3.3",
     "locale": "^0.1.0",
