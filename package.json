@@ -18,7 +18,7 @@
     "babel-preset-flow": "^6.23.0",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-0": "^6.24.1",
-    "bcrypt": "^1.0.2",
+    "bcrypt": "^3.0.3",
     "body-parser": "^1.18.1",
     "compression": "^1.7.0",
     "config": "^1.26.1",
