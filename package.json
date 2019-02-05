@@ -91,7 +91,7 @@
     "mocha": "^4.0.1",
     "nightwatch": "^0.9.16",
     "nodemon": "^1.12.1",
-    "nyc": "^11.2.1",
+    "nyc": "^13.2.0",
     "selenium-standalone": "^6.5.0",
     "sinon": "^4.0.1",
     "supertest": "^3.0.0",
