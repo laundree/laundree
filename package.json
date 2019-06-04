@@ -57,7 +57,7 @@
     "react-intl": "^2.4.0",
     "react-redux": "^5.0.5",
     "react-router": "^4.1.1",
-    "react-router-dom": "^4.1.1",
+    "react-router-dom": "^5.0.1",
     "react-scroll": "^1.6.4",
     "redis": "^2.7.1",
     "redux": "^3.7.1",
