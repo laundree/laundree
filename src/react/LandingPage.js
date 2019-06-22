@@ -95,7 +95,7 @@ const Statistics = ({userCount, bookingCount}: { userCount: number, bookingCount
             <use xlinkHref='#AvatarUsers' />
           </svg>
           <span>
-            {userCount}
+            {`>100`}
           </span>
         </div>
         <div className='subTitle'>
