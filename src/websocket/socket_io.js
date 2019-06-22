@@ -1,6 +1,5 @@
 // @flow
 import connectMongoose from '../db/mongoose'
-import { opbeat, trackRelease } from '../opbeat'
 import socketIo from 'socket.io'
 import UserHandler from '../handlers/user'
 import LaundryHandler from '../handlers/laundry'
@@ -65,7 +64,7 @@ function socketOn (socket, event, action: (n: number, ...mixed[]) => Promise<*>)
     if (jobId === null) {
       return
     }
-    const trans = opbeat ? opbeat.startTransaction(`WS ${event}`, 'web.websocket') : mockTransaction
+    const trans = mockTransaction
     try {
       await action(jobId, ...rest)
     } catch (err) {
@@ -148,15 +147,15 @@ function errorLogger (err) {
   logError(err)
 }
 
-function validateNumber (n: mixed): ?number {
+function validateNumber (n: mixed): number | null {
   return typeof n === 'number' ? n : null
 }
 
-function validateString (s: mixed): ?string {
+function validateString (s: mixed): string | null {
   return typeof s === 'string' ? s : null
 }
 
-function validateObjectId (s: mixed): ?string {
+function validateObjectId (s: mixed): string | null {
   return typeof s === 'string' && mongoDbId.test(s) ? s : null
 }
 
@@ -168,11 +167,11 @@ function validateDate (date: mixed): ?DateObject {
     return null
   }
   const year = validateNumber(date.year)
-  if (!year) return null
+  if (year === null) return null
   const month = validateNumber(date.month)
-  if (!month) return null
+  if (month === null) return null
   const day = validateNumber(date.day)
-  if (!day) return null
+  if (day === null) return null
   return {day, year, month}
 }
 
@@ -201,7 +200,7 @@ function setupFunctions (socket) {
         .lib
         .find(Object.assign({}, filter,
           {machine: {$in: laundry.model.machines}, owner: uid}),
-          {sort: {from: 1, to: 1}})
+        {sort: {from: 1, to: 1}})
       return [
         {
           type: 'LIST_BOOKINGS_FOR_USER',
@@ -434,5 +433,3 @@ function setupUser (socket, userUpdateEmitter, u: ?UserHandler) {
 }
 
 export default setupSocket
-
-trackRelease()

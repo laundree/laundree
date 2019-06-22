@@ -9,7 +9,6 @@ import type { LaundryInvitation as RestLaundryInvitation } from 'laundree-sdk/li
 import config from 'config'
 
 class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvitationModel, RestLaundryInvitation, *> {
-
   constructor () {
     super(LaundryInvitationHandler, LaundryInvitationModel, {
       create: obj => typeof obj === 'string' ? null : {type: 'CREATE_INVITATION', payload: obj.reduxModel()},
@@ -29,7 +28,6 @@ class LaundryInvitationHandlerLibrary extends HandlerLibrary<Invite, LaundryInvi
     this.emitEvent('create', handler)
     return handler
   }
-
 }
 
 const restUrlPrefix = `${config.get('api.base')}/invites/`

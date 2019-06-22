@@ -10,6 +10,7 @@ import { longIdToShort } from '../utils/string'
 
 const debug = Debug('laundree.handlers.handler')
 
+// eslint-disable-next-line no-use-before-define
 type ReduxActionCreator<A> = (a: Handler<*, A, *> | string) => ?Action
 
 type ActionCreators<A> = {

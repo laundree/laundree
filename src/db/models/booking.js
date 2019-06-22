@@ -1,6 +1,7 @@
 // @flow
 import mongoose from 'mongoose'
-import type {ObjectId} from 'mongoose'
+import type { ObjectId } from 'mongoose'
+
 const {Schema} = mongoose
 
 export type BookingDefinition = {
@@ -21,7 +22,7 @@ const bookingSchema: Schema<BookingDefinition> = new Schema({
   owner: {type: Schema.Types.ObjectId, ref: 'User', required: true},
   machine: {type: Schema.Types.ObjectId, ref: 'Machine', required: true},
   laundry: {type: Schema.Types.ObjectId, ref: 'Laundry', required: true}
-}, {timestamps: true})
+}, {timestamps: true, usePushEach: true})
 
 bookingSchema.index({'from': 1})
 bookingSchema.index({'to': 1})

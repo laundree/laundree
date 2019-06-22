@@ -1,6 +1,5 @@
 // @flow
 import connectMongoose from '../db/mongoose'
-import { opbeat, trackRelease } from '../opbeat'
 import path from 'path'
 import YAML from 'yamljs'
 import swaggerTools from 'swagger-tools'
@@ -83,12 +82,6 @@ const promise: Promise<ApiApp> = new Promise((resolve) => {
       result.basePath = '/'
       swaggerTools.initializeMiddleware(result, (middleware) => {
         app.use(middleware.swaggerMetadata())
-        app.use((req: Request, res, next) => {
-          if (!opbeat) return next()
-          if (!req.swagger || !req.swagger.apiPath) return next()
-          opbeat.setTransactionName(`${req.method} ${req.swagger.apiPath}`)
-          next()
-        })
         app.use(middleware.swaggerSecurity({
           jwt,
           basic
@@ -107,4 +100,3 @@ const promise: Promise<ApiApp> = new Promise((resolve) => {
 
 export default promise
 
-trackRelease()

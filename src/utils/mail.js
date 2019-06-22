@@ -23,9 +23,9 @@ type MailContent = { html: string, text: string, subject: string }
  */
 export async function render (data: Object, template: string, locale: LocaleType): Promise<MailContent> {
   debug('Rendering email')
-  const htmlP = renderHb(path.join('email', template, 'html.hbs'), data, locale)
-  const textP = renderHb(path.join('email', template, 'text.hbs'), data, locale)
-  const subjectP = renderHb(path.join('email', template, 'subject.hbs'), data, locale)
+  const htmlP = renderHb(path.join('email', template, 'html.hbs'), {...data, locale}, locale)
+  const textP = renderHb(path.join('email', template, 'text.hbs'), {...data, locale}, locale)
+  const subjectP = renderHb(path.join('email', template, 'subject.hbs'), {...data, locale}, locale)
   return {
     html: await htmlP,
     text: await textP,

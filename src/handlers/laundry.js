@@ -31,7 +31,6 @@ export type DateTimeObject = { year: number, month: number, day: number, hour: n
 export type DateObject = { year: number, month: number, day: number }
 
 class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, RestLaundry, *> {
-
   constructor () {
     super(LaundryHandler, LaundryModel, {
       create: obj => typeof obj === 'string' ? null : {type: 'CREATE_LAUNDRY', payload: obj.reduxModel()},
@@ -89,7 +88,6 @@ class LaundryHandlerLibrary extends HandlerLibrary<ReduxLaundry, LaundryModel, R
       })
     })
   }
-
 }
 
 const restUrlPrefix = `${config.get('api.base')}/laundries/`

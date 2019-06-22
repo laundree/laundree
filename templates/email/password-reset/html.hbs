@@ -4,8 +4,9 @@
             messages=messages
             name=user.displayName
             link=(format
-                    '<a href="https://laundree.io/auth/reset?user={userId}&token={token}">https://laundree.io/auth/reset?user={userId}&token={token}</a>'
+                    '<a href="https://laundree.io/{locale}/auth/reset?user={userId}&token={token}">https://laundree.io/{locale}/auth/reset?user={userId}&token={token}</a>'
                     userId=user.id
+                    locale=locale
                     token=token)
             nl='<br />' }}
     <br/><br/>
