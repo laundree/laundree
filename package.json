@@ -89,7 +89,7 @@
     "flow-typed": "^2.1.2",
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
-    "nightwatch": "^0.9.16",
+    "nightwatch": "^1.1.13",
     "nodemon": "^1.12.1",
     "nyc": "^11.2.1",
     "selenium-standalone": "^6.5.0",
