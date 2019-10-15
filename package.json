@@ -90,7 +90,7 @@
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "nightwatch": "^0.9.16",
-    "nodemon": "^1.12.1",
+    "nodemon": "^1.19.4",
     "nyc": "^11.2.1",
     "selenium-standalone": "^6.5.0",
     "sinon": "^4.0.1",
