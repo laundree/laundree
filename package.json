@@ -86,7 +86,7 @@
     "eslint-plugin-standard": "^3.0.1",
     "faker": "^4.1.0",
     "flow-bin": "^0.60.1",
-    "flow-typed": "^2.1.2",
+    "flow-typed": "^3.0.0",
     "istanbul": "^0.4.5",
     "mocha": "^4.0.1",
     "nightwatch": "^0.9.16",
